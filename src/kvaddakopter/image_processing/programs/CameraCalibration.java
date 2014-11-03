@@ -10,9 +10,12 @@ import org.opencv.calib3d.Calib3d;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.MatOfPoint3f;
 import org.opencv.core.Point;
+import org.opencv.core.Point3;
 import org.opencv.core.Size;
 import org.opencv.core.TermCriteria;
+import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
 /**
  * @see<a href="http://docs.opencv.org/trunk/doc/py_tutorials/py_calib3d/py_calibration/py_calibration.html#calibration">Lé camerat calibracíon
@@ -21,11 +24,14 @@ public class CameraCalibration extends ProgramClass{
 
 
 	Size mPatternSize; 
-	
-	Point[] mObjectPoints;
+
+	Point3[] mObjectPoints;
 	Mat 	mObjPoints;
 	List<Mat> mImgPointsList;
 	List<Mat> mObjPointsList;
+	
+	Mat calibImg;
+	
 
 	final static int DESIRED_FRAMES = 12;
 	int mFrameNumber = 0;
@@ -49,41 +55,32 @@ public class CameraCalibration extends ProgramClass{
 		//Open window 
 		openVideoWindow();
 
-
 		mPatternSize = new Size(7,6);
 		mImgPointsList = new ArrayList<Mat>();
 		mObjPointsList = new ArrayList<Mat>();
 
-		
 		int numPoints = (int)(mPatternSize.height*mPatternSize.width);
-		mObjectPoints = new Point[numPoints];
+		mObjectPoints = new Point3[numPoints];
 		Mat mObjPoints = new Mat(mPatternSize,CvType.CV_32FC2);
 		for (int i = 0; i < mObjectPoints.length; i++) {
-			
+
 			int x = i / (int)(mPatternSize.width);
 			int y = i % (int)(mPatternSize.width);
 			mObjPoints.put(x, y, new double[]{x,y}/*,0}*/);
-			
-			mObjectPoints[i] = new Point();
+
+			mObjectPoints[i] = new Point3();
 			mObjectPoints[i].x  =i / (int)(mPatternSize.width);
 			mObjectPoints[i].y = i %  (mPatternSize.width);
-			/*
-			System.out.println(
-					"Point number: " + i +
-					"\nx: " + points[i].x +
-					"\ny: " + points[i].y
-					);
-
-			 */
+			mObjectPoints[i].z = 0;
 		}
 	}
 
 	@Override
 	protected void update() {
-		mFrameNumber++;
 
 
-//		if(mFrameNumber < DESIRED_FRAMES){
+
+		if(mFrameNumber < DESIRED_FRAMES){
 			//Convert image
 			Mat image = getNextFrame(); 
 			Mat gray = ImageConversion.toGrey(image);
@@ -91,56 +88,63 @@ public class CameraCalibration extends ProgramClass{
 			//Fins chessboard corners in current frame 
 			MatOfPoint2f corners = new MatOfPoint2f();
 			boolean patternFound = Calib3d.findChessboardCorners(gray, mPatternSize, corners);
-			System.out.println(
-					"Frame number: " + mFrameNumber +
-					"\n Corners Size:\n" +
-					"W: "+ corners.size().height + 
-					" H: "+ corners.size().width
-					);
-			updateJavaWindow(ImageConversion.mat2Img(gray));
+
+
 			if(patternFound){
-			
+				
+				System.out.println(
+						"Frame number: " + mFrameNumber + "\n" +
+						"Corners Size:\n" +
+						"W: "+ corners.size().height + "\n" +
+						"H: "+ corners.size().width
+						);
+				
+				mFrameNumber++;
 				TermCriteria criteria = new TermCriteria(TermCriteria.MAX_ITER + TermCriteria.EPS,30,0.001);
 				Imgproc.cornerSubPix(gray, corners, new Size(5,5), new Size(-1,-1), criteria);
-				
+
 				mImgPointsList.add(corners);
-				Mat apa = new MatOfPoint2f(mObjectPoints);
+				Mat apa = new MatOfPoint3f(mObjectPoints);
 				mObjPointsList.add(apa);
 
 				// Displaying detected pattern
 				Calib3d.drawChessboardCorners(gray, mPatternSize, corners, patternFound);			
 				updateJavaWindow(ImageConversion.mat2Img(gray));
 
+				//Save last calibration image for validation of the camera matrix
+				if(mFrameNumber == DESIRED_FRAMES -1)
+					calibImg = image.clone();
+				
 				// Clean up
 				gray.release();
 				image.release();
+				
 			}else{
 				updateJavaWindow(ImageConversion.mat2Img(gray));
 			}
+		}else if(mFrameNumber == DESIRED_FRAMES){
 
-/*	}else if(mFrameNumber == DESIRED_FRAMES){
-			
 			Mat image = getNextFrame(); 
 			Size imgSize = image.size();
-			
+
 			Mat cameraMatrix = new Mat();
 			Mat distCoeffs	 = new Mat();
-			
+
 			List<Mat> rvecs = new ArrayList<Mat>();
 			List<Mat> tvecs = new ArrayList<Mat>();
-			
+
 			Calib3d.calibrateCamera(mObjPointsList, mImgPointsList, imgSize, cameraMatrix, distCoeffs, rvecs, tvecs);
+			Mat optimalCamMatrix = Calib3d.getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imgSize, 0.5);
 			
+			//Create an undistorted image and write it to file
+			Mat undistortedImage = new Mat(calibImg.size(),calibImg.type());
+			Imgproc.undistort(calibImg, undistortedImage, cameraMatrix, distCoeffs, optimalCamMatrix);
+			Highgui.imwrite("cam_undistorted.png", undistortedImage);
 			
-			// TODO: Export camera parameters to file and then
-		}else{
-			
+			//Export camera paraters to file
+//			optimalCamMatrix
+
 		}
-*/
-			return;
-
-
 	}
-
 }
 
