@@ -22,7 +22,6 @@ public class TestColorDetection extends ProgramClass{
 		//Create and initialize decoder. And select source.
 		mDecoder = new FFMpegDecoder();
 		mDecoder.initialize("tcp://192.168.1.1:5555");
-
 		// Listen to decoder events
 		mDecoder.setDecoderListener(this);
 

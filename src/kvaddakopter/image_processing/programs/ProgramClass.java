@@ -13,7 +13,7 @@ import org.opencv.core.Mat;
 import com.xuggle.xuggler.demos.VideoImage;
 
 
-public class ProgramClass  implements DecoderListener {
+public class ProgramClass extends Thread implements DecoderListener {
 
 	//Create image queue, which is a list that is holding the most recent
 	//images
