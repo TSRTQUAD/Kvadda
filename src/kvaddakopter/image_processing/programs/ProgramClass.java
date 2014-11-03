@@ -86,11 +86,12 @@ public class ProgramClass  implements DecoderListener {
 		System.exit(0);
 	};
 
+	
+	public DetectionClass getCurrentMethod(){
+		return mCurrentMethod;
+	}
 	public void run()  {
-
-		//Select Method here
-		mCurrentMethod = new BackgroundSubtraction();
-
+		
 		//Start program
 		while(true){
 			if(!isImageQueueEmpty()){
