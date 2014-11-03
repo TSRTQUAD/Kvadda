@@ -140,7 +140,7 @@ public class CameraCalibration extends ProgramClass{
 			Mat undistortedImage = new Mat(calibImg.size(),calibImg.type());
 			Imgproc.undistort(calibImg, undistortedImage, cameraMatrix, distCoeffs, optimalCamMatrix);
 			Highgui.imwrite("cam_undistorted.png", undistortedImage);
-			
+			 
 			//Export camera paraters to file
 //			optimalCamMatrix
 
