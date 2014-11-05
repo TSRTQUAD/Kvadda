@@ -1,22 +1,25 @@
 package kvaddakopter.image_processing.algorithms;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
+import kvaddakopter.image_processing.utils.MatchTests;
 
+import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDMatch;
 import org.opencv.core.MatOfPoint;
-import org.opencv.core.Point;
 import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+import org.opencv.features2d.DMatch;
 import org.opencv.features2d.DescriptorExtractor;
 import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.FeatureDetector;
+import org.opencv.features2d.Features2d;
 import org.opencv.imgproc.Imgproc;
 
 public class BackgroundSubtraction  extends DetectionClass{
@@ -55,28 +58,28 @@ public class BackgroundSubtraction  extends DetectionClass{
 		findCorrespondances(currentImageData);
 
 		//2. Camera Matrix blabla. - NOT IMPLEMENTED
-		
-		//3. Warp - NOT IMPLEMENTED
-		warpPreviousImage();
-
-		//4. Background subtraction
-		Mat movingForeground = subtractBackground(currentImageData);
-		
-		
-		//5. Morphology
-		Mat morphedImage = morphBinaryImage(movingForeground);
-
-		//6. Bounding Boxes
-		ArrayList<Rect> boundingBoxes = getBoundingBoxes(morphedImage);
-		
-		//Print boxes on a gray scale Image
-		Mat currentFrameGray = new Mat(); 
-		Imgproc.cvtColor(currentImageData.getImage(), currentFrameGray, Imgproc.COLOR_RGB2GRAY);
-		mIntermeditateResult = currentFrameGray;
-		for (Rect rect : boundingBoxes) {
-			Core.rectangle(mIntermeditateResult, new Point(rect.x,rect.y), new Point(rect.x+rect.width,rect.y+rect.height),new Scalar(255,0,0),4);
-		}
-		
+//		
+//		//3. Warp - NOT IMPLEMENTED
+//		warpPreviousImage();
+//		
+//		//4. Background subtraction
+//		Mat movingForeground = subtractBackground(currentImageData);
+//		
+//		
+//		//5. Morphology
+//		Mat morphedImage = morphBinaryImage(movingForeground);
+//
+//		//6. Bounding Boxes
+//		ArrayList<Rect> boundingBoxes = getBoundingBoxes(morphedImage);
+//		
+//		//Print boxes on a gray scale Image
+//		Mat currentFrameGray = new Mat(); 
+//		Imgproc.cvtColor(currentImageData.getImage(), currentFrameGray, Imgproc.COLOR_RGB2GRAY);
+//		mIntermeditateResult = currentFrameGray;
+//		for (Rect rect : boundingBoxes) {
+//			Core.rectangle(mIntermeditateResult, new Point(rect.x,rect.y), new Point(rect.x+rect.width,rect.y+rect.height),new Scalar(255,0,0),4);
+//		}
+//		
 		//7. Adjust parameters
 		
 		
@@ -98,25 +101,54 @@ public class BackgroundSubtraction  extends DetectionClass{
 
 
 		//Find matches (referred as correspondences in the design specification)
-		DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
-		MatOfDMatch correspondences = new MatOfDMatch();
-		descriptorMatcher.match(
+		DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE);
+		
+		
+		
+		List<MatOfDMatch> correspondences1 = new ArrayList<MatOfDMatch>();
+		descriptorMatcher.knnMatch(
 				currentImageData.getDescriptors(), 
 				mPreviousImageData.getDescriptors(), 
-				correspondences
+				correspondences1,
+				2
 				);
 
+		List<MatOfDMatch> correspondences2 = new ArrayList<MatOfDMatch>();
+		descriptorMatcher.knnMatch(
+				mPreviousImageData.getDescriptors(),
+				currentImageData.getDescriptors(), 
+				correspondences2,
+				2
+				);
 
+		MatchTests.ratioTest(correspondences1);
+		MatchTests.ratioTest(correspondences2);
+		/*	DMatch[] matches = new DMatch[correspondences.size()];
+	int idx = 0;
+		
+		for (Iterator iterator = correspondences.iterator(); iterator.hasNext();) {
+			MatOfDMatch matOfDMatch = (MatOfDMatch) iterator.next();
+			DMatch[] dMatchArray = matOfDMatch.toArray();
+			matches[idx++] = dMatchArray[0]; 
+			
+		}*/
+		MatOfDMatch matches = MatchTests.symmetryTest(correspondences1, correspondences2);
+		
 		// For debugging. Draw the current matches/correspondences to an image. 
-		/*	mIntermeditateResult = new Mat(); 
+		MatOfDMatch resultingMatches = new MatOfDMatch();
+		MatchTests.ransacTest(matches, currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(), resultingMatches);
+		
+		mIntermeditateResult = new Mat(); 
 		Features2d.drawMatches(
 				currentImageData.getImage(),
 				currentImageData.getKeyPoints(), 
 				mPreviousImageData.getImage(),
 				mPreviousImageData.getKeyPoints(), 
-				correspondences,
+				resultingMatches,
 				mIntermeditateResult
-				);*/
+				);
+//		correspondences.
+		
 	}
 	
 	

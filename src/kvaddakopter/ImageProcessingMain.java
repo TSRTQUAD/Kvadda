@@ -1,7 +1,10 @@
 package kvaddakopter;
+import java.util.Scanner;
+
 import kvaddakopter.image_processing.algorithms.ColorDetection;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.programs.CameraCalibration;
+import kvaddakopter.image_processing.programs.TestBackgroundSubtraction;
 import kvaddakopter.image_processing.programs.TestColorDetection;
 
 import org.opencv.core.Core;
@@ -24,9 +27,9 @@ public class ImageProcessingMain {
 		 * See TestBackgroundSubtraction for an example.
 		 * 
 		 */
-		
-//		TestBackgroundSubtraction program  = new TestBackgroundSubtraction();
-		CameraCalibration program  = new CameraCalibration();
+
+		TestBackgroundSubtraction program  = new TestBackgroundSubtraction();
+//		CameraCalibration program  = new CameraCalibration();
 //		TestColorDetection program  = new TestColorDetection();
 		//colorTemplates.add(new ColorTemplate("Yellow ball", 10, 50, 50, 255, 50, 255, ColorTemplate.FORM_CIRLE));
 		

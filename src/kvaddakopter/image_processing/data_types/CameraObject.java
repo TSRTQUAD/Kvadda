@@ -51,7 +51,7 @@ public class CameraObject {
 		Mat mat = new Mat(xDim,yDim,CvType.CV_64F);
 		for(int y = 0; y < yDim; y++)
 			for(int x = 0; x < xDim; x++){
-				mat.put(y,x,src[x][y]);
+				mat.put(y,x,src[y][x]);
 			}
 		return mat;
 	}
