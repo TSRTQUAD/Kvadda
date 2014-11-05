@@ -8,5 +8,7 @@
 	<classpathentry kind="lib" path="src/kvaddakopter/image_processing/decoder/lib/logback-core-1.1.2.jar"/>
 	<classpathentry kind="lib" path="src/kvaddakopter/image_processing/decoder/lib/slf4j-api-1.7.7.jar"/>
 	<classpathentry kind="lib" path="src/kvaddakopter/image_processing/decoder/lib/xuggle-xuggler-5.4.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/assignment_planer/lib/jamtio.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/assignment_planer/lib/matlabcontrol-4.1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
