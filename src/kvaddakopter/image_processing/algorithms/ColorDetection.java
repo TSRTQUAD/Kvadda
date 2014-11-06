@@ -2,7 +2,6 @@ package kvaddakopter.image_processing.algorithms;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.data_types.ImageObject;
@@ -17,7 +16,6 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.imgproc.Moments;
 
 
 public class ColorDetection  extends DetectionClass{
@@ -41,6 +39,8 @@ public class ColorDetection  extends DetectionClass{
 	// Color templates
 	ArrayList<ColorTemplate> colorTemplates;
 
+	// TMP!!!!
+	Mat HSVImage;
 
 	public ColorDetection(){
 		super();
@@ -53,7 +53,7 @@ public class ColorDetection  extends DetectionClass{
 	public ArrayList<TargetObject> start(ImageObject imageObject) {
 
 		// Convert RGB to HSV
-		Mat HSVImage = new Mat();
+		HSVImage = new Mat();
 		Imgproc.cvtColor(imageObject.getImage(), HSVImage, Imgproc.COLOR_BGR2HSV);
 
 		Mat resultImage = new Mat(HSVImage.rows(), HSVImage.cols(), CvType.CV_8U);
@@ -64,34 +64,43 @@ public class ColorDetection  extends DetectionClass{
 		Size morphSize = new Size(MORPH_KERNEL_SIZE, MORPH_KERNEL_SIZE);
 		Mat dilatedImage = new Mat();
 		ArrayList<TargetObject> targetObjects = new ArrayList<TargetObject>();
-
 		for(ColorTemplate colorTemplate : colorTemplates){
 			// Threshold with inRange
 			Core.inRange(HSVImage, colorTemplate.getLower(), colorTemplate.getUpper(), thresholdImage);
 
 
-			// Do morphological operations		
+			// Do morphological operations
 			Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, morphSize);
 			//Opening
 			Imgproc.morphologyEx(thresholdImage, dilatedImage, Imgproc.MORPH_OPEN, kernel);
 			//Closing
 			Imgproc.morphologyEx(dilatedImage, dilatedImage, Imgproc.MORPH_CLOSE, kernel);
-			
-			// Convert blobs to target objects
-			//TargetObject target = new TargetObject();
-
 
 			// Add results to binary result image
 			Core.bitwise_or(resultImage, dilatedImage, resultImage);
 			
 			//Detect targets
 			//TODO should return targetObjects
-			ArrayList<Rect> boundingBoxes;
+			ArrayList<Rect> boundingBoxes = new ArrayList<Rect>();
 			boundingBoxes = getBoundingBoxes(resultImage);
+			// Convert blobs to target objects
+			// Temporary solution using bounding boxes
+			for(Rect boundingBox : boundingBoxes){
+				Mat pos = new Mat(2, 1, CvType.CV_64F);
+				pos.put(0, 0, boundingBox.x);
+				pos.put(1, 0, boundingBox.y);
+				targetObjects.add(new TargetObject(pos, 1));
+				Core.rectangle(
+						resultImage, 
+						new Point(boundingBox.x, boundingBox.y), 
+						new Point(boundingBox.x + boundingBox.width, boundingBox.y + boundingBox.height), 
+						new Scalar(255,0,0), 
+						1);
+			}
 		}
 
 		// Create an intermediate result image
-		mIntermeditateResult = resultImage;
+		//mIntermeditateResult = resultImage;
 
 		return targetObjects;
 
@@ -117,14 +126,62 @@ public class ColorDetection  extends DetectionClass{
 			double contourArea = Imgproc.contourArea(c);
 			if(contourArea > largestArea){
 				largestArea = contourArea;
-				index = contours.indexOf(c);		
+				index = contours.indexOf(c);
 				}
 			}
-		System.out.println(
+		/*System.out.println(
 				"Num Contours: " + contours.size() + "\n" +
 						"Largest at index: " + index 	 
-						);
-				
+						);*/
+		
+		
+		
+		
+		// Cutout a region and calculate mean HSV values (in a bad way)
+		// Then display them on the image (in a not so bad way)
+		//
+        // Create a mask for each contour to mask out that region from image.
+        Mat mask = Mat.zeros(HSVImage.size(), CvType.CV_8UC1);
+        Imgproc.drawContours(mask, contours, -1, new Scalar(255), Core.FILLED); // This is a OpenCV function
+
+		Mat cutout = new Mat();
+		HSVImage.copyTo(cutout, mask);
+		
+		
+		double HVal = 0, SVal = 0, VVal = 0;
+		
+		double Htot = 0, Stot = 0, Vtot = 0;
+		double numVals = 0;
+		double[] tmpHSV;
+		// Worthless mean function
+		for(int r = 0; r < cutout.rows(); r++){
+			for(int c = 0; c < cutout.cols(); c++){
+				tmpHSV = cutout.get(r, c);
+				if(tmpHSV[2] > 10){
+					numVals++;
+					Htot += tmpHSV[0];
+					Stot += tmpHSV[1];
+					Vtot += tmpHSV[2];
+				}
+			}
+		}
+		HVal = Htot/numVals;
+		SVal = Stot/numVals;
+		VVal = Vtot/numVals;
+	
+		String txtString = String.format("H = %4f", HVal);
+	    Core.putText(cutout, txtString, new Point(25, 280) , Core.FONT_HERSHEY_SIMPLEX, .7, new Scalar(255, 255, 255), 2, 8, false);
+	    
+		txtString = String.format("S = %4f", SVal);
+	    Core.putText(cutout, txtString, new Point(25, 300) , Core.FONT_HERSHEY_SIMPLEX, .7, new Scalar(255, 255, 255), 2, 8, false);
+	    
+		txtString = String.format("V = %4f", VVal);
+	    Core.putText(cutout, txtString, new Point(25, 320) , Core.FONT_HERSHEY_SIMPLEX, .7, new Scalar(255, 255, 255), 2, 8, false);
+	    
+		mIntermeditateResult = cutout;
+		// HSV value calculations end here
+		
+		
 				
 		if(index != -1)
 			boxes.add(Imgproc.boundingRect(contours.get(index)));
@@ -177,6 +234,24 @@ public class ColorDetection  extends DetectionClass{
 	public void deactivateTemplate(int id){
 		if(id >= colorTemplates.size() || id < 0) return;
 		colorTemplates.get(id).deactivate();
+	}
+	
+	public boolean isActive(int id){
+		if(id >= colorTemplates.size() || id < 0) return false;
+		return colorTemplates.get(id).isActive();
+	}
+	
+	/**
+	 * Get current color templates descriptions. ID of a template is the position in the ArrayList. 
+	 * @return ArrayList of descriptions.
+	 */
+	public ArrayList<String> getTemplates(){
+		ArrayList<String> res = new ArrayList<String>();
+		for(ColorTemplate colorTemplate : colorTemplates){
+			res.add(colorTemplate.getDescription());
+		}
+		
+		return res;
 	}
 	
 }

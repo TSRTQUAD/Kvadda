@@ -8,7 +8,6 @@ import java.util.ArrayList;
 public class MissionObject {
 	// Variable declaration
 	protected MissionType mission = MissionType.ALONG_TRAJECTORY;
-	protected double[][] targetcoordinate = null;
 	protected ArrayList<Area> searchareas = null;
 	protected ArrayList<Area> forbiddenareas = null;
 	protected double[][] startcoordinate = null;
@@ -16,7 +15,7 @@ public class MissionObject {
 	protected double[] radius = null;
 	
 	// Get variables
-	public String getMissionType(){
+	public MissionType getMissionType(){
 		return this.mission;
 	}
 	public ArrayList<Area> getSearchAreaCoordinates(){
@@ -28,9 +27,6 @@ public class MissionObject {
 	public double[][] getStartCoordinate(){
 		return this.startcoordinate;
 	}
-	public double[][] getTargetCoordinate(){
-		return this.targetcoordinate;
-	}
 	public double[] getHeight(){
 		return this.height;
 	}
@@ -40,32 +36,26 @@ public class MissionObject {
 	
 	// Assign values to the different variables.
 	// Assign the mission type to variable mission.
-	public void mission(String missiontype){
+	public void mission(MissionType missiontype){
 		mission = missiontype;
-		
-		mission = MissionType.ALONG_TRAJECTORY;
 	}
-	// Assign the search area coordinates to variable searchareas.
-	public void setSearchAreas(ArrayList<Area> coord){
-		searchareas =  coord;
+	// Assign the search area, line or target coordinates to variable searchareas.
+	public void setSearchAreas(ArrayList<Area> searchcoordinates){
+		searchareas =  searchcoordinates;
 	}
 	// Assign the forbidden area coordinates to variable forbiddenareas.
-	public void setForbiddenAreas(ArrayList<Area> coord){
-		forbiddenareas =  coord;
+	public void setForbiddenAreas(ArrayList<Area> forbiddencoordinates){
+		forbiddenareas =  forbiddencoordinates;
 	}
 	// Assign the startcoordinate to variable startcoordinate.
 	public void setStartCoordinate(double[][] coord){
 		startcoordinate =  coord;
 	}
-	// Assign the targetcoordinate to variable targetcoordinate.
-	public void setTargetCoordinate(double[][] coord){
-		targetcoordinate =  coord;
-	}
-	/* Assign the height to the variable height.*/
+	// Assign the height to the variable height.
 	public void setHeight(double[] heightvalue){
 		height = heightvalue;
 	}
-	/* Assign the radius to the variable	radius.*/
+	// Assign the radius to the variable	radius.
 	public void setRadius(double[] radiusvalue){
 		radius = radiusvalue;
 	}
