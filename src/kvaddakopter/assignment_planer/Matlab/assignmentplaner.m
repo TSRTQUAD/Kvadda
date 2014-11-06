@@ -16,8 +16,8 @@
 % ================== Load object ===================
 % --------------------------------------------------
 load('../../../../object.mat');
-object = struct('mission',mission,'targetcoordinate',targetcoordinate,...
-    'startcoordinate',startcoordinate,'height',height,'radius',radius);
+object = struct('mission',mission,'startcoordinate',startcoordinate,...
+    'height',height,'radius',radius);
 object.area = area; object.forbiddenarea = forbiddenarea;
 
 
@@ -30,7 +30,7 @@ imagelength = imagelength_meter/1.09e+05; % m -> latlon
 cameracoverage = imagelength^2; % cameracoverage
 ppa = 1/cameracoverage; % nr of nodes per square latlon
 
-if strcmp(object.mission,'areacoverage')
+if object.mission == 3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                  Area Coverage                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -53,7 +53,7 @@ trajectory = interparc(2e3,rawtrajectory(:,1),rawtrajectory(:,2),'spline');
 % =============== Present results ==================
 % plotResults( object, nodes, trajectory)
 
-elseif strcmp(object.mission,'coordinatesearch')
+elseif object.mission == 1
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                Coordinate Search                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -64,13 +64,13 @@ spanlat = 0.5*imagelength_meter/(2*pi*1.1119e+05);
 spanlon = 0.5*imagelength_meter/(2*pi*5.8924e+04);
 span = imagelength/(2*2*pi*rotations);
 trajectory = [spanlat*th.*cos(th) spanlon*th.*sin(th)]...
-    + repmat(object.targetcoordinate,size(th));
+    + repmat(object.area{1},size(th));
 
 % =============== Present results ==================
 % radiuslength = lldistkm(trajectory(1,:),trajectory(end,:))*1000;
 % boundingcircle = [2*pi*spanlat*rotations*sin(0:0.01:2*pi)'...
 %     2*pi*spanlon*rotations*cos(0:0.01:2*pi)']...
-%     + repmat(object.targetcoordinate,length(0:0.01:2*pi),1);
+%     + repmat(object.area{1},length(0:0.01:2*pi),1);
 % figure('Name','Coordinate Search','Numbertitle','off'); clf; hold on
 % plot(trajectory(:,2), trajectory(:,1),'r')
 % h1 = plot(boundingcircle(:,2),boundingcircle(:,1),'k');
@@ -80,19 +80,19 @@ trajectory = [spanlat*th.*cos(th) spanlon*th.*sin(th)]...
 % plot_google_map; hold off
 
     
-elseif strcmp(object.mission,'linesearch')
+elseif object.mission == 2
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                   Line Search                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ============ Interpolate trajectory ==============
-rawtrajectory = object.targetcoordinates;
+rawtrajectory = object.area{1};
 % Interpolate using parametric splines, the first argument determines the
 % nr of nodes to interpolate between each nodpair in the trajectory.
 trajectory = interparc(2e3,rawtrajectory(:,1),rawtrajectory(:,2),'spline');
 
 % =============== Present results ==================
 % figure('Name','Line Search','Numbertitle','off'); clf; hold on
-% plot(object.targetcoordinates(:,2),object.targetcoordinates(:,1),'k.');
+% plot(object.area{1}(:,2),object.area{1}(:,1),'k.');
 % plot(trajectory(:,2), trajectory(:,1),'r');
 % plot_google_map; hold off
 
