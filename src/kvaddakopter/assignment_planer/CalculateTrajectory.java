@@ -14,6 +14,8 @@ import matlabcontrol.MatlabConnectionException;
 import matlabcontrol.MatlabInvocationException;
 import matlabcontrol.MatlabProxy;
 import matlabcontrol.MatlabProxyFactory;
+import matlabcontrol.MatlabProxyFactoryOptions;
+import matlabcontrol.MatlabProxyFactoryOptions.Builder;
 
 
 public class CalculateTrajectory {
@@ -27,7 +29,7 @@ public class CalculateTrajectory {
 
 		return trajectory;
 	}
-	
+
 	public double getTrajectoryLength() throws FileNotFoundException, IOException {
 		MatFileReader MLTrajectoryLength = new MatFileReader( "trajectory.mat" );
 		double[][] tmptrajectorylength = ((MLDouble) MLTrajectoryLength.getMLArray("trajectorylength")).getArray();
@@ -82,16 +84,20 @@ public class CalculateTrajectory {
 		new MatFileWriter( "object.mat", list );
 	}
 
-	public void calculateTrajectory() throws MatlabConnectionException, MatlabInvocationException {
-		//Create a proxy, which we will use to control MATLAB
-		MatlabProxyFactory factory = new MatlabProxyFactory();
+	public void calculateTrajectory() throws MatlabConnectionException, MatlabInvocationException{
+		//Create a proxy, which will be used to control MATLAB
+		//Set the options to quiet so no GUI are opened
+		Builder buildoptions = new MatlabProxyFactoryOptions.Builder();
+		buildoptions.setHidden(true);
+		MatlabProxyFactoryOptions options = buildoptions.build();
+		MatlabProxyFactory factory = new MatlabProxyFactory(options);
 		MatlabProxy proxy = factory.getProxy();
 
 		//Make script call
 		proxy.eval("cd('src/kvaddakopter/assignment_planer/Matlab');assignmentplaner");
 
 		//Terminate Matlab
-		//proxy.eval("exit;");
+		//proxy.exit();
 
 		//Disconnect the proxy from MATLAB
 		proxy.disconnect();

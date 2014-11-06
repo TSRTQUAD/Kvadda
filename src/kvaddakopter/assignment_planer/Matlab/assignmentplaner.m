@@ -49,17 +49,17 @@ rawtrajectory = getStartEndPath(object.startcoordinate, spiraltrajectory);
 trajectory = interparc(2e3,rawtrajectory(:,1),rawtrajectory(:,2),'spline');
 
 % =============== Present results ==================
-% radiuslength = lldistkm(spiraltrajectory(1,:),spiraltrajectory(end,:))*1e3;
-% boundingcircle = [2*pi*spanlat*rotations*sin(0:0.01:2*pi)'...
-%     2*pi*spanlon*rotations*cos(0:0.01:2*pi)']...
-%     + repmat(object.area{1},length(0:0.01:2*pi),1);
-% figure('Name','Coordinate Search','Numbertitle','off'); clf; hold on
-% plot(trajectory(:,2), trajectory(:,1),'r')
-% h1 = plot(boundingcircle(:,2),boundingcircle(:,1),'k');
-% h2 = plot([trajectory(1,2) trajectory(end,2)],...
-%     [trajectory(1,1) trajectory(end,1)], 'm--');
-% legend([h1,h2],'Bounding circle',['Radius: ' num2str(radiuslength) 'm']);
-% plot_google_map; hold off
+radiuslength = lldistkm(spiraltrajectory(1,:),spiraltrajectory(end,:))*1e3;
+boundingcircle = [2*pi*spanlat*rotations*sin(0:0.01:2*pi)'...
+    2*pi*spanlon*rotations*cos(0:0.01:2*pi)']...
+    + repmat(object.area{1},length(0:0.01:2*pi),1);
+figure('Name','Coordinate Search','Numbertitle','off'); clf; hold on
+plot(trajectory(:,2), trajectory(:,1),'r')
+h1 = plot(boundingcircle(:,2),boundingcircle(:,1),'k');
+h2 = plot([trajectory(1,2) trajectory(end,2)],...
+    [trajectory(1,1) trajectory(end,1)], 'm--');
+legend([h1,h2],'Bounding circle',['Radius: ' num2str(radiuslength) 'm']);
+plot_google_map; hold off
 
     
 elseif object.mission == 2
