@@ -1,6 +1,6 @@
 package kvaddakopter.assignment_planer;
 
-public enum MissionType {
+public enum MissionType{
 
 
 	AROUND_COORDINATE("Runt Koordinat"),
