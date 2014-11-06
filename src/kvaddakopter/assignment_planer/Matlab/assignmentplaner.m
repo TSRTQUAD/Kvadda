@@ -17,7 +17,9 @@
 % --------------------------------------------------
 load('../../../../object.mat');
 object = struct('mission',mission,'targetcoordinate',targetcoordinate,...
-    'height',height,'radius',radius);
+    'startcoordinate',startcoordinate,'height',height,'radius',radius);
+object.area = area; object.forbiddenarea = forbiddenarea;
+
 
 % --------------------------------------------------
 % ================ Camera Coverage =================
@@ -41,7 +43,7 @@ nodes = getPolygonGrid(object,ppa);
 tmpcostmat = getCostMatrix(nodes,object);
 
 % =============== Find trajectory ==================
-rawtrajectory = getTrajectory(tmpcostmat,nodes,object.startpoint);
+rawtrajectory = getTrajectory(tmpcostmat,nodes,object.startcoordinate);
 
 % ============ Interpolate trajectory ==============
 % Interpolate using parametric splines, the first argument determines the

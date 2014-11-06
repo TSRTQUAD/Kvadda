@@ -13,32 +13,39 @@ public class AssignmentPlanerMain {
 		
 		// Create an object to analyse
 		MissionObject testobject = new MissionObject();
-		testobject.mission("coordinatesearch");
+		testobject.mission("areacoverage");
 		testobject.setTargetCoordinate(new double[][] {{58.3949, 15.5742}});
-		testobject.setHeight(new double[] {1});
-		testobject.setRadius(new double[] {1});
+		testobject.setStartCoordinate(new double[][] {{58.3947, 15.5740}});
+		testobject.setHeight(new double[] {5});
+		testobject.setRadius(new double[] {15});
 		
 		// Create search areas
 		ArrayList<Area> searchareas = new ArrayList<Area>();
 		Area tmparea = new Area();
-		tmparea.area = new double[][] {{58.3949, 15.5742},{58.39493, 15.57423},
-				{58.39492, 15.57423},{58.39491, 15.57423},{58.39491, 15.57424}};
-		searchareas.add( tmparea );
-		tmparea.area = new double[][] {{58.3948, 15.5732},{58.39483, 15.57433},{58.39491, 15.57423}};
-		searchareas.add( tmparea );
-		tmparea.area = new double[][] {{58.3949, 15.57323},{58.394836, 15.574332},{58.394912, 15.574231}};
-		searchareas.add( tmparea );
-		tmparea.area = new double[][] {{58.3949, 15.57322},{58.394836, 15.574335},{58.394911, 15.574231}};
-		searchareas.add( tmparea );
+		tmparea.area = new double[][] {{58.395157,15.574821},
+				{58.395227,15.574976},
+				{58.395191,15.575202},
+				{58.395073,15.575266},
+				{58.394972,15.575041},
+				{58.394904,15.574687},
+				{58.394994,15.574526},
+				{58.395107,15.574526}};
+		Area tmparea1 = new Area();
+		searchareas.add( tmparea1 );
+		tmparea1.area = new double[][] {{58.394983,15.57606},
+			{58.394916,15.576317},
+			{58.394724,15.576092},
+			{58.394685,15.575856},
+			{58.394831,15.575759}};
+		searchareas.add( tmparea1 );
 		testobject.setSearchAreas(searchareas);
 		
 		// Create forbidden areas
 		ArrayList<Area> forbiddenareas = new ArrayList<Area>();
 		Area tmpforbiddenarea = new Area();
-		tmpforbiddenarea.area = new double[][] {{58.3949, 15.5742},{58.39493, 15.57423},
-				{58.39492, 15.57423},{58.39491, 15.57423},{58.39491, 15.57424}};
-		forbiddenareas.add( tmparea );
-		tmpforbiddenarea.area = new double[][] {{58.3948, 15.5732},{58.39483, 15.57433},{58.39491, 15.57423}};
+		tmpforbiddenarea.area = new double[][] {{58.395067,15.574794},
+			{58.395067,15.575019},
+			{58.394944,15.574912}};
 		forbiddenareas.add( tmparea );
 		testobject.setForbiddenAreas(forbiddenareas);
 		
@@ -47,7 +54,7 @@ public class AssignmentPlanerMain {
 		double[][] trajectory = calculatetrajectory.getTrajectory(testobject);
 		
 		// Print the calculated trajectory
-		calculatetrajectory.printTrajectory(trajectory);
+		//calculatetrajectory.printTrajectory(trajectory);
 		
 		System.out.println("\nProgram terminated");
 	}

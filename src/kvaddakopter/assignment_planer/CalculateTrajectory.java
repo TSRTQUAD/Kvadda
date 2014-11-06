@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import com.jmatio.io.MatFileReader;
 import com.jmatio.io.MatFileWriter;
 import com.jmatio.types.MLArray;
+import com.jmatio.types.MLCell;
 import com.jmatio.types.MLChar;
 import com.jmatio.types.MLDouble;
 
@@ -21,8 +22,8 @@ public class CalculateTrajectory {
 
 	public double[][] getTrajectory(MissionObject object) throws IOException, MatlabConnectionException, MatlabInvocationException {
 		createMatFile(object);
-		calculateTrajectory();
-		trajectory = readMatFile();
+		//calculateTrajectory();
+		//trajectory = readMatFile();
 
 		return trajectory;
 	}
@@ -31,29 +32,31 @@ public class CalculateTrajectory {
 		//Read data and put them in ML-classes
 		MLChar mission = new MLChar( "mission", object.getMissionType() );
 		MLDouble targetcoordinate = new MLDouble( "targetcoordinate", object.getTargetCoordinate() );
+		MLDouble startcoordinate = new MLDouble( "startcoordinate", object.getStartCoordinate() );
 		MLDouble height = new MLDouble( "height", object.getHeight(), 1 );
 		MLDouble radius = new MLDouble( "radius", object.getRadius(), 1 );
 
 		//Read search areas
-		ArrayList<MLArray> searcharealist = new ArrayList<MLArray>();
 		ArrayList<Area> searchareas = object.getSearchAreaCoordinates();
+		MLCell area = new MLCell("area", new int[] {1,searchareas.size()});
 		for (int i = 0 ; i < searchareas.size() ; i++) {
-			searcharealist.add( new MLDouble( "area" + i, searchareas.get(i).area ) );
+			area.set(new MLDouble( "area" + i, searchareas.get(i).area ), i);
 		}
 
 		//Read forbidden areas
-		ArrayList<MLArray> forbiddenarealist = new ArrayList<MLArray>();
 		ArrayList<Area> forbiddenareas = object.getForbiddenAreaCoordinates();
+		MLCell forbiddenarea = new MLCell("forbiddenarea", new int[] {1,forbiddenareas.size()});
 		for (int i = 0 ; i < forbiddenareas.size() ; i++) {
-			forbiddenarealist.add( new MLDouble( "forbiddenarea" + i, forbiddenareas.get(i).area ) );
+			forbiddenarea.set(new MLDouble( "forbiddenarea" + i, forbiddenareas.get(i).area ), i);
 		}
 
 		//Write arrays to file
 		ArrayList<MLArray> list = new ArrayList<MLArray>();
 		list.add( mission );
-		list.addAll( searcharealist );
-		list.addAll( forbiddenarealist );
+		list.add( area );
+		list.add( forbiddenarea );
 		list.add( targetcoordinate );
+		list.add( startcoordinate );
 		list.add( height );
 		list.add( radius );
 
