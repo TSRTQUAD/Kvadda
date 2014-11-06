@@ -10,7 +10,7 @@ public class TargetObject {
 	
 	public TargetObject(Mat position_, float noise_level){
 		// Create the state matrix with given position measurements
-		x = Mat.zeros(4, 1, CvType.CV_8UC1);
+		x = Mat.zeros(4, 1, CvType.CV_64F);
 		x.put(0, 0, position_.get(0, 0));
 		x.put(1, 0, position_.get(1, 0));
 		
@@ -36,7 +36,10 @@ public class TargetObject {
 	}
 	
 	public Mat getPosition(){
-		return x.rowRange(0, 1);
+		Mat res = new Mat(2, 1, CvType.CV_64F);
+		res.put(0, 0, x.get(0, 0));
+		res.put(1, 0, x.get(1, 0));
+		return res;
 	}
 	
 	public Mat getVelocity(){

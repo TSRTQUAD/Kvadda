@@ -8,6 +8,8 @@ import kvaddakopter.image_processing.data_types.TargetObject;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
 
 public class Tracking {
 	
@@ -44,19 +46,38 @@ public class Tracking {
 		
 		H = new Mat();
 		F_small = new Mat();
+		
+		x = new Mat(4, 1, CvType.CV_64F);
+		mInternalTargets = new HashMap<Integer, TargetObject>();
 	}
 	
 	
 	public void update(ArrayList<TargetObject> targetObjects){
 		// Create combined x and P matrices from mInternalTargets 
+		//createCombinedMatrices();
 		
 		// Perform time update
+		//timeUpdate();
 		
 		// Match new targetObjects with mInternalTargets by analyzing position difference and identifiers
 		
 		// Perform measurement update with matched objects
+		//measurementUpdate(getZ(targetObjects));
 		
 		// Add non-matched objects to internal list
+		if(mInternalTargets.size() == 0 && targetObjects.size() > 0){
+			mInternalTargets.put(0, (TargetObject)targetObjects.get(0));
+			System.out.print("Length of mInternalTargets: ");
+			System.out.println(mInternalTargets.size());
+		}
+		
+		if(targetObjects.size() > 0 && mInternalTargets.size() > 0){
+			TargetObject oldTarget = mInternalTargets.get(0);
+			TargetObject newTarget = targetObjects.get(0);
+			oldTarget.setState(newTarget.getState());
+		}
+		
+		
 	}
 	
 	private void timeUpdate(){
@@ -134,6 +155,40 @@ public class Tracking {
 		res.put(3, 3, a3);
 		
 		Core.gemm(emptyMat, emptyMat, 0, res.t(), sigma_sq, res);
+		
+		return res;
+	}
+	
+	public Mat getZ(ArrayList<TargetObject> targetObjects){
+		Mat res = new Mat(targetObjects.size(), 1, CvType.CV_64F);
+		for(TargetObject targetObject : targetObjects){
+			Mat pos = targetObject.getPosition();
+			//res.put();
+		}
+		
+		
+		
+		return res;
+	}
+	
+	public Mat getImage(){
+		Mat res = new Mat(720, 1280, CvType.CV_8U);
+		res.setTo(new Scalar(0, 0, 0));
+		if(mInternalTargets.size() > 0){
+			for(int key : mInternalTargets.keySet()) {
+			    TargetObject target = mInternalTargets.get(key);
+			    Mat pos = target.getPosition();
+				Core.rectangle(
+						res, 
+						new Point(pos.get(0, 0)[0] - 10, pos.get(1, 0)[0] - 10),
+						new Point(pos.get(0, 0)[0] + 10, pos.get(1, 0)[0] + 10),
+						new Scalar(255, 0, 0), 
+						1);
+
+				String txtString = String.format("ID:%d", key);
+			    Core.putText(res, txtString, new Point(pos.get(0, 0)[0] - 12, pos.get(1, 0)[0] + 22) , Core.FONT_HERSHEY_SIMPLEX, .4, new Scalar(255, 255, 255), 1, 8, false);
+			}
+		}
 		
 		return res;
 	}
