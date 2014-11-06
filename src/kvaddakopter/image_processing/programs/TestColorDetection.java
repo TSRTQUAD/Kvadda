@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import kvaddakopter.image_processing.algorithms.ColorDetection;
+import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
@@ -40,7 +41,8 @@ public class TestColorDetection extends ProgramClass{
 		Mat currentImage = getNextFrame();
 
 		ImageObject imageObject = new ImageObject(currentImage);
-
+		
+		((ColorDetection) mCurrentMethod).addTemplate("Yellow square", 20, 40, 100, 255, 100, 255, ColorTemplate.FORM_SQUARE);
 		mCurrentMethod.start(imageObject);
 
 
@@ -53,7 +55,4 @@ public class TestColorDetection extends ProgramClass{
 			updateJavaWindow(out);
 		}
 	}
-
-
-
 }

@@ -5,10 +5,9 @@ import java.util.ArrayList;
 /**
  * Definition of an object for trajectory planing.
  */
-
 public class MissionObject {
 	// Variable declaration
-	protected String mission = "";
+	protected MissionType mission = MissionType.ALONG_TRAJECTORY;
 	protected double[][] targetcoordinate = null;
 	protected ArrayList<Area> searchareas = null;
 	protected ArrayList<Area> forbiddenareas = null;
@@ -43,6 +42,8 @@ public class MissionObject {
 	// Assign the mission type to variable mission.
 	public void mission(String missiontype){
 		mission = missiontype;
+		
+		mission = MissionType.ALONG_TRAJECTORY;
 	}
 	// Assign the search area coordinates to variable searchareas.
 	public void setSearchAreas(ArrayList<Area> coord){

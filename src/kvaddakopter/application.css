@@ -1,3 +1,10 @@
 .root{
     -fx-font-family: "Lato";
 }
+
+.disabled-textbox{
+	-fx-background-color: #E9E9E9;
+}
+.textbox{
+	-fx-background-color: #ffffff;
+}

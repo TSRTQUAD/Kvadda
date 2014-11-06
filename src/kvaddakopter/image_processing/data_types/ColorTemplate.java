@@ -5,6 +5,7 @@ import org.opencv.core.Scalar;
 public class ColorTemplate {
 	
 	public static final int FORM_CIRLE = 1;
+	public static final int FORM_SQUARE = 2;
 	
 	String description;
 	private int hueLow, hueHigh, saturationLow, saturationHigh, valueLow, valueHigh;

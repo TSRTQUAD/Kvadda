@@ -18,13 +18,12 @@ import com.xuggle.xuggler.demos.VideoImage;
 
 /**
  * 
- * FFMpegDecoder används för att ta emot en bildström och avkoda den. 
- * Klassen bygger på Xuggler-bibliteket (som i sin tur är beroende av fem stycken andra bibliotek - CommonLang,CommonCli,Logback,LockbackCore,Sl4f... suck) 
- *  
- * 
- * FFMpegDecoder-klassen är testkörd mot:
- *  - http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8 
- *  - Spydroid, en android-app som strömmar video från kamera. Detta kan vara ganska användbart under vår utprovning
+ * FFMpegDecoder används för att ta emot en bildström och avkoda den.  <br>
+ * Klassen bygger på Xuggler-bibliteket (som i sin tur är beroende av fem stycken andra bibliotek - CommonLang,CommonCli,Logback,LockbackCore,Sl4f... suck) <br>
+ *  <br>
+ * FFMpegDecoder-klassen är testkörd mot:<br>
+ *  - http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8 <br>
+ *  - Spydroid, en android-app som strömmar video från kamera. Detta kan vara ganska användbart under vår utprovning<br>
  * 
  */
 public class FFMpegDecoder  {
