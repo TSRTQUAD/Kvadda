@@ -5,7 +5,6 @@ import java.util.ArrayList;
 /**
  * Definition of an object for trajectory planing.
  */
-
 public class MissionObject {
 	// Variable declaration
 	protected String mission = "";
