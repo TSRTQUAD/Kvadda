@@ -18,6 +18,7 @@ import matlabcontrol.MatlabProxyFactory;
 
 public class CalculateTrajectory {
 	protected double[][] trajectory;
+	protected double trajectorylength;
 
 	public double[][] getTrajectory(MissionObject object) throws IOException, MatlabConnectionException, MatlabInvocationException {
 		createMatFile(object);
@@ -25,6 +26,13 @@ public class CalculateTrajectory {
 		trajectory = readMatFile();
 
 		return trajectory;
+	}
+	
+	public double getTrajectoryLength() throws FileNotFoundException, IOException {
+		MatFileReader MLTrajectoryLength = new MatFileReader( "trajectory.mat" );
+		double[][] tmptrajectorylength = ((MLDouble) MLTrajectoryLength.getMLArray("trajectorylength")).getArray();
+		trajectorylength = tmptrajectorylength[0][0];
+		return trajectorylength;
 	}
 
 	public void createMatFile(MissionObject object) throws IOException {

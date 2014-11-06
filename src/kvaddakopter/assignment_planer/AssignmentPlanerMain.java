@@ -17,15 +17,16 @@ public class AssignmentPlanerMain {
 		testobject.setHeight(new double[] {5});
 		testobject.setRadius(new double[] {15});
 
-		/*
+		
 		testobject.mission( MissionType.AROUND_COORDINATE );
 		ArrayList<Area> searchareas = new ArrayList<Area>();
 		Area targetcoordinate = new Area();
 		targetcoordinate.area = new double[][] {{58.395157,15.574821}};
 		searchareas.add( targetcoordinate );
 		testobject.setSearchAreas(searchareas);
-		*/
 		
+		
+		/*
 		testobject.mission( MissionType.ALONG_TRAJECTORY );
 		ArrayList<Area> searchareas = new ArrayList<Area>();
 		Area linesearch = new Area();
@@ -39,6 +40,7 @@ public class AssignmentPlanerMain {
 				{58.395107,15.574526}};
 		searchareas.add( linesearch );
 		testobject.setSearchAreas(searchareas);
+		*/
 		
 		/*
 		testobject.mission( MissionType.AREA_COVERAGE );
@@ -77,8 +79,9 @@ public class AssignmentPlanerMain {
 		CalculateTrajectory calculatetrajectory = new CalculateTrajectory();
 		double[][] trajectory = calculatetrajectory.getTrajectory(testobject);
 
-		// Print the calculated trajectory
+		// Print the calculated trajectory and it´s length
 		calculatetrajectory.printTrajectory(trajectory);
+		System.out.println("Trajectory length: " + calculatetrajectory.getTrajectoryLength());
 
 		System.out.println("\nProgram terminated");
 	}

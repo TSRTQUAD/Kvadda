@@ -1,0 +1,23 @@
+% Add the startpoint to the beginning and end of the trajectory icluding
+% some points inbetween to straighten up the future interpolation
+function rawtrajectory = getStartEndPath(startpoint, besttrajectory)
+startpointslat = min(startpoint(1),besttrajectory(1,1)):...
+    abs(besttrajectory(1,1)-startpoint(1))/4:max(startpoint(1),...
+    besttrajectory(1,1));
+if startpoint(1) > besttrajectory(1,1)
+    startpointslat = fliplr(startpointslat);
+end
+startpointslon = interp1([startpoint(1) besttrajectory(1,1)],...
+    [startpoint(2) besttrajectory(1,2)],startpointslat);
+
+endpointslat = min(startpoint(1),besttrajectory(end,1)):...
+    abs(besttrajectory(end,1)-startpoint(1))/4:max(startpoint(1),...
+    besttrajectory(end,1));
+if startpoint(1) < besttrajectory(end,1)
+    endpointslat = fliplr(endpointslat);
+end
+endpointslon = interp1([startpoint(1) besttrajectory(end,1)],...
+    [startpoint(2) besttrajectory(end,2)],endpointslat);
+
+rawtrajectory = [[startpointslat(1:4)' startpointslon(1:4)'];...
+    besttrajectory;[endpointslat(2:5)' endpointslon(2:5)']];
