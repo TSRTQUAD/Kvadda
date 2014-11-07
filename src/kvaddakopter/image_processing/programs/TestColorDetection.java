@@ -61,7 +61,7 @@ public class TestColorDetection extends ProgramClass{
 
 			Mat output = mCurrentMethod.getIntermediateResult();
 			//Convert Mat to BufferedImage
-			BufferedImage out = ImageConversion.mat2Img(currentImage);
+			BufferedImage out = ImageConversion.mat2Img(output);
 			output.release();
 			updateJavaWindow(out);
 		}

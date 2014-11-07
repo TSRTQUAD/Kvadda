@@ -2,6 +2,7 @@ package kvaddakopter.image_processing.data_types;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Rect;
 
 public class TargetObject {
 	private Mat x; // State [x1, x2, dot(x1), dot(x2)]'
@@ -13,6 +14,17 @@ public class TargetObject {
 		x = Mat.zeros(4, 1, CvType.CV_64F);
 		x.put(0, 0, position_.get(0, 0));
 		x.put(1, 0, position_.get(1, 0));
+		
+		// Create the covariance matrix with noise_level on diagonal 
+		P = Mat.eye(4, 4, CvType.CV_32F);
+		P.mul(P, noise_level);
+	}
+	
+	public TargetObject(Rect boundingBox, float noise_level){
+		// Create the state matrix with given position measurements
+		x = Mat.zeros(4, 1, CvType.CV_64F);
+		x.put(0, 0, boundingBox.x);
+		x.put(1, 0, boundingBox.y);
 		
 		// Create the covariance matrix with noise_level on diagonal 
 		P = Mat.eye(4, 4, CvType.CV_32F);

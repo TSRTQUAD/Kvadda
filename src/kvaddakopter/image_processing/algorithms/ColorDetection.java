@@ -31,16 +31,15 @@ public class ColorDetection  extends DetectionClass{
 	// Minimum object size
 	static final int MINIMUM_OBJECT_SIZE = 10000;
 
-
 	//Morphology 
 	static final int MORPH_KERNEL_SIZE = 16;
 	static final int MORPH_KERNEL_TYPE = Imgproc.MORPH_ELLIPSE;
 
 	// Color templates
 	ArrayList<ColorTemplate> colorTemplates;
-
-	// TMP!!!!
-	Mat HSVImage;
+	
+	//Adaptive coloring
+	private boolean mUsingAdaptiveColoring = true;
 
 	public ColorDetection(){
 		super();
@@ -53,7 +52,7 @@ public class ColorDetection  extends DetectionClass{
 	public ArrayList<TargetObject> start(ImageObject imageObject) {
 
 		// Convert RGB to HSV
-		HSVImage = new Mat();
+		Mat HSVImage = new Mat();
 		Imgproc.cvtColor(imageObject.getImage(), HSVImage, Imgproc.COLOR_BGR2HSV);
 
 		Mat resultImage = new Mat(HSVImage.rows(), HSVImage.cols(), CvType.CV_8U);
@@ -79,74 +78,70 @@ public class ColorDetection  extends DetectionClass{
 			// Add results to binary result image
 			Core.bitwise_or(resultImage, dilatedImage, resultImage);
 			
-			//Detect targets
-			//TODO should return targetObjects
+			//Target detection
+			//detectTargets()
 			ArrayList<Rect> boundingBoxes = new ArrayList<Rect>();
-			boundingBoxes = getBoundingBoxes(resultImage);
-			// Convert blobs to target objects
-			// Temporary solution using bounding boxes
-			for(Rect boundingBox : boundingBoxes){
-				Mat pos = new Mat(2, 1, CvType.CV_64F);
-				pos.put(0, 0, boundingBox.x);
-				pos.put(1, 0, boundingBox.y);
-				targetObjects.add(new TargetObject(pos, 1));
-				Core.rectangle(
-						resultImage, 
-						new Point(boundingBox.x, boundingBox.y), 
-						new Point(boundingBox.x + boundingBox.width, boundingBox.y + boundingBox.height), 
-						new Scalar(255,0,0), 
-						1);
-			}
+			
+			//Get contours of binary image
+			List<MatOfPoint> contours = getContours(resultImage);
+			
+			//Calculate bounding boxes from contours, 
+			//calculate cutout image from HSVImage and contours
+			//set target HSV channels for adaptive color detection
+			boundingBoxes = getBoundingBoxes(contours,1000);
+			ArrayList<Double> targetHSVChannels = new ArrayList<Double>();
+			mIntermeditateResult = cutout(HSVImage,contours,targetHSVChannels);
+			
+			//Convert boundingboxes to targetObjects, draw boundingboxes in resultImage
+			targetObjects = convertToTargets(boundingBoxes, resultImage);
 		}
-
-		// Create an intermediate result image
-		//mIntermeditateResult = resultImage;
 
 		return targetObjects;
 
 	}
 	
-	//Should return ArrayList<TargetObject> 
-	private ArrayList<Rect> getBoundingBoxes(Mat binaryImage){
-		//List of targets in the image
-		//Using openCV findContours-routine to get pixel coordinates of the current blobs.
-		
-		//Parameters ( and return values) for the findContour
-		Mat hierarchy  = new Mat();
-		Mat contourImage = binaryImage.clone(); // remove clone 
-		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-		
-		Imgproc.findContours(contourImage, contours, hierarchy,Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-				
-		//Selecting the largest blob
-		double largestArea = -1;
-		int index = -1;
-		ArrayList<Rect> boxes = new ArrayList<Rect>();
-		for (MatOfPoint c : contours) {
-			double contourArea = Imgproc.contourArea(c);
-			if(contourArea > largestArea){
-				largestArea = contourArea;
-				index = contours.indexOf(c);
-				}
-			}
-		/*System.out.println(
-				"Num Contours: " + contours.size() + "\n" +
-						"Largest at index: " + index 	 
-						);*/
-		
-		
-		
-		
+	/**
+	 * TODO does this work for multiple  particles that look the same???? //Martin
+	 * Cutout of contours in Image, sets objectHSVChannels to mean value of the cutout
+	 * @param fromImage image to cut out from
+	 * @param contours countours to cut out
+	 * @param objectHSVChannels mean value of HSV channels of cutout in input image
+	 * @return cutout Image with HSV channel information
+	 */
+	private Mat cutout(Mat fromImage, List<MatOfPoint> contours, ArrayList<Double> objectHSVChannels){
 		// Cutout a region and calculate mean HSV values (in a bad way)
 		// Then display them on the image (in a not so bad way)
 		//
         // Create a mask for each contour to mask out that region from image.
-        Mat mask = Mat.zeros(HSVImage.size(), CvType.CV_8UC1);
+        Mat mask = Mat.zeros(fromImage.size(), CvType.CV_8UC1);
         Imgproc.drawContours(mask, contours, -1, new Scalar(255), Core.FILLED); // This is a OpenCV function
 
 		Mat cutout = new Mat();
-		HSVImage.copyTo(cutout, mask);
+		fromImage.copyTo(cutout, mask);
 		
+		//Calculate mean HSV channel values with 10 as value threshhold
+		objectHSVChannels = calculateMeanHSVValues(cutout,10);
+	
+		String txtString = String.format("H = %4f", objectHSVChannels.get(0));
+	    Core.putText(cutout, txtString, new Point(25, 280) , Core.FONT_HERSHEY_SIMPLEX, .7, new Scalar(255, 255, 255), 2, 8, false);
+	    
+		txtString = String.format("S = %4f", objectHSVChannels.get(1));
+	    Core.putText(cutout, txtString, new Point(25, 300) , Core.FONT_HERSHEY_SIMPLEX, .7, new Scalar(255, 255, 255), 2, 8, false);
+	    
+		txtString = String.format("V = %4f", objectHSVChannels.get(2));
+	    Core.putText(cutout, txtString, new Point(25, 320) , Core.FONT_HERSHEY_SIMPLEX, .7, new Scalar(255, 255, 255), 2, 8, false);
+	    
+		return cutout;
+	}
+	
+	/**
+	 * Calculates mean of HSV channels in cutout Image
+	 * @param cutout
+	 * @param threshold
+	 * @return ArrayList<Double> where index 0->Hue,1->Saturation,2->Value
+	 */
+	private ArrayList<Double> calculateMeanHSVValues(Mat cutout,double threshold){
+		ArrayList<Double> channelMeanValues = new ArrayList<Double>();
 		
 		double HVal = 0, SVal = 0, VVal = 0;
 		
@@ -157,7 +152,7 @@ public class ColorDetection  extends DetectionClass{
 		for(int r = 0; r < cutout.rows(); r++){
 			for(int c = 0; c < cutout.cols(); c++){
 				tmpHSV = cutout.get(r, c);
-				if(tmpHSV[2] > 10){
+				if(tmpHSV[2] > threshold){
 					numVals++;
 					Htot += tmpHSV[0];
 					Stot += tmpHSV[1];
@@ -166,76 +161,57 @@ public class ColorDetection  extends DetectionClass{
 			}
 		}
 		HVal = Htot/numVals;
+		channelMeanValues.add(HVal);
 		SVal = Stot/numVals;
+		channelMeanValues.add(VVal);
 		VVal = Vtot/numVals;
-	
-		String txtString = String.format("H = %4f", HVal);
-	    Core.putText(cutout, txtString, new Point(25, 280) , Core.FONT_HERSHEY_SIMPLEX, .7, new Scalar(255, 255, 255), 2, 8, false);
-	    
-		txtString = String.format("S = %4f", SVal);
-	    Core.putText(cutout, txtString, new Point(25, 300) , Core.FONT_HERSHEY_SIMPLEX, .7, new Scalar(255, 255, 255), 2, 8, false);
-	    
-		txtString = String.format("V = %4f", VVal);
-	    Core.putText(cutout, txtString, new Point(25, 320) , Core.FONT_HERSHEY_SIMPLEX, .7, new Scalar(255, 255, 255), 2, 8, false);
-	    
-		mIntermeditateResult = cutout;
-		// HSV value calculations end here
-		
-		
-				
-		if(index != -1)
-			boxes.add(Imgproc.boundingRect(contours.get(index)));
+		channelMeanValues.add(SVal);
+		return channelMeanValues;
 
-		/*
-		 * Find contours of img
-		 * CV_RETR_LIST retrieves all of the contours without establishing any hierarchical relationships.
-		 * CV_CHAIN_APPROX_SIMPLE compresses horizontal, vertical, and diagonal segments 
-		 * and leaves only their end points. For example, an up-right rectangular contour is encoded with 4 points. 
-		 */
-		//Imgproc.findContours(img, contours, hierarchy, Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-		
-		//float refArea = 0;
-		//boolean objectFound = false;
-		
-//		Moments oMoments = Imgproc.moments(img);
-//		Point pos = new Point(0,0);
-//		double dM01 = oMoments.get_m01();
-//		double dM10 = oMoments.get_m10();
-//		double dArea = oMoments.get_m00();
-//		
-//		Mat returnImage = originalImage.clone();
-//		if(dArea>MINIMUM_OBJECT_SIZE){
-//			//calculate the position
-//			double[] vals = new double[2];
-//			vals[0] = dM01/dArea;
-//			vals[1] = dM10/dArea;
-//			pos.set(vals);
-//			Core.circle(returnImage, pos, 10, new Scalar(0,0,255), 1);
-//
-//		}
-		
-		
-		return boxes;
 	}
 
-	// Adds a color template and returns handler id (ArrayList id)
+	/**
+	 * adds color template to method
+	 * @param description_
+	 * @param hueLow_
+	 * @param hueHigh_
+	 * @param saturationLow_
+	 * @param saturationHigh_
+	 * @param valueLow_
+	 * @param valueHigh_
+	 * @param form_type_
+	 * @return
+	 */
 	public int addTemplate(String description_, int hueLow_, int hueHigh_, int saturationLow_, int saturationHigh_, int valueLow_, int valueHigh_, int form_type_){
 		colorTemplates.add(new ColorTemplate(description_, hueLow_, hueHigh_, saturationLow_, saturationHigh_, valueLow_, valueHigh_, form_type_));
 		return colorTemplates.size() - 1;
 	}
 
+	/**
+	 * Activate template with id# id
+	 * @param id
+	 */
 	public void activateTemplate(int id){
 		synchronized (colorTemplates) {
 			if(id >= colorTemplates.size() || id < 0) return;
 			colorTemplates.get(id).activate();
 		}
 	}
-
+	
+	/**
+	 * Deactivate template with id# id
+	 * @param id
+	 */
 	public void deactivateTemplate(int id){
 		if(id >= colorTemplates.size() || id < 0) return;
 		colorTemplates.get(id).deactivate();
 	}
 	
+	/**
+	 * check if template with id# id is active
+	 * @param id
+	 * @return
+	 */
 	public boolean isActive(int id){
 		if(id >= colorTemplates.size() || id < 0) return false;
 		return colorTemplates.get(id).isActive();
@@ -254,4 +230,11 @@ public class ColorDetection  extends DetectionClass{
 		return res;
 	}
 	
+	public boolean isUsingAdaptiveColoring(){
+		return mUsingAdaptiveColoring;
+	}
+	
+	public void setUsingAdaptiveColoring(boolean b){
+		mUsingAdaptiveColoring = b;
+	}
 }

@@ -28,14 +28,14 @@ public class ImageProcessingMain {
 		 * 
 		 */
 
-		TestBackgroundSubtraction program  = new TestBackgroundSubtraction();
+		//TestBackgroundSubtraction program  = new TestBackgroundSubtraction();
 //		CameraCalibration program  = new CameraCalibration();
-//		TestColorDetection program  = new TestColorDetection();
+		TestColorDetection program  = new TestColorDetection();
 		//colorTemplates.add(new ColorTemplate("Yellow ball", 10, 50, 50, 255, 50, 255, ColorTemplate.FORM_CIRLE));
 		
 		
-//		ColorDetection method = (ColorDetection)program.getCurrentMethod();
-//		method.addTemplate("Pink square", 120, 255, 0, 100, 150, 255, ColorTemplate.FORM_SQUARE);
+		ColorDetection method = (ColorDetection)program.getCurrentMethod();
+		method.addTemplate("Pink square", 120, 255, 0, 100, 150, 255, ColorTemplate.FORM_SQUARE);
 		//method.addTemplate("Yellow square", 0, 60, 70, 130, 130, 200, ColorTemplate.FORM_SQUARE);
 		program.start();
 		

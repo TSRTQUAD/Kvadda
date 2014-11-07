@@ -45,4 +45,21 @@ public class ColorTemplate {
 	public boolean isActive(){
 		return isActive;
 	}
+	
+	/**
+	 * TODO Might need more fine tuning
+	 * Adapt colorTemplate according to object HSV channels
+	 * @param objectHSVChannels
+	 * @param hueWindow Value [0:1]
+	 * @param satWindow Value [0:1]
+	 * @param valWindow [0:1]
+	 */
+	public void adapt(double[] objectHSVChannels,double hueWindow, double satWindow, double valWindow){
+		hueLow = (int) (objectHSVChannels[0]*(1-hueWindow/2));
+		hueHigh = (int) (objectHSVChannels[0]*(1+hueWindow/2));
+		saturationLow = (int) (objectHSVChannels[1]*(1-satWindow/2));
+		saturationHigh = (int) (objectHSVChannels[1]*(1+satWindow/2));
+		valueLow = (int) (objectHSVChannels[2]*(1-valWindow/2));
+		valueHigh = (int) (objectHSVChannels[2]*(1-valWindow/2));
+	}
 }
