@@ -6,9 +6,12 @@ import java.util.List;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
 
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 public class DetectionClass {
@@ -32,21 +35,8 @@ public class DetectionClass {
 	 * @param areaThreshold
 	 * @return
 	 */
-	protected ArrayList<Rect> getBoundingBoxes(Mat binaryImage, double areaThreshold){
-
-		
-		//Using openCV findContours-routine to get pixel coordinates of the current blobs.
-		
-		//Parameters ( and return values) for the findContour
-		Mat hierarchy  = new Mat();
-		Mat contourImage = binaryImage.clone(); // remove clone 
-		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-		
-		Imgproc.findContours(contourImage, contours, hierarchy,Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-		
-		
-		//Selecting the largest blob
-
+	protected ArrayList<Rect> getBoundingBoxes(List<MatOfPoint> contours, double areaThreshold){	
+		//Selecting blobs that are big enough
 		ArrayList<Rect> boxes = new ArrayList<Rect>();
 		for (MatOfPoint c : contours) {
 			double contourArea = Imgproc.contourArea(c);
@@ -57,7 +47,46 @@ public class DetectionClass {
 		return boxes;
 	}
 	
+	/**
+	 * 
+	 * @param inImage (binary image)
+	 * @param areaThreshold (object size (depending on height?))
+	 * @return
+	 */
+	protected List<MatOfPoint> getContours(Mat inImage){
+		//Using openCV findContours-routine to get pixel coordinates of the current blobs.
 		
+		//Parameters ( and return values) for the findContour
+		Mat hierarchy  = new Mat();
+		Mat contourImage = inImage.clone(); // remove clone 
+		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+		
+		Imgproc.findContours(contourImage, contours, hierarchy,Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+		return contours;
+	}
 	
+	/**
+	 * Convertion of boundingBoxes to targetObjects
+	 * @param boundingBoxes
+	 * @param drawInImage
+	 * @return
+	 */
+	protected ArrayList<TargetObject> convertToTargets(ArrayList<Rect> boundingBoxes, Mat drawInImage){
+		//Initialize
+		ArrayList<TargetObject> targetObjects = new ArrayList<TargetObject>();
 		
+		// Convert blobs to target objects
+		// Temporary solution using bounding boxes
+		for(int i = 0; i < boundingBoxes.size(); i++){
+			Rect boundingBox = boundingBoxes.get(i);
+			targetObjects.add(new TargetObject(boundingBox, 1));
+			Core.rectangle(
+					drawInImage, 
+					new Point(boundingBox.x, boundingBox.y), 
+					new Point(boundingBox.x + boundingBox.width, boundingBox.y + boundingBox.height), 
+					new Scalar(255,0,0), 
+					1);
+		}
+		return targetObjects;
+	}
 }
