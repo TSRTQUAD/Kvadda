@@ -5,8 +5,13 @@ import java.awt.image.DataBufferByte;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+import javax.imageio.ImageIO;
+
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
 
 public class ImageConversion {
@@ -33,24 +38,18 @@ public class ImageConversion {
 	 */
 	public static BufferedImage mat2Img(Mat in)
 	{
+		BufferedImage out = null;
 		
-		int cols = in.cols();
-		int rows = in.rows();
+		MatOfByte mob = new MatOfByte();
+		Highgui.imencode(".jpg", in, mob);
+		byte[] byteBuffer = mob.toArray();
 		
-		byte[] data = new byte[rows * cols * (int)in.channels()];
-		int type;
-		in.get(0, 0, data);
-		InputStream inStream = new ByteArrayInputStream(data);
-		
-		if(in.channels() == 1)
-			type = BufferedImage.TYPE_BYTE_GRAY;
-		else
-			type = BufferedImage.TYPE_3BYTE_BGR;
-		
-
-		BufferedImage out;
-		out = new BufferedImage(cols, rows, type);
-		out.getRaster().setDataElements(0, 0, cols, rows, data);
+		 try {
+		        InputStream inStream = new ByteArrayInputStream(byteBuffer);
+		        out = ImageIO.read(inStream);
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    }
 		
 		return out;
 	} 

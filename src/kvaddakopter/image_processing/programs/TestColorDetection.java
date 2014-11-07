@@ -28,9 +28,9 @@ public class TestColorDetection extends ProgramClass{
 
 		//Create and initialize decoder. And select source.
 		mDecoder = new FFMpegDecoder();
-		//mDecoder.initialize("tcp://192.168.1.1:5555");
+		mDecoder.initialize("tcp://192.168.1.1:5555");
 		//mDecoder.initialize("rtsp://130.236.214.20:8086");
-		mDecoder.initialize("mvi.mp4");
+		//mDecoder.initialize("mvi.mp4");
 		// Listen to decoder events
 		mDecoder.setDecoderListener(this);
 
@@ -61,7 +61,7 @@ public class TestColorDetection extends ProgramClass{
 
 			Mat output = mCurrentMethod.getIntermediateResult();
 			//Convert Mat to BufferedImage
-			BufferedImage out = ImageConversion.mat2Img(output);
+			BufferedImage out = ImageConversion.mat2Img(currentImage);
 			output.release();
 			updateJavaWindow(out);
 		}
