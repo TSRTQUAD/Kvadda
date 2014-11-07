@@ -112,14 +112,23 @@ public class MatchTests {
 
 	}
 	/**
+	 * Computes the fundamental matrix using openCV function "Calib3d.findFundamentalMat". <br>
+	 * <br>
+	 * Also return a MatOfMatch-object holding matches that fulfill: <br>  
+	 * x_1 * F * x_2' < e <br> 
+	 * where <br>
+	 * x_1 and x_2 are two corresponding keypoints,
+	 * F is the fundamental matrix <br>
+	 * e is and epsilon ( a small value)
 	 * 
 	 * @param inMatches  Input matches
-	 * @param keypoints1 Keypoints from current frame
-	 * @param keypoints2 Keypoints from previous frame
+	 * @param keypoints1 Keypoints from frame1
+	 * @param keypoints2 Keypoints from frame2
+	 * @param epsilon threshold for determine inlier matches.
 	 * @param outMatches Output, returning passed matches after the ransac test.
-	 * @return
+	 * @return Fundamental matrix
 	 */
-	public static Mat ransacTest(MatOfDMatch inMatches, MatOfKeyPoint keypoints1,MatOfKeyPoint keypoints2,MatOfDMatch outMatches){
+	public static Mat computeFundamentalMatrix(MatOfDMatch inMatches, MatOfKeyPoint keypoints1,MatOfKeyPoint keypoints2,double epsilon,MatOfDMatch outMatches){
 
 		//Converting to arrays
 		DMatch[] matchArray = inMatches.toArray();

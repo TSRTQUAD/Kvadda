@@ -10,6 +10,7 @@ import kvaddakopter.image_processing.utils.MatchTests;
 
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDMatch;
 import org.opencv.core.MatOfPoint;
@@ -53,9 +54,20 @@ public class BackgroundSubtraction  extends DetectionClass{
 			// Terminate function by returning null.
 			return null;
 		}
-
+		
 		//1. Correspondences
-		findCorrespondances(currentImageData);
+		MatOfDMatch matches       = currentImageData.findMatches(mPreviousImageData);
+		MatOfDMatch inlierMatches = new MatOfDMatch();
+		Mat fundamentalMatrix 	  = MatchTests.computeFundamentalMatrix(matches, currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(),0.02, inlierMatches);
+		mIntermeditateResult = new Mat();
+		Features2d.drawMatches(
+				currentImageData.getImage(),
+				currentImageData.getKeyPoints(), 
+				mPreviousImageData.getImage(),
+				mPreviousImageData.getKeyPoints(), 
+				inlierMatches,
+				mIntermeditateResult
+				);
 
 		//2. Camera Matrix blabla. - NOT IMPLEMENTED
 //		
@@ -85,8 +97,11 @@ public class BackgroundSubtraction  extends DetectionClass{
 		
 		// TODO: Assign the box data to the TargetObjects
 		ArrayList<TargetObject> targetObjects = new ArrayList<TargetObject>();
-		TargetObject target = new TargetObject();
-
+	/*	Mat m = new Mat(1,2,CvType.CV_64F);
+		m.put(0, 0, 0);
+		m.put(0, 1, 1);
+		TargetObject target = new TargetObject(m, 0);
+*/
 		//Set previous image data to the current image data
 		mPreviousImageData = currentImageData;
 
@@ -94,111 +109,10 @@ public class BackgroundSubtraction  extends DetectionClass{
 	}
 	
 	
-
-
-	private void findCorrespondances(ImageObject currentImageData){
-
-
-
-		//Find matches (referred as correspondences in the design specification)
-		DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE);
-		
-		
-		
-		List<MatOfDMatch> correspondences1 = new ArrayList<MatOfDMatch>();
-		descriptorMatcher.knnMatch(
-				currentImageData.getDescriptors(), 
-				mPreviousImageData.getDescriptors(), 
-				correspondences1,
-				2
-				);
-
-		List<MatOfDMatch> correspondences2 = new ArrayList<MatOfDMatch>();
-		descriptorMatcher.knnMatch(
-				mPreviousImageData.getDescriptors(),
-				currentImageData.getDescriptors(), 
-				correspondences2,
-				2
-				);
-
-		MatchTests.ratioTest(correspondences1);
-		MatchTests.ratioTest(correspondences2);
-		/*	DMatch[] matches = new DMatch[correspondences.size()];
-	int idx = 0;
-		
-		for (Iterator iterator = correspondences.iterator(); iterator.hasNext();) {
-			MatOfDMatch matOfDMatch = (MatOfDMatch) iterator.next();
-			DMatch[] dMatchArray = matOfDMatch.toArray();
-			matches[idx++] = dMatchArray[0]; 
-			
-		}*/
-		MatOfDMatch matches = MatchTests.symmetryTest(correspondences1, correspondences2);
-		
-		// For debugging. Draw the current matches/correspondences to an image. 
-		MatOfDMatch resultingMatches = new MatOfDMatch();
-		MatchTests.ransacTest(matches, currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(), resultingMatches);
-		
-		mIntermeditateResult = new Mat(); 
-		Features2d.drawMatches(
-				currentImageData.getImage(),
-				currentImageData.getKeyPoints(), 
-				mPreviousImageData.getImage(),
-				mPreviousImageData.getKeyPoints(), 
-				resultingMatches,
-				mIntermeditateResult
-				);
-//		correspondences.
-		
-	}
-	
-	
 	private void warpPreviousImage(){
 	}
 	
-	/**
-	 * Finding contours of all the blobs in the image.
-	 * Largest blob is considered to be the actual target... for now.
-	 * 
-	 * To support multiple targets, all blobs with an area larger than a
-	 * certain may be considered valid tracks.
-	 * 
-	 */
-	private ArrayList<Rect> getBoundingBoxes(Mat binaryImage){
 
-		
-		//Using openCV findContours-routine to get pixel coordinates of the current blobs.
-		
-		//Parameters ( and return values) for the findContour
-		Mat hierarchy  = new Mat();
-		Mat contourImage = binaryImage.clone(); // remove clone 
-		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-		
-		Imgproc.findContours(contourImage, contours, hierarchy,Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-		
-		
-		//Selecting the largest blob
-		double largestArea = -1;
-		int index = -1;
-		ArrayList<Rect> boxes = new ArrayList<Rect>();
-		for (MatOfPoint c : contours) {
-			double contourArea = Imgproc.contourArea(c);
-			if(contourArea > largestArea){
-				largestArea = contourArea;
-				index = contours.indexOf(c);		
-			}
-		}
-		System.out.println(
-				"Num Contours: " + contours.size() + "\n" +
-				"Largest at index: " + index 	 
-				);
-		
-		
-		if(index != -1)
-			boxes.add(Imgproc.boundingRect(contours.get(index)));
-		
-		return boxes;
-	}
-	
 	
 	/**
 	 * Only dilation with a large ass kernel for now...

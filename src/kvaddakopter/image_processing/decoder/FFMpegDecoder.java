@@ -218,9 +218,13 @@ public class FFMpegDecoder  {
 						 * 
 						 */
 						int bytesDecoded = mVideoCoder.decodeVideo(picture, packet, offset);
-						if (bytesDecoded < 0)
-							throw new RuntimeException("got error decoding video in: "
-									+ sourceAdress);
+						if (bytesDecoded < 0){
+//							mVideoCoder.close();
+//							initialize(sourceAdress);
+							break;
+						/*	throw new RuntimeException("got error decoding video in: "
+									+ sourceAdress);*/
+						}
 						offset += bytesDecoded;
 
 						/*

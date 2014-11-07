@@ -1,8 +1,15 @@
 package kvaddakopter.image_processing.data_types;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import kvaddakopter.image_processing.utils.MatchTests;
+
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfDMatch;
 import org.opencv.core.MatOfKeyPoint;
 import org.opencv.features2d.DescriptorExtractor;
+import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.FeatureDetector;
 
 public class ImageObject {
@@ -102,6 +109,55 @@ public class ImageObject {
 // Blur detection
 	public float getBlurLevel(){
 		return mBlurLevel;
+	}
+	/**
+	 * Find keypoint matches/correspondances between this ImageObject and an 
+	 * external ImageObject.
+	 * 
+	 * 
+	 * @param externalImageObject
+	 * @return
+	 */
+	public MatOfDMatch findMatches(ImageObject externalImageObject){
+		ImageObject internalImageObject = this;
+		
+		//First a check if key points and descriptors has been computed for 
+		// both ImageObject's. If not, they are computed.
+		
+		if(!externalImageObject.hasKeyPoints())
+			computeKeyPoints(FeatureDetector.FAST);	
+		if(!externalImageObject.hasDescriptors())
+			externalImageObject.computeDescriptors(DescriptorExtractor.ORB);
+		
+		if(!internalImageObject.hasKeyPoints())
+			computeKeyPoints(FeatureDetector.FAST);
+		if(!internalImageObject.hasDescriptors())
+			externalImageObject.computeDescriptors(DescriptorExtractor.ORB);
+		
+		//Find matches (referred as correspondences in the design specification)
+		DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE);
+		
+		List<MatOfDMatch> correspondences1 = new ArrayList<MatOfDMatch>();
+		descriptorMatcher.knnMatch(
+				internalImageObject.getDescriptors(), 
+				externalImageObject.getDescriptors(), 
+				correspondences1,
+				2
+				);
+
+		List<MatOfDMatch> correspondences2 = new ArrayList<MatOfDMatch>();
+		descriptorMatcher.knnMatch(
+				externalImageObject.getDescriptors(),
+				internalImageObject.getDescriptors(), 
+				correspondences2,
+				2
+				);
+
+		MatchTests.ratioTest(correspondences1);
+		MatchTests.ratioTest(correspondences2);
+		
+		MatOfDMatch matches = MatchTests.symmetryTest(correspondences1, correspondences2);
+		return matches;
 	}
 	
 	

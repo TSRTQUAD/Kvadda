@@ -8,6 +8,7 @@ import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
 
 import org.opencv.core.Mat;
+import org.opencv.highgui.Highgui;
 
 public class TestBackgroundSubtraction extends ProgramClass{
 
