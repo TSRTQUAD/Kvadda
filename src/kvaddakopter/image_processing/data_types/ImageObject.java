@@ -135,7 +135,7 @@ public class ImageObject {
 			externalImageObject.computeDescriptors(DescriptorExtractor.ORB);
 		
 		//Find matches (referred as correspondences in the design specification)
-		DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE);
+		DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
 		
 		List<MatOfDMatch> correspondences1 = new ArrayList<MatOfDMatch>();
 		descriptorMatcher.knnMatch(

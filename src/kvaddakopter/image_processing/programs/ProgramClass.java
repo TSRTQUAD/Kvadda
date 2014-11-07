@@ -7,13 +7,15 @@ import kvaddakopter.image_processing.algorithms.DetectionClass;
 import kvaddakopter.image_processing.decoder.DecoderListener;
 import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
+import kvaddakopter.image_processing.utils.KeyBoardHandler;
+import kvaddakopter.image_processing.utils.KeyBoardListener;
 
 import org.opencv.core.Mat;
 
 import com.xuggle.xuggler.demos.VideoImage;
 
 
-public class ProgramClass extends Thread implements DecoderListener {
+public class ProgramClass extends Thread implements DecoderListener,KeyBoardListener {
 
 	//Create image queue, which is a list that is holding the most recent
 	//images
@@ -31,7 +33,9 @@ public class ProgramClass extends Thread implements DecoderListener {
 
 	//Sleep time / FPS
 	private long mSleepTime = 20;
-
+	
+	// KeyBoard handler
+	KeyBoardHandler mKeyBoardHandler = null;
 	public ProgramClass() {
 		init();
 	}
@@ -165,6 +169,8 @@ public class ProgramClass extends Thread implements DecoderListener {
 		System.err.print("Disconnected from video source\n");
 		System.exit(0);
 	}
+	@Override
+	public void onKeyBoardInput(String inputString) {};
 
 
 
