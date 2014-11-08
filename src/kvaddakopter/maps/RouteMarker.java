@@ -21,9 +21,8 @@ public class RouteMarker {
 
     static {
         markerPaths = new HashMap<>();
-        markerPaths.put(MapMarkerEnum.NAVIGATION_START, "point_marker_start.png");
-        markerPaths.put(MapMarkerEnum.NAVIGATION_STOP, "point_marker_end.png");
         markerPaths.put(MapMarkerEnum.NAVIGATION_NORMAL, "point_marker.png");
+        markerPaths.put(MapMarkerEnum.FORBIDDEN_AREAS, "point_marker_forbidden.png");
     }
 
 
