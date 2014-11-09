@@ -3,10 +3,13 @@ package kvaddakopter.gui.controllers;
 
 import com.lynden.gmapsfx.GoogleMapView;
 
+
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
+
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,8 +17,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.assignment_planer.MissionType;
 import kvaddakopter.gui.components.MissionHeight;
 import kvaddakopter.maps.PlanningMap;
@@ -47,7 +52,10 @@ public class TabPlaneraController implements Initializable {
     
     @FXML
     private ToggleGroup descriporRadioGroup;
-    
+    @FXML
+    private RadioButton radioDescriptor1;
+    @FXML
+    private RadioButton radioDescriptor2;
 
     @FXML
     private Button btnStartMissionCoordinates;
@@ -59,7 +67,6 @@ public class TabPlaneraController implements Initializable {
     private Button btnSaveMission;
     
     
-    
     /**
      * Properties
      */
@@ -69,6 +76,8 @@ public class TabPlaneraController implements Initializable {
     protected boolean canEnterMissionCoordinates = false;
 	protected boolean canEnterForbiddenAreaCoordinates = false;
 	
+	protected ArrayList<String> targetTemplates = new ArrayList<String>();
+	protected ArrayList<String> colorTemplates = new ArrayList<String>();
 	
 	
 	
@@ -122,17 +131,29 @@ public class TabPlaneraController implements Initializable {
     	this.listMissionHeight.getSelectionModel().select(0);
     	
     	// Populate template targets
+    	this.targetTemplates.add("Av");
+    	this.targetTemplates.add("Cirkel");
+    	this.targetTemplates.add("Kvadrat");
+    	this.targetTemplates.add("Triangel");
     	this.listTargetTemplate.setItems(FXCollections.observableArrayList(
-    			"Av", "Cirkel", "Kvadrat", "Triangel"
+    			this.targetTemplates
     			));
     	this.listTargetTemplate.getSelectionModel().select(0);
 
     	// Populate color targets
+    	this.colorTemplates.add("Av");
+    	this.colorTemplates.add("Röd");
+    	this.colorTemplates.add("Grön");
+    	this.colorTemplates.add("Blå");
     	this.listTargetColor.setItems(FXCollections.observableArrayList(
-    			"Av","Röd", "Grön", "Blå"
+    			this.colorTemplates
     			));
     	this.listTargetColor.getSelectionModel().select(0);
-		
+    	
+    	
+    	//Set up descriptors Radios
+    	this.radioDescriptor1.setUserData(0);
+    	this.radioDescriptor2.setUserData(1);
 	}
 
 
@@ -144,8 +165,37 @@ public class TabPlaneraController implements Initializable {
 
         // Event triggered when clicking "Save mission" button.
         this.btnSaveMission.setOnAction(e -> {
-        	System.out.println(this.planningMap.allNavigationCoordinates() );
-        	System.out.println(this.planningMap.allForbiddenAreaCoordinates() );
+        	
+        	MissionObject mission = new MissionObject();
+        	
+        	mission.mission(this.listMissionType.getValue());
+        	
+        	double[] height = {(double) this.listMissionHeight.getValue().getValue()};
+        	mission.setHeight(height);
+        	
+        	double[] radiusValue = {(double) 5};
+        	mission.setRadius(radiusValue);
+        	
+        	mission.setSearchAreas(this.planningMap.allNavigationCoordinates());
+        	mission.setForbiddenAreas(this.planningMap.allForbiddenAreaCoordinates());
+        	
+        	String selectedTemplate = this.listTargetTemplate.getValue();
+        	int templateId = this.targetTemplates.indexOf(selectedTemplate);
+        	mission.setImageTemplate(templateId);
+        	
+        	String selectedColor = this.listTargetColor.getValue();
+        	int colorId = this.colorTemplates.indexOf(selectedColor);
+        	mission.setColorTemplate(colorId);
+        	
+        	
+        	int descriptorId = (int) this.descriporRadioGroup.getSelectedToggle().getUserData();
+        	mission.setDescriptor(descriptorId);
+        	
+        	mission.setSearchAreas(this.planningMap.allNavigationCoordinates());
+        	mission.setForbiddenAreas(this.planningMap.allForbiddenAreaCoordinates());
+        	
+        	System.out.println(mission);
+        	
         });
         
         this.btnStartMissionCoordinates.setOnAction(e -> {

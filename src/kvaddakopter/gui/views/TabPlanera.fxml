@@ -98,12 +98,12 @@
                               </Label>
                               <HBox alignment="CENTER" prefWidth="235.0">
                                  <children>
-                                    <RadioButton mnemonicParsing="false" prefHeight="18.0" prefWidth="80.0" selected="true" text="MIMO">
+                                    <RadioButton fx:id="radioDescriptor1" mnemonicParsing="false" prefHeight="18.0" prefWidth="80.0" selected="true" text="MIMO">
                                        <toggleGroup>
                                           <ToggleGroup fx:id="descriporRadioGroup" />
                                        </toggleGroup>
                                     </RadioButton>
-                                    <RadioButton mnemonicParsing="false" text="SISO" toggleGroup="$descriporRadioGroup">
+                                    <RadioButton fx:id="radioDescriptor2" mnemonicParsing="false" text="SISO" toggleGroup="$descriporRadioGroup">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>

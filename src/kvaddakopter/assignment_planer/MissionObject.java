@@ -8,11 +8,17 @@ import java.util.ArrayList;
 public class MissionObject {
 	// Variable declaration
 	protected MissionType mission = MissionType.ALONG_TRAJECTORY;
+	
 	protected ArrayList<Area> searchareas = null;
 	protected ArrayList<Area> forbiddenareas = null;
+	
 	protected double[][] startcoordinate = null;
 	protected double[] height = null;
 	protected double[] radius = null;
+	
+	protected int imageTemplte = 0;
+	protected int colorTemplate = 0;
+	protected int descriptor = 0;
 	
 	// Get variables
 	public MissionType getMissionType(){
@@ -32,6 +38,15 @@ public class MissionObject {
 	}
 	public double[] getRadius(){
 		return this.radius;
+	}
+	public int getImageTemplate(){
+		return this.imageTemplte;
+	}
+	public int getColorTemplate(){
+		return this.colorTemplate;
+	}
+	public int getDescriptor(){
+		return this.descriptor;
 	}
 	
 	// Assign values to the different variables.
@@ -59,4 +74,17 @@ public class MissionObject {
 	public void setRadius(double[] radiusvalue){
 		radius = radiusvalue;
 	}
+	
+	public void setImageTemplate(int template){
+		imageTemplte = template;
+	}
+	
+	public void setColorTemplate(int color){
+		colorTemplate = color;
+	}
+	
+	public void setDescriptor(int descriptor){
+		this.descriptor = descriptor;
+	}
+	
 }

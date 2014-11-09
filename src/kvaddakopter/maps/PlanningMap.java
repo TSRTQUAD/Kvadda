@@ -7,8 +7,9 @@ import com.lynden.gmapsfx.javascript.object.*;
 
 import netscape.javascript.JSObject;
 
-
 import java.util.ArrayList;
+
+import kvaddakopter.assignment_planer.Area;
 import kvaddakopter.gui.controllers.TabPlaneraController;
 
 
@@ -112,8 +113,9 @@ public class PlanningMap implements MapComponentInitializedListener {
 	 * Returns an array of all placed markers
 	 * @return
 	 */
-	public ArrayList<GPSCoordinate> allNavigationCoordinates() {
-		return this.navigationCoordinates;
+	public ArrayList<Area> allNavigationCoordinates() {
+		return transformGPSToAreaObject(this.navigationCoordinates);
+		
 	}
 
 
@@ -122,10 +124,28 @@ public class PlanningMap implements MapComponentInitializedListener {
 	 * Returns an array of all placed markers
 	 * @return
 	 */
-	public ArrayList<GPSCoordinate> allForbiddenAreaCoordinates() {
-		return this.forbiddenAreasCoordinates;
+	public ArrayList<Area> allForbiddenAreaCoordinates() {
+		return transformGPSToAreaObject(this.forbiddenAreasCoordinates);
 	}
+	
+	
+	
+	private ArrayList<Area> transformGPSToAreaObject(ArrayList<GPSCoordinate> gpsCoordinates){
+		Area areaList = new Area();
+		ArrayList<Area> list = new ArrayList<Area>();
 
+		int i = 0;
+		for(GPSCoordinate coord: gpsCoordinates){
+			areaList.area[i][1] = coord.getLatitude();
+			areaList.area[i][2] = coord.getLongitude();
+			i++;
+		}
+
+		list.add(areaList);
+
+		return list;
+	}
+	
 
 	/**
 	 * Used to initialize the wanted map with given options.
