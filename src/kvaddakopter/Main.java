@@ -19,7 +19,7 @@ public class Main extends Application {
 	/**
 	 * Path for base View FXML-file
 	 */
-	private String mainCss = "application.css";
+	private String mainCss = "/kvaddakopter/application.css";
 	
 	
 	/**
