@@ -5,18 +5,23 @@ import java.util.ArrayList;
 
 import matlabcontrol.MatlabConnectionException;
 import matlabcontrol.MatlabInvocationException;
+import matlabcontrol.MatlabProxy;
 
 public class AssignmentPlanerMain {
 
 	public static void main(String[] args) throws IOException, MatlabConnectionException, MatlabInvocationException {
 		System.out.println("Program initialized \n");
 
+		// Set up an MatlabProxy
+		MatlabProxyConnection Matlab = new MatlabProxyConnection();
+		Matlab.startMatlab(false);
+		
 		// Create an object to analyse
 		MissionObject testobject = new MissionObject();
 		testobject.setStartCoordinate(new double[][] {{58.3948,15.574976}});
 		testobject.setHeight(new double[] {5});
 		testobject.setRadius(new double[] {15});
-
+		
 		/*
 		testobject.mission( MissionType.AROUND_COORDINATE );
 		ArrayList<Area> searchareas = new ArrayList<Area>();
@@ -76,13 +81,14 @@ public class AssignmentPlanerMain {
 		*/
 
 		// Calculate the trajectory
-		CalculateTrajectory calculatetrajectory = new CalculateTrajectory();
+		CalculateTrajectory calculatetrajectory = new CalculateTrajectory(Matlab);
 		double[][] trajectory = calculatetrajectory.getTrajectory(testobject);
 
 		// Print the calculated trajectory and it´s length
-		calculatetrajectory.printTrajectory(trajectory);
+		calculatetrajectory.printTrajectory(testobject);
 		System.out.println("Trajectory length: " + calculatetrajectory.getTrajectoryLength());
 
+		// Matlab.terminateMatlab();
 		System.out.println("\nProgram terminated");
 	}
 
