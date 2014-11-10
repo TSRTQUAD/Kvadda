@@ -48,7 +48,8 @@ public class ImageConversion {
 		        InputStream inStream = new ByteArrayInputStream(byteBuffer);
 		        out = ImageIO.read(inStream);
 		    } catch (Exception e) {
-		        e.printStackTrace();
+		        //e.printStackTrace();
+		    	System.err.println("Error in mat2Img conversion");
 		    }
 		
 		return out;

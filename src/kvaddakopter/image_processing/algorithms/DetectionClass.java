@@ -35,34 +35,17 @@ public class DetectionClass {
 	 * @param areaThreshold
 	 * @return
 	 */
-	protected ArrayList<Rect> getBoundingBoxes(List<MatOfPoint> contours, double areaThreshold){	
+	protected ArrayList<Rect> getBoundingBoxes(List<MatOfPoint> contours, Mat hierarchy, double areaThreshold){	
 		//Selecting blobs that are big enough
 		ArrayList<Rect> boxes = new ArrayList<Rect>();
 		for (MatOfPoint c : contours) {
 			double contourArea = Imgproc.contourArea(c);
+			//System.out.println(contourArea);
 			if(contourArea > areaThreshold){
-				boxes.add(Imgproc.boundingRect(c));	
+				boxes.add(Imgproc.boundingRect(c));
 			}
 		}
 		return boxes;
-	}
-	
-	/**
-	 * 
-	 * @param inImage (binary image)
-	 * @param areaThreshold (object size (depending on height?))
-	 * @return
-	 */
-	protected List<MatOfPoint> getContours(Mat inImage){
-		//Using openCV findContours-routine to get pixel coordinates of the current blobs.
-		
-		//Parameters ( and return values) for the findContour
-		Mat hierarchy  = new Mat();
-		Mat contourImage = inImage.clone(); // remove clone 
-		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-		
-		Imgproc.findContours(contourImage, contours, hierarchy,Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
-		return contours;
 	}
 	
 	/**
@@ -77,6 +60,7 @@ public class DetectionClass {
 		
 		// Convert blobs to target objects
 		// Temporary solution using bounding boxes
+		//System.out.println(boundingBoxes.size());
 		for(int i = 0; i < boundingBoxes.size(); i++){
 			Rect boundingBox = boundingBoxes.get(i);
 			targetObjects.add(new TargetObject(boundingBox, 1));

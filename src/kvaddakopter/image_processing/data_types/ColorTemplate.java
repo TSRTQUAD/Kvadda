@@ -1,5 +1,7 @@
 package kvaddakopter.image_processing.data_types;
 
+import java.util.ArrayList;
+
 import org.opencv.core.Scalar;
 
 public class ColorTemplate {
@@ -48,18 +50,24 @@ public class ColorTemplate {
 	
 	/**
 	 * TODO Might need more fine tuning
-	 * Adapt colorTemplate according to object HSV channels
+	 * Adapt colorTemplate according to object HSV channels with low pass filtering
 	 * @param objectHSVChannels
-	 * @param hueWindow Value [0:1]
-	 * @param satWindow Value [0:1]
-	 * @param valWindow [0:1]
+	 * @param hueWindow Value [0:255]
+	 * @param satWindow Value [0:255]
+	 * @param valWindow [0:255]
 	 */
-	public void adapt(double[] objectHSVChannels,double hueWindow, double satWindow, double valWindow){
-		hueLow = (int) (objectHSVChannels[0]*(1-hueWindow/2));
-		hueHigh = (int) (objectHSVChannels[0]*(1+hueWindow/2));
-		saturationLow = (int) (objectHSVChannels[1]*(1-satWindow/2));
-		saturationHigh = (int) (objectHSVChannels[1]*(1+satWindow/2));
-		valueLow = (int) (objectHSVChannels[2]*(1-valWindow/2));
-		valueHigh = (int) (objectHSVChannels[2]*(1-valWindow/2));
+	public void adapt(ArrayList<Double> objectHSVChannels,int hueWindow, int satWindow, int valWindow){
+		int T = 30; // number of updates to 63%
+		//Hue update
+		hueLow = (int) (hueLow + ((objectHSVChannels.get(0)-hueWindow/2) - hueLow)/T);
+		hueHigh = (int) (hueHigh + ((objectHSVChannels.get(0)+hueWindow/2) - hueHigh)/T);
+		
+		//Saturation update
+		saturationLow = (int) (saturationLow +(objectHSVChannels.get(1)-satWindow/2 - saturationLow)/T);
+		saturationHigh = (int) (saturationHigh + (objectHSVChannels.get(1)+satWindow/2 - saturationHigh)/T);
+		
+		//Value update
+		valueLow = (int) (valueLow + (objectHSVChannels.get(2)-valWindow/2 - valueLow)/T);
+		valueHigh = (int) (valueHigh + (objectHSVChannels.get(2)+valWindow/2 - valueHigh)/T);
 	}
 }

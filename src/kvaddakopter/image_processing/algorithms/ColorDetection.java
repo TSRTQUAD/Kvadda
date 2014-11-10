@@ -19,17 +19,10 @@ import org.opencv.imgproc.Imgproc;
 
 
 public class ColorDetection  extends DetectionClass{
-
-	// Color threshold
-	static final int HUE_LOW = 175 - 20;
-	static final int HUE_HIGH = 175 + 20;
-	static final int SATURATION_LOW = 50;
-	static final int SATURATION_HIGH = 255;
-	static final int VALUE_LOW = 50;
-	static final int VALUE_HIGH = 255;
 	
 	// Minimum object size
-	static final int MINIMUM_OBJECT_SIZE = 10000;
+	static final int MINIMUM_OBJECT_SIZE = 2000;
+	static final int MAXIMUM_OBJECT_SIZE = 15000; //Not used yet
 
 	//Morphology 
 	static final int MORPH_KERNEL_SIZE = 16;
@@ -39,7 +32,7 @@ public class ColorDetection  extends DetectionClass{
 	ArrayList<ColorTemplate> colorTemplates;
 	
 	//Adaptive coloring
-	private boolean mUsingAdaptiveColoring = true;
+	private boolean mUsingColorAdaption = true;
 
 	public ColorDetection(){
 		super();
@@ -56,17 +49,23 @@ public class ColorDetection  extends DetectionClass{
 		Imgproc.cvtColor(imageObject.getImage(), HSVImage, Imgproc.COLOR_BGR2HSV);
 
 		Mat resultImage = new Mat(HSVImage.rows(), HSVImage.cols(), CvType.CV_8U);
-		resultImage.setTo(new Scalar(0));
 
-
-		Mat thresholdImage = new Mat();
 		Size morphSize = new Size(MORPH_KERNEL_SIZE, MORPH_KERNEL_SIZE);
-		Mat dilatedImage = new Mat();
 		ArrayList<TargetObject> targetObjects = new ArrayList<TargetObject>();
+		
+		
+		Mat cutoutImage = Mat.zeros(HSVImage.size(), CvType.CV_8UC3);
+		
+		
 		for(ColorTemplate colorTemplate : colorTemplates){
+			//number of targets found from this template
+			int numberOfTargetsFound = 0;
 			// Threshold with inRange
+			Mat thresholdImage = new Mat();
+			Mat dilatedImage = new Mat();
+			resultImage.setTo(new Scalar(0));
+			
 			Core.inRange(HSVImage, colorTemplate.getLower(), colorTemplate.getUpper(), thresholdImage);
-
 
 			// Do morphological operations
 			Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_ELLIPSE, morphSize);
@@ -79,21 +78,43 @@ public class ColorDetection  extends DetectionClass{
 			Core.bitwise_or(resultImage, dilatedImage, resultImage);
 			
 			//Target detection
-			//detectTargets()
 			ArrayList<Rect> boundingBoxes = new ArrayList<Rect>();
 			
-			//Get contours of binary image
-			List<MatOfPoint> contours = getContours(resultImage);
+			//Get contours and hierarchy of binary image
+			List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+			Mat hierarchy = new Mat();
+			Imgproc.findContours(resultImage, contours, hierarchy,Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 			
 			//Calculate bounding boxes from contours, 
 			//calculate cutout image from HSVImage and contours
-			//set target HSV channels for adaptive color detection
-			boundingBoxes = getBoundingBoxes(contours,1000);
-			ArrayList<Double> targetHSVChannels = new ArrayList<Double>();
-			mIntermeditateResult = cutout(HSVImage,contours,targetHSVChannels);
+			//set target HSV channels for adaptive color detection		
+			boundingBoxes = getBoundingBoxes(contours, hierarchy, MINIMUM_OBJECT_SIZE);
+			numberOfTargetsFound  = boundingBoxes.size();
+			Core.bitwise_or(cutoutImage, cutout(HSVImage,contours), cutoutImage);
+			
+			//Calculate mean HSV channel values with 10 as value threshhold 
+			ArrayList<Double> targetHSVChannels = calculateMeanHSVValues(cutoutImage, 10);
+			
+			mIntermeditateResult = cutoutImage;
 			
 			//Convert boundingboxes to targetObjects, draw boundingboxes in resultImage
 			targetObjects = convertToTargets(boundingBoxes, resultImage);
+			
+			//Draw target HSV values
+			for(TargetObject target:targetObjects){
+				//System.out.println((int)target.getPosition().get(0,0)[0]);
+				drawTargetHSVValues(cutoutImage, targetHSVChannels, (int)target.getPosition().get(0,0)[0], (int)target.getPosition().get(1,0)[0]);
+			}
+			
+			
+			thresholdImage.release();
+			dilatedImage.release();
+			
+			//TODO Save original color templates
+			//Change adaptedcolortemplates
+			if(isUsingColorAdaption() && numberOfTargetsFound > 0){
+				colorTemplate.adapt(targetHSVChannels, 100, 100, 100);
+			}
 		}
 
 		return targetObjects;
@@ -101,46 +122,55 @@ public class ColorDetection  extends DetectionClass{
 	}
 	
 	/**
-	 * TODO does this work for multiple  particles that look the same???? //Martin
 	 * Cutout of contours in Image, sets objectHSVChannels to mean value of the cutout
 	 * @param fromImage image to cut out from
 	 * @param contours countours to cut out
 	 * @param objectHSVChannels mean value of HSV channels of cutout in input image
 	 * @return cutout Image with HSV channel information
 	 */
-	private Mat cutout(Mat fromImage, List<MatOfPoint> contours, ArrayList<Double> objectHSVChannels){
+	private Mat cutout(Mat fromImage, List<MatOfPoint> contours){
+		
+		Mat resultImage = Mat.zeros(fromImage.size(), CvType.CV_8UC3);
+		List<MatOfPoint> contourMask = new ArrayList<MatOfPoint>(); //Container for each of the contours in turn
+		
 		// Cutout a region and calculate mean HSV values (in a bad way)
 		// Then display them on the image (in a not so bad way)
 		//
         // Create a mask for each contour to mask out that region from image.
-        Mat mask = Mat.zeros(fromImage.size(), CvType.CV_8UC1);
-        Imgproc.drawContours(mask, contours, -1, new Scalar(255), Core.FILLED); // This is a OpenCV function
+		for(MatOfPoint c:contours){
+			//Place code here to do hsv cutout for each contour
+			contourMask.clear();
+			double contourArea = Imgproc.contourArea(c);
 
-		Mat cutout = new Mat();
-		fromImage.copyTo(cutout, mask);
+			//Only mask with real objects (big blobs)
+			if(contourArea > MINIMUM_OBJECT_SIZE){
+				contourMask.add(c);
+				
+				Mat mask = Mat.zeros(fromImage.size(), CvType.CV_8UC1);
+		        Imgproc.drawContours(mask, contourMask, 0, new Scalar(255), Core.FILLED); // This is a OpenCV function
+
+				Mat cutout = new Mat();
+				fromImage.copyTo(cutout, mask);								
+			    
+			    //Add cutout to result
+			    Core.add(resultImage, cutout, resultImage);
+			    
+			    //free memory
+			    cutout.release();
+			}
+		}
 		
-		//Calculate mean HSV channel values with 10 as value threshhold
-		objectHSVChannels = calculateMeanHSVValues(cutout,10);
-	
-		String txtString = String.format("H = %4f", objectHSVChannels.get(0));
-	    Core.putText(cutout, txtString, new Point(25, 280) , Core.FONT_HERSHEY_SIMPLEX, .7, new Scalar(255, 255, 255), 2, 8, false);
-	    
-		txtString = String.format("S = %4f", objectHSVChannels.get(1));
-	    Core.putText(cutout, txtString, new Point(25, 300) , Core.FONT_HERSHEY_SIMPLEX, .7, new Scalar(255, 255, 255), 2, 8, false);
-	    
-		txtString = String.format("V = %4f", objectHSVChannels.get(2));
-	    Core.putText(cutout, txtString, new Point(25, 320) , Core.FONT_HERSHEY_SIMPLEX, .7, new Scalar(255, 255, 255), 2, 8, false);
-	    
-		return cutout;
+		return resultImage;
 	}
 	
 	/**
+	 * TODO minimize calculation cost, doubles->longs???
 	 * Calculates mean of HSV channels in cutout Image
 	 * @param cutout
 	 * @param threshold
 	 * @return ArrayList<Double> where index 0->Hue,1->Saturation,2->Value
 	 */
-	private ArrayList<Double> calculateMeanHSVValues(Mat cutout,double threshold){
+	private ArrayList<Double> calculateMeanHSVValues(Mat cutout, double threshold){
 		ArrayList<Double> channelMeanValues = new ArrayList<Double>();
 		
 		double HVal = 0, SVal = 0, VVal = 0;
@@ -163,11 +193,30 @@ public class ColorDetection  extends DetectionClass{
 		HVal = Htot/numVals;
 		channelMeanValues.add(HVal);
 		SVal = Stot/numVals;
-		channelMeanValues.add(VVal);
-		VVal = Vtot/numVals;
 		channelMeanValues.add(SVal);
+		VVal = Vtot/numVals;
+		channelMeanValues.add(VVal);
 		return channelMeanValues;
 
+	}
+	
+	/**
+	 * Draw HSV values below targets
+	 * @param image
+	 * @param targetHSVChannels
+	 * @param targetPosX
+	 * @param targetPosY
+	 */
+	private void drawTargetHSVValues(Mat image, ArrayList<Double> targetHSVChannels, int targetPosX, int targetPosY){
+		//Draw HSV channels, should be moved and draw under each object
+		String txtString = String.format("H = %4f", targetHSVChannels.get(0));
+	    Core.putText(image, txtString, new Point(targetPosX, targetPosY+20) , Core.FONT_HERSHEY_SIMPLEX, .5, new Scalar(255, 255, 255), 1, 8, false);
+	    
+		txtString = String.format("S = %4f", targetHSVChannels.get(1));
+	    Core.putText(image, txtString, new Point(targetPosX, targetPosY+40) , Core.FONT_HERSHEY_SIMPLEX, .5, new Scalar(255, 255, 255), 1, 8, false);
+	    
+		txtString = String.format("V = %4f", targetHSVChannels.get(2));
+	    Core.putText(image, txtString, new Point(targetPosX, targetPosY+60) , Core.FONT_HERSHEY_SIMPLEX, .5, new Scalar(255, 255, 255), 1, 8, false);
 	}
 
 	/**
@@ -230,11 +279,11 @@ public class ColorDetection  extends DetectionClass{
 		return res;
 	}
 	
-	public boolean isUsingAdaptiveColoring(){
-		return mUsingAdaptiveColoring;
+	public boolean isUsingColorAdaption(){
+		return mUsingColorAdaption;
 	}
 	
-	public void setUsingAdaptiveColoring(boolean b){
-		mUsingAdaptiveColoring = b;
+	public void setUsingColorAdaption(boolean b){
+		mUsingColorAdaption = b;
 	}
 }

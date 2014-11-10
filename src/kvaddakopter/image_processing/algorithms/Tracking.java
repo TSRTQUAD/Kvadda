@@ -11,8 +11,9 @@ import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 
+import com.xuggle.xuggler.demos.VideoImage;
+
 public class Tracking {
-	
 	Mat emptyMat; // For easier use with Core.gemm
 	
 	Mat H_small; 
@@ -49,6 +50,7 @@ public class Tracking {
 		
 		x = new Mat(4, 1, CvType.CV_64F);
 		mInternalTargets = new HashMap<Integer, TargetObject>();
+		//Init window
 	}
 	
 	
@@ -171,8 +173,8 @@ public class Tracking {
 		return res;
 	}
 	
-	public Mat getImage(){
-		Mat res = new Mat(720, 1280, CvType.CV_8U);
+	public Mat getImage(int resWidth, int resHeight){
+		Mat res = new Mat(resHeight, resWidth, CvType.CV_8U);
 		res.setTo(new Scalar(0, 0, 0));
 		if(mInternalTargets.size() > 0){
 			for(int key : mInternalTargets.keySet()) {

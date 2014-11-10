@@ -40,7 +40,7 @@ public class TestColorDetection extends ProgramClass{
 		//Open window 
 		openVideoWindow();
 
-		trackingWindow = new VideoImage();
+		trackingWindow = new VideoImage(); // put in Tracking?
 		tracker = new Tracking();
 		
 		mCurrentMethod = new ColorDetection();
@@ -56,12 +56,15 @@ public class TestColorDetection extends ProgramClass{
 		//((ColorDetection) mCurrentMethod).addTemplate("Yellow square", 20, 40, 100, 255, 100, 255, ColorTemplate.FORM_SQUARE);
 		ArrayList<TargetObject> targetList = mCurrentMethod.start(imageObject);
 
-
+		int resWidth = 0;
+		int resHeight = 0;
 		if(mCurrentMethod.hasIntermediateResult()){
 
 			Mat output = mCurrentMethod.getIntermediateResult();
 			//Convert Mat to BufferedImage
 			BufferedImage out = ImageConversion.mat2Img(output);
+			resWidth = out.getWidth();
+			resHeight = out.getHeight();
 			output.release();
 			updateJavaWindow(out);
 		}
@@ -70,7 +73,7 @@ public class TestColorDetection extends ProgramClass{
 			tracker.update(targetList);
 			
 			
-			Mat output = tracker.getImage();
+			Mat output = tracker.getImage(resWidth,resHeight);
 			BufferedImage out = ImageConversion.mat2Img(output);
 			trackingWindow.setImage(out);
 		}
