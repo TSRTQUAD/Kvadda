@@ -7,6 +7,9 @@ import java.util.ArrayList;
  */
 public class MissionObject {
 	// Variable declaration
+	
+	protected String missionName = "";
+	
 	protected MissionType mission = MissionType.ALONG_TRAJECTORY;
 	
 	protected ArrayList<Area> searchareas = null;
@@ -21,6 +24,10 @@ public class MissionObject {
 	protected int descriptor = 0;
 	
 	// Get variables
+	public String getMissionName(){
+		return this.missionName;
+	}
+	
 	public MissionType getMissionType(){
 		return this.mission;
 	}
@@ -48,6 +55,7 @@ public class MissionObject {
 	public int getDescriptor(){
 		return this.descriptor;
 	}
+	
 	
 	// Assign values to the different variables.
 	// Assign the mission type to variable mission.
@@ -85,6 +93,14 @@ public class MissionObject {
 	
 	public void setDescriptor(int descriptor){
 		this.descriptor = descriptor;
+	}
+	
+	public void setMissionName(String name){
+		this.missionName = name;
+	}
+	
+	public String toString(){
+		return this.missionName + " // " + this.mission + " // ";
 	}
 	
 }

@@ -21,8 +21,8 @@ public class RouteMarker {
 
     static {
         markerPaths = new HashMap<>();
-        markerPaths.put(MapMarkerEnum.NAVIGATION_NORMAL, "point_marker.png");
-        markerPaths.put(MapMarkerEnum.FORBIDDEN_AREAS, "point_marker_forbidden.png");
+        markerPaths.put(MapMarkerEnum.NAVIGATION_NORMAL, "waypoint_marker.png");
+        markerPaths.put(MapMarkerEnum.FORBIDDEN_AREAS, "waypoint_marker_forbidden.png");
     }
 
 
@@ -30,7 +30,7 @@ public class RouteMarker {
      * Factory for creating Route markers.
      *
      * @param latitude  For the new Marker
-     * @param longitude The current nb in coordinate array If looping - Use 1 if you want a start marker (Green) and
+     * @param longitude 
      * @param iconType  IconType to be showed.
      * @param title     The title for the marker.
      * @return Marker
