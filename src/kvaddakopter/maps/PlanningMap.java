@@ -104,6 +104,8 @@ public class PlanningMap implements MapComponentInitializedListener {
 	public void addNavigationPoint(GPSCoordinate coordinate, MapMarkerEnum iconType, ArrayList<GPSCoordinate> list) {
 		Marker marker = RouteMarker.create(coordinate.getLatitude(), coordinate.getLongitude(), iconType);
 		list.add(coordinate);
+		Integer idx = list.size();
+		marker.setTitle(idx.toString());
 		map.addMarker(marker);
 	}
 
