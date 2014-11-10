@@ -4,12 +4,17 @@ import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.event.UIEventType;
 import com.lynden.gmapsfx.javascript.object.*;
+import com.lynden.gmapsfx.shapes.Circle;
+import com.lynden.gmapsfx.shapes.CircleOptions;
 
 import netscape.javascript.JSObject;
 
 import java.util.ArrayList;
 
 import kvaddakopter.assignment_planer.Area;
+import kvaddakopter.assignment_planer.MissionType;
+import kvaddakopter.gui.components.GPSMarker;
+import kvaddakopter.gui.components.GpsToAreaTransformer;
 import kvaddakopter.gui.controllers.TabPlaneraController;
 
 
@@ -39,14 +44,12 @@ public class PlanningMap implements MapComponentInitializedListener {
 	/**
 	 * Navigation Markers
 	 */
-	private ArrayList<GPSCoordinate> navigationCoordinates = new ArrayList<GPSCoordinate>();
-
+	private ArrayList<GPSMarker> navigationCoordinates = new ArrayList<GPSMarker>();
 
 	/**
 	 * Forbidden Areas Markers
 	 */
-	private ArrayList<GPSCoordinate> forbiddenAreasCoordinates = new ArrayList<GPSCoordinate>();
-
+	private ArrayList<GPSMarker> forbiddenAreasCoordinates = new ArrayList<GPSMarker>();
 
 	/**
 	 * Constructor
@@ -57,6 +60,7 @@ public class PlanningMap implements MapComponentInitializedListener {
 		this.mapView = mapView;
 		this.owningController = owningController;
 		this.mapView.addMapInializedListener(this);
+		
 	}
 
 
@@ -71,7 +75,36 @@ public class PlanningMap implements MapComponentInitializedListener {
 		this.addMapEventListeners();
 
 	}
-
+	
+	
+	/**
+	 * Clear all navigation markers on the map.
+	 */
+	public void clearNavigationCoordinates(){
+		for(GPSMarker marker : this.navigationCoordinates){
+			this.map.removeMarker(marker.getMarker());
+		}
+		this.navigationCoordinates.clear();
+	}
+	
+	/**
+	 * Clear all Forbidden Area markers on the map.
+	 */
+	public void clearForbiddenAreasCoordinates(){
+		for(GPSMarker marker : this.forbiddenAreasCoordinates){
+			this.map.removeMarker(marker.getMarker());
+		}
+		this.forbiddenAreasCoordinates.clear();
+	}
+	
+	/**
+	 * Clears both forbidden areas and navigation coordiantes
+	 */
+	public void clearMap(){
+		this.clearForbiddenAreasCoordinates();
+		this.clearNavigationCoordinates();
+	}
+	
 
 	/**
 	 * Sets all event listeners for the map.
@@ -81,14 +114,22 @@ public class PlanningMap implements MapComponentInitializedListener {
 		//EVENT FOR USER CLICKED MAP
 		this.map.addUIEventHandler(UIEventType.click, (JSObject obj) -> {
 			
-			LatLong ll = new LatLong((JSObject) obj.getMember("latLng"));
-			GPSCoordinate coord = new GPSCoordinate(ll.getLatitude(), ll.getLongitude());
+			//Coordinate where the user clicked.
+			LatLong coordinate = new LatLong((JSObject) obj.getMember("latLng"));
+			
+			if ( this.owningController.addMissionCoordinatesMode() ){
+				
+				// 3 cases
+				MissionType missionType = this.owningController.getCurrentSelectedMissionType();
 
-			if ( this.owningController.possibleToAddMissionCoordinates() ){
-				this.addNavigationPoint(coord, MapMarkerEnum.NAVIGATION_NORMAL, this.navigationCoordinates);
+	
+				if (missionType == MissionType.AROUND_COORDINATE && this.navigationCoordinates.size() < 1){
+                        this.addGpsPoint(coordinate, MapMarkerEnum.NAVIGATION_NORMAL, this.navigationCoordinates);
+				}
+
 			}
-			if ( this.owningController.possibleToAddForbinnenAreaCoordinates() ){
-				this.addNavigationPoint(coord, MapMarkerEnum.FORBIDDEN_AREAS, this.forbiddenAreasCoordinates);
+			if ( this.owningController.addForbiddenAreasMode() ){
+                        this.addGpsPoint(coordinate, MapMarkerEnum.FORBIDDEN_AREAS, this.forbiddenAreasCoordinates);
 			}
 
 		});
@@ -97,16 +138,41 @@ public class PlanningMap implements MapComponentInitializedListener {
 
 
 	/**
-	 * Add a navigation point to the given GPS Coordinate.
-	 *
+	 * Adds One GPS Point To the list supplied Area List
 	 * @param coordinate
+	 * @param iconType
+	 * @param list
 	 */
-	public void addNavigationPoint(GPSCoordinate coordinate, MapMarkerEnum iconType, ArrayList<GPSCoordinate> list) {
+	private void addGpsPoint(LatLong coordinate, MapMarkerEnum iconType, ArrayList<GPSMarker> list) {
 		Marker marker = RouteMarker.create(coordinate.getLatitude(), coordinate.getLongitude(), iconType);
-		list.add(coordinate);
-		Integer idx = list.size();
-		marker.setTitle(idx.toString());
+		GPSMarker gpsMarker = new GPSMarker(coordinate, marker);
+		
+		
+		CircleOptions cOpts = new CircleOptions()
+		.center(coordinate)
+		.radius(20)
+		.strokeColor("green")
+		.strokeWeight(2)
+		.fillColor("green")
+		.fillOpacity(0.1);
+		Circle searchAreaCircle = new Circle(cOpts);
+        map.addMapShape(searchAreaCircle);
+        map.addUIEventHandler(searchAreaCircle, UIEventType.click, (JSObject obj) -> {
+        	searchAreaCircle.setEditable(!searchAreaCircle.getEditable());
+        });
+		list.add(gpsMarker);
 		map.addMarker(marker);
+		map.addUIEventHandler(marker, UIEventType.click, (JSObject obj) -> {
+			int markerIndex = list.indexOf(gpsMarker);
+			GPSMarker clickedMarker = list.get(markerIndex);
+			this.map.removeMarker(clickedMarker.getMarker());
+			list.remove(markerIndex);
+			
+			
+			
+			
+		});
+
 	}
 
 
@@ -116,7 +182,7 @@ public class PlanningMap implements MapComponentInitializedListener {
 	 * @return
 	 */
 	public ArrayList<Area> allNavigationCoordinates() {
-		return transformGPSToAreaObject(this.navigationCoordinates);
+		return GpsToAreaTransformer.transform(this.navigationCoordinates);
 		
 	}
 
@@ -127,27 +193,12 @@ public class PlanningMap implements MapComponentInitializedListener {
 	 * @return
 	 */
 	public ArrayList<Area> allForbiddenAreaCoordinates() {
-		return transformGPSToAreaObject(this.forbiddenAreasCoordinates);
+		return GpsToAreaTransformer.transform( this.forbiddenAreasCoordinates );
 	}
 	
 	
 	
-	private ArrayList<Area> transformGPSToAreaObject(ArrayList<GPSCoordinate> gpsCoordinates){
-		Area areaList = new Area();
-		ArrayList<Area> list = new ArrayList<Area>();
 
-		int i = 0;
-		for(GPSCoordinate coord: gpsCoordinates){
-			areaList.area[i][1] = coord.getLatitude();
-			areaList.area[i][2] = coord.getLongitude();
-			i++;
-		}
-
-		list.add(areaList);
-
-		return list;
-	}
-	
 
 	/**
 	 * Used to initialize the wanted map with given options.

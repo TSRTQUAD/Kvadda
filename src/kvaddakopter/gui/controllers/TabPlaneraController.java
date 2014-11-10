@@ -12,6 +12,7 @@ import java.util.ResourceBundle;
 import storage.MissionStorage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -56,20 +57,11 @@ public class TabPlaneraController implements Initializable {
     @FXML
     private RadioButton radioDescriptor2;
 
-    @FXML
-    private Button btnStartMissionCoordinates;
-
-    @FXML
-    private Button btnStartMarkForbiddenAreas;
-
-    @FXML
-    private Button btnSaveMission;
     
     
     /**
      * Properties
      */
-    @SuppressWarnings("unused")
 	private PlanningMap planningMap;
     
     protected boolean canEnterMissionCoordinates = false;
@@ -82,33 +74,128 @@ public class TabPlaneraController implements Initializable {
 	protected MissionStorage storage;
 	
 	
+	protected MissionType currentSelectedMissionType;
+	
+	
+    /**
+     * GUI events
+     */
+	
+	
+    @FXML
+    private void missionTypeChanged()
+    {
+    	this.currentSelectedMissionType = this.listMissionType.getSelectionModel().getSelectedItem();
+    	this.planningMap.clearNavigationCoordinates();
+    }
+    
+    @FXML
+    private void btnClickedClearNagivationCoordinates(){
+    	this.planningMap.clearNavigationCoordinates();
+    }
+    
+    @FXML
+    private void btnClickedClearForbiddenAreasCoodinates(){
+    	this.planningMap.clearForbiddenAreasCoordinates();
+    }
+    
+    @FXML
+    private void btnStartMissionCoordinates(){
+    	this.canEnterMissionCoordinates = true;
+    	this.canEnterForbiddenAreaCoordinates = false;	
+    }
+    
+    @FXML
+    private void btnStartMarkForbiddenAreas(){
+    	this.canEnterForbiddenAreaCoordinates = true;
+    	this.canEnterMissionCoordinates = false;
+    }
+     
+    
+    @FXML 
+    private void btnSaveMission(){
+    	
+    	MissionObject mission = new MissionObject();
+    	
+    	mission.setMissionName(this.txtMissionName.getText());
+    	
+    	mission.mission(this.listMissionType.getValue());
+    	
+    	double[] height = {(double) this.listMissionHeight.getValue().getValue()};
+    	mission.setHeight(height);
+    	
+    	double[] radiusValue = {(double) 5};
+    	mission.setRadius(radiusValue);
+    	
+    	mission.setSearchAreas(this.planningMap.allNavigationCoordinates());
+    	mission.setForbiddenAreas(this.planningMap.allForbiddenAreaCoordinates());
+    	
+    	String selectedTemplate = this.listTargetTemplate.getValue();
+    	int templateId = this.targetTemplates.indexOf(selectedTemplate);
+    	mission.setImageTemplate(templateId);
+    	
+    	String selectedColor = this.listTargetColor.getValue();
+    	int colorId = this.colorTemplates.indexOf(selectedColor);
+    	mission.setColorTemplate(colorId);
+    	
+    	
+    	int descriptorId = (int) this.descriporRadioGroup.getSelectedToggle().getUserData();
+    	mission.setDescriptor(descriptorId);
+    	
+    	mission.setSearchAreas(this.planningMap.allNavigationCoordinates());
+    	mission.setForbiddenAreas(this.planningMap.allForbiddenAreaCoordinates());
+    	
+    	
+    	//Save mission
+    	this.storage.saveMission(mission);
+    }
+    
+    
 	/**
 	 * Public Methods
 	 */
+    
+    
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
     	
         this.planningMap = new PlanningMap(this.mapView, this);
         this.storage = new MissionStorage();
         
-        
-        this.setEventHandlers();
         this.populateListsAndDefaults();
     }
     
     
-    public boolean possibleToAddMissionCoordinates(){
+    /**
+     * Used by map to determine if the user specified that he/she want to add Mission Coordinates.
+     * @return boolean If we are on this Mode
+     */
+    public boolean addMissionCoordinatesMode(){
     	return this.canEnterMissionCoordinates;
     }
     
-    public boolean possibleToAddForbinnenAreaCoordinates(){
+    /**
+     * Used by map to determine if the user specified that he/she want to add Forbidden Area Coordinates.
+     * @return boolean If we are on this Mode
+     */
+    public boolean addForbiddenAreasMode(){
     	return this.canEnterForbiddenAreaCoordinates;
     }
+    
+    public MissionType getCurrentSelectedMissionType(){
+    	return this.currentSelectedMissionType;
+    }
+    
+    
+    
     
     
     /**
      * Private Methods
      */
+    
+    
     
     
     
@@ -119,12 +206,11 @@ public class TabPlaneraController implements Initializable {
     	
     	//  Populate list of MissionTypes
     	this.listMissionType.setItems( FXCollections.observableArrayList(
+    			MissionType.AROUND_COORDINATE,
     			MissionType.ALONG_TRAJECTORY,
-    			MissionType.AREA_COVERAGE,
-    			MissionType.AROUND_COORDINATE
+    			MissionType.AREA_COVERAGE
     			));
     	this.listMissionType.getSelectionModel().select(0);
-    	
     	
     	this.listMissionHeight.setItems( FXCollections.observableArrayList(
     			MissionHeight.ONE_METER,
@@ -160,64 +246,7 @@ public class TabPlaneraController implements Initializable {
 	}
 
 
-	/**
-     * Used to add all event listeners in the planning tab.
-     * EXCLUDES MAP EVENTS. THEY ARE HANDLED BY THE PLANNING MAP ABSTRACTION CLASS.
-     */
-    private void setEventHandlers() {
+    
 
-        // Event triggered when clicking "Save mission" button.
-        this.btnSaveMission.setOnAction(e -> {
-        	
-        	MissionObject mission = new MissionObject();
-        	
-        	mission.setMissionName(this.txtMissionName.getText());
-        	
-        	mission.mission(this.listMissionType.getValue());
-        	
-        	double[] height = {(double) this.listMissionHeight.getValue().getValue()};
-        	mission.setHeight(height);
-        	
-        	double[] radiusValue = {(double) 5};
-        	mission.setRadius(radiusValue);
-        	
-        	mission.setSearchAreas(this.planningMap.allNavigationCoordinates());
-        	mission.setForbiddenAreas(this.planningMap.allForbiddenAreaCoordinates());
-        	
-        	String selectedTemplate = this.listTargetTemplate.getValue();
-        	int templateId = this.targetTemplates.indexOf(selectedTemplate);
-        	mission.setImageTemplate(templateId);
-        	
-        	String selectedColor = this.listTargetColor.getValue();
-        	int colorId = this.colorTemplates.indexOf(selectedColor);
-        	mission.setColorTemplate(colorId);
-        	
-        	
-        	int descriptorId = (int) this.descriporRadioGroup.getSelectedToggle().getUserData();
-        	mission.setDescriptor(descriptorId);
-        	
-        	mission.setSearchAreas(this.planningMap.allNavigationCoordinates());
-        	mission.setForbiddenAreas(this.planningMap.allForbiddenAreaCoordinates());
-        	
-        	
-        	//Save mission
-        	this.storage.saveMission(mission);
-        	
-        });
-        
-        this.btnStartMissionCoordinates.setOnAction(e -> {
-        	this.canEnterMissionCoordinates = true;
-        	this.canEnterForbiddenAreaCoordinates = false;
-        });
-
-        this.btnStartMarkForbiddenAreas.setOnAction(e -> {
-        	this.canEnterForbiddenAreaCoordinates = true;
-        	this.canEnterMissionCoordinates = false;
-        });
-    }
-    
-    
-    
-    
 
 }

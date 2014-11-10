@@ -44,7 +44,7 @@
                                     <Font name="Lato Regular" size="14.0" />
                                  </font>
                               </Label>
-                              <ComboBox fx:id="listMissionType" prefWidth="250.0" />
+                              <ComboBox fx:id="listMissionType" onAction="#missionTypeChanged" prefWidth="250.0" />
                            </children>
                            <VBox.margin>
                               <Insets left="20.0" right="20.0" top="20.0" />
@@ -120,12 +120,22 @@
                               <Insets left="20.0" right="20.0" top="20.0" />
                            </VBox.margin>
                            <children>
-                              <Button fx:id="btnStartMissionCoordinates" mnemonicParsing="false" prefWidth="200.0" text="Markera koordinater" />
+                              <Button fx:id="btnStartMissionCoordinates" mnemonicParsing="false" onAction="#btnStartMissionCoordinates" prefWidth="200.0" text="Markera uppdragskoordinater" />
+                              <Button alignment="CENTER" mnemonicParsing="false" onAction="#btnClickedClearNagivationCoordinates" prefHeight="26.0" prefWidth="70.0" styleClass="btn-danger" stylesheets="@../../application.css" text="Rensa">
+                                 <HBox.margin>
+                                    <Insets left="30.0" />
+                                 </HBox.margin>
+                              </Button>
                            </children>
                         </HBox>
                         <HBox alignment="CENTER">
                            <children>
-                              <Button fx:id="btnStartMarkForbiddenAreas" mnemonicParsing="false" prefWidth="200.0" text="Markera förbjuda områden" />
+                              <Button fx:id="btnStartMarkForbiddenAreas" mnemonicParsing="false" onAction="#btnStartMarkForbiddenAreas" prefWidth="200.0" text="Markera förbjuda områden" />
+                              <Button alignment="CENTER" mnemonicParsing="false" onAction="#btnClickedClearForbiddenAreasCoodinates" prefHeight="26.0" prefWidth="70.0" styleClass="btn-danger" stylesheets="@../../application.css" text="Rensa">
+                                 <HBox.margin>
+                                    <Insets left="30.0" />
+                                 </HBox.margin>
+                              </Button>
                            </children>
                            <VBox.margin>
                               <Insets left="20.0" right="20.0" top="20.0" />
@@ -172,7 +182,7 @@
                   </VBox>
                   <HBox fx:id="txtEstimatedTime" alignment="CENTER" prefHeight="26.0" prefWidth="401.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                      <children>
-                        <Button fx:id="btnSaveMission" alignment="CENTER" mnemonicParsing="false" prefHeight="26.0" prefWidth="198.0" text="Spara uppdrag" />
+                        <Button fx:id="btnSaveMission" alignment="CENTER" mnemonicParsing="false" onAction="#btnSaveMission" prefHeight="26.0" prefWidth="198.0" text="Spara uppdrag" />
                      </children>
                   </HBox>
                </children>

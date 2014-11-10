@@ -8,3 +8,8 @@
 .textbox{
 	-fx-background-color: #ffffff;
 }
+
+.btn-danger{
+	-fx-background-color: #F06560;
+	-fx-border: 1px solid black;
+}
