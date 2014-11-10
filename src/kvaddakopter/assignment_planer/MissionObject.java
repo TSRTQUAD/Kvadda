@@ -7,6 +7,9 @@ import java.util.ArrayList;
  */
 public class MissionObject {
 	// Variable declaration
+	
+	protected String missionName = "";
+	
 	protected MissionType mission = MissionType.ALONG_TRAJECTORY;
 	
 	protected ArrayList<Area> searchareas = null;
@@ -23,6 +26,10 @@ public class MissionObject {
 	protected double[][] trajectory = null;
 	
 	// Get variables
+	public String getMissionName(){
+		return this.missionName;
+	}
+	
 	public MissionType getMissionType(){
 		return this.mission;
 	}
@@ -53,6 +60,7 @@ public class MissionObject {
 	public double[][] getTrajectory(){
 		return this.trajectory;
 	}
+	
 	
 	// Assign values to the different variables.
 	// Assign the mission type to variable mission.
@@ -94,6 +102,14 @@ public class MissionObject {
 	// Assign the trajectory to the variable trajectory.
 	public void setTrajectory(double[][] tmptrajectory){
 		this.trajectory =  tmptrajectory;
+	}
+	
+	public void setMissionName(String name){
+		this.missionName = name;
+	}
+	
+	public String toString(){
+		return this.missionName + " // " + this.mission + " // ";
 	}
 	
 }

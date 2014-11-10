@@ -3,14 +3,13 @@ package kvaddakopter.gui.controllers;
 
 import com.lynden.gmapsfx.GoogleMapView;
 
-
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
-
+import storage.MissionStorage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -80,6 +79,8 @@ public class TabPlaneraController implements Initializable {
 	protected ArrayList<String> colorTemplates = new ArrayList<String>();
 	
 	
+	protected MissionStorage storage;
+	
 	
 	/**
 	 * Public Methods
@@ -88,6 +89,8 @@ public class TabPlaneraController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
     	
         this.planningMap = new PlanningMap(this.mapView, this);
+        this.storage = new MissionStorage();
+        
         
         this.setEventHandlers();
         this.populateListsAndDefaults();
@@ -168,6 +171,8 @@ public class TabPlaneraController implements Initializable {
         	
         	MissionObject mission = new MissionObject();
         	
+        	mission.setMissionName(this.txtMissionName.getText());
+        	
         	mission.mission(this.listMissionType.getValue());
         	
         	double[] height = {(double) this.listMissionHeight.getValue().getValue()};
@@ -194,7 +199,9 @@ public class TabPlaneraController implements Initializable {
         	mission.setSearchAreas(this.planningMap.allNavigationCoordinates());
         	mission.setForbiddenAreas(this.planningMap.allForbiddenAreaCoordinates());
         	
-        	System.out.println(mission);
+        	
+        	//Save mission
+        	this.storage.saveMission(mission);
         	
         });
         
