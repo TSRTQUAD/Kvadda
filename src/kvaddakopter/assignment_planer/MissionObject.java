@@ -23,6 +23,8 @@ public class MissionObject {
 	protected int colorTemplate = 0;
 	protected int descriptor = 0;
 	
+	protected double[][] trajectory = null;
+	
 	// Get variables
 	public String getMissionName(){
 		return this.missionName;
@@ -55,6 +57,9 @@ public class MissionObject {
 	public int getDescriptor(){
 		return this.descriptor;
 	}
+	public double[][] getTrajectory(){
+		return this.trajectory;
+	}
 	
 	
 	// Assign values to the different variables.
@@ -78,7 +83,7 @@ public class MissionObject {
 	public void setHeight(double[] heightvalue){
 		height = heightvalue;
 	}
-	// Assign the radius to the variable	radius.
+	// Assign the radius to the variable radius.
 	public void setRadius(double[] radiusvalue){
 		radius = radiusvalue;
 	}
@@ -93,6 +98,10 @@ public class MissionObject {
 	
 	public void setDescriptor(int descriptor){
 		this.descriptor = descriptor;
+	}
+	// Assign the trajectory to the variable trajectory.
+	public void setTrajectory(double[][] tmptrajectory){
+		this.trajectory =  tmptrajectory;
 	}
 	
 	public void setMissionName(String name){

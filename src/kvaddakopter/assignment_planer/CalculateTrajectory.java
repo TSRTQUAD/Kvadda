@@ -13,20 +13,25 @@ import com.jmatio.types.MLDouble;
 import matlabcontrol.MatlabConnectionException;
 import matlabcontrol.MatlabInvocationException;
 import matlabcontrol.MatlabProxy;
-import matlabcontrol.MatlabProxyFactory;
-import matlabcontrol.MatlabProxyFactoryOptions;
-import matlabcontrol.MatlabProxyFactoryOptions.Builder;
 
 
 public class CalculateTrajectory {
 	protected double[][] trajectory;
 	protected double trajectorylength;
+	protected MatlabProxyConnection Matlab;
+
+	public CalculateTrajectory(MatlabProxyConnection matlab) {
+		this.Matlab = matlab;
+	}
 
 	public double[][] getTrajectory(MissionObject object) throws IOException, MatlabConnectionException, MatlabInvocationException {
 		createMatFile(object);
 		calculateTrajectory();
 		trajectory = readMatFile();
-
+		
+		// Save trajectory and corresponding data to MissionObject
+		object.setTrajectory(trajectory);
+		
 		return trajectory;
 	}
 
@@ -85,22 +90,11 @@ public class CalculateTrajectory {
 	}
 
 	public void calculateTrajectory() throws MatlabConnectionException, MatlabInvocationException{
-		//Create a proxy, which will be used to control MATLAB
-		//Set the options to quiet so no GUI are opened
-		Builder buildoptions = new MatlabProxyFactoryOptions.Builder();
-		buildoptions.setHidden(true);
-		MatlabProxyFactoryOptions options = buildoptions.build();
-		MatlabProxyFactory factory = new MatlabProxyFactory(options);
-		MatlabProxy proxy = factory.getProxy();
-
+		MatlabProxy proxy = this.Matlab.getMatlabProxy();
+		
 		//Make script call
 		proxy.eval("cd('src/kvaddakopter/assignment_planer/Matlab');assignmentplaner");
 
-		//Terminate Matlab
-		//proxy.exit();
-
-		//Disconnect the proxy from MATLAB
-		proxy.disconnect();
 	}
 
 	public double[][] readMatFile() throws FileNotFoundException, IOException {
@@ -109,7 +103,9 @@ public class CalculateTrajectory {
 		return tmptrajectory;
 	}
 
-	public void printTrajectory(double[][] trajectory) {
+	public void printTrajectory(MissionObject object) {
+		
+		double[][] trajectory = object.getTrajectory();
 
 		for (int i = 0; i < trajectory.length; i++)
 		{
