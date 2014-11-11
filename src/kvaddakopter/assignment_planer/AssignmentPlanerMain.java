@@ -32,7 +32,7 @@ public class AssignmentPlanerMain {
 		testobject.setSearchAreas(searchareas);
 		*/
 		
-		
+		/*
 		testobject.mission( MissionType.ALONG_TRAJECTORY );
 		ArrayList<Area> searchareas = new ArrayList<Area>();
 		Area linesearch = new Area();
@@ -46,9 +46,9 @@ public class AssignmentPlanerMain {
 				{58.395107,15.574526}};
 		searchareas.add( linesearch );
 		testobject.setSearchAreas(searchareas);
+		*/
 		
 		
-		/*
 		testobject.mission( MissionType.AREA_COVERAGE );
 		// Create search areas
 		ArrayList<Area> searchareas = new ArrayList<Area>();
@@ -79,19 +79,19 @@ public class AssignmentPlanerMain {
 				{58.394944,15.574912}};
 		forbiddenareas.add( tmpforbiddenarea );
 		testobject.setForbiddenAreas(forbiddenareas);
-		*/
+		
 
 		
 		// Calculate the trajectory
 		CalculateTrajectory calculatetrajectory = new CalculateTrajectory(Matlab);
 		double[][] trajectory = calculatetrajectory.getTrajectory(testobject);
 
-		// Print the calculated trajectory and it´s length
-		calculatetrajectory.printTrajectory(testobject);
-		calculatetrajectory.printReferenceVelocity(testobject);
-		System.out.println("Trajectory length: " + testobject.getTrajectoryLength());
-		System.out.println("Coverage area: " + testobject.getCoverageArea());
-		System.out.println("Mission time: " + testobject.getMissionTime());
+		// Print the calculated trajectory and corresponding data
+		AssignmentPlanerMain.print3D("Trajectory",trajectory);
+		AssignmentPlanerMain.print3D("Velocity",testobject.getReferenceVelocity());
+		AssignmentPlanerMain.print3D("Trajectory length",testobject.getTrajectoryLength());
+		AssignmentPlanerMain.print3D("Coverage area",testobject.getCoverageArea());
+		AssignmentPlanerMain.print3D("Mission time",testobject.getMissionTime());
 		
 		
 		/*
@@ -113,6 +113,20 @@ public class AssignmentPlanerMain {
 		
 		Matlab.terminateMatlab();
 		System.out.println("\nProgram terminated");
+	}
+	
+	public static void print3D(String string, double[][] variable) {
+		System.out.println(string + ": ");
+		for (int i = 0; i < variable.length; i++)
+		{
+			for (int j = 0; j < variable[0].length; j++)
+			{
+				System.out.print(variable[i][j]);
+				System.out.print(" ");
+			}
+
+			System.out.println("");
+		}
 	}
 
 }

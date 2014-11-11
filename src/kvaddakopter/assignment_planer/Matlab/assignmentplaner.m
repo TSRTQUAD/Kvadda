@@ -20,6 +20,7 @@
 % DouglasPeucker    - Epsilon describing minimum distance between two
 %                     points
 % interpolation     - Number of points to be set between each nodpair
+% lldistkm          - Earth radius
 
 
 % --------------------------------------------------

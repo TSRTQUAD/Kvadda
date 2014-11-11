@@ -67,6 +67,7 @@ public class CalculateTrajectory {
 			forbiddenarea.set(new MLDouble( "forbiddenarea" + 1, new double[][] {{0,0}} ), 0);
 		}
 
+		
 		//Write arrays to file
 		ArrayList<MLArray> list = new ArrayList<MLArray>();
 		list.add( mission );
@@ -75,8 +76,20 @@ public class CalculateTrajectory {
 		list.add( startcoordinate );
 		list.add( height );
 		list.add( radius );
-
 		new MatFileWriter( "object.mat", list );
+		
+		
+		/*
+		//Create a structure of the mission
+		MLStructure missionobject = new MLStructure("object", new int[] {6,1});
+		missionobject.setField("mission", mission);
+		missionobject.setField("area", area);
+		missionobject.setField("forbidden", forbiddenarea);
+		missionobject.setField("startcoordinate", startcoordinate);
+		missionobject.setField("height", height);
+		missionobject.setField("radius", radius);
+		*/
+		
 	}
 
 	public void calculateTrajectory() throws MatlabConnectionException, MatlabInvocationException{
