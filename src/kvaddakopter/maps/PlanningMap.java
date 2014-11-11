@@ -7,13 +7,19 @@ import com.lynden.gmapsfx.javascript.object.*;
 import com.lynden.gmapsfx.shapes.Circle;
 import com.lynden.gmapsfx.shapes.CircleOptions;
 
+
 import netscape.javascript.JSObject;
 
+
 import java.util.ArrayList;
+
 
 import kvaddakopter.assignment_planer.Area;
 import kvaddakopter.assignment_planer.MissionType;
 import kvaddakopter.gui.components.GPSMarker;
+import kvaddakopter.gui.components.GPSMarkerForbidden;
+import kvaddakopter.gui.components.GPSMarkerWithCircle;
+import kvaddakopter.gui.components.GPSMarkerWithPath;
 import kvaddakopter.gui.components.GpsToAreaTransformer;
 import kvaddakopter.gui.controllers.TabPlaneraController;
 
@@ -82,7 +88,7 @@ public class PlanningMap implements MapComponentInitializedListener {
 	 */
 	public void clearNavigationCoordinates(){
 		for(GPSMarker marker : this.navigationCoordinates){
-			this.map.removeMarker(marker.getMarker());
+			marker.clearFromMap(map);
 		}
 		this.navigationCoordinates.clear();
 	}
@@ -92,7 +98,7 @@ public class PlanningMap implements MapComponentInitializedListener {
 	 */
 	public void clearForbiddenAreasCoordinates(){
 		for(GPSMarker marker : this.forbiddenAreasCoordinates){
-			this.map.removeMarker(marker.getMarker());
+			marker.clearFromMap(map);
 		}
 		this.forbiddenAreasCoordinates.clear();
 	}
@@ -124,56 +130,27 @@ public class PlanningMap implements MapComponentInitializedListener {
 
 	
 				if (missionType == MissionType.AROUND_COORDINATE && this.navigationCoordinates.size() < 1){
-                        this.addGpsPoint(coordinate, MapMarkerEnum.NAVIGATION_NORMAL, this.navigationCoordinates);
+					
+                        GPSMarkerWithCircle mapMarker =  new GPSMarkerWithCircle(coordinate);
+                        mapMarker.attachToMap(map, this.navigationCoordinates);
+				}
+				if (missionType == MissionType.ALONG_TRAJECTORY ){
+                        GPSMarkerWithPath mapMarker = new GPSMarkerWithPath(coordinate);
+                        mapMarker.attachToMap(map, this.navigationCoordinates);
+				
 				}
 
 			}
 			if ( this.owningController.addForbiddenAreasMode() ){
-                        this.addGpsPoint(coordinate, MapMarkerEnum.FORBIDDEN_AREAS, this.forbiddenAreasCoordinates);
+                        //this.addGpsPoint(coordinate, MapMarkerEnum.FORBIDDEN_AREAS, this.forbiddenAreasCoordinates);
+                        GPSMarkerForbidden mapMarker =  new GPSMarkerForbidden(coordinate);
+                        mapMarker.attachToMap(map, this.forbiddenAreasCoordinates);
 			}
 
 		});
 	}
 
 
-
-	/**
-	 * Adds One GPS Point To the list supplied Area List
-	 * @param coordinate
-	 * @param iconType
-	 * @param list
-	 */
-	private void addGpsPoint(LatLong coordinate, MapMarkerEnum iconType, ArrayList<GPSMarker> list) {
-		Marker marker = RouteMarker.create(coordinate.getLatitude(), coordinate.getLongitude(), iconType);
-		GPSMarker gpsMarker = new GPSMarker(coordinate, marker);
-		
-		
-		CircleOptions cOpts = new CircleOptions()
-		.center(coordinate)
-		.radius(20)
-		.strokeColor("green")
-		.strokeWeight(2)
-		.fillColor("green")
-		.fillOpacity(0.1);
-		Circle searchAreaCircle = new Circle(cOpts);
-        map.addMapShape(searchAreaCircle);
-        map.addUIEventHandler(searchAreaCircle, UIEventType.click, (JSObject obj) -> {
-        	searchAreaCircle.setEditable(!searchAreaCircle.getEditable());
-        });
-		list.add(gpsMarker);
-		map.addMarker(marker);
-		map.addUIEventHandler(marker, UIEventType.click, (JSObject obj) -> {
-			int markerIndex = list.indexOf(gpsMarker);
-			GPSMarker clickedMarker = list.get(markerIndex);
-			this.map.removeMarker(clickedMarker.getMarker());
-			list.remove(markerIndex);
-			
-			
-			
-			
-		});
-
-	}
 
 
 
