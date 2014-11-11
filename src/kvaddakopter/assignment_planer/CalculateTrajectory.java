@@ -27,19 +27,9 @@ public class CalculateTrajectory {
 	public double[][] getTrajectory(MissionObject object) throws IOException, MatlabConnectionException, MatlabInvocationException {
 		createMatFile(object);
 		calculateTrajectory();
-		trajectory = readMatFile();
-		
-		// Save trajectory and corresponding data to MissionObject
-		object.setTrajectory(trajectory);
+		trajectory = readMatFile(object);
 		
 		return trajectory;
-	}
-
-	public double getTrajectoryLength() throws FileNotFoundException, IOException {
-		MatFileReader MLTrajectoryLength = new MatFileReader( "trajectory.mat" );
-		double[][] tmptrajectorylength = ((MLDouble) MLTrajectoryLength.getMLArray("trajectorylength")).getArray();
-		trajectorylength = tmptrajectorylength[0][0];
-		return trajectorylength;
 	}
 
 	public void createMatFile(MissionObject object) throws IOException {
@@ -92,15 +82,25 @@ public class CalculateTrajectory {
 	public void calculateTrajectory() throws MatlabConnectionException, MatlabInvocationException{
 		MatlabProxy proxy = this.Matlab.getMatlabProxy();
 		
+		System.out.println("Making Matlab call");
+		
 		//Make script call
 		proxy.eval("cd('src/kvaddakopter/assignment_planer/Matlab');assignmentplaner");
 
 	}
 
-	public double[][] readMatFile() throws FileNotFoundException, IOException {
-		MatFileReader MLTrajectory = new MatFileReader( "trajectory.mat" );
-		double[][] tmptrajectory = ((MLDouble) MLTrajectory.getMLArray("trajectory")).getArray();
-		return tmptrajectory;
+	public double[][] readMatFile(MissionObject object) throws FileNotFoundException, IOException {
+		MatFileReader MLResults = new MatFileReader( "results.mat" );
+		
+		// Save trajectory and corresponding data to MissionObject
+		double[][] trajectory = ((MLDouble) MLResults.getMLArray("trajectory")).getArray();
+		object.setTrajectory(trajectory);
+		object.setTrajectoryLength(((MLDouble) MLResults.getMLArray("trajectorylength")).getArray());
+		object.setCoverageArea(((MLDouble) MLResults.getMLArray("area")).getArray());
+		object.setMissionTime(((MLDouble) MLResults.getMLArray("time")).getArray());
+		object.setReferenceVelocity(((MLDouble) MLResults.getMLArray("velocity")).getArray());
+		
+		return trajectory;
 	}
 
 	public void printTrajectory(MissionObject object) {
@@ -112,6 +112,22 @@ public class CalculateTrajectory {
 			for (int j = 0; j < trajectory[0].length; j++)
 			{
 				System.out.print(trajectory[i][j]);
+				System.out.print(", ");
+			}
+
+			System.out.println("");
+		}
+	}
+	
+	public void printReferenceVelocity(MissionObject object) {
+		
+		double[][] velocity = object.getReferenceVelocity();
+
+		for (int i = 0; i < velocity.length; i++)
+		{
+			for (int j = 0; j < velocity[0].length; j++)
+			{
+				System.out.print(velocity[i][j]);
 				System.out.print(", ");
 			}
 

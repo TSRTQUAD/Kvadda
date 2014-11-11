@@ -2,6 +2,7 @@ package kvaddakopter.assignment_planer;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import matlabcontrol.MatlabConnectionException;
 import matlabcontrol.MatlabInvocationException;
@@ -12,9 +13,9 @@ public class AssignmentPlanerMain {
 	public static void main(String[] args) throws IOException, MatlabConnectionException, MatlabInvocationException {
 		System.out.println("Program initialized \n");
 
-		// Set up an MatlabProxy
+		// Set up an MatlabProxy, for quiet startup, set argument to true.
 		MatlabProxyConnection Matlab = new MatlabProxyConnection();
-		Matlab.startMatlab(false);
+		Matlab.startMatlab("quiet");
 		
 		// Create an object to analyse
 		MissionObject testobject = new MissionObject();
@@ -80,15 +81,37 @@ public class AssignmentPlanerMain {
 		testobject.setForbiddenAreas(forbiddenareas);
 		*/
 
+		
 		// Calculate the trajectory
 		CalculateTrajectory calculatetrajectory = new CalculateTrajectory(Matlab);
 		double[][] trajectory = calculatetrajectory.getTrajectory(testobject);
 
 		// Print the calculated trajectory and it´s length
 		calculatetrajectory.printTrajectory(testobject);
-		System.out.println("Trajectory length: " + calculatetrajectory.getTrajectoryLength());
+		calculatetrajectory.printReferenceVelocity(testobject);
+		System.out.println("Trajectory length: " + testobject.getTrajectoryLength());
+		System.out.println("Coverage area: " + testobject.getCoverageArea());
+		System.out.println("Mission time: " + testobject.getMissionTime());
+		
+		
+		/*
+		MatlabProxy proxy = Matlab.getMatlabProxy();
+		System.out.println("Matlab called");
+	    //By specifying 3 return arguments, returns as String arrays the loaded M-files, MEX files, and Java classes
+	    Object[] inmem = proxy.returningFeval("inmem", 3);
+	    System.out.println("Java classes loaded:");
+	    System.out.println(Arrays.toString((String[]) inmem[2]));
+	    
+	    long starttime = System.currentTimeMillis();
+	    for (int counter=1; counter < 1001; counter++) {
+	    //Retrieve MATLAB's release date by providing the -date argument
+	    Object[] releaseDate = proxy.returningFeval("version", 1, "-date");
+	    }
+	    System.out.println(System.currentTimeMillis() - starttime + "\n");
+	    */
 
-		// Matlab.terminateMatlab();
+		
+		Matlab.terminateMatlab();
 		System.out.println("\nProgram terminated");
 	}
 
