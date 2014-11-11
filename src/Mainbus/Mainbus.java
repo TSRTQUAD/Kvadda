@@ -13,11 +13,18 @@ package Mainbus;
  * MyRunnable myRunnable = new MyRunnable(other variables,mainbus);
  *       
  * Thread t = new Thread(myRunnable);
- * t.start();   
+ * t.setPriority(1); //Sets priority (how much sheduled time the thread gets)
+ * t.start(); 
+ * 
+ * -----------------------------------
+ * If unsure about synchronization read the following:
+ * http://www.javaworld.com/article/2074318/java-concurrency/java-101--understanding-java-threads--part-2--thread-synchronization.html
+ * 
  */
 public class Mainbus{
 	
 	private int var;
+	public boolean condVar = false;
 	
 	public static void main(String[] args) {
 		Mainbus mainbus = new Mainbus();
@@ -26,15 +33,17 @@ public class Mainbus{
         MyRunnable myRunnable2 = new MyRunnable(2,mainbus);
         
         Thread t = new Thread(myRunnable);
+        t.setPriority(1);
         t.start();
         
         Thread t2 = new Thread(myRunnable2);
+        t2.setPriority(2);
         t2.start();
         
         while(true){
         	//Thread.sleep(1);
         	synchronized(mainbus){
-            	System.out.println(mainbus.getVar());
+            	//System.out.println(mainbus.getVar());
         	}
         }
 	}
@@ -46,4 +55,18 @@ public class Mainbus{
 	public synchronized int getVar(){
 		return var;
 	}
+	
+	public synchronized void waitOnCondVar(){
+    	while (!condVar)
+    		try{
+    			wait();
+    			System.out.println("Stoped waiting");
+      	      }
+    	catch (InterruptedException e) {}
+    }
+    
+    public synchronized void releaseCondVar(){
+           condVar = true;
+           notify ();
+    }
 }
