@@ -1,4 +1,4 @@
-package signals;
+package kvaddakopter.control_module.signals;
 
 public class ControlSignal{
 	public static double YawRate;

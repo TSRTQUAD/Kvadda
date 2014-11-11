@@ -1,7 +1,6 @@
-package modules;
+package kvaddakopter.control_module.modules;
 import org.ejml.simple.SimpleMatrix;
-
-import signals.*;
+import kvaddakopter.control_module.signals.*;
 
 
 

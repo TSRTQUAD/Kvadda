@@ -1,4 +1,4 @@
-package signals;
+package kvaddakopter.control_module.signals;
 public class ReferenceData {
 	public double Yaw;
 	public double LateralPosition;

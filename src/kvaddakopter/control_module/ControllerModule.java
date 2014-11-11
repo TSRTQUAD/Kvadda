@@ -1,8 +1,6 @@
 package kvaddakopter.control_module;
-
-import modules.*;
-import signals.*;
-
+import kvaddakopter.control_module.modules.*;
+import kvaddakopter.control_module.signals.*;
 
 
 public class ControllerModule{
