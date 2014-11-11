@@ -150,15 +150,4 @@ public class TestBackgroundSubtraction extends ProgramClass{
 		}
 	}
 
-	private int YNquestion(String s){
-		if(s.equals("Y")){
-			return 1;
-		}else if(s.equals("N")){
-			return 0;	
-		}else {
-			System.out.println("Invalid input try again");
-			return -1;
-		}
-	}
-
 }

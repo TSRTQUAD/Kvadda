@@ -12,7 +12,7 @@ public class TemplateMatch  extends DetectionClass{
 		
 		
 		ArrayList<TargetObject> targetObjects = new ArrayList<TargetObject>();
-		TargetObject target = new TargetObject();
+//		TargetObject target = new TargetObject();
 		
 		
 		return targetObjects;

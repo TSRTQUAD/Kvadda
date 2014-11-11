@@ -6,6 +6,7 @@ import java.util.List;
 
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
+import kvaddakopter.image_processing.utils.ImageConversion;
 import kvaddakopter.image_processing.utils.MatchTests;
 
 import org.opencv.calib3d.Calib3d;
@@ -13,10 +14,15 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDMatch;
+import org.opencv.core.MatOfFloat;
+import org.opencv.core.MatOfInt;
 import org.opencv.core.MatOfKeyPoint;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+import org.opencv.core.Core.MinMaxLocResult;
 import org.opencv.features2d.DMatch;
 import org.opencv.features2d.DescriptorExtractor;
 import org.opencv.features2d.DescriptorMatcher;
@@ -27,12 +33,12 @@ import org.opencv.imgproc.Imgproc;
 
 public class BackgroundSubtraction  extends DetectionClass{
 	ImageObject mPreviousImageData;
-
+	ImageObject mBackgroundImageData;
 	/*Constants & Parameters: */
 
 	//Subtraction
-	static final int BLUR_KERNEL_SIZE 	 = 45;
-	static final int THRESHOLD_LEVEL 	 = 30;
+	static final int BLUR_KERNEL_SIZE 	 = 21;
+	static final int THRESHOLD_LOWEST_LEVEL 	 = 30;
 
 	//Morphology 
 	static final int MORPH_KERNEL_SIZE = 66;
@@ -53,25 +59,39 @@ public class BackgroundSubtraction  extends DetectionClass{
 			// Store the current image object as the previous object.
 			mPreviousImageData = currentImageData;
 
+
+			mBackgroundImageData = new ImageObject(currentImageData.getImage().clone());
+			// Assigning initial background
+			Mat firstBackgroundImage = mBackgroundImageData.getImage();
+
+			Mat grayBackground = new Mat(); 
+			Imgproc.cvtColor(firstBackgroundImage, grayBackground, Imgproc.COLOR_RGB2GRAY);
+
+			// Do some blur 
+			Mat blurredBackground = new Mat(grayBackground.rows(),grayBackground.cols(),grayBackground.type());
+			Size kernelSize = new Size(BLUR_KERNEL_SIZE,BLUR_KERNEL_SIZE);
+			Imgproc.GaussianBlur(blurredBackground,firstBackgroundImage,kernelSize,0);
+
+
 			// Terminate function by returning null.
 			return null;
 		}
 
 		//1. Correspondences
-		MatOfDMatch matches       = currentImageData.findMatches(mPreviousImageData);
-		
+		/*MatOfDMatch matches       = currentImageData.findMatches(mPreviousImageData);
+
 		//2. Find fundamental matrix
 		MatOfDMatch inlierMatches = new MatOfDMatch();
 		Mat fundamentalMatrix 	  = MatchTests.computeFundamentalMatrix(matches, currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(),0.01, inlierMatches);
 		if(fundamentalMatrix != null){
-			
+
 			//2.a Getting inlier keypoints
 			MatOfKeyPoint kpCurrent = new MatOfKeyPoint();
 			MatOfKeyPoint kpPrev = new MatOfKeyPoint();
  			MatchTests.getMatchingKeyPoints(currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(), kpCurrent, kpPrev, inlierMatches);
 
 			mIntermeditateResult = new Mat();
-			/*Features2d.drawMatches(
+			Features2d.drawMatches(
 					currentImageData.getImage(),
 					kpCurrent, 
 					mPreviousImageData.getImage(),
@@ -79,38 +99,43 @@ public class BackgroundSubtraction  extends DetectionClass{
 					inlierMatches,
 					mIntermeditateResult
 					);
-			*/
+
 			//2.b Computing Homography matrix using inlier keypoints
 			Mat homo = MatchTests.getHomoMatrix(kpCurrent, kpPrev);
-			
+
 			//2.c Warp Image
 			Imgproc.warpPerspective(mPreviousImageData.getImage(), mIntermeditateResult,homo, mPreviousImageData.getImage().size());
-		}
+				}*/
 
 		//2. Camera Matrix blabla. - NOT IMPLEMENTED
-		//		
-		//		//3. Warp - NOT IMPLEMENTED
-		//		warpPreviousImage();
-		//		
-		//		//4. Background subtraction
-		//		Mat movingForeground = subtractBackground(currentImageData);
-		//		
-		//		
-		//		//5. Morphology
-		//		Mat morphedImage = morphBinaryImage(movingForeground);
-		//
-		//		//6. Bounding Boxes
-		//		ArrayList<Rect> boundingBoxes = getBoundingBoxes(morphedImage);
-		//		
-		//		//Print boxes on a gray scale Image
-		//		Mat currentFrameGray = new Mat(); 
-		//		Imgproc.cvtColor(currentImageData.getImage(), currentFrameGray, Imgproc.COLOR_RGB2GRAY);
-		//		mIntermeditateResult = currentFrameGray;
-		//		for (Rect rect : boundingBoxes) {
-		//			Core.rectangle(mIntermeditateResult, new Point(rect.x,rect.y), new Point(rect.x+rect.width,rect.y+rect.height),new Scalar(255,0,0),4);
-		//		}
-		//		
-		//7. Adjust parameters
+
+		//3. Warp - NOT IMPLEMENTED
+		warpPreviousImage();
+
+		//4. Background subtraction
+		Mat movingForeground = subtractBackground(currentImageData);
+
+		//				mIntermeditateResult = movingForeground;
+		//5. Morphology
+		Mat morphedImage = morphBinaryImage(movingForeground);
+
+		//				//6. Bounding Boxes
+		//				//Get contours and hierarchy of binary image
+		//				List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
+		//				Mat hierarchy = new Mat();
+		//				Mat contourImage = morphedImage.clone(); //new Mat();
+		//				Imgproc.findContours(contourImage, contours, hierarchy,Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+		//				ArrayList<Rect> boundingBoxes = getBoundingBoxes(contours,hierarchy,0.1);
+		//				
+		//				//Print boxes on a gray scale Image
+		//				Mat currentFrameGray = new Mat(); 
+		//				Imgproc.cvtColor(currentImageData.getImage(), currentFrameGray, Imgproc.COLOR_RGB2GRAY);
+		////				mIntermeditateResult = currentFrameGray;
+		////				for (Rect rect : boundingBoxes) {
+		////					Core.rectangle(mIntermeditateResult, new Point(rect.x,rect.y), new Point(rect.x+rect.width,rect.y+rect.height),new Scalar(255,0,0),4);
+		////				}
+		//				
+		//		//7. Adjust parameters
 
 
 		// TODO: Assign the box data to the TargetObjects
@@ -121,8 +146,8 @@ public class BackgroundSubtraction  extends DetectionClass{
 		TargetObject target = new TargetObject(m, 0);
 		 */
 		//Set previous image data to the current image data
-		mPreviousImageData = currentImageData;
-
+		//		mPreviousImageData = currentImageData;
+		//		mBackgroundImageData = currentImageData;
 		return targetObjects;
 	}
 
@@ -171,54 +196,86 @@ public class BackgroundSubtraction  extends DetectionClass{
 		// To gray scale
 		Mat currentFrameGray = new Mat(); 
 		Imgproc.cvtColor(currentImageData.getImage(), currentFrameGray, Imgproc.COLOR_RGB2GRAY);
-		mIntermeditateResult = currentFrameGray;
-
-
-		Mat previousFrameGray = new Mat(); 
-		Imgproc.cvtColor(mPreviousImageData.getImage(), previousFrameGray, Imgproc.COLOR_RGB2GRAY);
-
 
 		// Averaging, using a gaussian blur filter 
 		Size kernelSize = new Size(BLUR_KERNEL_SIZE,BLUR_KERNEL_SIZE);
-
 		Mat currentFrameBlurred = new Mat(currentFrameGray.rows(),currentFrameGray.cols(),currentFrameGray.type());
 		Imgproc.GaussianBlur(currentFrameGray,currentFrameBlurred,kernelSize,0);
 
-		Mat previousFrameBlurred = new Mat(previousFrameGray.rows(),previousFrameGray.cols(),previousFrameGray.type());
-		Imgproc.GaussianBlur(previousFrameGray,previousFrameBlurred,kernelSize,0);
-
-
 		// Subtracting
-		Mat differenceImage = new Mat();
-		Core.subtract(currentFrameBlurred,previousFrameBlurred, differenceImage);
-
-
-		// Threshold
+		Mat absDifferenceImage = new Mat();
+		Core.absdiff(currentFrameBlurred, mBackgroundImageData.getImage(), absDifferenceImage);
+		
+		//Threshold
+		double threshold = computeThreshold(absDifferenceImage);
 		Mat thresholdedImage = new Mat();
-		Imgproc.threshold(differenceImage, thresholdedImage, THRESHOLD_LEVEL, 255, Imgproc.THRESH_BINARY);
+		Imgproc.threshold(absDifferenceImage, thresholdedImage, threshold, 255, Imgproc.THRESH_BINARY);
+		mIntermeditateResult = absDifferenceImage;
+		
+		//Output
+		List<Mat> concatMat = new ArrayList<Mat>();
+		concatMat.add(thresholdedImage);
+		concatMat.add(absDifferenceImage);
+		Core.hconcat(concatMat,mIntermeditateResult);
+		
+		//Adapt background model
+		adaptBackground(currentFrameBlurred);
 
-		return thresholdedImage; 
+		return thresholdedImage;
 
 	}
-
-	// To make the background subtraction more generic and robust. Some of the parameters might
-	// ought to be adjusted during runtime. The light level and background noise might vary a lot
-	// depending on the time of the day or the scene.
-
 	/**
-	 * Adjust threshold value, maybe with regard to sum( thresholded pixels outside of the bounding box(es) )
-	 * 
-	 * Adjust blur filter kernel size to the noise level of the image.
-	 * 
-	 * Adjust morphology kernel size to the number of contours detected. If the number of contours is way 
-	 * more than we reasonable can expect, we might want to increase the kernel size in order to detect 
-	 * fewer but larger blobs.
-	 * 
-	 * The kernel sizes are also heavily dependent on the image size.
-	 * 
+	 * Selecting a threshold regarding the content of the image.
+	 * @param greyImage
+	 * @return
 	 */
-	private void  adjustParameters(){
-
+	private double computeThreshold(Mat greyImage){
+		
+		//Calc histogram over gray values
+		List<Mat> images = new ArrayList<Mat>();
+		images.add(greyImage);
+		Mat hist = new Mat();
+		Imgproc.calcHist(images, new MatOfInt(0), new Mat(), hist, new MatOfInt(256), new MatOfFloat(0f,256f));
+		
+		//Normalize histogram
+		Mat histNorm = new Mat();
+		Core.normalize(hist, histNorm);
+		double N = 256;
+		double expectationValue = 0;
+		for (double x = 0; x < N; x++) {
+			double[] val = histNorm.get((int)x,0);
+			expectationValue +=x*val[0];
+		}
+		//Selecting threshold:  MAX(80% of the expected grey value,THRESHOLD_LOWEST_LEVEL ) 
+		double threshold = Math.max(expectationValue*0.8,THRESHOLD_LOWEST_LEVEL);
+		return threshold;
 	}
+	
+/**
+ * Adapt background model
+ * @param currentFrameBlurred
+ */
+	private void adaptBackground(Mat currentFrameBlurred){
+		double adaptSpeed = 0.4;
+		//Adapt		
+		//Reference to background image
+		Mat backgroundImg = mBackgroundImageData.getImage();
+		int cols = currentFrameBlurred.cols();
+		int rows = currentFrameBlurred.rows();
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				double[] backgroundValue = backgroundImg.get(i,j);
+				double[] curFrameValue   = currentFrameBlurred.get(i,j);
+				int numElements = backgroundValue.length;
+				double[] newBGVal = new double[numElements];
+				for (int k = 0; k < numElements; k++) {
+					newBGVal[k] = backgroundValue[k] + adaptSpeed*(curFrameValue[k]-backgroundValue[k]);
+				}
+				backgroundImg.put(i,j,newBGVal);
+			}
+		}
+	}
+
+
 
 }
