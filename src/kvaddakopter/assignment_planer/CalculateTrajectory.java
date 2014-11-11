@@ -103,36 +103,4 @@ public class CalculateTrajectory {
 		return trajectory;
 	}
 
-	public void printTrajectory(MissionObject object) {
-		
-		double[][] trajectory = object.getTrajectory();
-
-		for (int i = 0; i < trajectory.length; i++)
-		{
-			for (int j = 0; j < trajectory[0].length; j++)
-			{
-				System.out.print(trajectory[i][j]);
-				System.out.print(", ");
-			}
-
-			System.out.println("");
-		}
-	}
-	
-	public void printReferenceVelocity(MissionObject object) {
-		
-		double[][] velocity = object.getReferenceVelocity();
-
-		for (int i = 0; i < velocity.length; i++)
-		{
-			for (int j = 0; j < velocity[0].length; j++)
-			{
-				System.out.print(velocity[i][j]);
-				System.out.print(", ");
-			}
-
-			System.out.println("");
-		}
-	}
-
 }
