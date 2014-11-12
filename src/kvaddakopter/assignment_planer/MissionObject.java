@@ -24,6 +24,10 @@ public class MissionObject {
 	protected int descriptor = 0;
 	
 	protected double[][] trajectory = null;
+	protected double[][] trajectorylength = null;
+	protected double[][] coveragearea = null;
+	protected double[][] missiontime = null;
+	protected double[][] referencevelocity = null;
 	
 	// Get variables
 	public String getMissionName(){
@@ -59,6 +63,18 @@ public class MissionObject {
 	}
 	public double[][] getTrajectory(){
 		return this.trajectory;
+	}
+	public double[][] getTrajectoryLength(){
+		return this.trajectorylength;
+	}
+	public double[][] getCoverageArea(){
+		return this.coveragearea;
+	}
+	public double[][] getMissionTime(){
+		return this.missiontime;
+	}
+	public double[][] getReferenceVelocity(){
+		return this.referencevelocity;
 	}
 	
 	
@@ -102,6 +118,21 @@ public class MissionObject {
 	// Assign the trajectory to the variable trajectory.
 	public void setTrajectory(double[][] tmptrajectory){
 		this.trajectory =  tmptrajectory;
+	}
+	public void setTrajectoryLength(double[][] length){
+		this.trajectorylength = length;
+	}
+	
+	public void setCoverageArea(double[][] area){
+		this.coveragearea = area;
+	}
+	
+	public void setMissionTime(double[][] time){
+		this.missiontime = time;
+	}
+	
+	public void setReferenceVelocity(double[][] velocity){
+		this.referencevelocity = velocity;
 	}
 	
 	public void setMissionName(String name){

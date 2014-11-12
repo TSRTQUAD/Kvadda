@@ -27,19 +27,9 @@ public class CalculateTrajectory {
 	public double[][] getTrajectory(MissionObject object) throws IOException, MatlabConnectionException, MatlabInvocationException {
 		createMatFile(object);
 		calculateTrajectory();
-		trajectory = readMatFile();
-		
-		// Save trajectory and corresponding data to MissionObject
-		object.setTrajectory(trajectory);
+		trajectory = readMatFile(object);
 		
 		return trajectory;
-	}
-
-	public double getTrajectoryLength() throws FileNotFoundException, IOException {
-		MatFileReader MLTrajectoryLength = new MatFileReader( "trajectory.mat" );
-		double[][] tmptrajectorylength = ((MLDouble) MLTrajectoryLength.getMLArray("trajectorylength")).getArray();
-		trajectorylength = tmptrajectorylength[0][0];
-		return trajectorylength;
 	}
 
 	public void createMatFile(MissionObject object) throws IOException {
@@ -77,6 +67,7 @@ public class CalculateTrajectory {
 			forbiddenarea.set(new MLDouble( "forbiddenarea" + 1, new double[][] {{0,0}} ), 0);
 		}
 
+		
 		//Write arrays to file
 		ArrayList<MLArray> list = new ArrayList<MLArray>();
 		list.add( mission );
@@ -85,38 +76,44 @@ public class CalculateTrajectory {
 		list.add( startcoordinate );
 		list.add( height );
 		list.add( radius );
-
 		new MatFileWriter( "object.mat", list );
+		
+		
+		/*
+		//Create a structure of the mission
+		MLStructure missionobject = new MLStructure("object", new int[] {6,1});
+		missionobject.setField("mission", mission);
+		missionobject.setField("area", area);
+		missionobject.setField("forbidden", forbiddenarea);
+		missionobject.setField("startcoordinate", startcoordinate);
+		missionobject.setField("height", height);
+		missionobject.setField("radius", radius);
+		*/
+		
 	}
 
 	public void calculateTrajectory() throws MatlabConnectionException, MatlabInvocationException{
 		MatlabProxy proxy = this.Matlab.getMatlabProxy();
+		
+		System.out.println("Making Matlab call");
 		
 		//Make script call
 		proxy.eval("cd('src/kvaddakopter/assignment_planer/Matlab');assignmentplaner");
 
 	}
 
-	public double[][] readMatFile() throws FileNotFoundException, IOException {
-		MatFileReader MLTrajectory = new MatFileReader( "trajectory.mat" );
-		double[][] tmptrajectory = ((MLDouble) MLTrajectory.getMLArray("trajectory")).getArray();
-		return tmptrajectory;
-	}
-
-	public void printTrajectory(MissionObject object) {
+	public double[][] readMatFile(MissionObject object) throws FileNotFoundException, IOException {
+		MatFileReader MLResults = new MatFileReader( "results.mat" );
 		
-		double[][] trajectory = object.getTrajectory();
-
-		for (int i = 0; i < trajectory.length; i++)
-		{
-			for (int j = 0; j < trajectory[0].length; j++)
-			{
-				System.out.print(trajectory[i][j]);
-				System.out.print(", ");
-			}
-
-			System.out.println("");
-		}
+		// Save trajectory and corresponding data to MissionObject
+		double[][] trajectory = ((MLDouble) MLResults.getMLArray("trajectory")).getArray();
+		object.setTrajectory(trajectory);
+		object.setTrajectoryLength(((MLDouble) MLResults.getMLArray("trajectorylength")).getArray());
+		object.setCoverageArea(((MLDouble) MLResults.getMLArray("area")).getArray());
+		object.setMissionTime(((MLDouble) MLResults.getMLArray("time")).getArray());
+		object.setReferenceVelocity(((MLDouble) MLResults.getMLArray("velocity")).getArray());
+		
+		return trajectory;
 	}
 
 }

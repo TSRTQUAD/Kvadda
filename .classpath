@@ -10,5 +10,11 @@
 	<classpathentry kind="lib" path="src/kvaddakopter/image_processing/decoder/lib/xuggle-xuggler-5.4.jar"/>
 	<classpathentry kind="lib" path="src/kvaddakopter/assignment_planer/lib/jamtio.jar"/>
 	<classpathentry kind="lib" path="src/kvaddakopter/assignment_planer/lib/matlabcontrol-4.1.0.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/control_module/Matrixlib/EJML-core-0.26-sources.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/control_module/Matrixlib/EJML-core-0.26.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/control_module/Matrixlib/EJML-equation-0.26-sources.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/control_module/Matrixlib/EJML-equation-0.26.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/control_module/Matrixlib/EJML-experimental-0.26-sources.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/control_module/Matrixlib/EJML-experimental-0.26.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

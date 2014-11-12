@@ -2,15 +2,26 @@
 %                        Missionplaner Version 1.0                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input:
-% mission         - mission type
-% object          - mission specific data i.e. coordinates etz.
+% object            - mission specific data i.e. coordinates etz.
 %
 % Output:
-% trajectory      - trajectory containing coordinates
+% trajectory        - trajectory containing coordinates
+% time              - total time for mission [min]
+% area              - coverage area [m^2]
+% velocity          - reference vector containing velocities
 % 
 % The input object can contain different values depending on the mission.
 % For areacoverage the coordinates are specified by both areas and
 % forbidden areas.
+%
+% Hardcoded values:
+% main              - Camera propterties
+% getResults        - Arial velocities
+% DouglasPeucker    - Epsilon describing minimum distance between two
+%                     points
+% interpolation     - Number of points to be set between each nodpair
+% lldistkm          - Earth radius
+
 
 % --------------------------------------------------
 % ================== Load object ===================
@@ -46,10 +57,11 @@ spiraltrajectory = [spanlat*th.*cos(th) spanlon*th.*sin(th)]...
 rawtrajectory = getStartEndPath(object.startcoordinate, spiraltrajectory);
 % Interpolate using parametric splines, the first argument determines the
 % nr of nodes to interpolate between each nodpair in the trajectory.
-trajectory = interparc(2e3,rawtrajectory(:,1),rawtrajectory(:,2),'spline');
+trajectory = interparc(5e2,rawtrajectory(:,1),rawtrajectory(:,2),'spline');
+trajectory = DouglasPeucker(trajectory);
 
 % =============== Present results ==================
-[trajectorylength,area] = getResults( object, [],...
+[trajectorylength,area,time,velocity] = getResults( object, [],...
     trajectory, spiraltrajectory, imagelength_meter, 0 );
 
     
@@ -61,10 +73,11 @@ elseif object.mission == 2
 rawtrajectory = getStartEndPath(object.startcoordinate, object.area{1});
 % Interpolate using parametric splines, the first argument determines the
 % nr of nodes to interpolate between each nodpair in the trajectory.
-trajectory = interparc(2e3,rawtrajectory(:,1),rawtrajectory(:,2),'spline');
+trajectory = interparc(5e2,rawtrajectory(:,1),rawtrajectory(:,2),'spline');
+trajectory = DouglasPeucker(trajectory);
 
 % =============== Present results ==================
-[trajectorylength,area] = getResults( object, [],...
+[trajectorylength,area,time,velocity] = getResults( object, [],...
     trajectory, [], imagelength_meter, 0 );
 
 
@@ -81,22 +94,18 @@ nodes = getPolygonGrid(object,ppa);
 tmpcostmat = getCostMatrix(nodes,object);
 
 % =============== Find trajectory ==================
-rawtrajectory = getTrajectory(tmpcostmat,nodes,object.startcoordinate);
-
-% ============ Interpolate trajectory ==============
-% Interpolate using parametric splines, the first argument determines the
-% nr of nodes to interpolate between each nodpair in the trajectory.
-trajectory = interparc(2e3,rawtrajectory(:,1),rawtrajectory(:,2),'spline');
+% The interpolation and Douglas Peucker algoritms are run inside.
+trajectory = getTrajectory(tmpcostmat,nodes,object.startcoordinate);
 
 % =============== Present results ==================
-[trajectorylength,area] = getResults( object, nodes,...
+[trajectorylength,area,time,velocity] = getResults( object, nodes,...
     trajectory, [], imagelength_meter, 0 );
 
 end
 
 
 % --------------------------------------------------
-% ============ Save trajectory to file =============
+% ============== Save results to file ==============
 % --------------------------------------------------
-save('../../../../trajectory.mat');
-save('../../../../trajectorylength.mat');
+save('../../../../results.mat','trajectory','trajectorylength',...
+    'area','time','velocity');
