@@ -4,7 +4,7 @@ import kvaddakopter.maps.MapMarkerEnum;
 
 import com.lynden.gmapsfx.javascript.object.LatLong;
 
-public class GPSMarkerForbidden extends GPSMarker {
+public class GPSMarkerForbidden extends GPSMarkerNormal {
 	
 	
 	public GPSMarkerForbidden(LatLong coordinate) {

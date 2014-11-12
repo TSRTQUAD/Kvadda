@@ -4,23 +4,21 @@ import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.event.UIEventType;
 import com.lynden.gmapsfx.javascript.object.*;
-import com.lynden.gmapsfx.shapes.Circle;
-import com.lynden.gmapsfx.shapes.CircleOptions;
-
 
 import netscape.javascript.JSObject;
 
-
 import java.util.ArrayList;
-
 
 import kvaddakopter.assignment_planer.Area;
 import kvaddakopter.assignment_planer.MissionType;
-import kvaddakopter.gui.components.GPSMarker;
+import kvaddakopter.gui.components.AbstractGPSMarker;
+import kvaddakopter.gui.components.GPSMarkerNormal;
 import kvaddakopter.gui.components.GPSMarkerForbidden;
 import kvaddakopter.gui.components.GPSMarkerWithCircle;
-import kvaddakopter.gui.components.GPSMarkerWithPath;
 import kvaddakopter.gui.components.GpsToAreaTransformer;
+import kvaddakopter.gui.components.shapes.GPSPath;
+import kvaddakopter.gui.components.shapes.GreenGPSPolygon;
+import kvaddakopter.gui.components.shapes.RedGPSPolygon;
 import kvaddakopter.gui.controllers.TabPlaneraController;
 
 
@@ -50,13 +48,32 @@ public class PlanningMap implements MapComponentInitializedListener {
 	/**
 	 * Navigation Markers
 	 */
-	private ArrayList<GPSMarker> navigationCoordinates = new ArrayList<GPSMarker>();
+	private ArrayList<AbstractGPSMarker> navigationCoordinates = new ArrayList<AbstractGPSMarker>();
 
 	/**
 	 * Forbidden Areas Markers
 	 */
-	private ArrayList<GPSMarker> forbiddenAreasCoordinates = new ArrayList<GPSMarker>();
-
+	private ArrayList<AbstractGPSMarker> forbiddenAreasCoordinates = new ArrayList<AbstractGPSMarker>();
+	
+	/**
+	 * GPS paths 
+	 */
+	private GPSPath gpsPath = null;
+	
+	
+	/**
+	 * GPS Polygons
+	 */
+	private GreenGPSPolygon missionAreaGpsPolygon = null;
+	private RedGPSPolygon   forbiddenAreaGpsPolygon = null;
+	
+	
+	
+	/**
+	 * Is map initialized Initialized
+	 */
+	boolean isMapInitialized = false;
+	
 	/**
 	 * Constructor
 	 *
@@ -69,90 +86,60 @@ public class PlanningMap implements MapComponentInitializedListener {
 		
 	}
 
-
 	/**
 	 * WHEN MAP IS READY THIS RUNS ONCE.
 	 */
 	@Override
 	public void mapInitialized() {
-
+		
+		this.isMapInitialized = true;
 		this.createMapWithStartLocation(58.409719, 15.622071);
-
+		this.gpsPath = new GPSPath(this.map);
+		this.missionAreaGpsPolygon = new GreenGPSPolygon(this.map);
+		this.forbiddenAreaGpsPolygon = new RedGPSPolygon(this.map);
 		this.addMapEventListeners();
+		this.clearMap();
 
 	}
-	
 	
 	/**
 	 * Clear all navigation markers on the map.
 	 */
 	public void clearNavigationCoordinates(){
-		for(GPSMarker marker : this.navigationCoordinates){
-			marker.clearFromMap(map);
+		if (isMapInitialized){
+			for(AbstractGPSMarker marker : this.navigationCoordinates){
+				marker.clearFromMap(map);
+			}
+			this.gpsPath.remove();
+			this.missionAreaGpsPolygon.remove();
+			this.navigationCoordinates.clear();
 		}
-		this.navigationCoordinates.clear();
 	}
 	
 	/**
 	 * Clear all Forbidden Area markers on the map.
 	 */
 	public void clearForbiddenAreasCoordinates(){
-		for(GPSMarker marker : this.forbiddenAreasCoordinates){
-			marker.clearFromMap(map);
+		if (isMapInitialized){
+			for(AbstractGPSMarker marker : this.forbiddenAreasCoordinates){
+				marker.clearFromMap(map);
+			}
+			this.forbiddenAreaGpsPolygon.remove();
+			this.forbiddenAreasCoordinates.clear();
 		}
-		this.forbiddenAreasCoordinates.clear();
 	}
 	
 	/**
 	 * Clears both forbidden areas and navigation coordiantes
 	 */
 	public void clearMap(){
-		this.clearForbiddenAreasCoordinates();
-		this.clearNavigationCoordinates();
+		
+		if (isMapInitialized){
+			this.clearForbiddenAreasCoordinates();
+			this.clearNavigationCoordinates();
+		}
 	}
 	
-
-	/**
-	 * Sets all event listeners for the map.
-	 */
-	private void addMapEventListeners() {
-
-		//EVENT FOR USER CLICKED MAP
-		this.map.addUIEventHandler(UIEventType.click, (JSObject obj) -> {
-			
-			//Coordinate where the user clicked.
-			LatLong coordinate = new LatLong((JSObject) obj.getMember("latLng"));
-			
-			if ( this.owningController.addMissionCoordinatesMode() ){
-				
-				// 3 cases
-				MissionType missionType = this.owningController.getCurrentSelectedMissionType();
-
-	
-				if (missionType == MissionType.AROUND_COORDINATE && this.navigationCoordinates.size() < 1){
-					
-                        GPSMarkerWithCircle mapMarker =  new GPSMarkerWithCircle(coordinate);
-                        mapMarker.attachToMap(map, this.navigationCoordinates);
-				}
-				if (missionType == MissionType.ALONG_TRAJECTORY ){
-                        GPSMarkerWithPath mapMarker = new GPSMarkerWithPath(coordinate);
-                        mapMarker.attachToMap(map, this.navigationCoordinates);
-				
-				}
-
-			}
-			if ( this.owningController.addForbiddenAreasMode() ){
-                        //this.addGpsPoint(coordinate, MapMarkerEnum.FORBIDDEN_AREAS, this.forbiddenAreasCoordinates);
-                        GPSMarkerForbidden mapMarker =  new GPSMarkerForbidden(coordinate);
-                        mapMarker.attachToMap(map, this.forbiddenAreasCoordinates);
-			}
-
-		});
-	}
-
-
-
-
 
 	/**
 	 * Returns an array of all placed markers
@@ -173,6 +160,50 @@ public class PlanningMap implements MapComponentInitializedListener {
 		return GpsToAreaTransformer.transform( this.forbiddenAreasCoordinates );
 	}
 	
+
+	/**
+	 * Sets all event listeners for the map.
+	 */
+	private void addMapEventListeners() {
+		//EVENT FOR USER CLICKED MAP
+		this.map.addUIEventHandler(UIEventType.click, (JSObject obj) -> {
+			
+			//Coordinate where the user clicked.
+			LatLong clickedCoordinate = new LatLong((JSObject) obj.getMember("latLng"));
+			MissionType missionType = this.owningController.getCurrentSelectedMissionType();
+
+			if ( this.owningController.addMissionCoordinatesMode() ){
+				
+				// 3 cases for each mission type
+				if (missionType == MissionType.AROUND_COORDINATE && this.navigationCoordinates.size() < 1){
+					
+                        GPSMarkerWithCircle mapMarkerCircle =  new GPSMarkerWithCircle(clickedCoordinate);
+                        mapMarkerCircle.attachToMap(this.map, this.navigationCoordinates);
+				}
+				else if (missionType == MissionType.ALONG_TRAJECTORY ){
+					GPSMarkerNormal normalMarker = new GPSMarkerNormal(clickedCoordinate);
+					normalMarker.attachToMap(map, this.navigationCoordinates);
+					this.gpsPath.draw(this.navigationCoordinates);
+				}
+				else if (missionType == MissionType.AREA_COVERAGE){
+					GPSMarkerNormal normalMarker = new GPSMarkerNormal(clickedCoordinate);
+					normalMarker.attachToMap(map, this.navigationCoordinates);
+					this.missionAreaGpsPolygon.draw(this.navigationCoordinates);
+				}
+
+			}
+			if ( this.owningController.addForbiddenAreasMode() ){
+                        //this.addGpsPoint(coordinate, MapMarkerEnum.FORBIDDEN_AREAS, this.forbiddenAreasCoordinates);
+                        GPSMarkerForbidden mapMarker =  new GPSMarkerForbidden(clickedCoordinate);
+                        mapMarker.attachToMap(map, this.forbiddenAreasCoordinates);
+                        this.forbiddenAreaGpsPolygon.draw(this.forbiddenAreasCoordinates);
+			}
+			
+
+		});
+	}
+
+
 	
 	
 

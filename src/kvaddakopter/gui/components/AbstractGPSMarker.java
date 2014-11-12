@@ -11,19 +11,17 @@ import com.lynden.gmapsfx.javascript.object.GoogleMap;
 import com.lynden.gmapsfx.javascript.object.LatLong;
 import com.lynden.gmapsfx.javascript.object.Marker;
 
-public abstract class GPSMarker {
+public abstract class AbstractGPSMarker {
 	
-	public LatLong coordinate;
-	public Marker marker;
+	protected LatLong coordinate;
+	protected Marker marker;
 	
-	public GPSMarker(LatLong coordinate){
+	public AbstractGPSMarker(LatLong coordinate){
 		this.coordinate = coordinate;
 		this.marker = RouteMarker.create(coordinate.getLatitude(), coordinate.getLongitude(), this.getIcon());
 	}
 	
-	public MapMarkerEnum getIcon(){
-		return MapMarkerEnum.NAVIGATION_NORMAL;	 
-	}
+	public abstract MapMarkerEnum getIcon();
 	
 	public double getLatitude() {
 		return this.coordinate.getLatitude();
@@ -46,35 +44,45 @@ public abstract class GPSMarker {
 	 * @param map
 	 * @param listOfCoordinates
 	 */
-	public void attachToMap(GoogleMap map, ArrayList<GPSMarker> listOfCoordinates){
+	public void attachToMap(GoogleMap map, ArrayList<AbstractGPSMarker> listOfCoordinates){
 		
 		
 		listOfCoordinates.add(this);
 		map.addMarker(this.getMarker());
 		map.addUIEventHandler(this.getMarker(), UIEventType.click, (JSObject obj) -> {
-			this.remove(map, listOfCoordinates);
+			this.markerClickedEvent(map, listOfCoordinates);
 		});
-		
 		
 	}
 	
 	/**
-	 *  Action to take when this marker is removed.
+	 * Removes this marker from the supplied list.
+	 * @param listOfCoordinates
+	 */
+	public void removeMarkerFromList(ArrayList<AbstractGPSMarker> listOfCoordinates){
+		int markerIndex = listOfCoordinates.indexOf(this);
+		if(markerIndex != -1){
+            listOfCoordinates.remove(markerIndex);
+		}
+	}
+	
+	/**
+	 * Clear  marker from map.
+	 * @param map
+	 */
+	public void clearFromMap(GoogleMap map){
+		map.removeMarker(this.getMarker());
+	}	
+	
+	/**
+	 *  Action to take when this marker is clicked.
 	 * @param map
 	 * @param listOfCoordinates
 	 */
-	public void remove(GoogleMap map,  ArrayList<GPSMarker> listOfCoordinates){
+	public void markerClickedEvent(GoogleMap map,  ArrayList<AbstractGPSMarker> listOfCoordinates){
 		
 			this.clearFromMap(map);
-			int markerIndex = listOfCoordinates.indexOf(this);
-			if(markerIndex != -1){
-                listOfCoordinates.remove(markerIndex);
-			}
+			this.removeMarkerFromList(listOfCoordinates);
 	};
-	
-	
-	public void clearFromMap(GoogleMap map){
-		map.removeMarker(this.getMarker());
-	}
 	
 }

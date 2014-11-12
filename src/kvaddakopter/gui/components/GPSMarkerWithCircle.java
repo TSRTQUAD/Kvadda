@@ -10,7 +10,7 @@ import com.lynden.gmapsfx.javascript.object.LatLong;
 import com.lynden.gmapsfx.shapes.Circle;
 import com.lynden.gmapsfx.shapes.CircleOptions;
 
-public class GPSMarkerWithCircle extends GPSMarker{
+public class GPSMarkerWithCircle extends GPSMarkerNormal{
 	
 	protected int circleRadius = 20;
 	protected Circle circle;
@@ -24,7 +24,7 @@ public class GPSMarkerWithCircle extends GPSMarker{
 	}
 	
 	@Override
-	public void attachToMap(GoogleMap map, ArrayList<GPSMarker> listOfCoordinates){
+	public void attachToMap(GoogleMap map, ArrayList<AbstractGPSMarker> listOfCoordinates){
 		
 		super.attachToMap(map, listOfCoordinates);
 
