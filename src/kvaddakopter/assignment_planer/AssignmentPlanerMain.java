@@ -84,10 +84,10 @@ public class AssignmentPlanerMain {
 		
 		// Calculate the trajectory
 		CalculateTrajectory calculatetrajectory = new CalculateTrajectory(Matlab);
-		double[][] trajectory = calculatetrajectory.getTrajectory(testobject);
+		calculatetrajectory.calculateTrajectory(testobject);
 
 		// Print the calculated trajectory and corresponding data
-		AssignmentPlanerMain.print3D("Trajectory",trajectory);
+		AssignmentPlanerMain.print3D("Trajectory",testobject.getTrajectory());
 		AssignmentPlanerMain.print3D("Velocity",testobject.getReferenceVelocity());
 		AssignmentPlanerMain.print3D("Trajectory length",testobject.getTrajectoryLength());
 		AssignmentPlanerMain.print3D("Coverage area",testobject.getCoverageArea());
