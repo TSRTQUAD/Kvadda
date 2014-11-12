@@ -115,7 +115,7 @@ public class MissionObject {
 	public void setDescriptor(int descriptor){
 		this.descriptor = descriptor;
 	}
-	// Assign the trajectory to the variable trajectory.
+	
 	public void setTrajectory(double[][] tmptrajectory){
 		this.trajectory =  tmptrajectory;
 	}
