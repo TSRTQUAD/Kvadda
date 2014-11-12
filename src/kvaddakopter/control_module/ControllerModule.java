@@ -10,7 +10,7 @@ public class ControllerModule{
 	public RefinedSensorData 			 rsdata = new RefinedSensorData();
 	public ReferenceData				 rdata = new ReferenceData();
 	public ReferenceData 				 rrdata = new ReferenceData();
-	public double						 sampletime	= 0.01;
+	public double						 sampletime	= 0.02;
 	public Controller					 controller = new Controller(sampletime);
 	
 
@@ -18,10 +18,16 @@ public class ControllerModule{
 	
 	public void start() {
 		
-		rsdata.setXpos(10);
-	      do{
-	
+		rsdata.setXpos(10);	
 		//Test
+	    	  
+	   // XY coordinate initialization 	  
+	    	// Read latest sensordata
+	    	  
+	    	  
+	    	  
+	    	  
+	    	  
 		rsdata.setYaw(0);
 		rsdata.setXpos(10);
 		rsdata.setYpos(10);
@@ -49,7 +55,6 @@ public class ControllerModule{
 		//Control signal update
 		controlsignal.print();	
 		rsdata.print();
-	       }while( rsdata.getXpos() < 20 );
 	}
 }
 
