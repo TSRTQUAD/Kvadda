@@ -15,7 +15,7 @@ public abstract class AbstractGPSMarker {
 	
 	protected LatLong coordinate;
 	protected Marker marker;
-	
+
 	public AbstractGPSMarker(LatLong coordinate){
 		this.coordinate = coordinate;
 		this.marker = RouteMarker.create(coordinate.getLatitude(), coordinate.getLongitude(), this.getIcon());

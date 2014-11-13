@@ -26,7 +26,7 @@ import kvaddakopter.gui.controllers.TabPlaneraController;
 /**
  * Used as a high-level representation of the Google Map used for planning.
  */
-public class PlanningMap implements MapComponentInitializedListener {
+public class PlanningMap implements MapComponentInitializedListener{
 
 
 	/**
@@ -161,6 +161,7 @@ public class PlanningMap implements MapComponentInitializedListener {
 	}
 	
 
+
 	/**
 	 * Sets all event listeners for the map.
 	 */
@@ -171,35 +172,43 @@ public class PlanningMap implements MapComponentInitializedListener {
 			//Coordinate where the user clicked.
 			LatLong clickedCoordinate = new LatLong((JSObject) obj.getMember("latLng"));
 			MissionType missionType = this.owningController.getCurrentSelectedMissionType();
-
 			if ( this.owningController.addMissionCoordinatesMode() ){
 				
 				// 3 cases for each mission type
 				if (missionType == MissionType.AROUND_COORDINATE && this.navigationCoordinates.size() < 1){
 					
-                        GPSMarkerWithCircle mapMarkerCircle =  new GPSMarkerWithCircle(clickedCoordinate);
-                        mapMarkerCircle.attachToMap(this.map, this.navigationCoordinates);
+                        GPSMarkerWithCircle createdMarker =  new GPSMarkerWithCircle(clickedCoordinate);
+                        createdMarker.attachToMap(this.map, this.navigationCoordinates);
 				}
 				else if (missionType == MissionType.ALONG_TRAJECTORY ){
-					GPSMarkerNormal normalMarker = new GPSMarkerNormal(clickedCoordinate);
-					normalMarker.attachToMap(map, this.navigationCoordinates);
+					GPSMarkerNormal createdMarker = new GPSMarkerNormal(clickedCoordinate);
+					createdMarker.attachToMap(map, this.navigationCoordinates);
 					this.gpsPath.draw(this.navigationCoordinates);
+					this.map.addUIEventHandler(createdMarker.getMarker(), UIEventType.click, (JSObject obj2) -> {
+						this.gpsPath.draw(this.navigationCoordinates);
+					});
+			
 				}
 				else if (missionType == MissionType.AREA_COVERAGE){
-					GPSMarkerNormal normalMarker = new GPSMarkerNormal(clickedCoordinate);
-					normalMarker.attachToMap(map, this.navigationCoordinates);
+					GPSMarkerNormal createdMarker = new GPSMarkerNormal(clickedCoordinate);
+					createdMarker.attachToMap(map, this.navigationCoordinates);
 					this.missionAreaGpsPolygon.draw(this.navigationCoordinates);
+					this.map.addUIEventHandler(createdMarker.getMarker(), UIEventType.click, (JSObject obj2) -> {
+						this.missionAreaGpsPolygon.draw(this.navigationCoordinates);;
+					});
 				}
 
 			}
 			if ( this.owningController.addForbiddenAreasMode() ){
                         //this.addGpsPoint(coordinate, MapMarkerEnum.FORBIDDEN_AREAS, this.forbiddenAreasCoordinates);
-                        GPSMarkerForbidden mapMarker =  new GPSMarkerForbidden(clickedCoordinate);
-                        mapMarker.attachToMap(map, this.forbiddenAreasCoordinates);
-                        this.forbiddenAreaGpsPolygon.draw(this.forbiddenAreasCoordinates);
+                        GPSMarkerForbidden createdMarker =  new GPSMarkerForbidden(clickedCoordinate);
+                        createdMarker.attachToMap(map, this.forbiddenAreasCoordinates);
+                    	this.forbiddenAreaGpsPolygon.draw(this.forbiddenAreasCoordinates);
+                        this.map.addUIEventHandler(createdMarker.getMarker(), UIEventType.click, (JSObject obj2) -> {
+                        	this.forbiddenAreaGpsPolygon.draw(this.forbiddenAreasCoordinates);
+            			});
 			}
 			
-
 		});
 	}
 
@@ -230,6 +239,7 @@ public class PlanningMap implements MapComponentInitializedListener {
 		.zoom(17);
 		this.map = mapView.createMap(mapOptions);
 	}
+
 
 
 
