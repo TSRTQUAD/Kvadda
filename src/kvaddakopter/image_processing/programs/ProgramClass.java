@@ -1,9 +1,10 @@
 package kvaddakopter.image_processing.programs;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.List;
 
-import kvaddakopter.image_processing.algorithms.BackgroundSubtraction;
 import kvaddakopter.image_processing.algorithms.DetectionClass;
+import kvaddakopter.image_processing.algorithms.Tracking;
 import kvaddakopter.image_processing.decoder.DecoderListener;
 import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
@@ -15,17 +16,22 @@ import org.opencv.core.Mat;
 import com.xuggle.xuggler.demos.VideoImage;
 
 
-public class ProgramClass extends Thread implements DecoderListener,KeyBoardListener {
+public class ProgramClass implements Runnable,DecoderListener,KeyBoardListener {
 
 	//Create image queue, which is a list that is holding the most recent
 	//images
 	protected static int ImageQueueSize = 4;
 	protected  ArrayList<BufferedImage> mImageQueue  = new ArrayList<BufferedImage>();;
 
+	ImageProcessingMainProgram mDetetctionListener;
+	
 	//Algorithm
 	protected DetectionClass mCurrentMethod;
+	protected List<DetectionClass> mMethodList;
+	protected Tracking mTracker;
 
 	//Decoder
+	//TODO set shared decoder
 	protected FFMpegDecoder mDecoder;
 
 	//Window
@@ -171,7 +177,5 @@ public class ProgramClass extends Thread implements DecoderListener,KeyBoardList
 	}
 	@Override
 	public void onKeyBoardInput(String inputString) {};
-
-
 
 }

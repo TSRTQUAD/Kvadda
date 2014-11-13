@@ -58,6 +58,7 @@ public class TestColorDetection extends ProgramClass{
 
 		int resWidth = 0;
 		int resHeight = 0;
+		
 		if(mCurrentMethod.hasIntermediateResult()){
 
 			Mat output = mCurrentMethod.getIntermediateResult();
@@ -71,12 +72,11 @@ public class TestColorDetection extends ProgramClass{
 		
 		if(targetList.size() > 0){
 			tracker.update(targetList);
-			
-			
 			Mat output = tracker.getImage(resWidth,resHeight);
 			BufferedImage out = ImageConversion.mat2Img(output);
 			trackingWindow.setImage(out);
 		}
+		
 		
 	}
 }

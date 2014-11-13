@@ -3,6 +3,7 @@ package kvaddakopter.image_processing.algorithms;
 import java.util.ArrayList;
 import java.util.List;
 
+import kvaddakopter.ImageProcessingMain;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
 
@@ -14,9 +15,10 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+//TODO calculate moments of contours to get center of mass
 public class DetectionClass {
 	Mat mIntermeditateResult;
-	
+
 	public ArrayList<TargetObject> start(ImageObject imageObject){
 		return null;
 	};

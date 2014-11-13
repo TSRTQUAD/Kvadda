@@ -1,4 +1,4 @@
-package Mainbus;
+package kvaddakopter.Mainbus;
 
 /**
  * Example of how to make threads
@@ -45,19 +45,22 @@ public class MyRunnable implements Runnable {
      * Thread 2 sets condition variable after 5 seconds
      */
     private void condVarExample(){
-    	if(mThreadId == 1){
-    		mainbus.waitOnCondVar();
-    	}
-    	else if (mThreadId == 2){
     		try {
 				Thread.sleep(5000);
-				mainbus.releaseCondVar();
+				releaseCondVar();
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-    	}
     }
+    
+    public synchronized void releaseCondVar(){
+    	mainbus.setCondVar(true);
+    	synchronized(mainbus){
+            mainbus.notify ();
+    	}
+
+ }
 
 }
 
