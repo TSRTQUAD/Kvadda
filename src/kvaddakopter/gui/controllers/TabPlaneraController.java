@@ -7,7 +7,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-import storage.MissionStorage;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -19,6 +18,7 @@ import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.assignment_planer.MissionType;
 import kvaddakopter.gui.components.MissionHeight;
 import kvaddakopter.maps.PlanningMap;
+import kvaddakopter.storage.MissionStorage;
 
 
 public class TabPlaneraController implements Initializable {
@@ -164,7 +164,7 @@ public class TabPlaneraController implements Initializable {
     
     /**
      * Used by map to determine if the user specified that he/she want to add Mission Coordinates.
-     * @return boolean If we are on this Mode
+     * @return boolean If we are in this Mode
      */
     public boolean addMissionCoordinatesMode(){
     	return this.canEnterMissionCoordinates;

@@ -1,4 +1,4 @@
-package storage;
+package kvaddakopter.storage;
 
 import java.util.ArrayList;
 
