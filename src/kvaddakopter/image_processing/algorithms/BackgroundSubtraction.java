@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import kvaddakopter.Mainbus.Mainbus;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.utils.MatchTests;
@@ -38,14 +39,20 @@ public class BackgroundSubtraction  extends DetectionClass{
 	static final int MORPH_KERNEL_SIZE = 66;
 	static final int MORPH_KERNEL_TYPE = Imgproc.MORPH_ELLIPSE;
 
+	@Override
+	public boolean isMethodActive(Mainbus mainbus) {
+		return mainbus.isBackgroundSubtractionOn();
+	}
 
 	@Override
-	public ArrayList<TargetObject> start(ImageObject currentImageData) {
+	public ArrayList<TargetObject> runMethod(ImageObject currentImageData) {
 
 		// Compute key points and descriptors for the current image
 		currentImageData.computeKeyPoints(FeatureDetector.SURF);
 		currentImageData.computeDescriptors(DescriptorExtractor.ORB);
 
+		//Creating a list of target objects
+		ArrayList<TargetObject> targetObjects = new ArrayList<TargetObject>();
 
 		if(mPreviousImageData == null) {
 
@@ -53,39 +60,40 @@ public class BackgroundSubtraction  extends DetectionClass{
 			// Store the current image object as the previous object.
 			mPreviousImageData = currentImageData;
 
-			// Terminate function by returning null.
-			return null;
+			// Terminate function by returning an empty list of target objects.
+			return targetObjects;
 		}
+		mIntermeditateResult = currentImageData.getImage();
 
 		//1. Correspondences
-		MatOfDMatch matches       = currentImageData.findMatches(mPreviousImageData);
-		
-		//2. Find fundamental matrix
-		MatOfDMatch inlierMatches = new MatOfDMatch();
-		Mat fundamentalMatrix 	  = MatchTests.computeFundamentalMatrix(matches, currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(),0.01, inlierMatches);
-		if(fundamentalMatrix != null){
-			
-			//2.a Getting inlier keypoints
-			MatOfKeyPoint kpCurrent = new MatOfKeyPoint();
-			MatOfKeyPoint kpPrev = new MatOfKeyPoint();
- 			MatchTests.getMatchingKeyPoints(currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(), kpCurrent, kpPrev, inlierMatches);
-
-			mIntermeditateResult = new Mat();
-			/*Features2d.drawMatches(
-					currentImageData.getImage(),
-					kpCurrent, 
-					mPreviousImageData.getImage(),
-					kpPrev,  
-					inlierMatches,
-					mIntermeditateResult
-					);
-			*/
-			//2.b Computing Homography matrix using inlier keypoints
-			Mat homo = MatchTests.getHomoMatrix(kpCurrent, kpPrev);
-			
-			//2.c Warp Image
-			Imgproc.warpPerspective(mPreviousImageData.getImage(), mIntermeditateResult,homo, mPreviousImageData.getImage().size());
-		}
+//		MatOfDMatch matches       = currentImageData.findMatches(mPreviousImageData);
+//		
+//		//2. Find fundamental matrix
+//		MatOfDMatch inlierMatches = new MatOfDMatch();
+//		Mat fundamentalMatrix 	  = MatchTests.computeFundamentalMatrix(matches, currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(),0.01, inlierMatches);
+//		if(fundamentalMatrix != null){
+//			
+//			//2.a Getting inlier keypoints
+//			MatOfKeyPoint kpCurrent = new MatOfKeyPoint();
+//			MatOfKeyPoint kpPrev = new MatOfKeyPoint();
+// 			MatchTests.getMatchingKeyPoints(currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(), kpCurrent, kpPrev, inlierMatches);
+//
+//			mIntermeditateResult = new Mat();
+//			/*Features2d.drawMatches(
+//					currentImageData.getImage(),
+//					kpCurrent, 
+//					mPreviousImageData.getImage(),
+//					kpPrev,  
+//					inlierMatches,
+//					mIntermeditateResult
+//					);
+//			*/
+//			//2.b Computing Homography matrix using inlier keypoints
+//			Mat homo = MatchTests.getHomoMatrix(kpCurrent, kpPrev);
+//			
+//			//2.c Warp Image
+//			Imgproc.warpPerspective(mPreviousImageData.getImage(), mIntermeditateResult,homo, mPreviousImageData.getImage().size());
+//		}
 
 		//2. Camera Matrix blabla. - NOT IMPLEMENTED
 		//		
@@ -114,7 +122,7 @@ public class BackgroundSubtraction  extends DetectionClass{
 
 
 		// TODO: Assign the box data to the TargetObjects
-		ArrayList<TargetObject> targetObjects = new ArrayList<TargetObject>();
+	
 		/*	Mat m = new Mat(1,2,CvType.CV_64F);
 		m.put(0, 0, 0);
 		m.put(0, 1, 1);
@@ -125,7 +133,12 @@ public class BackgroundSubtraction  extends DetectionClass{
 
 		return targetObjects;
 	}
-
+/*
+	@Override
+	public boolean isMethodActive() {
+		
+	
+	}*/
 
 	private void warpPreviousImage(){
 	}

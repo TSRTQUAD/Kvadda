@@ -3,6 +3,8 @@ package kvaddakopter.Mainbus;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import org.opencv.core.Core;
+
 import kvaddakopter.ImageProcessingMain;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.data_types.TargetObject;
@@ -44,22 +46,26 @@ public class Mainbus{
 	private ArrayList<TargetObject> mTargetList;
 	private BufferedImage mOutImage;
 	private ArrayList<ColorTemplate> mColorTemplates;
-	//Flags
+	//Flags 
 	private boolean mImageProcessingRunning = false;
-	private boolean mColorDetectionOn = true;
-	private boolean mTemplateMatchingOn = true;
+	private boolean mColorDetectionOn = false;
+	private boolean mTemplateMatchingOn = false;
 	private boolean mBackGroundSubtractionOn = true;
 	
 	
 	public static void main(String[] args) {
-		Mainbus mainbus = new Mainbus();
-//		System.out.println("created mainbus");
-//		ImageProcessingMainProgram imageProcessing = new ImageProcessingMainProgram(1,mainbus);
-//		System.out.println("imageprocessing initiated");
 		
-//		Thread t3 = new Thread(imageProcessing);
-//		t3.setPriority(1);
-//		t3.start(); 
+		//Måste laddas i början av programmet... Förslagsvis här.
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+		
+		Mainbus mainbus = new Mainbus();
+		System.out.println("created mainbus");
+		ImageProcessingMainProgram imageProcessing = new ImageProcessingMainProgram(1,mainbus);
+		System.out.println("imageprocessing initiated");
+		
+		Thread t3 = new Thread(imageProcessing);
+		t3.setPriority(1);
+		t3.start(); 
 		
 		MyRunnable myRunnable = new MyRunnable(1,mainbus);
 		MyRunnable2 myRunnable2 = new MyRunnable2(2,mainbus);
@@ -74,7 +80,7 @@ public class Mainbus{
 		t2.setPriority(2);
 		t2.start();  
 		while(true){
-			//System.out.println("Mainbus running");
+//			System.out.println("Mainbus running");
 		}
 	}
        
