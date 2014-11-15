@@ -3,6 +3,32 @@ import kvaddakopter.control_module.modules.*;
 import kvaddakopter.control_module.signals.*;
 
 
+/*Initialize
+* 1: Read sensor data and set origo @ intilong init lat
+* 2: Initialize kalmanfilter
+* 3:
+*/
+		
+
+/*Sensor fusion loop
+* 1: For every sample:
+* 
+* 	i: Read latest sensor data
+* 	ii: Transform data into fixed coordinate system
+* 	iii: Estimate positions with kalmanfilter (time update) in X and Y direction.
+* 	iv: Transform states into quad velocities.
+
+* 2: For every 1/sampletime sample
+* 	i: Read new gps measurement.
+* 	ii: Transform into fixed coordinate system
+* 	iii: Estimate positions with kalmanfilter (measurement update) in X and Y direction.
+* 	iv: Transform states into quad velocities.
+*/
+
+
+
+
+
 
 
 public class Sensorfusionmodule {
@@ -32,9 +58,7 @@ public class Sensorfusionmodule {
 //		rsdata.setYaw(sdata.getYaw());								// Set Yaw
 //		rsdata.setHeight(sdata.getHeight());						// Set Height
 //		rsdata.XYdot2Vel();											//Transform Xdot,Ydot to velocities
-
-		
-	
+			
 		//Sensorfusion loop ------------------------------------------	
 		
 //				//For every sample  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-		
@@ -89,8 +113,8 @@ public class Sensorfusionmodule {
 				rsdata.XYdot2Vel();											//Transform Xdot,Ydot to velocities
 				rsdata.print();
 		
-				rsdata.setXstates(skalmanx.measurementupdate(0));// Measurement update in kalmanfilter
-				rsdata.setYstates(skalmany.measurementupdate(0.5));// Measurement update in kalmanfilter
+				rsdata.setXstates(skalmanx.measurementupdate(0));			// Measurement update in kalmanfilter
+				rsdata.setYstates(skalmany.measurementupdate(0.5));			// Measurement update in kalmanfilter
 				rsdata.XYdot2Vel();
 				rsdata.print();
 				

@@ -17,14 +17,22 @@ public class SensorData {
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	// Fixes the local coordinate system XY to intitiallat, initiallon
 	public void setinitial(){
 		this.initiallon = Longitud;
 		this.initiallat  = Latitud;	
 	}
 
-	
-	
 	
 	/* Transforms GPS coordinates Latitude and Longitude into local 
 	 *  coordinate system XY which has origo at (initiallat,initialat)
