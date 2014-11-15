@@ -6,6 +6,8 @@ import kvaddakopter.assignment_planer.MissionObject;
 
 public class MissionStorage {
 	
+	private ArrayList<MissionObject> savedMissions = new ArrayList<>();
+	
 	
 	public MissionStorage(){
 		
@@ -14,15 +16,14 @@ public class MissionStorage {
 	
 	public boolean saveMission(MissionObject mission){
 		// IMPLEMENT LOGIC TO ACTUALLY STORE A MISSION!!
-		System.out.println("Mission Saved:");
-		System.out.println(mission.toString());
-		return true;
+		
+		return savedMissions.add(mission);
+		
 	}
 	
 	public ArrayList<MissionObject> getSavedMissions(){
-		ArrayList<MissionObject> missions = new ArrayList<MissionObject>();
-		
-		return missions;
+		System.out.println("HERE");
+		return this.savedMissions;
 	}
 	
 }

@@ -29,22 +29,16 @@ public class TabPlaneraController implements Initializable {
 	 */
     @FXML
     private GoogleMapView mapView;
-
     @FXML
     private TextField txtMissionName;
-    
     @FXML
     private ComboBox<MissionType> listMissionType;
-    
     @FXML
     private ComboBox<MissionHeight> listMissionHeight;
-
     @FXML
     private ComboBox<String> listTargetTemplate;
-
     @FXML
     private ComboBox<String> listTargetColor;
-    
     @FXML
     private ToggleGroup descriporRadioGroup;
     @FXML
@@ -52,7 +46,6 @@ public class TabPlaneraController implements Initializable {
     @FXML
     private RadioButton radioDescriptor2;
 
-    
     
     /**
      * Properties
@@ -77,6 +70,9 @@ public class TabPlaneraController implements Initializable {
      */
 	
 	
+	/**
+	 * Triggered when missionType Combobox is changed
+	 */
     @FXML
     private void missionTypeChanged()
     {
@@ -84,65 +80,88 @@ public class TabPlaneraController implements Initializable {
     	this.planningMap.clearNavigationCoordinates();
     }
     
+    /**
+     * Triggered when user presses btn "Clear mission areas"
+     */
     @FXML
     private void btnClickedClearNagivationCoordinates(){
     	this.planningMap.clearNavigationCoordinates();
     }
     
+    /**
+     * Triggered when user presses btn "Clear forbidden areas"
+     */
     @FXML
     private void btnClickedClearForbiddenAreasCoodinates(){
     	this.planningMap.clearForbiddenAreasCoordinates();
     }
     
+    /**
+     * Triggered when user presses btn "Mark mission coordinates"
+     */
     @FXML
     private void btnStartMissionCoordinates(){
     	this.canEnterMissionCoordinates = true;
     	this.canEnterForbiddenAreaCoordinates = false;	
     }
     
+    /**
+     * Triggered when user presses btn "Mark forbidden areas"
+     */
     @FXML
     private void btnStartMarkForbiddenAreas(){
     	this.canEnterForbiddenAreaCoordinates = true;
     	this.canEnterMissionCoordinates = false;
     }
      
-    
+    /**
+     * Triggered when the user clicks "Save mission"
+     */
     @FXML 
     private void btnSaveMission(){
     	
+    	
+    	//Create new mission object
     	MissionObject mission = new MissionObject();
     	
+    	
+    	//Mission Name
     	mission.setMissionName(this.txtMissionName.getText());
     	
+    	//MissionType
     	mission.mission(this.listMissionType.getValue());
     	
+    	//Mission Height
     	double[] height = {(double) this.listMissionHeight.getValue().getValue()};
     	mission.setHeight(height);
     	
-    	double[] radiusValue = {(double) 5};
+    	//Mission Radius
+    	double[] radiusValue = this.planningMap.getCircleRadius();
     	mission.setRadius(radiusValue);
     	
-    	mission.setSearchAreas(this.planningMap.allNavigationCoordinates());
-    	mission.setForbiddenAreas(this.planningMap.allForbiddenAreaCoordinates());
-    	
+    	//Image template
     	String selectedTemplate = this.listTargetTemplate.getValue();
     	int templateId = this.targetTemplates.indexOf(selectedTemplate);
     	mission.setImageTemplate(templateId);
     	
+    	//Image color
     	String selectedColor = this.listTargetColor.getValue();
     	int colorId = this.colorTemplates.indexOf(selectedColor);
     	mission.setColorTemplate(colorId);
     	
-    	
+    	//Image Descriptor
     	int descriptorId = (int) this.descriporRadioGroup.getSelectedToggle().getUserData();
     	mission.setDescriptor(descriptorId);
     	
+    	//GPS AREAS
     	mission.setSearchAreas(this.planningMap.allNavigationCoordinates());
     	mission.setForbiddenAreas(this.planningMap.allForbiddenAreaCoordinates());
     	
     	
     	//Save mission
     	this.storage.saveMission(mission);
+    	
+    	System.out.println(this.storage.getSavedMissions().size());
     }
     
     

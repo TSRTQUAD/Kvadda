@@ -55,6 +55,13 @@ public class PlanningMap implements MapComponentInitializedListener{
 	 */
 	private ArrayList<AbstractGPSMarker> forbiddenAreasCoordinates = new ArrayList<AbstractGPSMarker>();
 	
+	
+	/**
+	 * GPS Circle
+	 * 
+	 */
+	private double circleRadius = 0.0f;
+	
 	/**
 	 * GPS paths 
 	 */
@@ -66,6 +73,8 @@ public class PlanningMap implements MapComponentInitializedListener{
 	 */
 	private GreenGPSPolygon missionAreaGpsPolygon = null;
 	private RedGPSPolygon   forbiddenAreaGpsPolygon = null;
+	
+	
 	
 	
 	
@@ -140,10 +149,20 @@ public class PlanningMap implements MapComponentInitializedListener{
 		}
 	}
 	
-
+	
 	/**
-	 * Returns an array of all placed markers
-	 * @return
+	 * The current set circle radius for the mission area
+	 * @return radius
+	 */
+	public double[] getCircleRadius(){
+		double[] radius = {this.circleRadius};
+		return radius;
+	}
+	
+	
+	/**
+	 * Returns an array of all navigation coordiantes
+	 * @return list of coordinates
 	 */
 	public ArrayList<Area> allNavigationCoordinates() {
 		return GpsToAreaTransformer.transform(this.navigationCoordinates);
@@ -153,8 +172,8 @@ public class PlanningMap implements MapComponentInitializedListener{
 
 
 	/**
-	 * Returns an array of all placed markers
-	 * @return
+	 * Returns an array of all forbidden area coordinates
+	 * @return list of coordinates
 	 */
 	public ArrayList<Area> allForbiddenAreaCoordinates() {
 		return GpsToAreaTransformer.transform( this.forbiddenAreasCoordinates );
@@ -179,6 +198,10 @@ public class PlanningMap implements MapComponentInitializedListener{
 					
                         GPSMarkerWithCircle createdMarker =  new GPSMarkerWithCircle(clickedCoordinate);
                         createdMarker.attachToMap(this.map, this.navigationCoordinates);
+                        this.circleRadius = createdMarker.getCircle().getRadius();
+                        map.addUIEventHandler(createdMarker.getCircle(), UIEventType.click, (JSObject obj43) -> {
+                        	this.circleRadius = createdMarker.getCircle().getRadius();
+                        });
 				}
 				else if (missionType == MissionType.ALONG_TRAJECTORY ){
 					GPSMarkerNormal createdMarker = new GPSMarkerNormal(clickedCoordinate);
