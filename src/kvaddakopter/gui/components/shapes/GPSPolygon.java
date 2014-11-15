@@ -33,8 +33,7 @@ public abstract class GPSPolygon implements MapShapeInterface{
 
 	@Override
 	public void draw(ArrayList<AbstractGPSMarker> listOfCoordinates) {
-		System.out.println("DRAW POLYGON");
-		//Clean the current Path if it exist
+		//Clean the current polygon if it exist
 		this.remove();
 		//If the listSize is 1 we are done. No Path can be  drawn for ONE point.
 		int listsize = listOfCoordinates.size();

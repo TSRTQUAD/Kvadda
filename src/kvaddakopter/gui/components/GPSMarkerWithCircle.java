@@ -23,6 +23,11 @@ public class GPSMarkerWithCircle extends GPSMarkerNormal{
 		return this.circleRadius;
 	}
 	
+	
+	public Circle getCircle(){
+		return this.circle;
+	}
+	
 	@Override
 	public void attachToMap(GoogleMap map, ArrayList<AbstractGPSMarker> listOfCoordinates){
 		
@@ -39,7 +44,7 @@ public class GPSMarkerWithCircle extends GPSMarkerNormal{
         map.addMapShape(this.circle);
         map.addUIEventHandler(this.circle, UIEventType.click, (JSObject obj) -> {
         	this.circle.setEditable(!this.circle.getEditable());
-        	System.out.println(this.circle.getRadius());
+        	this.circle.setCenter(this.coordinate);
         });
 	}
 
