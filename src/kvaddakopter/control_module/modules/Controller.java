@@ -3,6 +3,16 @@ import org.ejml.simple.SimpleMatrix;
 import kvaddakopter.control_module.signals.*;
 
 
+/* Controller for quadcopter uses two different controlling modes.
+ * 1. GetControlSignalSingle: Go to a single coordinate by controlling lateral and forward velocity, Yaw is fixed by referece.
+ * 	Input: Refinedreference data and Sensordata, output is void, Updates the public object controlsignal.
+ * 2. GetControlSignalMission: Controls quadcopter by fixed forward velocity and Yaw-angle. Lateral vel is set to zero.
+ *  Input: Refinedreference data and Sensordata, output is void, Updates the public object controlsignal.
+ * 
+ * 
+ * Created by Anton on 2014-10-10.
+ */
+
 
 public class Controller{		
 	protected double  errorheigt,errorlateralvel, errorforwardvel, errorheading, Ts;

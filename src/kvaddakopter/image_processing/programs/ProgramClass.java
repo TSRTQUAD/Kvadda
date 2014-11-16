@@ -1,9 +1,11 @@
 package kvaddakopter.image_processing.programs;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.List;
 
-import kvaddakopter.image_processing.algorithms.BackgroundSubtraction;
+import kvaddakopter.Mainbus.Mainbus;
 import kvaddakopter.image_processing.algorithms.DetectionClass;
+import kvaddakopter.image_processing.algorithms.Tracking;
 import kvaddakopter.image_processing.decoder.DecoderListener;
 import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
@@ -15,17 +17,22 @@ import org.opencv.core.Mat;
 import com.xuggle.xuggler.demos.VideoImage;
 
 
-public class ProgramClass extends Thread implements DecoderListener,KeyBoardListener {
+public class ProgramClass implements Runnable,DecoderListener,KeyBoardListener {
 
 	//Create image queue, which is a list that is holding the most recent
 	//images
 	protected static int ImageQueueSize = 4;
 	protected  ArrayList<BufferedImage> mImageQueue  = new ArrayList<BufferedImage>();;
 
+	ImageProcessingMainProgram mDetetctionListener;
+	
 	//Algorithm
 	protected DetectionClass mCurrentMethod;
+	protected List<DetectionClass> mDetectionMethodList;
+	protected Tracking mTracker;
 
 	//Decoder
+	//TODO set shared decoder
 	protected FFMpegDecoder mDecoder;
 
 	//Window
@@ -34,14 +41,23 @@ public class ProgramClass extends Thread implements DecoderListener,KeyBoardList
 	//Sleep time / FPS
 	private long mSleepTime = 20;
 	
+	//private volatile Container container;
+	protected Mainbus mMainbus;
+    protected int mThreadId;
+    
+	
 	// KeyBoard handler
 	KeyBoardHandler mKeyBoardHandler = null;
-	public ProgramClass() {
+
+	public ProgramClass(int threadid, Mainbus mainbus) {
+		mMainbus = mainbus;
+	    mThreadId = threadid;
 		init();
 	}
+	
 	/** 
-	 *Init function of a program class. This function is called when a Program class instance is created.  <br>
-	 *<br>
+	 *Init function of a program class. <br> 
+	 * This function is implicitly called be constructor of the ProgramClass <br>
 	 *Example how this function can  be implemented in subclasses: <br>
 	 *<code>
 	 *<ul>
@@ -64,7 +80,7 @@ public class ProgramClass extends Thread implements DecoderListener,KeyBoardList
 	 *</ul>
 	 *</code> 
 	 */
-	protected void init(){
+	public void init(){
 		System.err.println("ProgramClass: 'init()' not implemented");
 		System.exit(0);
 	}
@@ -171,7 +187,5 @@ public class ProgramClass extends Thread implements DecoderListener,KeyBoardList
 	}
 	@Override
 	public void onKeyBoardInput(String inputString) {};
-
-
 
 }

@@ -9,9 +9,6 @@ import kvaddakopter.image_processing.programs.TestColorDetection;
 
 import org.opencv.core.Core;
 
-
-
-
 public class ImageProcessingMain {
 	
 	public static void main(String[] args) {
@@ -30,14 +27,18 @@ public class ImageProcessingMain {
 
 		//TestBackgroundSubtraction program  = new TestBackgroundSubtraction();
 //		CameraCalibration program  = new CameraCalibration();
-		TestColorDetection program  = new TestColorDetection();
+		TestColorDetection program  = new TestColorDetection(0, null);
 		//colorTemplates.add(new ColorTemplate("Yellow ball", 10, 50, 50, 255, 50, 255, ColorTemplate.FORM_CIRLE));
 		
 		
 		ColorDetection method = (ColorDetection)program.getCurrentMethod();
 		method.addTemplate("Pink square", 160, 255, 70, 150, 150, 255, ColorTemplate.FORM_SQUARE);
 		//method.addTemplate("Yellow square", 0, 100, 80, 150, 130, 255, ColorTemplate.FORM_SQUARE);
-		program.start();
+		
+
+        Thread t = new Thread(program);
+        t.setPriority(1);
+        t.start();
 		
 //		System.out.println("Image processing unit up and running!");
 	}

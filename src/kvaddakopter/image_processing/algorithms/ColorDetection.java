@@ -3,6 +3,7 @@ package kvaddakopter.image_processing.algorithms;
 import java.util.ArrayList;
 import java.util.List;
 
+import kvaddakopter.Mainbus.Mainbus;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
@@ -37,12 +38,15 @@ public class ColorDetection  extends DetectionClass{
 	public ColorDetection(){
 		super();
 		colorTemplates = new ArrayList<ColorTemplate>();
-		//colorTemplates.add(new ColorTemplate("Blue ball", 90, 140, 50, 255, 50, 255, ColorTemplate.FORM_CIRLE));
-		//colorTemplates.add(new ColorTemplate("Yellow ball", 10, 50, 50, 255, 50, 255, ColorTemplate.FORM_CIRLE));
 	}
 
+
 	@Override
-	public ArrayList<TargetObject> start(ImageObject imageObject) {
+	public boolean isMethodActive(Mainbus mainbus) {
+		return mainbus.isColorDetectionOn();
+	}
+	@Override
+	public ArrayList<TargetObject> runMethod(ImageObject imageObject) {
 
 		// Convert RGB to HSV
 		Mat HSVImage = new Mat();
@@ -106,15 +110,18 @@ public class ColorDetection  extends DetectionClass{
 				drawTargetHSVValues(cutoutImage, targetHSVChannels, (int)target.getPosition().get(0,0)[0], (int)target.getPosition().get(1,0)[0]);
 			}
 			
-			
-			thresholdImage.release();
-			dilatedImage.release();
-			
-			//TODO Save original color templates
-			//Change adaptedcolortemplates
+			//Adapt color template towards HSV-channels of detected target
+			//If no target is found the template is adapted towards original bounds
 			if(isUsingColorAdaption() && numberOfTargetsFound > 0){
 				colorTemplate.adapt(targetHSVChannels, 100, 100, 100);
 			}
+			else if (isUsingColorAdaption()){
+				colorTemplate.adaptToOriginalBounds();
+			}
+			
+			//Free memory
+			thresholdImage.release();
+			dilatedImage.release();
 		}
 
 		return targetObjects;
@@ -159,7 +166,6 @@ public class ColorDetection  extends DetectionClass{
 			    cutout.release();
 			}
 		}
-		
 		return resultImage;
 	}
 	
@@ -201,7 +207,7 @@ public class ColorDetection  extends DetectionClass{
 	}
 	
 	/**
-	 * Draw HSV values below targets
+	 * Draw mean HSV values of alike targets below targets
 	 * @param image
 	 * @param targetHSVChannels
 	 * @param targetPosX
@@ -233,6 +239,11 @@ public class ColorDetection  extends DetectionClass{
 	 */
 	public int addTemplate(String description_, int hueLow_, int hueHigh_, int saturationLow_, int saturationHigh_, int valueLow_, int valueHigh_, int form_type_){
 		colorTemplates.add(new ColorTemplate(description_, hueLow_, hueHigh_, saturationLow_, saturationHigh_, valueLow_, valueHigh_, form_type_));
+		return colorTemplates.size() - 1;
+	}
+	
+	public int addTemplate(ColorTemplate cTemplate){
+		colorTemplates.add(cTemplate);
 		return colorTemplates.size() - 1;
 	}
 
