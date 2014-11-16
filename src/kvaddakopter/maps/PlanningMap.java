@@ -26,19 +26,10 @@ import kvaddakopter.gui.controllers.TabPlaneraController;
 /**
  * Used as a high-level representation of the Google Map used for planning.
  */
-public class PlanningMap implements MapComponentInitializedListener{
+public class PlanningMap extends BaseMap implements MapComponentInitializedListener{
 
 
-	/**
-	 * View that represent the map view.
-	 */
-	private GoogleMapView mapView;
-
-
-	/**
-	 * The object representing the Map itself
-	 */
-	private GoogleMap map = new GoogleMap();
+	
 
 	/**
 	 * Owning Controller
@@ -65,14 +56,14 @@ public class PlanningMap implements MapComponentInitializedListener{
 	/**
 	 * GPS paths 
 	 */
-	private GPSPath gpsPath = null;
+	private GPSPath gpsPath = new GPSPath(this.map);
 	
 	
 	/**
 	 * GPS Polygons
 	 */
-	private GreenGPSPolygon missionAreaGpsPolygon = null;
-	private RedGPSPolygon   forbiddenAreaGpsPolygon = null;
+	private GreenGPSPolygon missionAreaGpsPolygon;
+	private RedGPSPolygon  forbiddenAreaGpsPolygon;
 	
 	
 	
@@ -90,6 +81,9 @@ public class PlanningMap implements MapComponentInitializedListener{
 	 */
 	public PlanningMap(GoogleMapView mapView, TabPlaneraController owningController) {
 		this.mapView = mapView;
+		this.gpsPath = new GPSPath(this.map);
+		this.missionAreaGpsPolygon = new GreenGPSPolygon(this.map);
+		this.forbiddenAreaGpsPolygon = new RedGPSPolygon(this.map);
 		this.owningController = owningController;
 		this.mapView.addMapInializedListener(this);
 		
@@ -102,10 +96,8 @@ public class PlanningMap implements MapComponentInitializedListener{
 	public void mapInitialized() {
 		
 		this.isMapInitialized = true;
-		this.createMapWithStartLocation(58.409719, 15.622071);
-		this.gpsPath = new GPSPath(this.map);
-		this.missionAreaGpsPolygon = new GreenGPSPolygon(this.map);
-		this.forbiddenAreaGpsPolygon = new RedGPSPolygon(this.map);
+		this.createMapWithStartLocation();
+
 		this.addMapEventListeners();
 		this.clearMap();
 
@@ -179,7 +171,14 @@ public class PlanningMap implements MapComponentInitializedListener{
 		return GpsToAreaTransformer.transform( this.forbiddenAreasCoordinates );
 	}
 	
-
+	/**
+	 * Where should we start the mapView. The world is yours!
+	 * @return
+	 */
+	protected LatLong startCoordinate(){
+		return new LatLong(58.406659, 15.620358);
+	}
+	
 
 	/**
 	 * Sets all event listeners for the map.
@@ -239,29 +238,6 @@ public class PlanningMap implements MapComponentInitializedListener{
 	
 	
 
-
-	/**
-	 * Used to initialize the wanted map with given options.
-	 *
-	 * @param startLat  Map center start Latitude.
-	 * @param startLong Map center start Longitude.
-	 * @return GoogleMap instance
-	 */
-	private void createMapWithStartLocation(double startLat, double startLong) {
-		LatLong mapStartingPosition = new LatLong(startLat, startLong);
-		MapOptions mapOptions = new MapOptions();
-
-		mapOptions.center(mapStartingPosition)
-		.mapType(MapTypeIdEnum.ROADMAP)
-		.overviewMapControl(false)
-		.panControl(false)
-		.rotateControl(false)
-		.scaleControl(false)
-		.streetViewControl(false)
-		.zoomControl(true)
-		.zoom(17);
-		this.map = mapView.createMap(mapOptions);
-	}
 
 
 

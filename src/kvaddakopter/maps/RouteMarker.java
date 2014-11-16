@@ -23,6 +23,7 @@ public class RouteMarker {
         markerPaths = new HashMap<>();
         markerPaths.put(MapMarkerEnum.NAVIGATION_NORMAL, "waypoint_marker.png");
         markerPaths.put(MapMarkerEnum.FORBIDDEN_AREAS, "waypoint_marker_forbidden.png");
+        markerPaths.put(MapMarkerEnum.QUAD_MARKER, "quad_marker.png");
     }
 
 

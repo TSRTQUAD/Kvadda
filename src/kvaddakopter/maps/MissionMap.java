@@ -2,14 +2,12 @@ package kvaddakopter.maps;
 
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
-import com.lynden.gmapsfx.javascript.event.UIEventType;
 import com.lynden.gmapsfx.javascript.object.*;
-
-import netscape.javascript.JSObject;
 
 import java.util.ArrayList;
 
 import kvaddakopter.gui.components.AbstractGPSMarker;
+import kvaddakopter.gui.components.QuadMarker;
 import kvaddakopter.gui.controllers.TabUtforController;
 
 
@@ -17,19 +15,9 @@ import kvaddakopter.gui.controllers.TabUtforController;
 /**
  * Used as a high-level representation of the Google Map used while executing a mission.
  */
-public class MissionMap implements MapComponentInitializedListener{
+public class MissionMap extends BaseMap implements MapComponentInitializedListener{
 
 
-	/**
-	 * View that represent the map view.
-	 */
-	private GoogleMapView mapViewUtfor;
-
-
-	/**
-	 * The object representing the Map itself
-	 */
-	private GoogleMap map = new GoogleMap();
 
 	/**
 	 * Owning Controller
@@ -53,15 +41,19 @@ public class MissionMap implements MapComponentInitializedListener{
 	 */
 	boolean isMapInitialized = false;
 	
+	
+	private QuadMarker quadMarker;
+	
+	
 	/**
 	 * Constructor
 	 *
 	 * @param mapView A valid GoogleMapView obtained from the GUI XML.
 	 */
 	public MissionMap(GoogleMapView mapView, TabUtforController owningController) {
-		this.mapViewUtfor = mapView;
+		this.mapView = mapView;
 		this.owningController = owningController;
-		this.mapViewUtfor.addMapInializedListener(this);
+		this.mapView.addMapInializedListener(this);
 		
 	}
 
@@ -72,34 +64,48 @@ public class MissionMap implements MapComponentInitializedListener{
 	public void mapInitialized() {
 		
 		this.isMapInitialized = true;
-		this.createMapWithStartLocation(58.409719, 15.622071);
+		this.createMapWithStartLocation();
 	}
 	
 	
-
-
 	/**
-	 * Used to initialize the wanted map with given options.
-	 *
-	 * @param startLat  Map center start Latitude.
-	 * @param startLong Map center start Longitude.
+	 * Draw the quad marker on the specified position.
+	 * @param latitude
+	 * @param longitude
 	 */
-	private void createMapWithStartLocation(double startLat, double startLong) {
-		LatLong mapStartingPosition = new LatLong(startLat, startLong);
-		MapOptions mapOptions = new MapOptions();
+	public void drawQuad(double latitude, double longitude){
+		if (!this.isMapInitialized) return;
+		LatLong coordinate = new LatLong(latitude, longitude);
+	    if(this.quadMarker != null){
+	    	System.out.println("AND IS DELETED:");
+	    	System.out.println(this.quadMarker.getMarker());
+	    	System.out.println("------------------------");
+	    	this.quadMarker.clearFromMap(this.map);
+	    	this.quadMarker.clearFromMap(this.map);
+	    	this.quadMarker.clearFromMap(this.map);
+	    	this.quadMarker = null;
+	    }
+	    QuadMarker marker = new QuadMarker(coordinate);
+		marker.attachToMap(this.map);
+		this.quadMarker = marker;
+    System.out.println("CREATED!!!!");
+		System.out.println(this.quadMarker.getMarker());
+	   
 
-		mapOptions.center(mapStartingPosition)
-		.mapType(MapTypeIdEnum.ROADMAP)
-		.overviewMapControl(false)
-		.panControl(false)
-		.rotateControl(false)
-		.scaleControl(false)
-		.streetViewControl(false)
-		.zoomControl(true)
-		.zoom(17);
-		this.map = mapViewUtfor.createMap(mapOptions);
+		
 	}
+	
+	
+	/**
+	 * Where should we start the mapView. The world is yours!
+	 * @return
+	 */
+	protected LatLong startCoordinate(){
+		return new LatLong(58.406659, 15.620358);
+	}
+	
 
+	
 
 
 

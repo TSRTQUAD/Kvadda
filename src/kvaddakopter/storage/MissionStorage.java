@@ -10,7 +10,9 @@ public class MissionStorage {
 	
 	
 	public MissionStorage(){
-		
+		MissionObject mission = new MissionObject();
+		this.savedMissions.add(mission);
+	
 	}
 	
 	
@@ -22,7 +24,6 @@ public class MissionStorage {
 	}
 	
 	public ArrayList<MissionObject> getSavedMissions(){
-		System.out.println("HERE");
 		return this.savedMissions;
 	}
 	

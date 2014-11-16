@@ -21,7 +21,7 @@ import kvaddakopter.maps.PlanningMap;
 import kvaddakopter.storage.MissionStorage;
 
 
-public class TabPlaneraController implements Initializable {
+public class TabPlaneraController extends BaseController implements Initializable {
 
 
 	/**
