@@ -20,20 +20,16 @@ public class GUIWorker implements Runnable{
 	@Override
 	public void run() {
 		
-		boolean killThread = true;
+		boolean killThread = false;
 
 		while(!killThread){
 			try {
-                Thread.sleep(1000);
+                Thread.sleep(200);
 				if(mainController != null && mainController.tabUtforController.shouldStart()){
-					
-				
 					 Platform.runLater(new Runnable() {
 						@Override
 						public void run() {
 							mainController.tabUtforController.drawQuadMarker();
-	
-						    System.out.println("UPDATED");
 						}
 					 });
 				

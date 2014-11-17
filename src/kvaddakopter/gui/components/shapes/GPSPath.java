@@ -36,7 +36,6 @@ public class GPSPath implements MapShapeInterface{
 	 * @param listOfCoordinates
 	 */
 	public void draw(ArrayList<AbstractGPSMarker> listOfCoordinates){
-		
 		//Clean the current Path if it exist
 		this.remove();
 		//If the listSize is 1 we are done. No Path can be  drawn for ONE point.
@@ -54,7 +53,7 @@ public class GPSPath implements MapShapeInterface{
 			MVCArray mvc = new MVCArray(ary);
 			PolylineOptions options = new PolylineOptions().path(mvc).strokeColor("green").strokeWeight(2);
 			this.path = new Polyline(options);
-			map.addMapShape(this.path);
+			this.map.addMapShape(this.path);
 		}
 		
 	}

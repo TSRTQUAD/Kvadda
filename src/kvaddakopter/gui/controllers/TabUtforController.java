@@ -16,6 +16,7 @@ import javafx.scene.control.Label;
 import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.gui.interfaces.MainBusGUIInterface;
 import kvaddakopter.gui.interfaces.MockMainBus;
+import kvaddakopter.maps.GPSCoordinate;
 import kvaddakopter.maps.MissionMap;
 import kvaddakopter.storage.MissionStorage;
 
@@ -70,13 +71,11 @@ public class TabUtforController extends BaseController implements Initializable 
     @FXML
     private void startMission(){
     	this.shouldStart = true;
-    	this.drawQuadMarker();
     }
     
     @FXML
     private void abortMission(){
     	this.shouldStart = false;
-    	this.drawQuadMarker();
     }
     
 	/**
@@ -87,7 +86,7 @@ public class TabUtforController extends BaseController implements Initializable 
 	
 	
 	public boolean shouldStart(){
-		return this.shouldStart();
+		return this.shouldStart;
 	}
 	
 
@@ -136,20 +135,14 @@ public class TabUtforController extends BaseController implements Initializable 
      */
     private void drawMission() {
     	//TODO: Implement drawing.
-    	
-    	
 	}
     
     /**
      * Draw the Quad to the map.
      */
     public void drawQuadMarker(){
-    	double latitude = this.getParent().getMainBus().getCurrentQuadLatitudePosition();
-    	double longitude = this.getParent().getMainBus().getCurrentQuadLongitudePosition();
-    	
-    	this.missionMap.drawQuad(latitude, longitude);
-    	
-    	
+    	GPSCoordinate gps = this.getParent().getMainBus().getCurrentQuadPosition();
+    	this.missionMap.drawQuad(gps.getLatitude(), gps.getLongitude());
     }
  
     

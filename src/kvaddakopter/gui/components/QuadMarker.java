@@ -19,11 +19,17 @@ public class QuadMarker extends AbstractGPSMarker {
 	 */
 	public void attachToMap(GoogleMap map){
 		
-		map.setCenter(this.getLatLong());
 		map.addMarker(this.getMarker());
 		
 	}
-
+	/**
+	 * Update the markers position
+	 * @param latlng
+	 */
+	public void updatePosition(LatLong latlng){
+		this.setLatLong(latlng);
+	}
+	
 	@Override
 	public MapMarkerEnum getIcon() {
 		
