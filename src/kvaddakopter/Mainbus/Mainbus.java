@@ -5,7 +5,11 @@ import java.util.ArrayList;
 
 import org.opencv.core.Core;
 
+
+import matlabcontrol.MatlabConnectionException;
 import kvaddakopter.ImageProcessingMain;
+import kvaddakopter.assignment_planer.MatlabProxyConnection;
+import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.programs.ImageProcessingMainProgram;
@@ -39,8 +43,9 @@ public class Mainbus{
 	//Programs
 	MyRunnable myRunnable;
 	MyRunnable2 myRunnable2;
+	AssignmentPlanerRunnable assignmentplanerrunnable;
 	
-	//ImageProcessingMainProgram imageProcessing;
+	ImageProcessingMainProgram imageProcessing;
 	
 	//Image processing storage
 	private ArrayList<TargetObject> mTargetList;
@@ -52,10 +57,16 @@ public class Mainbus{
 	private boolean mTemplateMatchingOn = false;
 	private boolean mBackGroundSubtractionOn = true;
 	
+	//Assignment planer storage
+	private MatlabProxyConnection matlabproxy;
+	private MissionObject missionobject;
+	//Flags
+	private boolean mAssignmentPlanerRunning = false;
+	
 	
 	public static void main(String[] args) {
 		
-		//Måste laddas i början av programmet... Förslagsvis här.
+		//Mï¿½ste laddas i bï¿½rjan av programmet... Fï¿½rslagsvis hï¿½r.
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		
 		Mainbus mainbus = new Mainbus();
@@ -63,12 +74,22 @@ public class Mainbus{
 		ImageProcessingMainProgram imageProcessing = new ImageProcessingMainProgram(1,mainbus);
 		System.out.println("imageprocessing initiated");
 		
+		//Setting up a Matlab Proxy Server
+		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
+		try {
+			matlabproxy.startMatlab("quiet");
+		} catch (MatlabConnectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		Thread t3 = new Thread(imageProcessing);
 		t3.setPriority(1);
 		t3.start(); 
 		
 		MyRunnable myRunnable = new MyRunnable(1,mainbus);
 		MyRunnable2 myRunnable2 = new MyRunnable2(2,mainbus);
+		AssignmentPlanerRunnable assignmentplanerrunnable = new AssignmentPlanerRunnable(3,mainbus);
 
 		
 
@@ -78,7 +99,12 @@ public class Mainbus{
 	        
 		Thread t2 = new Thread(myRunnable2);
 		t2.setPriority(2);
-		t2.start();  
+		t2.start();
+		
+		Thread t4 = new Thread(assignmentplanerrunnable);
+		t4.setPriority(1);
+		t4.start();
+		
 		while(true){
 //			System.out.println("Mainbus running");
 		}
@@ -147,4 +173,32 @@ public class Mainbus{
 	public synchronized boolean isBackgroundSubtractionOn() {
 		return mBackGroundSubtractionOn;
 	}
+	
+	/*
+	 * Get/set functions for Mission Planing
+	 */
+	public synchronized void setMissionObject(MissionObject MO){
+		missionobject = MO;
+	}
+	
+	public synchronized MissionObject getMissionObject() {
+		return missionobject;
+	}
+	
+	public synchronized void setMatlabProxy(MatlabProxyConnection MP){
+		matlabproxy = MP;
+	}
+	
+	public synchronized MatlabProxyConnection getMatlabProxy() {
+		return matlabproxy;
+	}
+	
+	public synchronized void setAssignmentPlanerOn(boolean state){
+		mAssignmentPlanerRunning = state;
+	}
+	
+	public synchronized boolean isAssignmentPlanerOn() {
+		return mAssignmentPlanerRunning;
+	}
+	
 }
