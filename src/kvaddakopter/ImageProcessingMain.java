@@ -5,11 +5,13 @@ import kvaddakopter.image_processing.algorithms.ColorDetection;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.programs.CameraCalibration;
 import kvaddakopter.image_processing.programs.TestBackgroundSubtraction;
+import kvaddakopter.image_processing.programs.TestBlurDetection;
 import kvaddakopter.image_processing.programs.TestColorDetection;
+import kvaddakopter.interfaces.ImageProcessingInterface;
 
 import org.opencv.core.Core;
 
-public class ImageProcessingMain {
+public class ImageProcessingMain implements ImageProcessingInterface{
 	
 	public static void main(String[] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -27,12 +29,13 @@ public class ImageProcessingMain {
 
 		//TestBackgroundSubtraction program  = new TestBackgroundSubtraction();
 //		CameraCalibration program  = new CameraCalibration();
-		TestColorDetection program  = new TestColorDetection(0, null);
+		//TestColorDetection program  = new TestColorDetection(0, null);
+		TestBlurDetection program  = new TestBlurDetection(0, null);
 		//colorTemplates.add(new ColorTemplate("Yellow ball", 10, 50, 50, 255, 50, 255, ColorTemplate.FORM_CIRLE));
 		
 		
-		ColorDetection method = (ColorDetection)program.getCurrentMethod();
-		method.addTemplate("Pink square", 160, 255, 70, 150, 150, 255, ColorTemplate.FORM_SQUARE);
+		//ColorDetection method = (ColorDetection)program.getCurrentMethod();
+		//method.addTemplate("Pink square", 160, 255, 70, 150, 150, 255, ColorTemplate.FORM_SQUARE);
 		//method.addTemplate("Yellow square", 0, 100, 80, 150, 130, 255, ColorTemplate.FORM_SQUARE);
 		
 
