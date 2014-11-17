@@ -107,10 +107,7 @@ public class ImageObject {
 		return mDescriptors;
 	}
 	
-// Blur detection
-	public float getBlurLevel(){
-		return mBlurLevel;
-	}
+
 	/**
 	 * Find keypoint matches/correspondances between this ImageObject and an 
 	 * external ImageObject.
