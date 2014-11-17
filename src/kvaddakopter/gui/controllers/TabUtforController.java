@@ -14,11 +14,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import kvaddakopter.assignment_planer.MissionObject;
-import kvaddakopter.gui.interfaces.MainBusGUIInterface;
-import kvaddakopter.gui.interfaces.MockMainBus;
 import kvaddakopter.maps.GPSCoordinate;
 import kvaddakopter.maps.MissionMap;
 import kvaddakopter.storage.MissionStorage;
+import kvaddakopter.utils.SecToMinSec;
 
 
 
@@ -57,7 +56,7 @@ public class TabUtforController extends BaseController implements Initializable 
     
     
     private boolean shouldStart = false;
-    
+    private long timeLeft = 0;
  
     /**
      * UI Events
@@ -71,6 +70,7 @@ public class TabUtforController extends BaseController implements Initializable 
     @FXML
     private void startMission(){
     	this.shouldStart = true;
+    	this.timeLeft = 5000; // (long) this.currentSelectedMissionObject.getMissionTime()[0][0];
     }
     
     @FXML
@@ -89,6 +89,14 @@ public class TabUtforController extends BaseController implements Initializable 
 		return this.shouldStart;
 	}
 	
+	
+	public void updateTimeLeft(long passedTime){
+		 this.timeLeft -= (long) passedTime/1000;
+		long newTime = this.timeLeft;
+		
+		this.lblTimeLeft.setText( SecToMinSec.transform( Math.max(0, newTime)));
+	}
+	
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -96,7 +104,6 @@ public class TabUtforController extends BaseController implements Initializable 
         this.missionMap = new MissionMap(this.mapViewUtfor, this);
         this.loadFromStorage();
         this.populateDefaultLists();
-        
     }
     
     

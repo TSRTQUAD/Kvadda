@@ -28,6 +28,7 @@ public class QuadMarker extends AbstractGPSMarker {
 	 */
 	public void updatePosition(LatLong latlng){
 		this.setLatLong(latlng);
+
 	}
 	
 	@Override
