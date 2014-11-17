@@ -58,43 +58,45 @@ public class TestBackgroundSubtraction extends ProgramClass{
 	@Override
 	protected void update() {
 		Mat currentImage = getNextFrame();
-		
-		ImageObject imageObject = new ImageObject(currentImage);
-		mCurrentMethod.start(imageObject);
-
-		if(mCurrentMethod.hasIntermediateResult()){
-			updateWindow(mCurrentMethod.getIntermediateResult());
-		}
-		/*
-		if(state == PoseState.SelectFirstPose|| state == PoseState.SelectSecondPose ){
-			updateWindow(currentImage);
-			return;
-		}
-
-		if(state == PoseState.ConfirmFirstPose){
-			updateWindow(mFirstPose.clone());
-			return;
-		}
-
-		if(state == PoseState.ConfirmSecondPose){
-			updateWindow(mSecondPose.clone());
-			return;
-		}
-
-		
-		if(FRAME_COUNTER % 2 == 0){
-			FRAME_COUNTER++;
-			ImageObject imageObject = new ImageObject(mFirstPose);
-			mCurrentMethod.start(imageObject);
-		}else{
-			FRAME_COUNTER++;
-			ImageObject imageObject = new ImageObject(mSecondPose);
+		boolean photoShoot = false;
+		if(!photoShoot){
+			ImageObject imageObject = new ImageObject(currentImage);
 			mCurrentMethod.start(imageObject);
 
 			if(mCurrentMethod.hasIntermediateResult()){
 				updateWindow(mCurrentMethod.getIntermediateResult());
 			}
-		}*/
+		}else{
+			if(state == PoseState.SelectFirstPose|| state == PoseState.SelectSecondPose ){
+				updateWindow(currentImage);
+				return;
+			}
+
+			if(state == PoseState.ConfirmFirstPose){
+				updateWindow(mFirstPose.clone());
+				return;
+			}
+
+			if(state == PoseState.ConfirmSecondPose){
+				updateWindow(mSecondPose.clone());
+				return;
+			}
+
+
+			if(FRAME_COUNTER % 2 == 0){
+				FRAME_COUNTER++;
+				ImageObject imageObject = new ImageObject(mFirstPose);
+				mCurrentMethod.start(imageObject);
+			}else{
+				FRAME_COUNTER++;
+				ImageObject imageObject = new ImageObject(mSecondPose);
+				mCurrentMethod.start(imageObject);
+
+				if(mCurrentMethod.hasIntermediateResult()){
+					updateWindow(mCurrentMethod.getIntermediateResult());
+				}
+			}
+		}
 	}
 
 	private void updateWindow(Mat img){

@@ -16,7 +16,6 @@ import org.opencv.core.MatOfPoint3f;
 import org.opencv.core.Point;
 import org.opencv.core.Point3;
 import org.opencv.core.Scalar;
-
 import org.opencv.features2d.DMatch;
 import org.opencv.features2d.KeyPoint;
 
@@ -164,19 +163,22 @@ public class MatchTests {
 				points2[i] = p;
 
 			}
-
+//			System.out.println("NUM KEYPOINTS: "+ points1.length);
 			Mat fundamentalMatrix = Calib3d.findFundamentalMat(new MatOfPoint2f(points1), new MatOfPoint2f(points2),Calib3d.FM_RANSAC,3,0.99);
 			List<DMatch> inlierMatches = new ArrayList<DMatch>();
+			
 			for (int i = 0; i < numMatches; i++) {
 
+				int index1 = i; //inlierMatches.get(i).trainIdx;
 				Mat m1 = new Mat(1,3,CvType.CV_64F);
-				m1.put(0, 0, points1[i].x);
-				m1.put(0, 1, points1[i].y);
+				m1.put(0, 0, points1[index1].x);
+				m1.put(0, 1, points1[index1].y);
 				m1.put(0, 2, 1.0);
-
+				
+				int index2 = i; //inlierMatches.get(i).queryIdx;
 				Mat m2 = new Mat(1,3,CvType.CV_64F);
-				m2.put(0, 0, points2[i].x);
-				m2.put(0, 1, points2[i].y);
+				m2.put(0, 0, points2[index2].x);
+				m2.put(0, 1, points2[index2].y);
 				m2.put(0, 2, 1.0);
 
 
@@ -192,14 +194,23 @@ public class MatchTests {
 				Core.gemm(m1,tempMat, 1, zeroMatrix, 0, resMat);
 
 				double res[] = resMat.get(0, 0);
-				if(res[0] <epsilon){
-					inlierMatches.add(matchArray[i]);
+				if(Math.abs(res[0]) < epsilon){
+					double dist = Math.sqrt(Math.pow(points1[i].x-points2[i].x,2.0) + Math.pow(points1[i].y-points2[i].y,2.0));
+					if(dist > 40){
+						System.out.println("Distance: " +dist);
+						System.out.println("F: " +fundamentalMatrix.dump());
+						System.out.println("Error: " + Math.abs(res[0]));
+					}
+						inlierMatches.add(matchArray[i]);
+					
 				}
 			}
+//			System.out.println("Matches before: " + numMatches + "\nMatches after:" +inlierMatches.size());
 			DMatch[] inlierMatchesArray = new DMatch[inlierMatches.size()];
 			inlierMatches.toArray(inlierMatchesArray);
+			
 			outMatches.fromArray(inlierMatchesArray); 
-
+//			keypoints1.from
 			return fundamentalMatrix;
 		}else{
 			return null;
@@ -243,6 +254,7 @@ public class MatchTests {
 		int length = (int)(matchArray.length);
 		KeyPoint[] kp1Inlier = new KeyPoint[length];
 		KeyPoint[] kp2Inlier = new KeyPoint[length];
+		
 		for (int i = 0; i < length; i++) {
 			kp1Inlier[i] = kp1Array[matchArray[i].queryIdx];
 			kp2Inlier[i] = kp2Array[matchArray[i].trainIdx];
@@ -252,6 +264,7 @@ public class MatchTests {
 		
 		dst1.fromArray(kp1Inlier);
 		dst2.fromArray(kp2Inlier);
+		matches.fromArray(matchArray);
 	}
 
 }
