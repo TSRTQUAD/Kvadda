@@ -26,7 +26,7 @@ public class MatlabProxyConnection {
 		if (option.equals("quiet")) {
 			//If option is set to quiet the Matlab session will start quiet
 			//and be running in the background
-			System.out.println("Setting up quiet session of Matlab");
+			System.out.println("Setting up a quiet Matlab session ...");
 			Builder buildoptions = new MatlabProxyFactoryOptions.Builder();
 			buildoptions.setHidden(true);
 			MatlabProxyFactoryOptions options = buildoptions.build();
@@ -37,7 +37,7 @@ public class MatlabProxyConnection {
 		else if (option.equals("existing")) {
 			//If option is set to existing the proxy will try to connect to
 			//to an running session of Matlab
-			System.out.println("Connecting to running session of Matlab");
+			System.out.println("Connecting to running session of Matlab ...");
 			Builder buildoptions = new MatlabProxyFactoryOptions.Builder();
 			buildoptions.setUsePreviouslyControlledSession(true);
 			MatlabProxyFactoryOptions options = buildoptions.build();
