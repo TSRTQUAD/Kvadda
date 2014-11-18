@@ -22,6 +22,7 @@ public class MissionObject {
 	protected int imageTemplte = 0;
 	protected int colorTemplate = 0;
 	protected int descriptor = 0;
+	protected int counter = 0;
 	
 	protected double[][] trajectory = null;
 	protected double[][] trajectorylength = null;
@@ -30,6 +31,14 @@ public class MissionObject {
 	protected double[][] referencevelocity = null;
 	
 	// Get variables
+	public double[] update(){
+		if (counter == 0){
+			
+			
+			
+		}
+	}
+	
 	public String getMissionName(){
 		return this.missionName;
 	}

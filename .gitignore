@@ -1,5 +1,5 @@
 /bin/
 /cam_undistorted.png
-/.metadata/
+.metadata
 *.txt
 *.mat

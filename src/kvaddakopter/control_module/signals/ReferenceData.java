@@ -21,12 +21,13 @@ public class ReferenceData {
 	public double Yaw;
 	public double Latitud;
 	public double Longitud;
-	public double Xpos;
-	public double Ypos;
 	public double Height;
 	public double ForVel;
 	public double time;
 	public int Mission;
+	
+	public double Xpos;
+	public double Ypos;
 	long lStartTime, lEndTime, difference;
 	private boolean running;
 	public double initiallat;
@@ -36,7 +37,7 @@ public class ReferenceData {
 	
 	
 	// Initialize coordinate system XY with origo in Initiallat and initiallon
-	public ReferenceData(double inlat, double inlong){		
+	public void initialize(double inlat, double inlong){		
 	this.initiallat = inlat;
 	this.initiallon = inlong;
 	}
@@ -57,7 +58,7 @@ public class ReferenceData {
 	}
 	
 	
-	public void refine(RefinedSensorData rsdata){
+	public void update(RefinedSensorData rsdata){
 		//Mission = FALSE
 		//Update reference data if close enough and reference time at coordinate is reached.
 		if (Math.abs(rsdata.getHeight()-Height)<1 && 
@@ -74,9 +75,9 @@ public class ReferenceData {
 			if (running && Math.abs(System.currentTimeMillis() - lStartTime) > time){
 			this.running = false;
 			
-			// Update reference data
-			// Update reference data
-			// Update reference data			
+			
+			
+			
 			}
 		}	
 		// Mission = TRUE

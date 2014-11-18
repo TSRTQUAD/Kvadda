@@ -8,21 +8,46 @@ import kvaddakopter.control_module.signals.*;
 * 2: Initialize kalmanfilter
 * 3:
 */
-		
+	
+/*Control loop
+* 1: Update Reference ..
+* 2: Transformation into correct coordinate system
+* 3: Check mission type:
+* 		Type 1: Get control signal Mission
+* 				controller.GetControlSignalMission(rsdata, rrdata);
+* 		Type 0: Get control signal single
+* 				controller.GetControlSignalSingle(rsdata, rrdata);
+* 4: Saturate control signal?
+* 5: Update to mainbus?
+*/
 
-/*Sensor fusion loop
-* 1: For every sample:
+/*Main control loop
+*	 1: For every sample:
+* 		SENSORFUSION
+*	 	i: Read latest sensor data
+*	 	ii: Transform data into fixed coordinate system
+*	 	iii: Estimate positions with kalmanfilter (time update) in X and Y direction.
+*	 	iv: Transform states into quad velocities.
+*
+*		CONTROLLER
+*		i: Update Reference ..
+*		ii: Transformation into correct coordinate system
+*		iii: Check mission type:
+* 			Type 1: Get control signal Mission
+* 					controller.GetControlSignalMission(rsdata, rrdata);
+* 			Type 0: Get control signal single
+* 					controller.GetControlSignalSingle(rsdata, rrdata);
+*		vi: Saturate control signal?
+*		v: Update to mainbus?
+
+*	 2: For every new GPS measurement
+* 		i: Read new gps measurement.
+* 		ii: Transform into fixed coordinate system
+* 		iii: Estimate positions with kalmanfilter (measurement update) in X and Y direction.
+* 		iv: Transform states into quad velocities.
 * 
-* 	i: Read latest sensor data
-* 	ii: Transform data into fixed coordinate system
-* 	iii: Estimate positions with kalmanfilter (time update) in X and Y direction.
-* 	iv: Transform states into quad velocities.
-
-* 2: For every 1/sampletime sample
-* 	i: Read new gps measurement.
-* 	ii: Transform into fixed coordinate system
-* 	iii: Estimate positions with kalmanfilter (measurement update) in X and Y direction.
-* 	iv: Transform states into quad velocities.
+* 
+* 
 */
 
 
@@ -38,7 +63,10 @@ public class Sensorfusionmodule {
 	public Kalmanfilter			 skalmanx 		= new Kalmanfilter(sampletime,1,1,0,0);
 	public Kalmanfilter			 skalmany 		= new Kalmanfilter(sampletime,1,1,0,0);
 	public RefinedSensorData 	 rsdata  		= new RefinedSensorData();
-
+	public Controller					 controller = new Controller(sampletime);
+	public ControlSignal 				 controlsignal = new ControlSignal();
+	public ReferenceData 				 rrdata = new ReferenceData();   
+	
 	
 	public void start(){
 
@@ -52,7 +80,9 @@ public class Sensorfusionmodule {
 		sdata.setinitial();											// Fix local coordinate system XY
 		sdata.GPS2XY();												// Transformation GPS to XY coordinates
 		sdata.xydot2XYdot();										// Transformation velocities to XY(dot)
-
+		
+		rrdata.initialize(sdata.getLatitud(),sdata.getLongitud());	// Fix local coordinate system XY
+		
 		
 		//Set initials
 		rsdata.setXstates(skalmanx.timeupdate(sdata.getXdot())); 	// Kalmanfilter in X direction
@@ -66,6 +96,7 @@ public class Sensorfusionmodule {
 				{
 				time = System.currentTimeMillis();	
 				//For every sample  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+				//SENSORFUSION  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 			    //Statements
 				sdata.setydot(0.2);									//read sdata
 				sdata.setxdot(0.1);									//read sdata
@@ -75,6 +106,16 @@ public class Sensorfusionmodule {
 				rsdata.setXstates(skalmanx.timeupdate(sdata.getXdot())); //Kalmanfilter in X direction
 				rsdata.setYstates(skalmany.timeupdate(sdata.getYdot())); //Kalmanfilter in Y direction
 				rsdata.XYdot2Vel();										 //Transform Xdot,Ydot to velocities
+				
+				//CONTROLLER  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+				rrdata.update(rsdata);								// Update referencedata
+				rrdata.GPS2XY();
+				
+				if
+				
+				
+				
+				
 				// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 				
 				if(true)
