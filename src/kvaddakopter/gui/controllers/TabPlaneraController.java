@@ -176,8 +176,6 @@ public class TabPlaneraController extends BaseController implements Initializabl
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-    	
-        //this.planningMap = new PlanningMap(this.mapView, this);
         this.storage = new MissionStorage();
         
         this.populateListsAndDefaults();
