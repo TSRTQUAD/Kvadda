@@ -7,11 +7,11 @@ import kvaddakopter.image_processing.programs.CameraCalibration;
 import kvaddakopter.image_processing.programs.TestBackgroundSubtraction;
 import kvaddakopter.image_processing.programs.TestBlurDetection;
 import kvaddakopter.image_processing.programs.TestColorDetection;
-import kvaddakopter.interfaces.ImageProcessingInterface;
+import kvaddakopter.interfaces.MainBusIPInterface;
 
 import org.opencv.core.Core;
 
-public class ImageProcessingMain implements ImageProcessingInterface{
+public class ImageProcessingMain{
 	
 	public static void main(String[] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);

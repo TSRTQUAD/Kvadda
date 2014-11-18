@@ -7,21 +7,25 @@ import kvaddakopter.Mainbus.Mainbus;
 import kvaddakopter.image_processing.algorithms.BlurDetection;
 import kvaddakopter.image_processing.algorithms.ColorDetection;
 import kvaddakopter.image_processing.algorithms.Tracking;
-import kvaddakopter.image_processing.comm_tests.IPMockMainBus;
+import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
+import kvaddakopter.interfaces.MainBusIPInterface;
 
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
 
 import com.xuggle.xuggler.demos.VideoImage;
 
-
-public class TestBlurDetection extends ProgramClass{
+public class TestColorCalibration extends ProgramClass{
 	BlurDetection mBlurDetection;
+	
+	public ColorTemplate cTemplate;
 
-	public TestBlurDetection(int threadid, IPMockMainBus mainbus) {
+	public TestColorCalibration(int threadid, MainBusIPInterface mainbus) {
 		super(threadid, mainbus);
 	}
 
@@ -35,9 +39,9 @@ public class TestBlurDetection extends ProgramClass{
 
 		//Create and initialize decoder. And select source.
 		mDecoder = new FFMpegDecoder();
-		//mDecoder.initialize("tcp://192.168.1.1:5555");
+		mDecoder.initialize("tcp://192.168.1.1:5555");
 		//mDecoder.initialize("rtsp://130.236.214.20:8086");
-		mDecoder.initialize("mvi2.mp4");
+		//mDecoder.initialize("mvi2.mp4");
 		// Listen to decoder events
 		mDecoder.setDecoderListener(this);
 
@@ -48,27 +52,31 @@ public class TestBlurDetection extends ProgramClass{
 		openVideoWindow();
 		
 		mCurrentMethod = new ColorDetection();
-		
-		mBlurDetection = new BlurDetection();
 
+	}
+	
+	public Mat thresholdImage(ImageObject imageObject, ColorTemplate template){
+		Mat  thresh = new Mat();
+		Mat  HSVImage= new Mat();
+		
+		// Convert RGB to HSV
+		Imgproc.cvtColor(imageObject.getImage(), HSVImage, Imgproc.COLOR_BGR2HSV);
+		//Threshold
+		Core.inRange(HSVImage, template.getLower(), template.getUpper(), thresh);
+		return thresh;
 	}
 
 	public void update()  {
 
 		Mat currentImage = getNextFrame();
+		Mat result= new Mat();
 
 		ImageObject imageObject = new ImageObject(currentImage);
 		
-		//((ColorDetection) mCurrentMethod).addTemplate("Yellow square", 20, 40, 100, 255, 100, 255, ColorTemplate.FORM_SQUARE);
-		//ArrayList<TargetObject> targetList = mCurrentMethod.runMethod(imageObject);
-		mBlurDetection.runMethod(imageObject);
-		System.out.println(imageObject.getBlurLevels().h);
-		int resWidth = 0;
-		int resHeight = 0;
+		cTemplate = mMainbus.getIPCalibTemplate();
+		result = thresholdImage(imageObject, cTemplate);
 		
-		BufferedImage out = ImageConversion.mat2Img(mBlurDetection.getGradXImage());
-		resWidth = out.getWidth();
-		resHeight = out.getHeight();
+		BufferedImage out = ImageConversion.mat2Img(result);
 		updateJavaWindow(out);
 		}
 }

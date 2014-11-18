@@ -9,6 +9,7 @@ import kvaddakopter.image_processing.algorithms.DetectionClass;
 import kvaddakopter.image_processing.algorithms.ColorDetection;
 import kvaddakopter.image_processing.algorithms.TemplateMatch;
 import kvaddakopter.image_processing.algorithms.Tracking;
+import kvaddakopter.image_processing.comm_tests.IPMockMainBus;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
@@ -33,7 +34,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 
 	int count = 0;
 
-	public ImageProcessingMainProgram(int threadid, Mainbus mainbus)  {
+	public ImageProcessingMainProgram(int threadid, IPMockMainBus mainbus)  {
 		super(threadid,mainbus);
 	}
 

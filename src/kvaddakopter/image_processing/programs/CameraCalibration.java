@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kvaddakopter.Mainbus.Mainbus;
+import kvaddakopter.image_processing.comm_tests.IPMockMainBus;
 import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
 
@@ -28,7 +29,7 @@ import org.opencv.imgproc.Imgproc;
 public class CameraCalibration extends ProgramClass{
 
 
-	public CameraCalibration(int threadid, Mainbus mainbus) {
+	public CameraCalibration(int threadid, IPMockMainBus mainbus) {
 		super(threadid, mainbus);
 
 	}
