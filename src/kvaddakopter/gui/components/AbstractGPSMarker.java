@@ -31,6 +31,11 @@ public abstract class AbstractGPSMarker {
 		return this.coordinate.getLongitude();
 	}
 	
+	public void setLatLong(LatLong latlng){
+		this.coordinate = latlng;
+		this.marker.setPosition(latlng);
+	}
+	
 	public Marker getMarker(){
 		return this.marker;
 	}

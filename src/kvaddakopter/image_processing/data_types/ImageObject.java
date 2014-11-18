@@ -24,7 +24,7 @@ public class ImageObject {
 	private Mat mDescriptors;
 	
 	
-	private float mBlurLevel;
+	private BlurLevels mBlurLevels;
 	
 	/**
 	 * Constructor
@@ -32,6 +32,7 @@ public class ImageObject {
 	 */
 	public ImageObject(Mat image) {
 		mImage = image;
+		mBlurLevels = new BlurLevels();
 	}
 	
 	public void setImage(Mat image){
@@ -106,10 +107,7 @@ public class ImageObject {
 		return mDescriptors;
 	}
 	
-// Blur detection
-	public float getBlurLevel(){
-		return mBlurLevel;
-	}
+
 	/**
 	 * Find keypoint matches/correspondances between this ImageObject and an 
 	 * external ImageObject.
@@ -160,23 +158,40 @@ public class ImageObject {
 		return matches;
 	}
 	
-	
-	
-	public void detectBlur(){
-		
-		//TODO: 
-		
-		// To gray
-		
-		// Sobel x(y)
-		
-		// Determine edge width
-		
-		// Find local maximum
-		
-		// Compute mean value of every local maximum
-		
-		// Set blur level 
-		
+	/**
+	 * Container for blur levels in horisontal/vertical directions
+	 *
+	 */
+	public class BlurLevels{
+		public float h;
+		public float v;
 	}
+	
+	public BlurLevels getBlurLevels(){
+		return mBlurLevels;
+	}
+	
+	public void setBlurLevels(float h, float v){
+		mBlurLevels.h = h;
+		mBlurLevels.v = v;
+	}
+	
+	
+//	public void detectBlur(){
+//		
+//		
+//		
+//		// To gray
+//		
+//		// Sobel x(y)
+//		
+//		// Determine edge width
+//		
+//		// Find local maximum
+//		
+//		// Compute mean value of every local maximum
+//		
+//		// Set blur level 
+//		
+//	}
 }

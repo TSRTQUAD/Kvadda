@@ -42,6 +42,10 @@ public class ColorTemplate {
 		adaptationConstant = 30;
 	}
 	
+	public void setThresholds(){
+		
+	}
+	
 	public Scalar getLower(){
 		return new Scalar(hueLow, saturationLow, valueLow);
 	}

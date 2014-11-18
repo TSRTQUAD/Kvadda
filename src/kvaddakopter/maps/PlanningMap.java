@@ -56,15 +56,14 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 	/**
 	 * GPS paths 
 	 */
-	private GPSPath gpsPath = new GPSPath(this.map);
 	
 	
 	/**
 	 * GPS Polygons
 	 */
+	private GPSPath gpsPath;
 	private GreenGPSPolygon missionAreaGpsPolygon;
 	private RedGPSPolygon  forbiddenAreaGpsPolygon;
-	
 	
 	
 	
@@ -81,9 +80,6 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 	 */
 	public PlanningMap(GoogleMapView mapView, TabPlaneraController owningController) {
 		this.mapView = mapView;
-		this.gpsPath = new GPSPath(this.map);
-		this.missionAreaGpsPolygon = new GreenGPSPolygon(this.map);
-		this.forbiddenAreaGpsPolygon = new RedGPSPolygon(this.map);
 		this.owningController = owningController;
 		this.mapView.addMapInializedListener(this);
 		
@@ -95,9 +91,12 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 	@Override
 	public void mapInitialized() {
 		
-		this.isMapInitialized = true;
 		this.createMapWithStartLocation();
 
+		this.gpsPath = new GPSPath(this.map);
+		this.missionAreaGpsPolygon = new GreenGPSPolygon(this.map);
+		this.forbiddenAreaGpsPolygon = new RedGPSPolygon(this.map);
+		this.isMapInitialized = true;
 		this.addMapEventListeners();
 		this.clearMap();
 

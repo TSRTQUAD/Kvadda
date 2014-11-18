@@ -57,7 +57,9 @@ public class MainController implements Initializable {
 			this.tabPlaneraController.setParent(this);
 		}
 		
-		(new Thread(new GUIWorker(this))).start();
+		Thread t1 = new Thread(new GUIWorker(this));
+		t1.setDaemon(true);
+		t1.start();
 		
 	}
 	

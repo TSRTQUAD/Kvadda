@@ -7,8 +7,6 @@ public class GUITESTMain{
 	public static void main(String[] args) {
 		// START MODULE
 	    GUIModule gui = new GUIModule(new MockMainBus());
-	    
-	    
 	    new Thread(gui).start();
 
 	}
