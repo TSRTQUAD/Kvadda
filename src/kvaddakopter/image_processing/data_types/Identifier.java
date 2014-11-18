@@ -21,7 +21,7 @@ public class Identifier {
 		}
 	}
 	
-	static float compare(Identifier first, Identifier second){
+	public static float compare(Identifier first, Identifier second){
 		
 		float certaintyFromColorDetection = 0;
 		float colorDetectionPower = 1;
@@ -71,8 +71,8 @@ public class Identifier {
 			// Updates certainty much when there is a low difference between measured and old values
 			// If diff/255 < 0.5 (large difference) then certainty is lowered
 			float diff = Math.abs(meanHSVValues[i] - newMeasured.meanHSVValues[i]) / 255;
-			meanHSVValuesCertainty += (0.5 - diff) / timeConstant;
-			meanHSVValuesCertainty = Math.min(0, Math.max(1, meanHSVValuesCertainty)); // Constrain certainty between 0 and 1
+			meanHSVValuesCertainty += (0.5 - diff) / (5 * timeConstant);
+			meanHSVValuesCertainty = Math.min(1, Math.max(0, meanHSVValuesCertainty)); // Constrain certainty between 0 and 1
 		}
 
 		// Updates number of matches by adapting to newMeasured number of matches with time constant timeConstant
@@ -80,5 +80,7 @@ public class Identifier {
 		for(int i = 0; i < numberOfTemplates; i++){
 			templateMatches[i] += (newMeasured.templateMatches[i] - templateMatches[i]) / timeConstant;
 		}
+		
+		System.out.println(meanHSVValuesCertainty);
 	}
 }
