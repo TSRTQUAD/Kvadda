@@ -78,19 +78,19 @@ public class ColorTemplate {
 	 * @param satWindow Value [0:255]
 	 * @param valWindow [0:255]
 	 */
-	public void adapt(ArrayList<Double> objectHSVChannels,int hueWindow, int satWindow, int valWindow){
-		int T = adaptationConstant; // number of updates to 63%
+	public void adapt(ArrayList<Long> objectHSVChannels,int hueWindow, int satWindow, int valWindow){
+		float T = adaptationConstant; // number of updates to 63%
 		//Hue update
-		hueLow = (int) (hueLow + ((objectHSVChannels.get(0)-hueWindow/2) - hueLow)/T);
-		hueHigh = (int) (hueHigh + ((objectHSVChannels.get(0)+hueWindow/2) - hueHigh)/T);
+		hueLow = (int) (hueLow + ((float)(objectHSVChannels.get(0)-hueWindow/2 - hueLow))/T);
+		hueHigh = (int) (hueHigh + ((float)(objectHSVChannels.get(0)+hueWindow/2 - hueHigh))/T);
 		
 		//Saturation update
-		saturationLow = (int) (saturationLow +(objectHSVChannels.get(1)-satWindow/2 - saturationLow)/T);
-		saturationHigh = (int) (saturationHigh + (objectHSVChannels.get(1)+satWindow/2 - saturationHigh)/T);
+		saturationLow = (int) (saturationLow +((float)(objectHSVChannels.get(1)-satWindow/2 - saturationLow))/T);
+		saturationHigh = (int) (saturationHigh + ((float)(objectHSVChannels.get(1)+satWindow/2 - saturationHigh))/T);
 		
 		//Value update
-		valueLow = (int) (valueLow + (objectHSVChannels.get(2)-valWindow/2 - valueLow)/T);
-		valueHigh = (int) (valueHigh + (objectHSVChannels.get(2)+valWindow/2 - valueHigh)/T);
+		valueLow = (int) (valueLow + ((float)(objectHSVChannels.get(2)-valWindow/2 - valueLow))/T);
+		valueHigh = (int) (valueHigh + ((float)(objectHSVChannels.get(2)+valWindow/2 - valueHigh))/T);
 	}
 	
 	/**
