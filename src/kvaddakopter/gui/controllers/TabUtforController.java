@@ -13,6 +13,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
 import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.maps.GPSCoordinate;
 import kvaddakopter.maps.MissionMap;
@@ -28,8 +29,10 @@ public class TabUtforController extends BaseController implements Initializable 
 	 * UI ELEMENTS
 	 */
     @FXML
-    private GoogleMapView mapViewUtfor; 
-    
+    public AnchorPane mapContainer;
+
+    public GoogleMapView mapViewUtfor; 
+
     @FXML 
     private Label lblMissionType;
     @FXML
@@ -45,15 +48,17 @@ public class TabUtforController extends BaseController implements Initializable 
     @FXML
     private ComboBox<MissionObject> cmbListOfMissions;
     
-    
-    /**
-     *  Properties
+	/**
+     * Properties
      */
+	
+	public MissionMap missionMap;
+	 
     private ArrayList<MissionObject> listOfMissions;
     private MissionObject currentSelectedMissionObject;
     
     private MissionStorage missionStorage = new MissionStorage();
-    
+
     
     private boolean shouldStart = false;
     private long timeLeft = 0;
@@ -78,12 +83,7 @@ public class TabUtforController extends BaseController implements Initializable 
     	this.shouldStart = false;
     }
     
-	/**
-     * Properties
-     */
-	
-	private MissionMap missionMap;
-	
+
 	
 	public boolean shouldStart(){
 		return this.shouldStart;
