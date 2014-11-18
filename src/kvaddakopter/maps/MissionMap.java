@@ -65,6 +65,9 @@ public class MissionMap extends BaseMap implements MapComponentInitializedListen
 		
 		this.isMapInitialized = true;
 		this.createMapWithStartLocation();
+	
+		//this.quadMarker.attachToMap(map);
+		///this.createMapWithStartLocation();
 	}
 	
 	
@@ -73,26 +76,15 @@ public class MissionMap extends BaseMap implements MapComponentInitializedListen
 	 * @param latitude
 	 * @param longitude
 	 */
-	public void drawQuad(double latitude, double longitude){
-		if (!this.isMapInitialized) return;
-		LatLong coordinate = new LatLong(latitude, longitude);
-	    if(this.quadMarker != null){
-	    	System.out.println("AND IS DELETED:");
-	    	System.out.println(this.quadMarker.getMarker());
-	    	System.out.println("------------------------");
-	    	this.quadMarker.clearFromMap(this.map);
-	    	this.quadMarker.clearFromMap(this.map);
-	    	this.quadMarker.clearFromMap(this.map);
-	    	this.quadMarker = null;
-	    }
-	    QuadMarker marker = new QuadMarker(coordinate);
-		marker.attachToMap(this.map);
-		this.quadMarker = marker;
-    System.out.println("CREATED!!!!");
-		System.out.println(this.quadMarker.getMarker());
-	   
-
-		
+	public void drawQuad(double latitude, double longitude) {
+		if (this.quadMarker == null){
+			this.quadMarker = new QuadMarker(new LatLong(latitude, longitude));  
+			this.quadMarker.attachToMap(map);
+		}
+		System.out.println("Updated Position");
+		this.quadMarker.updatePosition(new LatLong(latitude, longitude));
+		map.setZoom(map.getZoom() - 1);
+		map.setZoom(map.getZoom() + 1);
 	}
 	
 	

@@ -66,43 +66,46 @@ public class TestBackgroundSubtraction extends ProgramClass{
 	@Override
 	protected void update() {
 		Mat currentImage = getNextFrame();
-		
-		ImageObject imageObject = new ImageObject(currentImage);
-		mCurrentMethod.runMethod(imageObject);
+		boolean photoShoot = false;
+		if(!photoShoot){
+			ImageObject imageObject = new ImageObject(currentImage);
+			mCurrentMethod.runMethod(imageObject);
 
-		if(mCurrentMethod.hasIntermediateResult()){
-			updateWindow(mCurrentMethod.getIntermediateResult());
-		}
-		/*
-		if(state == PoseState.SelectFirstPose|| state == PoseState.SelectSecondPose ){
-			updateWindow(currentImage);
-			return;
-		}
-
-		if(state == PoseState.ConfirmFirstPose){
-			updateWindow(mFirstPose.clone());
-			return;
-		}
-
-		if(state == PoseState.ConfirmSecondPose){
-			updateWindow(mSecondPose.clone());
-			return;
-		}
-
-		
-		if(FRAME_COUNTER % 2 == 0){
-			FRAME_COUNTER++;
-			ImageObject imageObject = new ImageObject(mFirstPose);
-			mCurrentMethod.start(imageObject);
-		}else{
-			FRAME_COUNTER++;
-			ImageObject imageObject = new ImageObject(mSecondPose);
-			mCurrentMethod.start(imageObject);
 
 			if(mCurrentMethod.hasIntermediateResult()){
 				updateWindow(mCurrentMethod.getIntermediateResult());
 			}
-		}*/
+		}else{
+			if(state == PoseState.SelectFirstPose|| state == PoseState.SelectSecondPose ){
+				updateWindow(currentImage);
+				return;
+			}
+
+			if(state == PoseState.ConfirmFirstPose){
+				updateWindow(mFirstPose.clone());
+				return;
+			}
+
+			if(state == PoseState.ConfirmSecondPose){
+				updateWindow(mSecondPose.clone());
+				return;
+			}
+
+
+			if(FRAME_COUNTER % 2 == 0){
+				FRAME_COUNTER++;
+				ImageObject imageObject = new ImageObject(mFirstPose);
+				mCurrentMethod.runMethod(imageObject);
+			}else{
+				FRAME_COUNTER++;
+				ImageObject imageObject = new ImageObject(mSecondPose);
+				mCurrentMethod.runMethod(imageObject);
+
+				if(mCurrentMethod.hasIntermediateResult()){
+					updateWindow(mCurrentMethod.getIntermediateResult());
+				}
+			}
+		}
 	}
 
 	private void updateWindow(Mat img){
@@ -155,17 +158,6 @@ public class TestBackgroundSubtraction extends ProgramClass{
 
 		default:
 			break;
-		}
-	}
-
-	private int YNquestion(String s){
-		if(s.equals("Y")){
-			return 1;
-		}else if(s.equals("N")){
-			return 0;	
-		}else {
-			System.out.println("Invalid input try again");
-			return -1;
 		}
 	}
 
