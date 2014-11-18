@@ -7,7 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import kvaddakopter.gui.GUIWorker;
-import kvaddakopter.gui.interfaces.MainBusGUIInterface;
+import kvaddakopter.interfaces.MainBusGUIInterface;
 
 public class MainController implements Initializable {
 
@@ -38,7 +38,18 @@ public class MainController implements Initializable {
 	 */
 	@FXML
 	public TabUtforController tabUtforController;
-
+	
+	
+	/**
+	 * GUI events
+	 */
+	@FXML
+	private void runMissionTabSelected(){
+		System.out.println("Detta kan inte vara");
+	}
+	
+	
+	
 
 	/**
 	 * MainBus

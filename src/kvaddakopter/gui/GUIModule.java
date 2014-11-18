@@ -7,7 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import kvaddakopter.gui.controllers.MainController;
-import kvaddakopter.gui.interfaces.MainBusGUIInterface;
+import kvaddakopter.interfaces.MainBusGUIInterface;
 
 public class GUIModule extends Application implements Runnable{
 

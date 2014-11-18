@@ -101,7 +101,7 @@ public class TabUtforController extends BaseController implements Initializable 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
     	
-        this.missionMap = new MissionMap(this.mapViewUtfor, this);
+        //this.missionMap = new MissionMap(this.mapViewUtfor, this);
         this.loadFromStorage();
         this.populateDefaultLists();
     }

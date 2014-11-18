@@ -1,4 +1,4 @@
-package kvaddakopter.gui.interfaces;
+package kvaddakopter.interfaces;
 
 import kvaddakopter.maps.GPSCoordinate;
 
