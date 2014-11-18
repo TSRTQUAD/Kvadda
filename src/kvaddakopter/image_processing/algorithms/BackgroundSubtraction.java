@@ -49,13 +49,21 @@ public class BackgroundSubtraction  extends DetectionClass{
 	//Contours
 	static final double CONTOUR_AREA_LOWER_THRESHOLD = 0.01;
 	double mContourAreaThreshold = CONTOUR_AREA_LOWER_THRESHOLD;
+
 	@Override
-	public ArrayList<TargetObject> start(ImageObject currentImageData) {
+	public boolean isMethodActive(Mainbus mainbus) {
+		return mainbus.isBackgroundSubtractionOn();
+	}
+
+	@Override
+	public ArrayList<TargetObject> runMethod(ImageObject currentImageData) {
 
 		// Compute key points and descriptors for the current image
 		currentImageData.computeKeyPoints(FeatureDetector.SURF);
 		currentImageData.computeDescriptors(DescriptorExtractor.ORB);
 
+		//Creating a list of target objects
+		ArrayList<TargetObject> targetObjects = new ArrayList<TargetObject>();
 
 		if(mPreviousImageData == null) {
 
@@ -76,10 +84,11 @@ public class BackgroundSubtraction  extends DetectionClass{
 			Size kernelSize = new Size(BLUR_KERNEL_SIZE,BLUR_KERNEL_SIZE);
 			Imgproc.GaussianBlur(blurredBackground,firstBackgroundImage,kernelSize,0);
 
+			// Terminate function by returning an empty list of target objects.
+			return targetObjects;
 
-			// Terminate function by returning null.
-			return null;
 		}
+		mIntermeditateResult = currentImageData.getImage();
 
 		//1. Correspondences
 		MatOfDMatch matches       = currentImageData.findMatches(mPreviousImageData);
@@ -95,7 +104,10 @@ public class BackgroundSubtraction  extends DetectionClass{
 			MatchTests.getMatchingKeyPoints(currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(), kpCurrent, kpPrev, inlierMatches);
 
 			Mat matchesImg= currentImageData.getImage().clone();
-//			Features2d.drawMatches(
+ 			MatchTests.getMatchingKeyPoints(currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(), kpCurrent, kpPrev, inlierMatches);
+//
+//			mIntermeditateResult = new Mat();
+//			/*Features2d.drawMatches(
 //					currentImageData.getImage(),
 //					kpCurrent, 
 //					mPreviousImageData.getImage(),
@@ -103,8 +115,7 @@ public class BackgroundSubtraction  extends DetectionClass{
 //					inlierMatches,
 //					matchesImg
 //					);
-//			§
-			
+
 			for (int i = 0; i < kpCurrent.rows(); i++) {
 				for (int j = 0; j < kpCurrent.cols(); j++) {
 					
@@ -132,10 +143,13 @@ public class BackgroundSubtraction  extends DetectionClass{
 				Core.hconcat(concatMat,mIntermeditateResult);
 			}
 
+		
+			//2.b Computing Homography matrix using inlier keypoints
+			Mat homo = MatchTests.getHomoMatrix(kpCurrent, kpPrev);
+			
+			//2.c Warp Image
+			Imgproc.warpPerspective(mPreviousImageData.getImage(), mIntermeditateResult,homo, mPreviousImageData.getImage().size());
 		}
-
-		//2. Camera Matrix blabla. - NOT IMPLEMENTED
-
 		//3. Warp - NOT IMPLEMENTED
 		//		warpPreviousImage();
 		//
@@ -189,7 +203,7 @@ public class BackgroundSubtraction  extends DetectionClass{
 
 
 		// TODO: Assign the box data to the TargetObjects
-		ArrayList<TargetObject> targetObjects = new ArrayList<TargetObject>();
+	
 		/*	Mat m = new Mat(1,2,CvType.CV_64F);
 		m.put(0, 0, 0);
 		m.put(0, 1, 1);
@@ -200,7 +214,12 @@ public class BackgroundSubtraction  extends DetectionClass{
 		//		mBackgroundImageData = currentImageData;
 		return targetObjects;
 	}
-
+/*
+	@Override
+	public boolean isMethodActive() {
+		
+	
+	}*/
 
 	private void warpPreviousImage(){
 	}

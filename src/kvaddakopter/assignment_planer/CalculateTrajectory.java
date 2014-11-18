@@ -14,7 +14,11 @@ import matlabcontrol.MatlabConnectionException;
 import matlabcontrol.MatlabInvocationException;
 import matlabcontrol.MatlabProxy;
 
-
+/**
+ * This class is used for all tasks regarding the calculation of an trajectory.
+ * @author tobiashammarling
+ *
+ */
 public class CalculateTrajectory {
 	protected double[][] trajectory;
 	protected double trajectorylength;
@@ -24,14 +28,22 @@ public class CalculateTrajectory {
 		this.Matlab = matlab;
 	}
 
-	public double[][] getTrajectory(MissionObject object) throws IOException, MatlabConnectionException, MatlabInvocationException {
+	/**
+	 * Calculates the trajectory and saves all obtained information such as; coverage area, <br>
+	 * estimated time, the trajectory itself and an velocity reference vector for the regulator.
+	 * @param object
+	 */
+	public void calculateTrajectory(MissionObject object) throws IOException, MatlabConnectionException, MatlabInvocationException {
 		createMatFile(object);
 		calculateTrajectory();
-		trajectory = readMatFile(object);
-		
-		return trajectory;
+		readMatFile(object);
 	}
 
+	/**
+	 * Creates a Mat-file to be loaded in Matlab by the Matlabscript.
+	 * @param object
+	 * @throws IOException
+	 */
 	public void createMatFile(MissionObject object) throws IOException {
 		// Declare local variables
 		MLCell area = new MLCell("area", new int[] {1,1});
@@ -92,6 +104,11 @@ public class CalculateTrajectory {
 		
 	}
 
+	/**
+	 * Calls the Matlabscript which saves the results in a Mat-file.
+	 * @throws MatlabConnectionException
+	 * @throws MatlabInvocationException
+	 */
 	public void calculateTrajectory() throws MatlabConnectionException, MatlabInvocationException{
 		MatlabProxy proxy = this.Matlab.getMatlabProxy();
 		
@@ -102,7 +119,13 @@ public class CalculateTrajectory {
 
 	}
 
-	public double[][] readMatFile(MissionObject object) throws FileNotFoundException, IOException {
+	/**
+	 * Reads the Mat-file and saves the obtained results in assigned MissionObject.
+	 * @param object
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public void readMatFile(MissionObject object) throws FileNotFoundException, IOException {
 		MatFileReader MLResults = new MatFileReader( "results.mat" );
 		
 		// Save trajectory and corresponding data to MissionObject
@@ -113,7 +136,6 @@ public class CalculateTrajectory {
 		object.setMissionTime(((MLDouble) MLResults.getMLArray("time")).getArray());
 		object.setReferenceVelocity(((MLDouble) MLResults.getMLArray("velocity")).getArray());
 		
-		return trajectory;
 	}
 
 }

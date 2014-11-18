@@ -2,6 +2,7 @@ package kvaddakopter.assignment_planer;
 
 
 public enum MissionType {
+	NULL_MISSION(0, ""),
 	AROUND_COORDINATE(1, "Runt Koordinat"),
 	ALONG_TRAJECTORY(2, "Längs bana"),
 	AREA_COVERAGE(3,"Inom område");

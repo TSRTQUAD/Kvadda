@@ -6,47 +6,69 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import kvaddakopter.gui.GUIWorker;
+import kvaddakopter.gui.interfaces.MainBusGUIInterface;
 
 public class MainController implements Initializable {
 
 
-    /**
-     * View responsible for Planning Tab.
-     */
-    @FXML
-    private Parent tabPlanera;
+	/**
+	 * View responsible for Planning Tab.
+	 */
+	@FXML
+	private Parent tabPlanera;
 
 
-    /**
-     * Controller responsible for Running Tab.
-     */
-    @FXML
-    private TabPlaneraController tabPlaneraController;
+	/**
+	 * Controller responsible for Running Tab.
+	 */
+	@FXML
+	public TabPlaneraController tabPlaneraController;
 
 
-    /**
-     * View responsible for  Running Tab.
-     */
-    @FXML
-    private Parent tabUtfor;
+	/**
+	 * View responsible for  Running Tab.
+	 */
+	@FXML
+	private Parent tabUtfor;
 
 
-    /**
-     * Controller responsible for Running Tab.
-     */
-    @FXML
-    private TabUtforController tabUtforController;
+	/**
+	 * Controller responsible for Running Tab.
+	 */
+	@FXML
+	public TabUtforController tabUtforController;
 
 
-    /**
-     * Runs When GUI is initialized.
-     */
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        // INIT THE PROGRAM
-        // CONSTRUCT THE CORE OBJECT
+	/**
+	 * MainBus
+	 */
+	protected MainBusGUIInterface mainBus;
 
-    }
-
+	/**
+	 * Runs When GUI is initialized.
+	 */
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+		if (this.tabUtforController != null){
+			this.tabUtforController.setParent(this);
+		}
+		if (this.tabPlaneraController != null){
+			this.tabPlaneraController.setParent(this);
+		}
+		
+		(new Thread(new GUIWorker(this))).start();
+		
+	}
+	
+	public void setMainBus(MainBusGUIInterface mainBus){
+		this.mainBus = mainBus;
+		
+	}
+	
+	public MainBusGUIInterface getMainBus(){
+		return this.mainBus;
+	}
+	
 
 }

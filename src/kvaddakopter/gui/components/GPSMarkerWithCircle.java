@@ -10,21 +10,26 @@ import com.lynden.gmapsfx.javascript.object.LatLong;
 import com.lynden.gmapsfx.shapes.Circle;
 import com.lynden.gmapsfx.shapes.CircleOptions;
 
-public class GPSMarkerWithCircle extends GPSMarker{
+public class GPSMarkerWithCircle extends GPSMarkerNormal{
 	
-	protected int circleRadius = 20;
+	protected double circleRadius = 20.123123;
 	protected Circle circle;
 	
 	public GPSMarkerWithCircle(LatLong coordinate) {
 		super(coordinate);
 	}
 	
-	public void setCircleRadius(int radius){
-		this.circleRadius = radius;
+	public double getCircleRadius(double radius){
+		return this.circleRadius;
+	}
+	
+	
+	public Circle getCircle(){
+		return this.circle;
 	}
 	
 	@Override
-	public void attachToMap(GoogleMap map, ArrayList<GPSMarker> listOfCoordinates){
+	public void attachToMap(GoogleMap map, ArrayList<AbstractGPSMarker> listOfCoordinates){
 		
 		super.attachToMap(map, listOfCoordinates);
 
@@ -39,6 +44,7 @@ public class GPSMarkerWithCircle extends GPSMarker{
         map.addMapShape(this.circle);
         map.addUIEventHandler(this.circle, UIEventType.click, (JSObject obj) -> {
         	this.circle.setEditable(!this.circle.getEditable());
+        	this.circle.setCenter(this.coordinate);
         });
 	}
 
@@ -48,5 +54,4 @@ public class GPSMarkerWithCircle extends GPSMarker{
 		super.clearFromMap(map);
 	}
 	
-
 }

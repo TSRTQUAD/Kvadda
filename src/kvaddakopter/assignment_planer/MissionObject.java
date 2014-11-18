@@ -10,7 +10,7 @@ public class MissionObject {
 	
 	protected String missionName = "";
 	
-	protected MissionType mission = MissionType.ALONG_TRAJECTORY;
+	protected MissionType mission = MissionType.NULL_MISSION;
 	
 	protected ArrayList<Area> searchareas = null;
 	protected ArrayList<Area> forbiddenareas = null;
@@ -115,7 +115,7 @@ public class MissionObject {
 	public void setDescriptor(int descriptor){
 		this.descriptor = descriptor;
 	}
-	// Assign the trajectory to the variable trajectory.
+	
 	public void setTrajectory(double[][] tmptrajectory){
 		this.trajectory =  tmptrajectory;
 	}
@@ -140,7 +140,10 @@ public class MissionObject {
 	}
 	
 	public String toString(){
-		return this.missionName + " // " + this.mission + " // ";
+		if(this.mission == MissionType.NULL_MISSION){
+			return "Väj ett uppdrag...";
+		}
+		return this.missionName;
 	}
 	
 }

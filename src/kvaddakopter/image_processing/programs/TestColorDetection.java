@@ -3,6 +3,7 @@ package kvaddakopter.image_processing.programs;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import kvaddakopter.Mainbus.Mainbus;
 import kvaddakopter.image_processing.algorithms.ColorDetection;
 import kvaddakopter.image_processing.algorithms.Tracking;
 import kvaddakopter.image_processing.data_types.ImageObject;
@@ -18,10 +19,14 @@ import com.xuggle.xuggler.demos.VideoImage;
 public class TestColorDetection extends ProgramClass{
 
 
+	public TestColorDetection(int threadid, Mainbus mainbus) {
+		super(threadid, mainbus);
+	}
+
 	Tracking tracker;
 	private static VideoImage trackingWindow = null;
 	
-	protected void init() {
+	public void init() {
 		//Create image queue, which is a list that is holding the most recent
 		// images
 		mImageQueue = new ArrayList<BufferedImage>();
@@ -54,10 +59,11 @@ public class TestColorDetection extends ProgramClass{
 		ImageObject imageObject = new ImageObject(currentImage);
 		
 		//((ColorDetection) mCurrentMethod).addTemplate("Yellow square", 20, 40, 100, 255, 100, 255, ColorTemplate.FORM_SQUARE);
-		ArrayList<TargetObject> targetList = mCurrentMethod.start(imageObject);
+		ArrayList<TargetObject> targetList = mCurrentMethod.runMethod(imageObject);
 
 		int resWidth = 0;
 		int resHeight = 0;
+		
 		if(mCurrentMethod.hasIntermediateResult()){
 
 			Mat output = mCurrentMethod.getIntermediateResult();
@@ -71,12 +77,11 @@ public class TestColorDetection extends ProgramClass{
 		
 		if(targetList.size() > 0){
 			tracker.update(targetList);
-			
-			
 			Mat output = tracker.getImage(resWidth,resHeight);
 			BufferedImage out = ImageConversion.mat2Img(output);
 			trackingWindow.setImage(out);
 		}
+		
 		
 	}
 }

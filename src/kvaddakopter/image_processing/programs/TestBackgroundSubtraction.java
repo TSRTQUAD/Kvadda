@@ -2,6 +2,7 @@ package kvaddakopter.image_processing.programs;
 
 import java.awt.image.BufferedImage;
 
+import kvaddakopter.Mainbus.Mainbus;
 import kvaddakopter.image_processing.algorithms.BackgroundSubtraction;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.decoder.FFMpegDecoder;
@@ -12,6 +13,7 @@ import org.opencv.core.Mat;
 import org.opencv.highgui.Highgui;
 
 public class TestBackgroundSubtraction extends ProgramClass{
+
 
 
 	enum PoseState{
@@ -29,7 +31,13 @@ public class TestBackgroundSubtraction extends ProgramClass{
 
 	int FRAME_COUNTER = 0;
 
-	protected void init() {
+	public TestBackgroundSubtraction(int threadid, Mainbus mainbus) {
+		super(threadid, mainbus);
+		// TODO Auto-generated constructor stub
+	}
+
+	
+	public void init() {
 
 		//Create and initialize decoder. And select source.
 		mDecoder = new FFMpegDecoder();
@@ -61,7 +69,8 @@ public class TestBackgroundSubtraction extends ProgramClass{
 		boolean photoShoot = false;
 		if(!photoShoot){
 			ImageObject imageObject = new ImageObject(currentImage);
-			mCurrentMethod.start(imageObject);
+			mCurrentMethod.runMethod(imageObject);
+
 
 			if(mCurrentMethod.hasIntermediateResult()){
 				updateWindow(mCurrentMethod.getIntermediateResult());
@@ -86,11 +95,11 @@ public class TestBackgroundSubtraction extends ProgramClass{
 			if(FRAME_COUNTER % 2 == 0){
 				FRAME_COUNTER++;
 				ImageObject imageObject = new ImageObject(mFirstPose);
-				mCurrentMethod.start(imageObject);
+				mCurrentMethod.runMethod(imageObject);
 			}else{
 				FRAME_COUNTER++;
 				ImageObject imageObject = new ImageObject(mSecondPose);
-				mCurrentMethod.start(imageObject);
+				mCurrentMethod.runMethod(imageObject);
 
 				if(mCurrentMethod.hasIntermediateResult()){
 					updateWindow(mCurrentMethod.getIntermediateResult());

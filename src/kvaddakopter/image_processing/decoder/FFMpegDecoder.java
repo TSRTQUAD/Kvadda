@@ -64,6 +64,7 @@ public class FFMpegDecoder  {
 	 */
 	public void initialize(String sourceAddr){
 
+		System.out.println("FFMPEG decoder: Trying to establish connection to source...");
 		sourceAdress = sourceAddr;
 
 		mThread = new DecoderThread();
@@ -128,6 +129,8 @@ public class FFMpegDecoder  {
 				throw new RuntimeException("could not create color space " +
 						"resampler for: " + sourceAdress);
 		}
+		
+		System.out.println("FFMPEG decoder: Connection established");
 	}
 	
 	public BufferedImage getCurrentImage(){

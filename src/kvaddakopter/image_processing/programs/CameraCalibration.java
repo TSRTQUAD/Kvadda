@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import kvaddakopter.Mainbus.Mainbus;
 import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
 
@@ -27,6 +28,10 @@ import org.opencv.imgproc.Imgproc;
 public class CameraCalibration extends ProgramClass{
 
 
+	public CameraCalibration(int threadid, Mainbus mainbus) {
+		super(threadid, mainbus);
+
+	}
 	Size mPatternSize; 
 
 	Point3[] mObjectPoints;
@@ -42,7 +47,7 @@ public class CameraCalibration extends ProgramClass{
 
 
 	@Override
-	protected void init() {
+	public void init() {
 
 		//Create and initialize decoder. And select source.
 		mDecoder = new FFMpegDecoder();

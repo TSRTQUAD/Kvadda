@@ -1,19 +1,27 @@
 package kvaddakopter.gui.components;
 
+
 import kvaddakopter.maps.MapMarkerEnum;
 
 import com.lynden.gmapsfx.javascript.object.LatLong;
 
-public class GPSMarkerForbidden extends GPSMarkerNormal {
+
+public class GPSMarkerNormal extends AbstractGPSMarker{
 	
-	
-	public GPSMarkerForbidden(LatLong coordinate) {
+
+	public GPSMarkerNormal(LatLong coordinate) {
 		super(coordinate);
-		
 	}
-
+	
+	
+	@Override
 	public MapMarkerEnum getIcon(){
-		return MapMarkerEnum.FORBIDDEN_AREAS;	 
-	}
+		return MapMarkerEnum.NAVIGATION_NORMAL;	 
+	}	
+	
+	
 
+
+
+	
 }
