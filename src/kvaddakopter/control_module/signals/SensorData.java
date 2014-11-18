@@ -88,8 +88,8 @@ public class SensorData {
 	
 	// setGPSposition (Latitud longitud)
 	public void setGPSposition(double[] GPS) {
-		Latitud = GPS[0];
-		Longitud = GPS[1];
+		this.Latitud = GPS[0];
+		this.Longitud = GPS[1];
 	}
 	
 	
