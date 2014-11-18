@@ -2,6 +2,7 @@ package kvaddakopter.gui.interfaces;
 
 import java.util.ArrayList;
 
+import kvaddakopter.interfaces.MainBusGUIInterface;
 import kvaddakopter.maps.GPSCoordinate;
 
 public class MockMainBus implements MainBusGUIInterface{

@@ -4,7 +4,7 @@ import java.util.Date;
 
 import javafx.application.Platform;
 import kvaddakopter.gui.controllers.MainController;
-import kvaddakopter.gui.interfaces.MainBusGUIInterface;
+import kvaddakopter.interfaces.MainBusGUIInterface;
 import kvaddakopter.utils.Clock;
 
 public class GUIWorker implements Runnable{

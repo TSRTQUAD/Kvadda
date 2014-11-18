@@ -13,9 +13,11 @@
 		<Pane prefHeight="800.0" prefWidth="1400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 			<children>
 				<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="800.0" prefWidth="1400.0">
+					<!--  
 					<children>
 						<GoogleMapView fx:id="mapViewUtfor" prefHeight="750.0" prefWidth="761.0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0.0" />
 					</children>
+					-->
 				</AnchorPane>
 <ToolBar layoutX="-2.0" layoutY="-4.0" prefHeight="50.0" prefWidth="1406.0">
 	<items>
