@@ -80,12 +80,9 @@ public class MainController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 
-		if (this.tabUtforController != null){
 			this.tabUtforController.setParent(this);
-		}
-		if (this.tabPlaneraController != null){
 			this.tabPlaneraController.setParent(this);
-		}
+			this.createGoogleMapViewOnTab(0);
 		
 		this.mainTabPane.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
 			@Override
@@ -118,7 +115,11 @@ public class MainController implements Initializable {
 	}
 	
 	
-	private void createGoogleMapViewOnTab(int tabNr){
+	/**
+	 * Draws a Google map instance on the current tab.
+	 * @param tabNr
+	 */
+	public void createGoogleMapViewOnTab(int tabNr){
 		
 		if(0 == tabNr && this.tabPlaneraController.mapView  == null){
 				this.tabPlaneraController.mapView = new GoogleMapView();
