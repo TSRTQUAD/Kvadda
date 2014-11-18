@@ -29,16 +29,11 @@ public class MissionObject {
 	protected double[][] coveragearea = {{0}};
 	protected double[][] missiontime = {{0}};
 	protected double[][] referencevelocity = {{0}};
-	
-	// Get variables
-	public double[] update(){
-		if (counter == 0){
-			
-			
-			
-		}
-	}
-	
+
+
+	/*
+	 * Get functions
+	 */
 	public String getMissionName(){
 		return this.missionName;
 	}
@@ -87,7 +82,9 @@ public class MissionObject {
 	}
 	
 	
-	// Assign values to the different variables.
+	/*
+	 * Set functions
+	 */
 	// Assign the mission type to variable mission.
 	public void setMissionType(MissionType missiontype){
 		mission = missiontype;
