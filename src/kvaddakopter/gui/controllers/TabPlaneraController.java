@@ -3,6 +3,7 @@ package kvaddakopter.gui.controllers;
 
 import com.lynden.gmapsfx.GoogleMapView;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -132,7 +133,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	mission.setMissionName(this.txtMissionName.getText());
     	
     	//MissionType
-    	mission.mission(this.listMissionType.getValue());
+    	mission.setMissionType(this.listMissionType.getValue());
     	
     	//Mission Height
     	double[] height = {(double) this.listMissionHeight.getValue().getValue()};
@@ -162,7 +163,12 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	
     	
     	//Save mission
-    	this.storage.saveMission(mission);
+    	try {
+			this.storage.saveMission(mission);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	
     	System.out.println(this.storage.getSavedMissions().size());
     }
