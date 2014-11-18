@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import kvaddakopter.Mainbus.Mainbus;
 import matlabcontrol.MatlabConnectionException;
 import matlabcontrol.MatlabInvocationException;
 import matlabcontrol.MatlabProxy;
@@ -17,7 +16,7 @@ public class AssignmentPlanerMain {
 		
 		// Set up an MatlabProxy, for quiet startup, set argument to true.
 		MatlabProxyConnection Matlab = new MatlabProxyConnection();
-		Matlab.startMatlab("quiet");
+		Matlab.startMatlab("Test");
 		
 
 		// Create an object to analyse

@@ -84,11 +84,14 @@ public class MatFileHandler {
 			list.add( coveragearea );
 			list.add( time );
 			list.add( velocity );
+			
+			//Write arrays to file			
+			new MatFileWriter("Missions/" + name + ".mat", list );
 		}
-
-
-		//Write arrays to file
-		new MatFileWriter( name + ".mat", list );
+		else {
+			//Write arrays to file
+			new MatFileWriter("src/kvaddakopter/assignment_planer/Matlab/Data/" + name + ".mat", list );
+		}
 
 	}
 	
@@ -99,10 +102,10 @@ public class MatFileHandler {
 	 * @throws IOException
 	 */
 	public MissionObject readMatFile(String name, MissionObject missionobject) throws FileNotFoundException, IOException {
-		MatFileReader MLRead = new MatFileReader( name + ".mat" );
 
 		//Save data to missionobject
 		if (name.equals("results")) {
+			MatFileReader MLRead = new MatFileReader("src/kvaddakopter/assignment_planer/Matlab/Data" + name + ".mat" );
 			missionobject.setTrajectory(((MLDouble) MLRead.getMLArray("trajectory")).getArray());
 			missionobject.setTrajectoryLength(((MLDouble) MLRead.getMLArray("trajectorylength")).getArray());
 			missionobject.setCoverageArea(((MLDouble) MLRead.getMLArray("coveragearea")).getArray());
@@ -110,6 +113,9 @@ public class MatFileHandler {
 			missionobject.setReferenceVelocity(((MLDouble) MLRead.getMLArray("velocity")).getArray());
 		}
 		else {
+			MatFileReader MLRead = new MatFileReader("Mission/" + name + ".mat" );
+			
+			//Set mission name
 			missionobject.setMissionName(name);
 
 			//Set mission type
@@ -172,8 +178,8 @@ public class MatFileHandler {
 			double[][] descriptor = ((MLDouble) MLRead.getMLArray("descriptor")).getArray();
 			missionobject.setDescriptor( (int) descriptor[0][0] );
 
-
 		}
+		
 		return missionobject;
 	}
 

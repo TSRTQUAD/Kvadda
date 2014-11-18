@@ -1,30 +1,33 @@
 package kvaddakopter.storage;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import kvaddakopter.assignment_planer.MatFileHandler;
 import kvaddakopter.assignment_planer.MissionObject;
 
 public class MissionStorage {
 	
-	private ArrayList<MissionObject> savedMissions = new ArrayList<>();
+	public List<String> getSavedMissions(){
+		List<String> storedmissions = new ArrayList<String>();
+		File[] files = new File("Missions").listFiles();
+
+		for (File file : files) {
+		    if (file.isFile()) {
+		        storedmissions.add(file.getName());
+		    }
+		}
 	
-	
-	public MissionStorage(){
-		MissionObject mission = new MissionObject();
-		this.savedMissions.add(mission);
-	
+		return storedmissions;
 	}
 	
 	
-	public boolean saveMission(MissionObject mission) throws IOException{
-		// IMPLEMENT LOGIC TO ACTUALLY STORE A MISSION!!
+	public void saveMission(MissionObject mission) throws IOException{
 		MatFileHandler missionstorage = new MatFileHandler();
 		missionstorage.createMatFile(mission.getMissionName(), mission);
-		
-		return savedMissions.add(mission);
 		
 	}
 	
@@ -34,10 +37,6 @@ public class MissionStorage {
 		missionstorage.readMatFile(missionname, mission);
 		
 		return mission;
-	}
-	
-	public ArrayList<MissionObject> getSavedMissions(){
-		return this.savedMissions;
 	}
 	
 }

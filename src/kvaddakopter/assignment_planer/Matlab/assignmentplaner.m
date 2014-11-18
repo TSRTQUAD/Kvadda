@@ -26,7 +26,7 @@
 % --------------------------------------------------
 % ================== Load object ===================
 % --------------------------------------------------
-load('../../../../object.mat');
+load('Data/object.mat');
 object = struct('mission',mission,'startcoordinate',startcoordinate,...
     'height',height,'radius',radius);
 object.area = area; object.forbiddenarea = forbiddenarea;
@@ -107,5 +107,5 @@ end
 % --------------------------------------------------
 % ============== Save results to file ==============
 % --------------------------------------------------
-save('../../../../results.mat','trajectory','trajectorylength',...
+save('Data/results.mat','trajectory','trajectorylength',...
     'coveragearea','time','velocity');

@@ -26,20 +26,17 @@ public class AssignmentPlanerRunnable implements Runnable {
 		try {
 			new MatFileHandler().createMatFile("object", mainbus.getMissionObject());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		try {
 			calculatetrajectory.makeMatlabCall();
 		} catch (MatlabConnectionException | MatlabInvocationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		try {
 			missionobject = new MatFileHandler().readMatFile("results", mainbus.getMissionObject());
 			mainbus.setMissionObject(missionobject);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		resetCondVar();
