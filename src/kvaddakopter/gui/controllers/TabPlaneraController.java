@@ -3,6 +3,7 @@ package kvaddakopter.gui.controllers;
 
 import com.lynden.gmapsfx.GoogleMapView;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -14,6 +15,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.AnchorPane;
 import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.assignment_planer.MissionType;
 import kvaddakopter.gui.components.MissionHeight;
@@ -28,7 +30,10 @@ public class TabPlaneraController extends BaseController implements Initializabl
 	 * UI ELEMENTS
 	 */
     @FXML
-    private GoogleMapView mapView;
+    public AnchorPane mapContainer;
+
+    public GoogleMapView mapView;
+    
     @FXML
     private TextField txtMissionName;
     @FXML
@@ -50,7 +55,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     /**
      * Properties
      */
-	private PlanningMap planningMap;
+	public PlanningMap planningMap;
     
     protected boolean canEnterMissionCoordinates = false;
 	protected boolean canEnterForbiddenAreaCoordinates = false;
@@ -77,7 +82,6 @@ public class TabPlaneraController extends BaseController implements Initializabl
     private void missionTypeChanged()
     {
     	this.currentSelectedMissionType = this.listMissionType.getSelectionModel().getSelectedItem();
-    	this.planningMap.clearNavigationCoordinates();
     }
     
     /**
@@ -129,7 +133,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	mission.setMissionName(this.txtMissionName.getText());
     	
     	//MissionType
-    	mission.mission(this.listMissionType.getValue());
+    	mission.setMissionType(this.listMissionType.getValue());
     	
     	//Mission Height
     	double[] height = {(double) this.listMissionHeight.getValue().getValue()};
@@ -159,7 +163,12 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	
     	
     	//Save mission
-    	this.storage.saveMission(mission);
+    	try {
+			this.storage.saveMission(mission);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	
     	System.out.println(this.storage.getSavedMissions().size());
     }
@@ -173,8 +182,6 @@ public class TabPlaneraController extends BaseController implements Initializabl
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-    	
-        this.planningMap = new PlanningMap(this.mapView, this);
         this.storage = new MissionStorage();
         
         this.populateListsAndDefaults();

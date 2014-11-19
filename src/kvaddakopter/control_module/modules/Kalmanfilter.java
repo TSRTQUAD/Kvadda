@@ -12,10 +12,10 @@ public class Kalmanfilter {
 	// Construct all matrices from initial conditions, and variances
 	public Kalmanfilter(double sampletime,double lambdaxdot,double lambday,
 						double initialx, double initialxdot){		
-	    // Construct all matrices 	
+	    // Construct all matrices
 		F = new SimpleMatrix(2,2,true, ((double) 1), (sampletime), ((double) 0),((double) 0)); 
 		Gu = new SimpleMatrix(2,1,true,((double)0),((double)1));
-		Gv = new SimpleMatrix(2,1,true,((double)0),((double)1));
+		Gv = new SimpleMatrix(2,1,true,Math.pow(sampletime, 2)/2,sampletime);
 		Q = new SimpleMatrix(1,1,true,lambdaxdot);
 		R = new SimpleMatrix(1,1,true,lambday);
 		H = new SimpleMatrix(1,2,true,((double)1),((double)0));
@@ -27,8 +27,6 @@ public class Kalmanfilter {
 		z1 = new SimpleMatrix(1,1);
 		z2 = new SimpleMatrix(1,1);
 		x = new SimpleMatrix(2,1,true,initialx,initialxdot);
-		
-
 	}
 	
 	

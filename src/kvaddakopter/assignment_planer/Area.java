@@ -8,4 +8,5 @@ package kvaddakopter.assignment_planer;
  */
 public class Area {
 	public double[][] area;
+	
 }

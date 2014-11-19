@@ -11,6 +11,7 @@ import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
 import kvaddakopter.image_processing.utils.KeyBoardHandler;
 import kvaddakopter.image_processing.utils.KeyBoardListener;
+import kvaddakopter.interfaces.MainBusIPInterface;
 
 import org.opencv.core.Mat;
 
@@ -32,7 +33,6 @@ public class ProgramClass implements Runnable,DecoderListener,KeyBoardListener {
 	protected Tracking mTracker;
 
 	//Decoder
-	//TODO set shared decoder
 	protected FFMpegDecoder mDecoder;
 	private boolean toBeReconnected = false;
 	//Window
@@ -42,19 +42,19 @@ public class ProgramClass implements Runnable,DecoderListener,KeyBoardListener {
 	private long mSleepTime = 20;
 	
 	//private volatile Container container;
-	protected Mainbus mMainbus;
+	protected MainBusIPInterface mMainbus;
     protected int mThreadId;
     
 	
 	// KeyBoard handler
 	KeyBoardHandler mKeyBoardHandler = null;
 
-	public ProgramClass(int threadid, Mainbus mainbus) {
+	public ProgramClass(int threadid, MainBusIPInterface mainbus) {
 		mMainbus = mainbus;
 	    mThreadId = threadid;
 		init();
 	}
-	
+
 	/** 
 	 *Init function of a program class. <br> 
 	 * This function is implicitly called be constructor of the ProgramClass <br>

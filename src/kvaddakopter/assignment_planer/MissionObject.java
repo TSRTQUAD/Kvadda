@@ -15,21 +15,25 @@ public class MissionObject {
 	protected ArrayList<Area> searchareas = null;
 	protected ArrayList<Area> forbiddenareas = null;
 	
-	protected double[][] startcoordinate = null;
-	protected double[] height = null;
-	protected double[] radius = null;
+	protected double[][] startcoordinate = {{0}};
+	protected double[] height = {0};
+	protected double[] radius = {0};
 	
-	protected int imageTemplte = 0;
+	protected int imageTemplate = 0;
 	protected int colorTemplate = 0;
 	protected int descriptor = 0;
+	protected int counter = 0;
 	
-	protected double[][] trajectory = null;
-	protected double[][] trajectorylength = null;
-	protected double[][] coveragearea = null;
-	protected double[][] missiontime = null;
-	protected double[][] referencevelocity = null;
-	
-	// Get variables
+	protected double[][] trajectory = {{0}};
+	protected double[][] trajectorylength = {{0}};
+	protected double[][] coveragearea = {{0}};
+	protected double[][] missiontime = {{0}};
+	protected double[][] referencevelocity = {{0}};
+
+
+	/*
+	 * Get functions
+	 */
 	public String getMissionName(){
 		return this.missionName;
 	}
@@ -53,7 +57,7 @@ public class MissionObject {
 		return this.radius;
 	}
 	public int getImageTemplate(){
-		return this.imageTemplte;
+		return this.imageTemplate;
 	}
 	public int getColorTemplate(){
 		return this.colorTemplate;
@@ -78,9 +82,11 @@ public class MissionObject {
 	}
 	
 	
-	// Assign values to the different variables.
+	/*
+	 * Set functions
+	 */
 	// Assign the mission type to variable mission.
-	public void mission(MissionType missiontype){
+	public void setMissionType(MissionType missiontype){
 		mission = missiontype;
 	}
 	// Assign the search area, line or target coordinates to variable searchareas.
@@ -105,7 +111,7 @@ public class MissionObject {
 	}
 	
 	public void setImageTemplate(int template){
-		imageTemplte = template;
+		imageTemplate = template;
 	}
 	
 	public void setColorTemplate(int color){

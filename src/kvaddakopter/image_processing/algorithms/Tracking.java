@@ -2,34 +2,34 @@ package kvaddakopter.image_processing.algorithms;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Set;
 
+import kvaddakopter.image_processing.data_types.Identifier;
 import kvaddakopter.image_processing.data_types.TargetObject;
 
+import org.apache.commons.collections4.queue.CircularFifoQueue;
+import org.ejml.simple.SimpleMatrix;
 import org.opencv.core.Core;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 
-import com.xuggle.xuggler.demos.VideoImage;
+public class Tracking {	
+	HashMap<Integer, TargetObject> mInternalTargets;	
 
-public class Tracking {
-	Mat emptyMat; // For easier use with Core.gemm
+	SimpleMatrix H; // Measurments from state matrix
+	SimpleMatrix F; // Matrix describing the dynamics (constant acceleration)
+	SimpleMatrix Q; // G*G'
+	SimpleMatrix R; // Measurement noise
 	
-	Mat H_small; 
-	Mat H;
-	
-	HashMap<Integer, TargetObject> mInternalTargets;
-	Mat x; // State matrix containing all targets state matrices
-	Mat P; // Covariance matrix -||-
-	
-	Mat F_small; // Matrix describing the dynamics (constant acceleration)
-	Mat F;
-	Mat G; // Noise dependency
-	Mat Q; // G*G'
-	Mat R; // Measurement noise
-	
+	double Ts = 0.15;
+	double sigmaSquared = 50;
 
+	CircularFifoQueue<double[]> trajectoryX = new CircularFifoQueue<double[]>(30);
+	CircularFifoQueue<double[]> trajectoryM = new CircularFifoQueue<double[]>(30);
+	long lastTime = 0;
 	/**
 	 *  <Lägg till beskrivning utav track här>
 	 * 
@@ -38,32 +38,44 @@ public class Tracking {
 	
 	public Tracking(){
 		// Initialize matrices
-		emptyMat = new Mat();
+		H = new SimpleMatrix(2, 4, true, 
+				1, 0, 0, 0, 
+				0, 1, 0, 0);				
+		R = SimpleMatrix.diag(1, 1).scale(50);
 		
-		// Create H_small as [1 0 0 0; 0 1 0 0]. H is then [H_s 0 ... 0; 0 H_s 0 ..0; ...; ... 0 H_s]
-		H_small = Mat.zeros(2, 4, CvType.CV_64F);
-		H_small.put(0, 0, 1.0);
-		H_small.put(1, 1, 1.0);		
-		
-		H = new Mat();
-		F_small = new Mat();
-		
-		x = new Mat(4, 1, CvType.CV_64F);
+		// Initialize target list
 		mInternalTargets = new HashMap<Integer, TargetObject>();
-		//Init window
 	}
 	
 	
 	public void update(ArrayList<TargetObject> targetObjects){
-		// Create combined x and P matrices from mInternalTargets 
-		//createCombinedMatrices();
+		// Elapsed time since last update
+		double elapsedTime = ((double)(System.currentTimeMillis() - lastTime)) / 1000;
+		lastTime = System.currentTimeMillis();
+		updateTimeDependentMatrices(elapsedTime);
+		
 		
 		// Perform time update
-		//timeUpdate();
+		timeUpdate();
+		
+		if(mInternalTargets.size() > 0){
+			trajectoryX.add(new double[]{mInternalTargets.get(0).getPosition().get(0, 0), mInternalTargets.get(0).getPosition().get(1, 0)});
+		}
 		
 		// Match new targetObjects with mInternalTargets by analyzing position difference and identifiers
+		matchTargets(targetObjects);
 		
 		// Perform measurement update with matched objects
+		
+		// DEBUG!
+		if(targetObjects.size() > 0 && mInternalTargets.size() > 0){
+			SimpleMatrix z = new SimpleMatrix(2, 1, true, targetObjects.get(0).getPosition().get(0, 0), targetObjects.get(0).getPosition().get(1, 0));
+			measurementUpdate(mInternalTargets.get(0), z);
+			mInternalTargets.get(0).updateIdentifier(targetObjects.get(0).getIdentifier());
+			trajectoryM.add(new double[]{z.get(0, 0), z.get(1, 0)});
+		} else {
+			trajectoryM.add(new double[]{0, 0});
+		}
 		//measurementUpdate(getZ(targetObjects));
 		
 		// Add non-matched objects to internal list
@@ -71,124 +83,173 @@ public class Tracking {
 			mInternalTargets.put(0, (TargetObject)targetObjects.get(0));
 			System.out.print("Length of mInternalTargets: ");
 			System.out.println(mInternalTargets.size());
+			
 		}
-		
-		if(targetObjects.size() > 0 && mInternalTargets.size() > 0){
-			TargetObject oldTarget = mInternalTargets.get(0);
-			TargetObject newTarget = targetObjects.get(0);
-			oldTarget.setState(newTarget.getState());
-		}
-		
 		
 	}
 	
-	private void timeUpdate(){
-		// Predicted state estimate:	x 	= F*x
-		Core.gemm(F, x, 1, emptyMat, 0, x);
+	private void matchTargets(ArrayList<TargetObject> targetObjects) {
+		// Match targetObjects against mInternalTargets
+		// Create a grid between mInternalTargets and targetObjects
+		int numInternalTargets = mInternalTargets.size();
+		int numTargets = targetObjects.size();
+		double[][] matchMap = new double[numInternalTargets][numTargets];
+		for(int key : mInternalTargets.keySet()){
+			for(TargetObject target : targetObjects){
+				TargetObject internalTarget = mInternalTargets.get(key);
+				matchMap[key][targetObjects.indexOf(target)] = 
+						(Identifier.compare(internalTarget.getIdentifier(), target.getIdentifier()) + 
+						compareDistance(internalTarget, target)) / 2;
+			}
+		}
 		
-		// Predicted covariance:		P	= F*P*F' + Q
-		Mat tmp = new Mat();
-		Core.gemm(F.t(), P, 1, emptyMat, 0, tmp);
-		Core.gemm(tmp, F.t(), 1, Q.t(), 1, P);
+	}
+
+
+	private float compareDistance(TargetObject internalTarget, TargetObject target) {
+		// Compares distance between objects with regard of covariance
+		// XXX uncertainDistance only depends on one axis of the covariance
+		float uncertainDistance = (float)(internalTarget.getCovariance().get(0, 0) + target.getCovariance().get(0, 0));
+		float distance = (float)Math.sqrt(
+				Math.pow(internalTarget.getPosition().get(0, 0) - target.getPosition().get(0, 0), 2) + 
+				Math.pow(internalTarget.getPosition().get(1, 0) - target.getPosition().get(1, 0), 2));
+		
+		// Comparation of distances and uncertainties
+		
+		
+		return 0;
+	}
+
+
+	private void updateTimeDependentMatrices(double elapsedTime) {
+		// Updates matrices F and Q
+		F = createF(elapsedTime);
+		Q = createQ(elapsedTime, sigmaSquared);
+	}
+
+	private void timeUpdate(){ // TODO: Variable time updates
+		for(Entry<Integer, TargetObject> entry: mInternalTargets.entrySet()){
+			// Get state and covariance
+			TargetObject target = entry.getValue();
+			SimpleMatrix x = target.getState();
+			SimpleMatrix P = target.getCovariance();
+			
+			// Predicted state estimate:	x 	= F*x
+			x = F.mult(x);
+			
+			// Predicted covariance:		P	= F*P*F' + Q
+			P = (F.mult(P)).mult(F.transpose()).plus(Q);
+			
+			// Update state and covariance	
+			target.setState(x);
+			target.setCovariance(P);
+		}
 	}
 	
-	private void measurementUpdate(Mat z){
+	private void measurementUpdate(TargetObject target, SimpleMatrix z){
+		SimpleMatrix x = target.getState();
+		SimpleMatrix P = target.getCovariance();
+		
 		// TODO make y = 0 where no measurments are found for the object
 		// Innovation of measurement: 	y	= z-H*x 			// y = 0 where we have no matching targets
-		Mat y = new Mat();
-		Core.gemm(H.t(), x, -1, z, 1, y);
+		SimpleMatrix y = z.minus(H.mult(x));
 		
 		// Covariance innovation:		S	= H*P*H' + R
-		Mat S = new Mat();
-		Mat tmp = new Mat();
-		Core.gemm(H.t(), P, 1, emptyMat, 0, tmp);
-		Core.gemm(tmp, H.t(), 1, R.t(), 1, S);
+		SimpleMatrix S = ((H.mult(P)).mult(H.transpose())).plus(R);
 		
 		// Optimal Kalman gain: 		K	= P*H'*inv(S)
-		Mat K = new Mat();
-		tmp = new Mat();
-		Core.gemm(P.t(), H.t(), 1, emptyMat, 0, tmp);
-		Core.gemm(tmp.t(), S.inv(), 1, emptyMat, 0, K);
+		SimpleMatrix K = (P.mult(H.transpose()).mult(S.pseudoInverse()));
 		
 		// Updated estimate:			x	= x + K*y
-		Core.gemm(K.t(), y, 1, x.t(), 1, x);
+		x = x.plus(K.mult(y));
 		
 		// Updated covariance			P	= (I - K*H)*P = P - K*H*P
-		tmp = new Mat();
-		Core.gemm(K.t(), H, 1, emptyMat, 0, tmp);
-		Core.gemm(tmp.t(), P, -1, P, 1, P);
+		P = P.minus((K.mult(H)).mult(P));
+
+		// DEBUG!
+		target.setState(x);
+		target.setCovariance(P);
+	}
+
+	private SimpleMatrix createF(double Ts){
+		// Creates the dynamic matrix F as FSmall = [1 0 Ts 0; 0 1 0 Ts; 0 0 1 0; 0 0 0 1]
+		return new SimpleMatrix(4, 4, true,
+				1, 0, Ts, 0,
+				0, 1, 0, Ts,
+				0, 0, 1, 0,
+				0, 0, 0, 1);
 	}
 	
-	private Mat createF_small(double Ts){
-		// Creates the dynamic matrix F as F_small = [1 0 Ts 0; 0 1 0 Ts; 0 0 1 0; 0 0 0 1]
-		Mat res = Mat.eye(4, 4, CvType.CV_64F);
-		res.put(0, 2, Ts);
-		res.put(1, 3, Ts);		
-		return res;
-	}
-	
-	private Mat createQ(double Ts, double sigma_sq){
+	private SimpleMatrix createQ(double Ts, double sigmaSquared){
 		// Creates the system noise Q = G*G'*sigma_squared
 		// Given a1 = Ts^4/4, a2 = Ts^3/2, a3 = Ts^2 we have Q as follows
-		// Q = [a1 a2 a1 a2; a2 a3 a2 a3; a1 a2 a1 a2; a2 a3 a2 a3]
 		double a1 = Math.pow(Ts, 4) / 4;
 		double a2 = Math.pow(Ts, 3) / 2;
 		double a3 = Math.pow(Ts, 2);
-		Mat res = new Mat(4, 4, CvType.CV_64F);
-		
-		res.put(0, 0, a1);
-		res.put(0, 1, a2);
-		res.put(0, 2, a1);
-		res.put(0, 3, a2);
-
-		res.put(1, 0, a2);
-		res.put(1, 1, a3);
-		res.put(1, 2, a2);
-		res.put(1, 3, a3);
-		
-		res.put(2, 0, a1);
-		res.put(2, 1, a2);
-		res.put(2, 2, a1);
-		res.put(2, 3, a2);
-
-		res.put(3, 0, a2);
-		res.put(3, 1, a3);
-		res.put(3, 2, a2);
-		res.put(3, 3, a3);
-		
-		Core.gemm(emptyMat, emptyMat, 0, res.t(), sigma_sq, res);
-		
+		SimpleMatrix res = new SimpleMatrix(4, 4, true, 
+				a1, 0, a2, 0,
+				0, a1, 0, a2,
+				a2, 0, a3, 0,
+				0, a2, 0, a3);
+		res.scale(sigmaSquared);
 		return res;
 	}
 	
-	public Mat getZ(ArrayList<TargetObject> targetObjects){
-		Mat res = new Mat(targetObjects.size(), 1, CvType.CV_64F);
+	public SimpleMatrix getZ(ArrayList<TargetObject> targetObjects){
+		SimpleMatrix res = new SimpleMatrix();/*Mat(targetObjects.size(), 1, CvType.CV_64F);
 		for(TargetObject targetObject : targetObjects){
 			Mat pos = targetObject.getPosition();
 			//res.put();
-		}
-		
-		
+		}*/
+			
 		
 		return res;
 	}
 	
-	public Mat getImage(int resWidth, int resHeight){
-		Mat res = new Mat(resHeight, resWidth, CvType.CV_8U);
-		res.setTo(new Scalar(0, 0, 0));
+	public Mat getImage(int w_, int h_, Mat res){
+		//Mat res = new Mat(w_, h_, CvType.CV_8U);
+		//res.setTo(new Scalar(0, 0, 0));
 		if(mInternalTargets.size() > 0){
 			for(int key : mInternalTargets.keySet()) {
 			    TargetObject target = mInternalTargets.get(key);
-			    Mat pos = target.getPosition();
+			    
+			    // Draw trajectory
+			    Object[] trajs = trajectoryX.toArray();
+			    for(int i = 1; i < trajs.length; i++){
+			    	Core.line(
+			    			res, 
+			    			new Point(((double[])trajs[i - 1])[0], ((double[])trajs[i - 1])[1]), 
+			    			new Point(((double[])trajs[i])[0], ((double[])trajs[i])[1]), 
+			    			new Scalar(0, 200, 0));
+			    }
+
+			    // Draw measurements
+			    Object[] measurements = trajectoryM.toArray();
+			    for(int i = 1; i < measurements.length; i++){
+			    	Core.circle(
+			    			res, 
+			    			new Point(((double[])measurements[i - 1])[0], ((double[])measurements[i - 1])[1]), 
+			    			3, 
+			    			new Scalar(0, 0, 255));
+			    }
+			    
+			    SimpleMatrix pos = target.getPosition();
 				Core.rectangle(
 						res, 
-						new Point(pos.get(0, 0)[0] - 10, pos.get(1, 0)[0] - 10),
-						new Point(pos.get(0, 0)[0] + 10, pos.get(1, 0)[0] + 10),
+						new Point(pos.get(0, 0) - 10, pos.get(1, 0) - 10),
+						new Point(pos.get(0, 0) + 10, pos.get(1, 0) + 10),
 						new Scalar(255, 0, 0), 
 						1);
+				
+				SimpleMatrix cov = target.getCovariance();
+				Core.ellipse(res, new Point(pos.get(0, 0), pos.get(1, 0)), new Size(new double[]{cov.get(0, 0), cov.get(1, 1)}), 0.0, 0.0, 360.0, new Scalar(255, 255, 255));
 
 				String txtString = String.format("ID:%d", key);
-			    Core.putText(res, txtString, new Point(pos.get(0, 0)[0] - 12, pos.get(1, 0)[0] + 22) , Core.FONT_HERSHEY_SIMPLEX, .4, new Scalar(255, 255, 255), 1, 8, false);
+			    Core.putText(res, txtString, new Point(pos.get(0, 0) - 12, pos.get(1, 0) + 22) , Core.FONT_HERSHEY_SIMPLEX, .4, new Scalar(255, 255, 255), 1, 8, false);
+
+			    SimpleMatrix x = target.getState();
+			    String stateString = String.format("X:%1$dn Y:%2$d, nX:%3$d, nY:%4$d.", (int)x.get(0,0), (int)x.get(1,0), (int)x.get(2,0), (int)x.get(3,0));
+			    Core.putText(res, stateString, new Point(20, 20) , Core.FONT_HERSHEY_SIMPLEX, .4, new Scalar(255, 255, 255), 1, 8, false);
 			}
 		}
 		

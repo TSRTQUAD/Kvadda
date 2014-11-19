@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 
 import kvaddakopter.Mainbus.Mainbus;
 import kvaddakopter.image_processing.algorithms.BackgroundSubtraction;
+import kvaddakopter.image_processing.comm_tests.IPMockMainBus;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
@@ -31,9 +32,8 @@ public class TestBackgroundSubtraction extends ProgramClass{
 
 	int FRAME_COUNTER = 0;
 
-	public TestBackgroundSubtraction(int threadid, Mainbus mainbus) {
+	public TestBackgroundSubtraction(int threadid, IPMockMainBus mainbus) {
 		super(threadid, mainbus);
-		// TODO Auto-generated constructor stub
 	}
 
 	

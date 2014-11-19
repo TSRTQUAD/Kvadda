@@ -7,7 +7,7 @@
 % Output:
 % trajectory        - trajectory containing coordinates
 % time              - total time for mission [min]
-% area              - coverage area [m^2]
+% coveragearea      - coverage area [m^2]
 % velocity          - reference vector containing velocities
 % 
 % The input object can contain different values depending on the mission.
@@ -26,7 +26,7 @@
 % --------------------------------------------------
 % ================== Load object ===================
 % --------------------------------------------------
-load('../../../../object.mat');
+load('Data/object.mat');
 object = struct('mission',mission,'startcoordinate',startcoordinate,...
     'height',height,'radius',radius);
 object.area = area; object.forbiddenarea = forbiddenarea;
@@ -61,7 +61,7 @@ trajectory = interparc(5e2,rawtrajectory(:,1),rawtrajectory(:,2),'spline');
 trajectory = DouglasPeucker(trajectory);
 
 % =============== Present results ==================
-[trajectorylength,area,time,velocity] = getResults( object, [],...
+[trajectorylength,coveragearea,time,velocity] = getResults( object, [],...
     trajectory, spiraltrajectory, imagelength_meter, 0 );
 
     
@@ -77,7 +77,7 @@ trajectory = interparc(5e2,rawtrajectory(:,1),rawtrajectory(:,2),'spline');
 trajectory = DouglasPeucker(trajectory);
 
 % =============== Present results ==================
-[trajectorylength,area,time,velocity] = getResults( object, [],...
+[trajectorylength,coveragearea,time,velocity] = getResults( object, [],...
     trajectory, [], imagelength_meter, 0 );
 
 
@@ -98,7 +98,7 @@ tmpcostmat = getCostMatrix(nodes,object);
 trajectory = getTrajectory(tmpcostmat,nodes,object.startcoordinate);
 
 % =============== Present results ==================
-[trajectorylength,area,time,velocity] = getResults( object, nodes,...
+[trajectorylength,coveragearea,time,velocity] = getResults( object, nodes,...
     trajectory, [], imagelength_meter, 0 );
 
 end
@@ -107,5 +107,5 @@ end
 % --------------------------------------------------
 % ============== Save results to file ==============
 % --------------------------------------------------
-save('../../../../results.mat','trajectory','trajectorylength',...
-    'area','time','velocity');
+save('Data/results.mat','trajectory','trajectorylength',...
+    'coveragearea','time','velocity');
