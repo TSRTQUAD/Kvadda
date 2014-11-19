@@ -41,8 +41,8 @@ public class FFMpegDecoder  {
 
 	//Current Image, 
 	BufferedImage mCurrentImage  = new BufferedImage(32, 32, BufferedImage.TYPE_BYTE_GRAY);
-	
-	
+
+
 	// Debug:  write first video fram to a png-file
 	private boolean writeFirstFrameToFile = false;
 
@@ -69,8 +69,8 @@ public class FFMpegDecoder  {
 
 		mThread = new DecoderThread();
 
-		
-		
+
+
 		// Let's make sure that we can actually convert video pixel formats.
 		if (!IVideoResampler.isSupported(
 				IVideoResampler.Feature.FEATURE_COLORSPACECONVERSION))
@@ -129,12 +129,16 @@ public class FFMpegDecoder  {
 				throw new RuntimeException("could not create color space " +
 						"resampler for: " + sourceAdress);
 		}
-		
+
 		System.out.println("FFMPEG decoder: Connection established");
 	}
 	
+	public void reinitialize(){
+		initialize(sourceAdress);
+	}
+
 	public BufferedImage getCurrentImage(){
-		
+
 		synchronized (mCurrentImage) {
 			return mCurrentImage;
 		}	
@@ -199,7 +203,6 @@ public class FFMpegDecoder  {
 
 			//Boolean used for safe thread shutdown.
 			mExternalStop = false;
-
 			while(mContainer.readNextPacket(packet) >= 0 && !mExternalStop)
 			{
 				/*
@@ -222,10 +225,10 @@ public class FFMpegDecoder  {
 						 */
 						int bytesDecoded = mVideoCoder.decodeVideo(picture, packet, offset);
 						if (bytesDecoded < 0){
-//							mVideoCoder.close();
-//							initialize(sourceAdress);
+							//							mVideoCoder.close();
+							//							initialize(sourceAdress);
 							break;
-						/*	throw new RuntimeException("got error decoding video in: "
+							/*	throw new RuntimeException("got error decoding video in: "
 									+ sourceAdress);*/
 						}
 						offset += bytesDecoded;
@@ -315,7 +318,7 @@ public class FFMpegDecoder  {
 							// And finally, convert the BGR24 to an Java buffered image
 							BufferedImage javaImage = Utils.videoPictureToImage(newPic);
 							mCurrentImage = javaImage;
-							
+
 							mDecoderListener.onFrameRecieved(javaImage);
 							/*if(mDecoderListener.onFrameRecieved(javaImage))
 								try {
@@ -324,7 +327,7 @@ public class FFMpegDecoder  {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}*/
-							
+
 							// and display it on the Java Swing window
 							updateJavaWindow(javaImage);
 						}
@@ -350,13 +353,13 @@ public class FFMpegDecoder  {
 				mContainer.close();
 				mContainer = null;
 			}
-			
-			mDecoderListener.onConnectionLost();
-	
+
+			mDecoderListener.onConnectionLost(mExternalStop);
+
 		}
 
 	}
-	
+
 	public void setDecoderListener(DecoderListener decoderListener){
 		mDecoderListener = decoderListener;
 	}

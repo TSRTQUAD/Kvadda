@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import kvaddakopter.ImageProcessingMain;
+import kvaddakopter.Mainbus.Mainbus;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.utils.ImageConversion;
@@ -59,8 +60,8 @@ public class BackgroundSubtraction  extends DetectionClass{
 	public ArrayList<TargetObject> runMethod(ImageObject currentImageData) {
 
 		// Compute key points and descriptors for the current image
-		currentImageData.computeKeyPoints(FeatureDetector.SURF);
-		currentImageData.computeDescriptors(DescriptorExtractor.ORB);
+		currentImageData.computeKeyPoints(FeatureDetector.SIFT);
+		currentImageData.computeDescriptors(DescriptorExtractor.SIFT);
 
 		//Creating a list of target objects
 		ArrayList<TargetObject> targetObjects = new ArrayList<TargetObject>();
@@ -88,140 +89,104 @@ public class BackgroundSubtraction  extends DetectionClass{
 			return targetObjects;
 
 		}
-		mIntermeditateResult = currentImageData.getImage();
 
-		//1. Correspondences
-		MatOfDMatch matches       = currentImageData.findMatches(mPreviousImageData);
+		Mat homographicMatrix = computeHomographicsMatrix(currentImageData);
+		if(homographicMatrix != null){
+			//4. Background subtraction
+			Mat movingForeground = subtractBackground(currentImageData,homographicMatrix);
 
-		//2. Find fundamental matrix
-		MatOfDMatch inlierMatches = new MatOfDMatch();
-		Mat fundamentalMatrix 	  = MatchTests.computeFundamentalMatrix(matches, currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(),0.1, inlierMatches);
-		if(fundamentalMatrix != null){
+			//5. Morphology
+			Mat morphedImage = morphBinaryImage(movingForeground);
 
-			//2.a Getting inlier keypoints
-			MatOfKeyPoint kpCurrent = new MatOfKeyPoint();
-			MatOfKeyPoint kpPrev = new MatOfKeyPoint();
-			MatchTests.getMatchingKeyPoints(currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(), kpCurrent, kpPrev, inlierMatches);
+			//6. Find contours 
+			List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
 
-			Mat matchesImg= currentImageData.getImage().clone();
- 			MatchTests.getMatchingKeyPoints(currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(), kpCurrent, kpPrev, inlierMatches);
-//
-//			mIntermeditateResult = new Mat();
-//			/*Features2d.drawMatches(
-//					currentImageData.getImage(),
-//					kpCurrent, 
-//					mPreviousImageData.getImage(),
-//					kpPrev,  
-//					inlierMatches,
-//					matchesImg
-//					);
+			//Find contours that have an normalized area that is larger than CONTOUR_AREA_LOWER_THRESHOLD; 
+			Mat contourImage = findContours(morphedImage, contours);
 
-			for (int i = 0; i < kpCurrent.rows(); i++) {
-				for (int j = 0; j < kpCurrent.cols(); j++) {
-					
-					Core.line(matchesImg, new Point(kpCurrent.get(i, j)), new Point(kpPrev.get(i, j)), new Scalar(255,255,255));
-					
-					double[] p1 = kpCurrent.get(i, j);
-					double[] p2 = kpPrev.get(i, j);
-					double dist = Math.sqrt(Math.pow(p1[0]-p2[0],2.0) + Math.pow(p1[1]-p2[1],2.0));
-					if(dist > 40)
-						System.out.println("Distance: " +dist);
-				}
-			}
-			//2.b Computing Homography matrix using inlier keypoints. number of inlier point must be more than 4
-			if(inlierMatches.cols() *inlierMatches.rows() >=4){
-				Mat homo = MatchTests.getHomoMatrix(kpCurrent, kpPrev);
-				//2.c Warp Image
-				Mat homoImg = new Mat();
-				Imgproc.warpPerspective(mPreviousImageData.getImage(), homoImg,homo, mPreviousImageData.getImage().size());
+			//Dilate the image once more in order smaller contours into larger ones 
+			Mat diletedImage = morphBinaryImage(contourImage);
 
-				//Output
-				mIntermeditateResult = new Mat();
-				List<Mat> concatMat = new ArrayList<Mat>();
-				concatMat.add(homoImg);
-				concatMat.add(matchesImg);
-				Core.hconcat(concatMat,mIntermeditateResult);
+			//Find contour once again
+			contourImage = findContours(diletedImage, contours);
+
+			for(MatOfPoint c: contours){
+				Moments m = Imgproc.moments(c);
+				double[] targetPosition = new double[2];
+				targetPosition[0] = m.get_m10()/m.get_m00();
+				targetPosition[1] = m.get_m10()/m.get_m00();
+				Core.circle(diletedImage, new Point(targetPosition),40, new Scalar(0.5f));
+				//TargetObject newTarget = new TargetObject(position_, noise_level);
+
 			}
 
-		
-			//2.b Computing Homography matrix using inlier keypoints
-			Mat homo = MatchTests.getHomoMatrix(kpCurrent, kpPrev);
-			
-			//2.c Warp Image
-			Imgproc.warpPerspective(mPreviousImageData.getImage(), mIntermeditateResult,homo, mPreviousImageData.getImage().size());
+			//	Output
+			List<Mat> concatMat = new ArrayList<Mat>();
+			concatMat = new ArrayList<Mat>();
+			concatMat.add(movingForeground);
+			concatMat.add(diletedImage);
+			mIntermeditateResult = new Mat();
+			Core.hconcat(concatMat,mIntermeditateResult);
+
+			//Set previous image data to the current image data
+			mPreviousImageData = currentImageData;
 		}
-		//3. Warp - NOT IMPLEMENTED
-		//		warpPreviousImage();
-		//
-		//		//4. Background subtraction
-		//		Mat movingForeground = subtractBackground(currentImageData);
-		//
-		//		//5. Morphology
-		//		Mat morphedImage = morphBinaryImage(movingForeground);
-		//
-		//		//6. Find contours 
-		//		List<MatOfPoint> contours = new ArrayList<MatOfPoint>();
-		//		//Find contours that have an normalized area that is larger than CONTOUR_AREA_LOWER_THRESHOLD; 
-		//		Mat contourImage = findContours(morphedImage, contours);
-		//		//Dilate the image once more in order smaller contours into larger ones 
-		//		Mat diletedImage = morphBinaryImage(contourImage);
-		//		//Find contour once again
-		//		ArrayList<TargetObject> targetObjects = new ArrayList<TargetObject>();
-		//
-		//		for(MatOfPoint c: contours){
-		//			Moments m = Imgproc.moments(c);
-		//			double[] targetPosition = new double[2];
-		//			targetPosition[0] = m.get_m10()/m.get_m00();
-		//			targetPosition[1] = m.get_m10()/m.get_m00();
-		//			Core.circle(diletedImage, new Point(targetPosition), 8, new Scalar(0.5f));
-		//			//			TargetObject newTarget = new TargetObject(position_, noise_level);
-		//
-		//		}
-		//		//
-		//		//Output
-		//		List<Mat> concatMat = new ArrayList<Mat>();
-		//		concatMat.add(morphedImage);
-		//		concatMat.add(diletedImage);
-		//		mIntermeditateResult = new Mat();
-		//		Core.hconcat(concatMat,mIntermeditateResult);
-
-		//6. Bounding Boxes
-		//Get contours and hierarchy of binary image
-
-
-		//				ArrayList<Rect> boundingBoxes = getBoundingBoxes(contours,hierarchy,0.1);
-
-		//Print boxes on a gray scale Image
-		//		Mat currentFrameGray = new Mat(); 
-		//		Imgproc.cvtColor(currentImageData.getImage(), currentFrameGray, Imgproc.COLOR_RGB2GRAY);
-		//		mIntermeditateResult = currentFrameGray;
-		//		for (Rect rect : boundingBoxes) {
-		//			Core.rectangle(mIntermeditateResult, new Point(rect.x,rect.y), new Point(rect.x+rect.width,rect.y+rect.height),new Scalar(255,0,0),4);
-		//		}
-
-		//7. Adjust parameters
-
-
-		// TODO: Assign the box data to the TargetObjects
-	
-		/*	Mat m = new Mat(1,2,CvType.CV_64F);
-		m.put(0, 0, 0);
-		m.put(0, 1, 1);
-		TargetObject target = new TargetObject(m, 0);
-		 */
-		//Set previous image data to the current image data
-		mPreviousImageData = currentImageData;
-		//		mBackgroundImageData = currentImageData;
 		return targetObjects;
 	}
-/*
+	/*
 	@Override
 	public boolean isMethodActive() {
-		
-	
+
+
 	}*/
 
-	private void warpPreviousImage(){
+	private Mat computeHomographicsMatrix(ImageObject currentImageData){
+		//1. Correspondences
+		MatOfDMatch matches  = currentImageData.findMatches(mPreviousImageData,10);
+		if(matches != null){
+			//2. Find fundamental matrix
+			MatOfDMatch inlierMatches = new MatOfDMatch();
+			//computeFundamentalMatrix(
+			Mat fundamentalMatrix = new Mat(); 
+			MatchTests.findHomography_EXT(matches, currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(),0.1, inlierMatches);
+			if(fundamentalMatrix != null){
+
+				//2.a Getting inlier keypoints
+				MatOfKeyPoint kpCurrent = new MatOfKeyPoint();
+				MatOfKeyPoint kpPrev = new MatOfKeyPoint();
+				MatchTests.getInlierKeypoints(currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(), kpCurrent, kpPrev, inlierMatches);
+				//Out
+				mIntermeditateResult = new Mat();
+//				Features2d.drawMatches(
+//						currentImageData.getImage(),
+//						kpCurrent, 
+//						mPreviousImageData.getImage(),
+//						kpPrev,  
+//						inlierMatches,
+//						mIntermeditateResult
+//						);
+				
+
+				//2.b Computing Homography matrix using inlier keypoints. number of inlier point must be more than 4
+				System.out.println("NUM INLIERS: " + inlierMatches.cols() *inlierMatches.rows());
+				if(inlierMatches.cols() *inlierMatches.rows() >=40){
+
+					Mat homo = MatchTests.getHomoMatrix(kpCurrent, kpPrev);
+					//2.c Warp Image
+					//Output
+//					Mat homoImg = new Mat();
+//					Mat matchesImg= currentImageData.getImage().clone();
+//					Imgproc.warpPerspective(mPreviousImageData.getImage(), homoImg,homo, mPreviousImageData.getImage().size());
+//					mIntermeditateResult = new Mat();
+//					List<Mat> concatMat = new ArrayList<Mat>();
+//					concatMat.add(homoImg);
+//					concatMat.add(matchesImg);
+//					Core.hconcat(concatMat,mIntermeditateResult);
+					return homo;
+				}
+			}
+		}
+		return null;
 	}
 
 
@@ -260,7 +225,7 @@ public class BackgroundSubtraction  extends DetectionClass{
 	 * Pixel wise sub:   ...
 	 * Thresholding:   	 Remove noise in the background
 	 */
-	private Mat subtractBackground(ImageObject currentImageData){
+	private Mat subtractBackground(ImageObject currentImageData,Mat homoMatrix){
 
 		// To gray scale
 		Mat currentFrameGray = new Mat(); 
@@ -271,9 +236,13 @@ public class BackgroundSubtraction  extends DetectionClass{
 		Mat currentFrameBlurred = new Mat(currentFrameGray.rows(),currentFrameGray.cols(),currentFrameGray.type());
 		Imgproc.GaussianBlur(currentFrameGray,currentFrameBlurred,kernelSize,0);
 
-		// Subtracting
+		//Warped background
+		Mat warpedBackgroundImg = new Mat();
+		Imgproc.warpPerspective(mBackgroundImageData.getImage(), warpedBackgroundImg,homoMatrix, mPreviousImageData.getImage().size());
+
+		//Subtracting
 		Mat absDifferenceImage = new Mat();
-		Core.absdiff(currentFrameBlurred, mBackgroundImageData.getImage(), absDifferenceImage);
+		Core.absdiff(currentFrameBlurred, warpedBackgroundImg, absDifferenceImage);
 
 		//Threshold
 		double threshold = computeThreshold(absDifferenceImage);
@@ -344,7 +313,7 @@ public class BackgroundSubtraction  extends DetectionClass{
 	 * @param currentFrameBlurred
 	 */
 	private void adaptBackground(Mat currentFrameBlurred){
-		double adaptSpeed = 0.4;	
+		double adaptSpeed = 1.0;	
 		//Reference to background image
 		Mat backgroundImg = mBackgroundImageData.getImage();
 		int cols = currentFrameBlurred.cols();
@@ -402,4 +371,17 @@ public class BackgroundSubtraction  extends DetectionClass{
 
 	}
 
+	//	
+	//	for (int i = 0; i < kpCurrent.rows(); i++) {
+	//		for (int j = 0; j < kpCurrent.cols(); j++) {
+	//
+	//			Core.line(matchesImg, new Point(kpCurrent.get(i, j)), new Point(kpPrev.get(i, j)), new Scalar(255,255,255));
+	//
+	//			double[] p1 = kpCurrent.get(i, j);
+	//			double[] p2 = kpPrev.get(i, j);
+	//			double dist = Math.sqrt(Math.pow(p1[0]-p2[0],2.0) + Math.pow(p1[1]-p2[1],2.0));
+	//			if(dist > 40)
+	//				System.out.println("Distance: " +dist);
+	//		}
+	//	}
 }

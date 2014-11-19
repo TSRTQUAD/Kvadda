@@ -97,9 +97,12 @@ public class Mainbus{
 		t.setPriority(1);
 		t.start();
 	        
-		Thread t2 = new Thread(myRunnable2);
+		Thread t2 = new Thread(imageProcessing);
 		t2.setPriority(2);
 		t2.start();
+		
+		
+		
 		
 		Thread t4 = new Thread(assignmentplanerrunnable);
 		t4.setPriority(1);

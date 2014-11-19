@@ -2,9 +2,13 @@ package kvaddakopter.image_processing.programs;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import javax.swing.text.html.FormSubmitEvent.MethodType;
 
 import kvaddakopter.Mainbus.Mainbus;
 import kvaddakopter.image_processing.algorithms.BackgroundSubtraction;
+import kvaddakopter.image_processing.algorithms.BlurDetection;
 import kvaddakopter.image_processing.algorithms.DetectionClass;
 import kvaddakopter.image_processing.algorithms.ColorDetection;
 import kvaddakopter.image_processing.algorithms.TemplateMatch;
@@ -15,16 +19,35 @@ import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
+import kvaddakopter.maps.GPSCoordinate;
 
 import org.opencv.core.Mat;
 
 
 public class ImageProcessingMainProgram extends ProgramClass{
 
+
+	public static int COLOR_DETECTION 		= 0;
+	public static int TEMPLATE_MATCHING 	= 1;
+	public static int BACKGROUND_SUBTRACION = 2;
+	public static int BLUR_DETECTION 		= 3;
+	public static int COLOR_CALIBRATION 	= 4;
+	public static int TRACKING			 	= 5;
+
+	public static enum ImageType{
+		DEFAULT,
+		COLOR_CALIBRATION_IMAGE,
+		TARGET_IMAGE,
+		SUPRISE_IMAGE,
+		CUT_OUT_IMAGE
+	};
+
+
 	private ColorDetection mColorDetection;
 	private TemplateMatch mTemplateMatch;
 	private BackgroundSubtraction mBackgroundSubtraction;
-	private Tracking mTracker;
+	private BlurDetection mBlurDetection;
+	private Tracking mTracker; 
 
 	//Debug Warning
 	boolean userHasBeenWarned = false;
@@ -43,7 +66,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 		//Create and initialize decoder. And select source.
 		mDecoder = new FFMpegDecoder();
 
-		mDecoder.initialize(/*"tcp://192.168.1.1:5555"*/FFMpegDecoder.STREAM_ADDR_BIPBOP);
+		mDecoder.initialize("tcp://192.168.1.1:5555"/*FFMpegDecoder.STREAM_ADDR_BIPBOP*/);
 
 		// Listen to decoder events
 		mDecoder.setDecoderListener(this);
@@ -54,21 +77,19 @@ public class ImageProcessingMainProgram extends ProgramClass{
 		//Open window 
 		openVideoWindow();
 
-
-		mDetectionMethodList = new ArrayList<DetectionClass>();
-
 		//Create and add background subtraction method and add it to the list of active methods
 		mBackgroundSubtraction = new BackgroundSubtraction();
-		mDetectionMethodList.add(mBackgroundSubtraction);
 
 		//Color detection
 		mColorDetection = new ColorDetection();
+
 		initiateColorDetection();
-		mDetectionMethodList.add(mColorDetection);
 
 		//Color Template matching
 		mTemplateMatch = new TemplateMatch();
-		mDetectionMethodList.add(mTemplateMatch);
+
+		// Blur detection 
+		mBlurDetection = new BlurDetection();
 
 		//Create Trackers
 		mTracker = new Tracking();
@@ -76,39 +97,48 @@ public class ImageProcessingMainProgram extends ProgramClass{
 	}
 
 	public void update(){
-
-		// Detta behövs inte  då init() körs vid skapandet av en ProgramClass.
-		// Om vi vill kunna köra init() explicit får vi ändra om lite. 
-		/*if (count == 0){
-			init();
-			count++;
-		}*/
-		//checkIsRunning();
+		checkIsRunning();
+		
+		Mat image = getNextFrame();
+		ImageObject imageObject = new ImageObject(image);
+		ArrayList<TargetObject> targetObjects = new ArrayList<TargetObject>();
+		
+		//GPSCoordinate gpsCoordinate = mMainbus.getGPSCoordinate(); 
 		
 		
-		//Get image
-		Mat currentImage = getNextFrame();
-		ImageObject imageObject = new ImageObject(currentImage);
-
-		ArrayList<TargetObject> targetList = new ArrayList<TargetObject>();
-		for(DetectionClass detectionMethod : mDetectionMethodList){
-			if(detectionMethod.isMethodActive(mMainbus)){
-				targetList.addAll(detectionMethod.runMethod(imageObject));
+		int[] modes = new int[1]; // mMainBus.getModes() 
+	    
+		if(modes[COLOR_CALIBRATION] == 1){
+			// DO SOMETHING
+			
+		}else{
+			if(modes[BLUR_DETECTION] == 1){
+				// DO SOMETHING
+				targetObjects.addAll(mColorDetection.runMethod(imageObject));
 			}
-		}
-		/*
-		System.out.println(1);
-//		if(mMainbus.isColorDetectionOn()){
-//			targetList.addAll(mColorDetection.start(imageObject));
-//		}
-		if(mMainbus.isTemplateMatchingOn()){
-			//targetList.addAll(mTemplateMatch.start(imageObject));
-		}
-		if(mMainbus.isBackgroundSubtractionOn()){
-			//targetList.addAll(mBackgroundSubtraction.start(imageObject));
-		}*/
 
-
+			if(modes[COLOR_DETECTION] == 1){
+				// DO SOMETHING
+				ArrayList<ColorTemplate> colorTemplates = mMainbus.getIPColorTemplate();		
+				targetObjects.addAll(mColorDetection.runMethod(imageObject));
+			}
+			if(modes[BACKGROUND_SUBTRACION] == 1){
+				// DO SOMETHING
+				targetObjects.addAll(mBackgroundSubtraction.runMethod(imageObject));
+			}
+			if(modes[TEMPLATE_MATCHING] == 1){
+				// DO SOMETHING
+				ArrayList<FormTemplat> formTemplates = mMainbus.getFormTemplate();
+				targetObjects.addAll(mTemplateMatch.runMethod(imageObject));
+			}
+			if(modes[TRACKING] == 1){
+				// DO SOMETHING
+				mTracker.update(targetObjects);
+			}
+			
+//			mMainbus.setIPImageObject(imageObject);
+//			mMainbus.setIPTargetList(targetList);
+		}
 
 		//For debugging
 		//Select Method that u want 2 dbug
@@ -166,4 +196,28 @@ public class ImageProcessingMainProgram extends ProgramClass{
 		//		}
 	}
 
+	private void busActions(){
+
+
+
+
+
+		/*
+		 * 
+		 * IN:
+		 * - Läs vilka metoder som ska aktivera
+		 * - Läs tempalate ( färg och form)
+		 * - GPS DATA/HEADING(?)
+		 * -
+		 * UT:
+		 * - TRACK DATA
+		 * - OUTPUT IMG
+		 * - STYRSIGNAL
+		 * 
+		 * 
+		 */
+
+	}
+
 }
+
