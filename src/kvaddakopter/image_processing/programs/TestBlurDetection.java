@@ -3,15 +3,13 @@ package kvaddakopter.image_processing.programs;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import kvaddakopter.Mainbus.Mainbus;
 import kvaddakopter.image_processing.algorithms.BlurDetection;
 import kvaddakopter.image_processing.algorithms.ColorDetection;
 import kvaddakopter.image_processing.algorithms.Tracking;
-import kvaddakopter.image_processing.comm_tests.IPMockMainBus;
 import kvaddakopter.image_processing.data_types.ImageObject;
-import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
+import kvaddakopter.interfaces.MainBusIPInterface;
 
 import org.opencv.core.Mat;
 
@@ -21,7 +19,7 @@ import com.xuggle.xuggler.demos.VideoImage;
 public class TestBlurDetection extends ProgramClass{
 	BlurDetection mBlurDetection;
 
-	public TestBlurDetection(int threadid, IPMockMainBus mainbus) {
+	public TestBlurDetection(int threadid, MainBusIPInterface mainbus) {
 		super(threadid, mainbus);
 	}
 
@@ -35,9 +33,9 @@ public class TestBlurDetection extends ProgramClass{
 
 		//Create and initialize decoder. And select source.
 		mDecoder = new FFMpegDecoder();
-		//mDecoder.initialize("tcp://192.168.1.1:5555");
+		mDecoder.initialize("tcp://192.168.1.1:5555");
 		//mDecoder.initialize("rtsp://130.236.214.20:8086");
-		mDecoder.initialize("mvi2.mp4");
+		//mDecoder.initialize("mvi2.mp4");
 		// Listen to decoder events
 		mDecoder.setDecoderListener(this);
 

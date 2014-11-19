@@ -3,13 +3,10 @@ package kvaddakopter.image_processing.programs;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import kvaddakopter.Mainbus.Mainbus;
-import kvaddakopter.image_processing.algorithms.BlurDetection;
 import kvaddakopter.image_processing.algorithms.ColorDetection;
 import kvaddakopter.image_processing.algorithms.Tracking;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.data_types.ImageObject;
-import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
 import kvaddakopter.interfaces.MainBusIPInterface;
@@ -21,7 +18,6 @@ import org.opencv.imgproc.Imgproc;
 import com.xuggle.xuggler.demos.VideoImage;
 
 public class TestColorCalibration extends ProgramClass{
-	BlurDetection mBlurDetection;
 	
 	public ColorTemplate cTemplate;
 

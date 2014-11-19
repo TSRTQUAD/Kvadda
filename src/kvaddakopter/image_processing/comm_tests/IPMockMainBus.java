@@ -6,6 +6,7 @@ import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.data_types.Template;
+import kvaddakopter.image_processing.programs.TestBlurDetection;
 import kvaddakopter.image_processing.programs.TestColorCalibration;
 import kvaddakopter.interfaces.MainBusIPInterface;
 import kvaddakopter.maps.GPSCoordinate;
@@ -29,7 +30,7 @@ public class IPMockMainBus implements MainBusIPInterface{
 	    TestSliders testSliders = new TestSliders(mainbus);
 	    new Thread(testSliders).start();
 	    
-	    TestColorCalibration imageProcessing = new TestColorCalibration(1,mainbus);
+	    TestBlurDetection imageProcessing = new TestBlurDetection(1,mainbus);
 	    new Thread(imageProcessing).start();
 	    
 	    while(true){

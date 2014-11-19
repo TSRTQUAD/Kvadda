@@ -1,23 +1,20 @@
 package kvaddakopter.image_processing.programs;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import kvaddakopter.Mainbus.Mainbus;
-import kvaddakopter.image_processing.comm_tests.IPMockMainBus;
 import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
+import kvaddakopter.interfaces.MainBusIPInterface;
 
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.MatOfPoint3f;
-import org.opencv.core.Point;
 import org.opencv.core.Point3;
 import org.opencv.core.Size;
 import org.opencv.core.TermCriteria;
@@ -29,7 +26,7 @@ import org.opencv.imgproc.Imgproc;
 public class CameraCalibration extends ProgramClass{
 
 
-	public CameraCalibration(int threadid, IPMockMainBus mainbus) {
+	public CameraCalibration(int threadid, MainBusIPInterface mainbus) {
 		super(threadid, mainbus);
 
 	}
