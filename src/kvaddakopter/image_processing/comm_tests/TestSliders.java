@@ -31,6 +31,8 @@ public class TestSliders extends Application implements Runnable{
 				
         Button btn = new Button();
         btn.setText("Open a New Window");
+        
+        final HSVSliders hsvSliders = new HSVSliders();
 
         btn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -40,7 +42,7 @@ public class TestSliders extends Application implements Runnable{
             	mMainbus.addIPColorTemplate(cTemplate);
             	mMainbus.setIPCalibTemplate(mMainbus.getIPColorTemplates().get(0));
             	
-                HSVSliders.setHSVChannels(mMainbus.getIPCalibTemplate(),primaryStage);
+                hsvSliders.setHSVChannels(mMainbus.getIPCalibTemplate(),primaryStage);
             }
         });
          

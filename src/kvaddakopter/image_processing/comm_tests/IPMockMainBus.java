@@ -30,7 +30,7 @@ public class IPMockMainBus implements MainBusIPInterface{
 	    TestSliders testSliders = new TestSliders(mainbus);
 	    new Thread(testSliders).start();
 	    
-	    TestBlurDetection imageProcessing = new TestBlurDetection(1,mainbus);
+	    TestColorCalibration imageProcessing = new TestColorCalibration(1,mainbus);
 	    new Thread(imageProcessing).start();
 	    
 	    while(true){

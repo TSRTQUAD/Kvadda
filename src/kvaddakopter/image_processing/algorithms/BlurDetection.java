@@ -13,7 +13,7 @@ import kvaddakopter.image_processing.data_types.ImageObject;
 
 public class BlurDetection{
 	private static final float MAX_EDGE_INTENSITY = 200;
-	private static final int EDGE_THRESHOLD = 100;
+	private static final int EDGE_THRESHOLD = 50;
 	private static final int DEFAULT_SQUARE_SIZE = 21;
 	private static final int X_DIRECTION = 0;
 	private static final int Y_DIRECTION = 1;
@@ -138,6 +138,8 @@ public class BlurDetection{
 	 */
 	private float calculateMean(Vector<Float> src){
 		float temp = 0;
+		if(src.size()==0)
+			return 0;
 		
 		for(Float f:src){
 			temp +=f;
