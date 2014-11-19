@@ -41,7 +41,7 @@ public class TestBackgroundSubtraction extends ProgramClass{
 
 		//Create and initialize decoder. And select source.
 		mDecoder = new FFMpegDecoder();
-		mDecoder.initialize("tcp://192.168.1.1:5555");
+		mDecoder.initialize(/*"tcp://192.168.1.1:5555"*/FFMpegDecoder.STREAM_ADDR_BIPBOP);
 		// Listen to decoder events
 		mDecoder.setDecoderListener(this);
 
@@ -90,8 +90,7 @@ public class TestBackgroundSubtraction extends ProgramClass{
 				updateWindow(mSecondPose.clone());
 				return;
 			}
-
-
+	
 			if(FRAME_COUNTER % 2 == 0){
 				FRAME_COUNTER++;
 				ImageObject imageObject = new ImageObject(mFirstPose);
@@ -103,6 +102,15 @@ public class TestBackgroundSubtraction extends ProgramClass{
 
 				if(mCurrentMethod.hasIntermediateResult()){
 					updateWindow(mCurrentMethod.getIntermediateResult());
+				}
+				
+				while(state == PoseState.ViewResult){
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}	
 				}
 			}
 		}
@@ -135,6 +143,7 @@ public class TestBackgroundSubtraction extends ProgramClass{
 			break;
 		case ConfirmFirstPose:
 			state =PoseState.SelectSecondPose;	
+			System.out.println("Select second pose");
 			break;
 		case SelectSecondPose:	
 			// Reading image from decoder
@@ -154,6 +163,7 @@ public class TestBackgroundSubtraction extends ProgramClass{
 			break;
 		case ViewResult:
 			state =PoseState.SelectFirstPose;
+			System.out.println("Select first pose");
 			break;
 
 		default:

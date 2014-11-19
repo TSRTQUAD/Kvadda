@@ -27,10 +27,10 @@ public class ImageProcessingMain implements ImageProcessingInterface{
 		 * 
 		 */
 
-		//TestBackgroundSubtraction program  = new TestBackgroundSubtraction();
+		TestBackgroundSubtraction program  = new TestBackgroundSubtraction(0, null);
 //		CameraCalibration program  = new CameraCalibration();
 		//TestColorDetection program  = new TestColorDetection(0, null);
-		TestBlurDetection program  = new TestBlurDetection(0, null);
+//		TestBlurDetection program  = new TestBlurDetection(0, null);
 		//colorTemplates.add(new ColorTemplate("Yellow ball", 10, 50, 50, 255, 50, 255, ColorTemplate.FORM_CIRLE));
 		
 		
