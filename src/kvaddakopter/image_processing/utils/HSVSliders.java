@@ -151,26 +151,31 @@ public class HSVSliders{
         hueHighLabel.setTranslateY(65);
         secondaryLayout.getChildren().add(hueHighLabel);
         sliderHueHigh.setTranslateY(80);
+        sliderHueHigh.setMaxWidth(180);
         secondaryLayout.getChildren().add(sliderHueHigh);
         
         satLowLabel.setTranslateY(110);
         secondaryLayout.getChildren().add(satLowLabel);
         sliderSatLow.setTranslateY(125);
+        sliderSatLow.setMaxWidth(180);
         secondaryLayout.getChildren().add(sliderSatLow);
         
         satHighLabel.setTranslateY(155);
         secondaryLayout.getChildren().add(satHighLabel);
         sliderSatHigh.setTranslateY(170);
+        sliderSatHigh.setMaxWidth(180);
         secondaryLayout.getChildren().add(sliderSatHigh);
         
         valLowLabel.setTranslateY(200);
         secondaryLayout.getChildren().add(valLowLabel);
         sliderValLow.setTranslateY(215);
+        sliderValLow.setMaxWidth(180);
         secondaryLayout.getChildren().add(sliderValLow);
         
         valHighLabel.setTranslateY(245);
         secondaryLayout.getChildren().add(valHighLabel);
         sliderValHigh.setTranslateY(265);
+        sliderValHigh.setMaxWidth(180);
         secondaryLayout.getChildren().add(sliderValHigh);
         
          

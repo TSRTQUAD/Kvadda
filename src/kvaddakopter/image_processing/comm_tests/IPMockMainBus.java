@@ -38,7 +38,8 @@ public class IPMockMainBus implements MainBusIPInterface{
 	    
 	    ImageProcessingMainProgram imageProcessing = new ImageProcessingMainProgram(1,mainbus);
 	    Thread t1 = new Thread(imageProcessing);
-	    t1.setDaemon(true);
+	    //t1.setDaemon(true);
+	    t1.start();
 	    
 	    while(true){
 	    	
