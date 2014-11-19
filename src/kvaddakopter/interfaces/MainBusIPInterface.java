@@ -27,41 +27,41 @@ public interface MainBusIPInterface {
 	 * @return
 	 */
 	public int[] getIPActiveModes();
-	public void setIPActiveModes(int[] modes);
-	public void activateIPMode(int i);
-	public void deactivateIPMode(int i);
+	public void setIPActiveModes(int[] modes); //TODO in GUI interface
+	public void activateIPMode(int i); //TODO in GUI interface
+	public void deactivateIPMode(int i); //TODO in GUI interface
 	//public boolean getIsIPModeActive(int i); //Not needed really but might be handier than to fetch all modes
 	public boolean getIsIPRunning();
-	public void setIsIPRunning(boolean b);
+	public void setIsIPRunning(boolean b); //TODO in GUI interface
 	
 	//Image flags
 	public int getIPImageMode();
-	public void setIPImageMode(int imageMode);
+	public void setIPImageMode(int imageMode);//TODO in GUI interface
 	
 	//Templates
 	//Color
 	public ArrayList<ColorTemplate> getIPColorTemplates();
-	public void setIPColorTemplates(ArrayList<ColorTemplate> colorTemplates);
-	public void addIPColorTemplate(ColorTemplate template);
+	public void setIPColorTemplates(ArrayList<ColorTemplate> colorTemplates); //TODO in GUI interface
+	public void addIPColorTemplate(ColorTemplate template); //TODO in GUI interface
 	
 	//Form
 	public ArrayList<Template> getIPFormTemplates();
-	public void setIPFormTemplates(ArrayList<Template> templates);
-	public void addIPFormTemplate(Template template);
+	public void setIPFormTemplates(ArrayList<Template> templates); //TODO in GUI interface
+	public void addIPFormTemplate(Template template); //TODO in GUI interface
 	
 	//GPS
-	public void setIPGPSCoordinate(GPSCoordinate coord);
+	public void setIPGPSCoordinate(GPSCoordinate coord); //TODO somewhere
 	public GPSCoordinate getGPSCoordinate();
 	
 	//Targets
 	public void setIPTargetList(ArrayList<TargetObject> listOfTargets);
-	public ArrayList<TargetObject> getIPTargetList();
+	public ArrayList<TargetObject> getIPTargetList(); //TODO in GUI interface
 	
 	//Image object
 	public void setIPImageToShow(BufferedImage image);
-	public BufferedImage getIPImageToShow();
+	public BufferedImage getIPImageToShow(); //TODO in GUI interface
 	
 	//Color Calibration
-	public void setIPCalibTemplate(ColorTemplate cTemplate);
-	public ColorTemplate getIPCalibTemplate();
+	public void setIPCalibTemplate(ColorTemplate cTemplate); //TODO in GUI interface
+	public ColorTemplate getIPCalibTemplate(); 
 }
