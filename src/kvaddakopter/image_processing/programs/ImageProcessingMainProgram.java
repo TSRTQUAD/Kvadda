@@ -8,7 +8,6 @@ import kvaddakopter.image_processing.algorithms.BlurDetection;
 import kvaddakopter.image_processing.algorithms.ColorDetection;
 import kvaddakopter.image_processing.algorithms.TemplateMatch;
 import kvaddakopter.image_processing.algorithms.Tracking;
-import kvaddakopter.image_processing.comm_tests.IPMockMainBus;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;

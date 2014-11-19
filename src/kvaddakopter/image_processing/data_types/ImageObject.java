@@ -9,6 +9,7 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDMatch;
 import org.opencv.core.MatOfKeyPoint;
+import org.opencv.core.Scalar;
 import org.opencv.features2d.DescriptorExtractor;
 import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.FeatureDetector;
@@ -208,7 +209,14 @@ public class ImageObject {
 		// Convert RGB to HSV
 		Imgproc.cvtColor(mImage, HSVImage, Imgproc.COLOR_BGR2HSV);
 		//Threshold
-		Core.inRange(HSVImage, template.getLower(), template.getUpper(), mImage);
+		Scalar lowerBounds;
+		Scalar upperBounds;
+		synchronized(template){
+			lowerBounds = template.getLower().clone();
+			upperBounds = template.getLower().clone();
+		}
+
+		Core.inRange(HSVImage, lowerBounds, upperBounds, mImage);
 	}
 	
 }

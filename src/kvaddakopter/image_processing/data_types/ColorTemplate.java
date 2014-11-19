@@ -35,7 +35,7 @@ public class ColorTemplate {
 		saturationHigh = DEFAULT_SAT_HIGH;
 		valueLow = DEFAULT_VAL_LOW;
 		valueHigh = DEFAULT_VAL_HIGH;
-		isActive = true;
+		isActive = false;
 		
 		//original values
 		oHueLow = hueLow;

@@ -248,13 +248,17 @@ public class ColorDetection  extends DetectionClass{
 	 * @return
 	 */
 	public int addTemplate(String description_, int hueLow_, int hueHigh_, int saturationLow_, int saturationHigh_, int valueLow_, int valueHigh_, int form_type_){
+		synchronized (colorTemplates) {
 		colorTemplates.add(new ColorTemplate(description_, hueLow_, hueHigh_, saturationLow_, saturationHigh_, valueLow_, valueHigh_, form_type_));
 		return colorTemplates.size() - 1;
+		}
 	}
 	
 	public int addTemplate(ColorTemplate cTemplate){
+		synchronized (colorTemplates) {
 		colorTemplates.add(cTemplate);
 		return colorTemplates.size() - 1;
+		}
 	}
 
 	/**
@@ -273,8 +277,10 @@ public class ColorDetection  extends DetectionClass{
 	 * @param id
 	 */
 	public void deactivateTemplate(int id){
+		synchronized (colorTemplates) {
 		if(id >= colorTemplates.size() || id < 0) return;
 		colorTemplates.get(id).deactivate();
+		}
 	}
 	
 	/**
@@ -314,6 +320,6 @@ public class ColorDetection  extends DetectionClass{
 	 * @param colorTemplates_
 	 */
 	public void setTemplates(ArrayList<ColorTemplate> colorTemplates_) {
-		colorTemplates = (ArrayList<ColorTemplate>) colorTemplates_.clone();
+		colorTemplates = (ArrayList<ColorTemplate>) colorTemplates_;
 	}
 }
