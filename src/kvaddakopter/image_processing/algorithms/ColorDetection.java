@@ -42,11 +42,15 @@ public class ColorDetection  extends DetectionClass{
 		colorTemplates = new ArrayList<ColorTemplate>();
 	}
 
-
 	@Override
 	public boolean isMethodActive(Mainbus mainbus) {
-		return mainbus.isColorDetectionOn();
+		//return mainbus.isColorDetectionOn();
+		return false;
 	}
+	
+	/**
+	 * TODO explanation of method functionallity
+	 */
 	@Override
 	public ArrayList<TargetObject> runMethod(ImageObject imageObject) {
 
@@ -298,5 +302,14 @@ public class ColorDetection  extends DetectionClass{
 	
 	public void setUsingColorAdaption(boolean b){
 		mUsingColorAdaption = b;
+	}
+
+
+	/**
+	 * Assign the member "colorTemplates" of ColorDetection class
+	 * @param colorTemplates_
+	 */
+	public void setTemplates(ArrayList<ColorTemplate> colorTemplates_) {
+		colorTemplates = colorTemplates_;
 	}
 }

@@ -11,6 +11,11 @@ import org.opencv.core.Core.MinMaxLocResult;
 
 import kvaddakopter.image_processing.data_types.ImageObject;
 
+/**
+ * Class which has the purpose of containing and calculating the 
+ * bluriness of an image
+ *
+ */
 public class BlurDetection{
 	private static final float MAX_EDGE_INTENSITY = 200;
 	private static final int EDGE_THRESHOLD = 50;
@@ -23,6 +28,9 @@ public class BlurDetection{
 	private float mVBlurLevel; //between 0:1
 	private float mHBlurLevel; //between 0:1
 	
+	/**
+	 * Constructor
+	 */
 	public BlurDetection(){
 		mVBlurLevel = 0;
 		mHBlurLevel = 0;
@@ -30,6 +38,19 @@ public class BlurDetection{
 		mGradYImage = new Mat();
 	}
 	
+	/**
+	 * Calculates horisontal respectively vertical blur levels
+	 * The method uses sobel edge derivatives as a meassure of edge sharpness
+	 * A sharper edge gives higher sobel derivative.
+	 * 
+	 * The local maximas of the edges are computed
+	 * This is then flipped and normalised with respect to maximum edge intensity
+	 * 
+	 * The blur level is between [0:1] where 1 is maximum blur
+	 * 
+	 * @param imageObject image container to process
+	 * @return Mean of blur in both directions
+	 */
 	public float runMethod(ImageObject imageObject){
 		Mat greyImage = new Mat();
 		Mat absGradX = new Mat();
@@ -161,6 +182,16 @@ public class BlurDetection{
 	 */
 	public Mat getGradYImage(){
 		return mGradYImage;
+	}
+	
+	/**
+	 * 
+	 * Container class for horisontal respectively vertical motion blur levels
+	 *
+	 */
+	public class BlurLevels{
+		public float h;
+		public float v;
 	}
 }
 

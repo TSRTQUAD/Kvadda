@@ -1,18 +1,11 @@
 package kvaddakopter.Mainbus;
 
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-
-import org.opencv.core.Core;
-
-
-import matlabcontrol.MatlabConnectionException;
-import kvaddakopter.ImageProcessingMain;
 import kvaddakopter.assignment_planer.MatlabProxyConnection;
 import kvaddakopter.assignment_planer.MissionObject;
-import kvaddakopter.image_processing.data_types.ColorTemplate;
-import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.programs.ImageProcessingMainProgram;
+import matlabcontrol.MatlabConnectionException;
+
+import org.opencv.core.Core;
 
 /**
  * Mainbus class
@@ -48,14 +41,7 @@ public class Mainbus{
 	ImageProcessingMainProgram imageProcessing;
 	
 	//Image processing storage
-	private ArrayList<TargetObject> mTargetList;
-	private BufferedImage mOutImage;
-	private ArrayList<ColorTemplate> mColorTemplates;
-	//Flags 
-	private boolean mImageProcessingRunning = false;
-	private boolean mColorDetectionOn = false;
-	private boolean mTemplateMatchingOn = false;
-	private boolean mBackGroundSubtractionOn = true;
+	//TODO
 	
 	//Assignment planer storage
 	private MatlabProxyConnection matlabproxy;
@@ -71,8 +57,8 @@ public class Mainbus{
 		
 		Mainbus mainbus = new Mainbus();
 		System.out.println("created mainbus");
-		ImageProcessingMainProgram imageProcessing = new ImageProcessingMainProgram(1,mainbus);
-		System.out.println("imageprocessing initiated");
+		//ImageProcessingMainProgram imageProcessing = new ImageProcessingMainProgram(1,mainbus);
+		//System.out.println("imageprocessing initiated");
 		
 		//Setting up a Matlab Proxy Server
 		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
@@ -83,9 +69,9 @@ public class Mainbus{
 			e.printStackTrace();
 		}
 		
-		Thread t3 = new Thread(imageProcessing);
-		t3.setPriority(1);
-		t3.start(); 
+		//Thread t3 = new Thread(imageProcessing);
+		//t3.setPriority(1);
+		//t3.start(); 
 		
 		MyRunnable myRunnable = new MyRunnable(1,mainbus);
 		MyRunnable2 myRunnable2 = new MyRunnable2(2,mainbus);
@@ -96,13 +82,6 @@ public class Mainbus{
 		Thread t = new Thread(myRunnable);
 		t.setPriority(1);
 		t.start();
-	        
-		Thread t2 = new Thread(imageProcessing);
-		t2.setPriority(2);
-		t2.start();
-		
-		
-		
 		
 		Thread t4 = new Thread(assignmentplanerrunnable);
 		t4.setPriority(1);
@@ -141,41 +120,7 @@ public class Mainbus{
 	/*
 	 * Get/set functions for image processing
 	 */
-	public synchronized void setTargetList(ArrayList<TargetObject> targetList){
-		mTargetList = targetList;
-	}
-	
-	public synchronized ArrayList<ColorTemplate> getColorTemplates() {
-		return mColorTemplates;
-	}
-	
-	public synchronized void setColorTemplates(ArrayList<ColorTemplate> cTemplates) {
-		mColorTemplates = cTemplates;
-	}
-	
-	public synchronized boolean isImageProcessingUnitRunning() {
-		return mImageProcessingRunning;
-	}
-	
-	public synchronized void setImageProcessingUnitRunning(boolean b) {
-		mImageProcessingRunning = b;
-	}
-
-	public synchronized void setColorDetectionOn(boolean b) {
-		mColorDetectionOn = b;
-	}
-	
-	public synchronized boolean isColorDetectionOn() {
-		return mColorDetectionOn;
-	}
-	
-	public synchronized boolean isTemplateMatchingOn() {
-		return mTemplateMatchingOn;
-	}
-	
-	public synchronized boolean isBackgroundSubtractionOn() {
-		return mBackGroundSubtractionOn;
-	}
+	//TODO image processing bus functionallity (being implemented in IPMockMainbus)
 	
 	/*
 	 * Get/set functions for Mission Planing

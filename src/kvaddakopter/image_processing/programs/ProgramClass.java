@@ -18,7 +18,7 @@ import org.opencv.core.Mat;
 import com.xuggle.xuggler.demos.VideoImage;
 
 
-public class ProgramClass implements Runnable,DecoderListener,KeyBoardListener {
+public abstract class ProgramClass implements Runnable,DecoderListener,KeyBoardListener {
 
 	//Create image queue, which is a list that is holding the most recent
 	//images
@@ -34,7 +34,7 @@ public class ProgramClass implements Runnable,DecoderListener,KeyBoardListener {
 
 	//Decoder
 	protected FFMpegDecoder mDecoder;
-	private boolean toBeReconnected = false;
+
 	//Window
 	private static VideoImage mScreen = null;
 
@@ -122,15 +122,6 @@ public class ProgramClass implements Runnable,DecoderListener,KeyBoardListener {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			if(toBeReconnected){
-				System.err.println("FFMPEG decoder: Connection to decoder lost. Trying to reconnect...");
-				mDecoder.stopStream();
-				mDecoder.reinitialize();
-				mDecoder.startStream();
-				System.err.println("FFMPEG decoder: Reconnected sucessfully");
-				toBeReconnected = false;
-				
-			}
 		}
 	}
 
@@ -190,11 +181,11 @@ public class ProgramClass implements Runnable,DecoderListener,KeyBoardListener {
 	}
 
 	@Override
-	public void onConnectionLost(boolean manualStop) {
-		// If decoder was shutdown by unknown reasons. Automatically
-		// reconnect.
-			toBeReconnected = !manualStop;
+	public void onConnectionLost() {
+		System.err.print("Disconnected from video source\n");
+		System.exit(0);
 	}
+	
 	@Override
 	public void onKeyBoardInput(String inputString) {};
 

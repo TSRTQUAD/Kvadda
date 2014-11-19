@@ -1,11 +1,15 @@
 package kvaddakopter.image_processing.comm_tests;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+
+import org.opencv.core.Core;
 
 import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.data_types.Template;
+import kvaddakopter.image_processing.programs.ImageProcessingMainProgram;
 import kvaddakopter.image_processing.programs.TestBlurDetection;
 import kvaddakopter.image_processing.programs.TestColorCalibration;
 import kvaddakopter.interfaces.MainBusIPInterface;
@@ -16,26 +20,40 @@ public class IPMockMainBus implements MainBusIPInterface{
 	private ArrayList<TargetObject> mTargetList;
 	private ArrayList<ColorTemplate> mColorTemplates;
 	private ColorTemplate mIPCalibTemplate;
-	private ImageObject mImageObject;
+	//private ImageObject mImageObject;
+	private BufferedImage mIPImageToShow;
 	private boolean mIsIPRunning = true;
-	//0:Colordetection, 1:Background subtraction 2:Template match, 3:Blur detection,
-	//4:Color calibration, 5: Tracking
-	private int[] mIPActiveModes = {0, 0, 0, 0,1,0};
+	private int[] mIPActiveModes;
 	private int mIPImageMode = 0;
 	
 	public static void main(String[] args) {
+		//Has to be run to be working
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+		
 		IPMockMainBus mainbus = new IPMockMainBus();
 		mainbus.initIPVariables();
 		
 	    TestSliders testSliders = new TestSliders(mainbus);
 	    new Thread(testSliders).start();
 	    
-	    TestColorCalibration imageProcessing = new TestColorCalibration(1,mainbus);
-	    new Thread(imageProcessing).start();
+	    ImageProcessingMainProgram imageProcessing = new ImageProcessingMainProgram(1,mainbus);
+	    Thread t1 = new Thread(imageProcessing);
+	    t1.setDaemon(true);
 	    
 	    while(true){
 	    	
 	    }
+	}
+	
+	@Override
+	public synchronized void initIPVariables() {
+		// TODO More initializations needed (probably)
+		mIPActiveModes = new int[6];
+		activateIPMode(COLOR_CALIBRATION_MODE);
+		mTargetList = new ArrayList<TargetObject>();
+		mColorTemplates = new ArrayList<ColorTemplate>();
+		mIPCalibTemplate = new ColorTemplate();
+		mIPImageToShow = null;
 	}
 
 	
@@ -50,8 +68,13 @@ public class IPMockMainBus implements MainBusIPInterface{
 	}
 
 	@Override
-	public synchronized void removeIPMode(int i) {
+	public synchronized void deactivateIPMode(int i) {
 		mIPActiveModes[i] = 0;
+	}
+	
+	@Override
+	public synchronized void activateIPMode(int i) {
+		mIPActiveModes[i] = 1;
 	}
 
 	@Override
@@ -96,6 +119,12 @@ public class IPMockMainBus implements MainBusIPInterface{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public synchronized void addIPFormTemplate(Template template) {
+		// TODO Auto-generated method stub
+		
+	}
 
 	@Override
 	public synchronized void setIPGPSCoordinate(GPSCoordinate coord) {
@@ -115,9 +144,13 @@ public class IPMockMainBus implements MainBusIPInterface{
 	}
 
 	@Override
-	public synchronized void setIPImageObject(ImageObject imageObject) {
-		mImageObject = imageObject;
-		
+	public synchronized void setIPImageToShow(BufferedImage image) {
+		mIPImageToShow = image;
+	}
+	
+	@Override
+	public synchronized BufferedImage getIPImageToShow() {
+		return mIPImageToShow;
 	}
 
 	@Override
@@ -126,25 +159,8 @@ public class IPMockMainBus implements MainBusIPInterface{
 	}
 
 	@Override
-	public synchronized void initIPVariables() {
-		// TODO More initializations needed (probably)
-		mTargetList = new ArrayList<TargetObject>();
-		mColorTemplates = new ArrayList<ColorTemplate>();
-		mIPCalibTemplate = new ColorTemplate();
-		//imageObject = new ImageObject(); 
-		//TODO this constructor does not exist, 
-		// should we return buffered image instead?
-	}
-
-	@Override
 	public synchronized void addIPColorTemplate(ColorTemplate template) {
 		mColorTemplates.add(template);
-		
-	}
-
-	@Override
-	public synchronized void addIPFormTemplates(Template template) {
-		// TODO Auto-generated method stub
 		
 	}
 

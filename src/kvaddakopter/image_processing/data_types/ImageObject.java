@@ -5,12 +5,14 @@ import java.util.List;
 
 import kvaddakopter.image_processing.utils.MatchTests;
 
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDMatch;
 import org.opencv.core.MatOfKeyPoint;
 import org.opencv.features2d.DescriptorExtractor;
 import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.FeatureDetector;
+import org.opencv.imgproc.Imgproc;
 
 public class ImageObject {
 	
@@ -194,22 +196,19 @@ public class ImageObject {
 		mBlurLevels.v = v;
 	}
 	
+	/**
+	 * Thresholds image with HSV thresholds from ColorTemplate
+	 * @param imageObject
+	 * @param template
+	 * @return
+	 */
+	public void thresholdImage(ColorTemplate template){
+		Mat  HSVImage= new Mat();
+		
+		// Convert RGB to HSV
+		Imgproc.cvtColor(mImage, HSVImage, Imgproc.COLOR_BGR2HSV);
+		//Threshold
+		Core.inRange(HSVImage, template.getLower(), template.getUpper(), mImage);
+	}
 	
-//	public void detectBlur(){
-//		
-//		
-//		
-//		// To gray
-//		
-//		// Sobel x(y)
-//		
-//		// Determine edge width
-//		
-//		// Find local maximum
-//		
-//		// Compute mean value of every local maximum
-//		
-//		// Set blur level 
-//		
-//	}
 }

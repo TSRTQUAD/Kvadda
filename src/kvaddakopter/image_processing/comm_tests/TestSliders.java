@@ -26,8 +26,6 @@ public class TestSliders extends Application implements Runnable{
 	
 	@Override
     public void start(final Stage primaryStage) {
-		//M�ste laddas i b�rjan av programmet... F�rslagsvis h�r.
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 				
         Button btn = new Button();
         btn.setText("Open a New Window");
