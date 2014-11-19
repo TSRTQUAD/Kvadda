@@ -7,11 +7,11 @@ import org.opencv.core.Scalar;
 public class ColorTemplate {
 	private static final String DEFAULT_DESCRIPTION = "undefined";
 	private static final int DEFAULT_HUE_LOW = 0;
-	private static final int DEFAULT_HUE_HIGH = 0;
+	private static final int DEFAULT_HUE_HIGH = 179;
 	private static final int DEFAULT_SAT_LOW = 0;
-	private static final int DEFAULT_SAT_HIGH = 0;
+	private static final int DEFAULT_SAT_HIGH = 255;
 	private static final int DEFAULT_VAL_LOW = 0;
-	private static final int DEFAULT_VAL_HIGH = 0;
+	private static final int DEFAULT_VAL_HIGH = 400;
 	
 	public static final int FORM_CIRLE = 1;
 	public static final int FORM_SQUARE = 2;
@@ -35,7 +35,7 @@ public class ColorTemplate {
 		saturationHigh = DEFAULT_SAT_HIGH;
 		valueLow = DEFAULT_VAL_LOW;
 		valueHigh = DEFAULT_VAL_HIGH;
-		isActive = false;
+		isActive = true;
 		
 		//original values
 		oHueLow = hueLow;

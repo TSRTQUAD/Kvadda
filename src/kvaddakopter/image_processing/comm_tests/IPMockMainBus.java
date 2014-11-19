@@ -22,7 +22,7 @@ public class IPMockMainBus implements MainBusIPInterface{
 	private ColorTemplate mIPCalibTemplate;
 	//private ImageObject mImageObject;
 	private BufferedImage mIPImageToShow;
-	private boolean mIsIPRunning = true;
+	private boolean mIsIPRunning;
 	private int[] mIPActiveModes;
 	private int mIPImageMode = 0;
 	
@@ -33,7 +33,7 @@ public class IPMockMainBus implements MainBusIPInterface{
 		IPMockMainBus mainbus = new IPMockMainBus();
 		mainbus.initIPVariables();
 		
-	    TestSliders testSliders = new TestSliders(mainbus);
+	    IPTestGUI testSliders = new IPTestGUI(mainbus);
 	    new Thread(testSliders).start();
 	    
 	    ImageProcessingMainProgram imageProcessing = new ImageProcessingMainProgram(1,mainbus);
@@ -50,11 +50,13 @@ public class IPMockMainBus implements MainBusIPInterface{
 	public synchronized void initIPVariables() {
 		// TODO More initializations needed (probably)
 		mIPActiveModes = new int[6];
-		activateIPMode(COLOR_CALIBRATION_MODE);
+		activateIPMode(COLOR_DETECTION_MODE);
+		setIPImageMode(DEFAULT_IMAGE);
 		mTargetList = new ArrayList<TargetObject>();
 		mColorTemplates = new ArrayList<ColorTemplate>();
 		mIPCalibTemplate = new ColorTemplate();
 		mIPImageToShow = null;
+		mIsIPRunning = false;
 	}
 
 	

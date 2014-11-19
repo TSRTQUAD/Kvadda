@@ -37,13 +37,16 @@ public abstract class ProgramClass implements Runnable,DecoderListener,KeyBoardL
 
 	//Window
 	private static VideoImage mScreen = null;
-
+	
 	//Sleep time / FPS
 	private long mSleepTime = 20;
 	
 	//private volatile Container container;
 	protected MainBusIPInterface mMainbus;
     protected int mThreadId;
+    
+    //is initiated
+    private boolean mIsInitiated = false;
     
 	
 	// KeyBoard handler
@@ -52,7 +55,6 @@ public abstract class ProgramClass implements Runnable,DecoderListener,KeyBoardL
 	public ProgramClass(int threadid, MainBusIPInterface mainbus) {
 		mMainbus = mainbus;
 	    mThreadId = threadid;
-		init();
 	}
 
 	/** 
@@ -111,7 +113,7 @@ public abstract class ProgramClass implements Runnable,DecoderListener,KeyBoardL
 		return mCurrentMethod;
 	}
 	public void run()  {
-		
+		checkIsRunning();
 		//Start program
 		while(true){
 			if(!isImageQueueEmpty()){
@@ -124,7 +126,31 @@ public abstract class ProgramClass implements Runnable,DecoderListener,KeyBoardL
 			}
 		}
 	}
+	
+	/**
+	 * Check is the image processing unit has been activated
+	 * Waits until some other thread does notify on the mMainbus interface
+	 * Then checks the condition again
+	 */
+	protected void checkIsRunning(){
+		while(!mMainbus.getIsIPRunning()){
+			synchronized(mMainbus){
+				try {
+					mMainbus.wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		if(!mIsInitiated){
+			mIsInitiated = true;
+			System.out.println("Image processing being initiated");
+			init();
+		}
 
+	}
+	
 	protected void setSleepTime(long t){
 		mSleepTime = t;
 	}

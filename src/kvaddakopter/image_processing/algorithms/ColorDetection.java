@@ -48,12 +48,13 @@ public class ColorDetection  extends DetectionClass{
 		return false;
 	}
 	
+	
 	/**
 	 * TODO explanation of method functionallity
 	 */
 	@Override
 	public ArrayList<TargetObject> runMethod(ImageObject imageObject) {
-
+		mIntermeditateResult = imageObject.getImage();
 		// Convert RGB to HSV
 		Mat HSVImage = new Mat();
 		Imgproc.cvtColor(imageObject.getImage(), HSVImage, Imgproc.COLOR_BGR2HSV);
@@ -66,7 +67,9 @@ public class ColorDetection  extends DetectionClass{
 		
 		Mat cutoutImage = Mat.zeros(HSVImage.size(), CvType.CV_8UC3);
 		
-		
+		if(colorTemplates.isEmpty())
+			return targetObjects;
+		else{
 		for(ColorTemplate colorTemplate : colorTemplates){
 			//number of targets found from this template
 			int numberOfTargetsFound = 0;
@@ -131,6 +134,7 @@ public class ColorDetection  extends DetectionClass{
 		}
 
 		return targetObjects;
+		}
 
 	}
 	
@@ -190,7 +194,7 @@ public class ColorDetection  extends DetectionClass{
 		long Htot = 0, Stot = 0, Vtot = 0;
 		long numVals = 0;
 		double[] tmpHSV;
-		// Worthless mean function
+		
 		for(int r = 0; r < cutout.rows(); r++){
 			for(int c = 0; c < cutout.cols(); c++){
 				tmpHSV = cutout.get(r, c);
@@ -310,6 +314,6 @@ public class ColorDetection  extends DetectionClass{
 	 * @param colorTemplates_
 	 */
 	public void setTemplates(ArrayList<ColorTemplate> colorTemplates_) {
-		colorTemplates = colorTemplates_;
+		colorTemplates = (ArrayList<ColorTemplate>) colorTemplates_.clone();
 	}
 }

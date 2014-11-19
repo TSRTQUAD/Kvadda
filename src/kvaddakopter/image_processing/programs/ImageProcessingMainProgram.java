@@ -26,7 +26,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 	private TemplateMatch mTemplateMatch;
 	private BackgroundSubtraction mBackgroundSubtraction;
 	private BlurDetection mBlurDetection;
-	private Tracking mTracker; 
+	private Tracking mTracker;
 
 	//Debug Warning
 	boolean userHasBeenWarned = false;
@@ -36,7 +36,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 
 	int count = 0;
 
-	public ImageProcessingMainProgram(int threadid, IPMockMainBus mainbus)  {
+	public ImageProcessingMainProgram(int threadid, MainBusIPInterface mainbus)  {
 		super(threadid,mainbus);
 	}
 
@@ -45,8 +45,8 @@ public class ImageProcessingMainProgram extends ProgramClass{
 		//Create and initialize decoder. And select source.
 		mDecoder = new FFMpegDecoder();
 
-		mDecoder.initialize("tcp://192.168.1.1:5555"/*FFMpegDecoder.STREAM_ADDR_BIPBOP*/);
-
+		//mDecoder.initialize("tcp://192.168.1.1:5555"/*FFMpegDecoder.STREAM_ADDR_BIPBOP*/);
+		mDecoder.initialize("mvi2.mp4");
 		// Listen to decoder events
 		mDecoder.setDecoderListener(this);
 
@@ -70,13 +70,12 @@ public class ImageProcessingMainProgram extends ProgramClass{
 
 		//Create Trackers
 		//mTracker = new Tracking();
-
+		
 	}
 
 	public void update(){
-		//checkIsRunning(); //TODO Only working if notify() called from other thread
-		System.out.println("update");
-		BufferedImage out;
+		BufferedImage out = null;
+		BufferedImage colorDetectionImage = null;
 		Mat image = getNextFrame();
 		ImageObject imageObject = new ImageObject(image);
 		
@@ -87,7 +86,6 @@ public class ImageProcessingMainProgram extends ProgramClass{
 		int[] modes = mMainbus.getIPActiveModes(); 
 	    
 		if(modes[MainBusIPInterface.COLOR_CALIBRATION_MODE] == 1){
-			System.out.println("CALIBRATION");
 			// Show Color calibration image
 			ColorTemplate cTemplate = mMainbus.getIPCalibTemplate();
 			imageObject.thresholdImage(cTemplate);
@@ -107,6 +105,8 @@ public class ImageProcessingMainProgram extends ProgramClass{
 				ArrayList<ColorTemplate> colorTemplates = mMainbus.getIPColorTemplates();	
 				mColorDetection.setTemplates(colorTemplates);
 				targetObjects.addAll(mColorDetection.runMethod(imageObject));
+				colorDetectionImage = ImageConversion.mat2Img(mColorDetection.getIntermediateResult());
+				
 			}
 			if(modes[MainBusIPInterface.BACKGROUND_SUBTRACION_MODE] == 1){
 				// DO SOMETHING
@@ -126,8 +126,24 @@ public class ImageProcessingMainProgram extends ProgramClass{
 			
 			mMainbus.setIPTargetList(targetObjects);
 			
-			mMainbus.setIPImageToShow(imageToShow(mMainbus.getIPImageMode()));
-//			mMainbus.setIPTargetList(targetList);
+			//What image to show
+			switch(mMainbus.getIPImageMode()){
+				case MainBusIPInterface.DEFAULT_IMAGE:
+					out = ImageConversion.mat2Img(imageObject.getImage());
+					break;
+				case MainBusIPInterface.CUT_OUT_IMAGE:
+					out = colorDetectionImage;
+					System.out.println("set cut out image");
+					break;
+				case MainBusIPInterface.TARGET_IMAGE:
+					//imageFromMethod = mTracker.getImage();
+					//out = ImageConversion.mat2Img(imageFromMethod);
+					break;
+				case MainBusIPInterface.SUPRISE_IMAGE :
+					out = ImageConversion.loadImageFromFile("suprise_image.jpg");
+					break;
+			}
+			updateJavaWindow(colorDetectionImage);
 		}
 
 		//For debugging
@@ -157,46 +173,5 @@ public class ImageProcessingMainProgram extends ProgramClass{
 //		}
 //		return null;
 //	}
-
-
-	private BufferedImage imageToShow(int ipImageMode) {
-		// TODO GUI wants a buffered image to show
-		BufferedImage out = null;
-		Mat imageFromMethod;
-		
-		switch(ipImageMode){
-		case MainBusIPInterface.DEFAULT_IMAGE:
-			//imageFromMethod = mTracker.getImage();
-			//out = ImageConversion.mat2Img(imageFromMethod);
-			break;
-		case MainBusIPInterface.TARGET_IMAGE:
-			//imageFromMethod = mTracker.getImage();
-			//out = ImageConversion.mat2Img(imageFromMethod);
-			break;
-		case MainBusIPInterface.SUPRISE_IMAGE :
-			out = ImageConversion.loadImageFromFile("suprise_image.jpg");
-			break;
-		}
-		
-		return out;
-	}
-	
-	/**
-	 * Check is the imageprocessing unit has been activated
-	 * Waits until some other thread does notify on the mMainbus interface
-	 * Then checks the condition again
-	 */
-	private void checkIsRunning(){
-		while(!mMainbus.getIsIPRunning()){
-			synchronized(mMainbus){
-				try {
-					mMainbus.wait();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-	}
 }
 

@@ -132,7 +132,9 @@ public class HSVSliders{
 					public void changed(ObservableValue<? extends Number> arg0,
 							Number arg1, Number arg2) {
 						synchronized(template){
+							
 						template.setValHigh(arg1.intValue());
+						System.out.println(template.getHueLow());
 						}
 					}
 					});
