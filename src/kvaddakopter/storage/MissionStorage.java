@@ -11,13 +11,26 @@ import kvaddakopter.assignment_planer.MissionObject;
 
 public class MissionStorage {
 	
-	public List<String> getSavedMissions(){
-		List<String> storedmissions = new ArrayList<String>();
+	public List<String> getListOfSavedMissions() {
+		List<String> listofstoredmissions = new ArrayList<String>();
 		File[] files = new File("Missions").listFiles();
 
 		for (File file : files) {
 		    if (file.isFile()) {
-		        storedmissions.add(file.getName());
+		        listofstoredmissions.add(file.getName());
+		    }
+		}
+	
+		return listofstoredmissions;
+	}
+	
+	public ArrayList<MissionObject> getSavedMissions() throws FileNotFoundException, IOException{
+		ArrayList<MissionObject> storedmissions = new ArrayList<MissionObject>();
+		File[] files = new File("Missions").listFiles();
+		
+		for (File file : files) {
+		    if (file.isFile()) {
+		        storedmissions.add( loadMission(file.getName()) );
 		    }
 		}
 	

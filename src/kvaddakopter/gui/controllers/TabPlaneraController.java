@@ -3,6 +3,7 @@ package kvaddakopter.gui.controllers;
 
 import com.lynden.gmapsfx.GoogleMapView;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -120,9 +121,11 @@ public class TabPlaneraController extends BaseController implements Initializabl
      
     /**
      * Triggered when the user clicks "Save mission"
+     * @throws IOException 
+     * @throws FileNotFoundException 
      */
     @FXML 
-    private void btnSaveMission(){
+    private void btnSaveMission() throws FileNotFoundException, IOException{
     	
     	
     	//Create new mission object

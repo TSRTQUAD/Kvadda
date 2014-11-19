@@ -3,6 +3,8 @@ package kvaddakopter.gui.controllers;
 
 import com.lynden.gmapsfx.GoogleMapView;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -102,15 +104,25 @@ public class TabUtforController extends BaseController implements Initializable 
     public void initialize(URL url, ResourceBundle rb) {
     	
         //this.missionMap = new MissionMap(this.mapViewUtfor, this);
-        this.loadFromStorage();
+        try {
+			this.loadFromStorage();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         this.populateDefaultLists();
     }
     
     
     /**
      * Loads all needed things from the persistence layer.
+     * @throws IOException 
+     * @throws FileNotFoundException 
      */
-    private void loadFromStorage(){
+    private void loadFromStorage() throws FileNotFoundException, IOException{
     	this.listOfMissions =  this.missionStorage.getSavedMissions();
     }
     
