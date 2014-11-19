@@ -18,3 +18,26 @@
 	<classpathentry kind="lib" path="commons-collections4-4.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/OpenCV 2.4.9"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/image_processing/decoder/lib/commons-cli-1.2.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/image_processing/decoder/lib/logback-classic-1.1.2.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/image_processing/decoder/lib/logback-core-1.1.2.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/image_processing/decoder/lib/slf4j-api-1.7.7.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/image_processing/decoder/lib/xuggle-xuggler-5.4.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/assignment_planer/lib/jamtio.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/assignment_planer/lib/matlabcontrol-4.1.0.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/control_module/Matrixlib/EJML-core-0.26-sources.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/control_module/Matrixlib/EJML-core-0.26.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/control_module/Matrixlib/EJML-equation-0.26-sources.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/control_module/Matrixlib/EJML-equation-0.26.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/control_module/Matrixlib/EJML-experimental-0.26-sources.jar"/>
+	<classpathentry kind="lib" path="src/kvaddakopter/control_module/Matrixlib/EJML-experimental-0.26.jar"/>
+	<classpathentry kind="lib" path="commons-collections4-4.0.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
+>>>>>>> 91bd67764a003bbcdbd2ffd4af121513221b2643
