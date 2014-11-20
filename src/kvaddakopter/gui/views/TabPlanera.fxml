@@ -120,7 +120,7 @@
                               <Insets left="20.0" right="20.0" top="20.0" />
                            </VBox.margin>
                            <children>
-                              <Button fx:id="btnStartMissionCoordinates" mnemonicParsing="false" onAction="#btnStartMissionCoordinates" prefWidth="200.0" text="Markera uppdragskoordinater" />
+                              <Button fx:id="btnStartMissionCoordinates" mnemonicParsing="false" onAction="#btnStartMissionCoordinates" prefWidth="200.0" text="Nytt avsökningsområde" />
                               <Button alignment="CENTER" mnemonicParsing="false" onAction="#btnClickedClearNagivationCoordinates" prefHeight="26.0" prefWidth="70.0" styleClass="btn-danger" stylesheets="@../../application.css" text="Rensa">
                                  <HBox.margin>
                                     <Insets left="30.0" />
@@ -130,7 +130,7 @@
                         </HBox>
                         <HBox alignment="CENTER">
                            <children>
-                              <Button fx:id="btnStartMarkForbiddenAreas" mnemonicParsing="false" onAction="#btnStartMarkForbiddenAreas" prefWidth="200.0" text="Markera förbjuda områden" />
+                              <Button fx:id="btnStartMarkForbiddenAreas" mnemonicParsing="false" onAction="#btnStartMarkForbiddenAreas" prefWidth="200.0" text="Nytt förbjudet område" />
                               <Button alignment="CENTER" mnemonicParsing="false" onAction="#btnClickedClearForbiddenAreasCoodinates" prefHeight="26.0" prefWidth="70.0" styleClass="btn-danger" stylesheets="@../../application.css" text="Rensa">
                                  <HBox.margin>
                                     <Insets left="30.0" />

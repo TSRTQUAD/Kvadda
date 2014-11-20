@@ -83,6 +83,9 @@ public class TabPlaneraController extends BaseController implements Initializabl
     private void missionTypeChanged()
     {
     	this.currentSelectedMissionType = this.listMissionType.getSelectionModel().getSelectedItem();
+    	if (this.planningMap != null){
+                this.planningMap.clearNavigationCoordinates();
+    	}
     }
     
     /**
@@ -102,12 +105,13 @@ public class TabPlaneraController extends BaseController implements Initializabl
     }
     
     /**
-     * Triggered when user presses btn "Mark mission coordinates"
+     * Triggered when user presses btn "Mark new mission coordinates"
      */
     @FXML
     private void btnStartMissionCoordinates(){
     	this.canEnterMissionCoordinates = true;
     	this.canEnterForbiddenAreaCoordinates = false;	
+    	this.planningMap.createNewMapShape();
     }
     
     /**
@@ -117,6 +121,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     private void btnStartMarkForbiddenAreas(){
     	this.canEnterForbiddenAreaCoordinates = true;
     	this.canEnterMissionCoordinates = false;
+    	this.planningMap.createNewForbiddenArea();
     }
      
     /**
@@ -142,6 +147,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	double[] height = {(double) this.listMissionHeight.getValue().getValue()};
     	mission.setHeight(height);
     	
+    	
     	//Mission Radius
     	double[] radiusValue = this.planningMap.getCircleRadius();
     	mission.setRadius(radiusValue);
@@ -160,33 +166,28 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	int descriptorId = (int) this.descriporRadioGroup.getSelectedToggle().getUserData();
     	mission.setDescriptor(descriptorId);
     	
+    	
     	//GPS AREAS
     	mission.setSearchAreas(this.planningMap.allNavigationCoordinates());
     	mission.setForbiddenAreas(this.planningMap.allForbiddenAreaCoordinates());
     	
-    	
+
     	//Save mission
     	try {
 			this.storage.saveMission(mission);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     	
-    	System.out.println(this.storage.getSavedMissions().size());
     }
     
     
 	/**
 	 * Public Methods
 	 */
-    
-    
-    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         this.storage = new MissionStorage();
-        
         this.populateListsAndDefaults();
     }
     
@@ -211,17 +212,9 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	return this.currentSelectedMissionType;
     }
     
-    
-    
-    
-    
     /**
      * Private Methods
      */
-    
-    
-    
-    
     
     /**
      * Loads and sets the default values for all GUI options.

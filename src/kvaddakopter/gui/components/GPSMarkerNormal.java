@@ -14,6 +14,8 @@ public class GPSMarkerNormal extends AbstractGPSMarker{
 	}
 	
 	
+	
+	
 	@Override
 	public MapMarkerEnum getIcon(){
 		return MapMarkerEnum.NAVIGATION_NORMAL;	 
