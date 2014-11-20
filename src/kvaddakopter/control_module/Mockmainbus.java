@@ -23,18 +23,18 @@ public class Mockmainbus implements ControlMainBusInterface{
 	public Mockmainbus(){
 		//sensorarray.add(new double[]{Latitud,Longitud,xdot,ydot,height,yaw});
 		
-			sensorarray.add(new double[]{58.406659,15.620358,0		,0,0,-Math.PI/2});
-			sensorarray.add(new double[]{58.406659,15.620358,0		,0,0,-Math.PI/2});
-			sensorarray.add(new double[]{58.406659,15.620358,0		,0,0,-Math.PI/2});
-			sensorarray.add(new double[]{58.406659,15.620358,0		,0,0,-Math.PI/2});
-			sensorarray.add(new double[]{58.406659,15.620358,0		,0,0,-Math.PI/2});
+			sensorarray.add(new double[]{58.406659,15.620358,0		,0,0,- Math.PI});
+			sensorarray.add(new double[]{58.406659,15.620358,0		,0,0,- Math.PI});
+			sensorarray.add(new double[]{58.406659,15.620358,0		,0,0,- Math.PI});
+			sensorarray.add(new double[]{58.406659,15.620358,0		,0,0,- Math.PI});
+			sensorarray.add(new double[]{58.406659,15.620358,0		,0,0,- Math.PI});
 		
 		while(i < 21){
-			sensorarray.add(new double[]{58.406659	,15.620358	,0	,0.1*i	,0	,-Math.PI/2});
-			sensorarray.add(new double[]{58.406659	,15.620358	,0	,0.1*i	,0	,-Math.PI/2});
-			sensorarray.add(new double[]{58.406659	,15.620358	,0	,0.1*i	,0	,-Math.PI/2});
-			sensorarray.add(new double[]{58.406659  ,15.620358	,0	,0.1*i	,0	,-Math.PI/2});
-			sensorarray.add(new double[]{58.406659	,15.620358	,0	,0.1*i	,0	,-Math.PI/2});
+			sensorarray.add(new double[]{58.406659	,15.620358	,0	,0.1*i	,0	,- Math.PI});
+			sensorarray.add(new double[]{58.406659	,15.620358	,0	,0.1*i	,0	,- Math.PI});
+			sensorarray.add(new double[]{58.406659	,15.620358	,0	,0.1*i	,0	,- Math.PI});
+			sensorarray.add(new double[]{58.406659  ,15.620358	,0	,0.1*i	,0	,- Math.PI});
+			sensorarray.add(new double[]{58.406659	,15.620358	,0	,0.1*i	,0	,- Math.PI});
 			i ++;
 		}
 		
@@ -42,22 +42,23 @@ public class Mockmainbus implements ControlMainBusInterface{
 		
 		i = 1;
 		while(i < 1000){
-			sensorarray.add(new double[]{58.406659	,15.620358	,0	,2		,0	,-Math.PI/2});
-			sensorarray.add(new double[]{58.406659	,15.620358	,0	,2		,0	,-Math.PI/2});
-			sensorarray.add(new double[]{58.406659	,15.620358	,0	,2		,0	,-Math.PI/2});
-			sensorarray.add(new double[]{58.406659  ,15.620358	,0	,2		,0	,-Math.PI/2});
-			sensorarray.add(new double[]{58.406659	,15.620358	,0	,2		,0	,-Math.PI/2});
+			sensorarray.add(new double[]{58.406659	,15.620358	,0	,2		,0	,- Math.PI});
+			sensorarray.add(new double[]{58.406659	,15.620358	,0	,2		,0	,- Math.PI});
+			sensorarray.add(new double[]{58.406659	,15.620358	,0	,2		,0	,- Math.PI});
+			sensorarray.add(new double[]{58.406659  ,15.620358	,0	,2		,0	,- Math.PI});
+			sensorarray.add(new double[]{58.406659	,15.620358	,0	,2		,0	,- Math.PI});
 			i ++;
 		}
 
-				
-		missionobject.setTrajectory(new double[][]{ {58.406659,15.620358},
-													{58.406759,15.620358},
-													{58.406859,15.620358},
-													{58.406959,15.620358},
-													{58.409999,15.620358}});
+
 		
-		missionobject.setYaw(0);
+		missionobject.setTrajectory(new double[][]{ {58.406659,15.620358},
+													{58.406659,15.620358},
+													{58.406659,15.620358},
+													{58.406659,15.620358},
+													{58.406659,15.620358}});
+		
+		missionobject.setYaw(-Math.PI);
 		missionobject.setHeight(new double[]{0,0,0,0,0});
 		missionobject.setReferenceVelocity(new double[][]{ 	{0,0},
 															{2,0},
@@ -89,8 +90,8 @@ public class Mockmainbus implements ControlMainBusInterface{
 		
 		while(i < 6){
 		sensorarray.add(new double[]{58.406659+0.000009*(i-1),15.620358,1.1		,0,0,0});
-		sensorarray.add(new double[]{58.406659+0.000009*(i-1),15.620358,1.05		,0,0,0});
-		sensorarray.add(new double[]{58.406659+0.000009*(i-1),15.620358,1.05		,0,0,0});
+		sensorarray.add(new double[]{58.406659+0.000009*(i-1),15.620358,1.05	,0,0,0});
+		sensorarray.add(new double[]{58.406659+0.000009*(i-1),15.620358,1.05	,0,0,0});
 		sensorarray.add(new double[]{58.406659+0.000009*(i-1),15.620358,1.1		,0,0,0});
 		sensorarray.add(new double[]{58.406659+0.000009*i	,15.620358,1		,0,0,0});
 		i ++;

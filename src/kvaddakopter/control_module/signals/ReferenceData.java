@@ -133,8 +133,17 @@ public class ReferenceData {
 					this.Yaw = Math.PI/2;
 				}
 					
+		}		
+		else if (Xpos == rsdata.getXpos()){
+			if (Ypos > rsdata.getYpos()){
+				this.Yaw = 0;
+			}
+			else{
+				this.Yaw = - Math.PI;
+			}
+				
 		}
-		else if (  Xpos >= rsdata.getXpos()  && Ypos > rsdata.getYpos() ){ 				
+		else if (  Xpos > rsdata.getXpos()  && Ypos > rsdata.getYpos() ){ 				
 			this.Yaw = Math.atan( (rsdata.getXpos() - Xpos)  /  (Ypos - rsdata.getYpos()) ); 			
 		}
 		else if (  Xpos < rsdata.getXpos()  && Ypos > rsdata.getYpos() ){ 				

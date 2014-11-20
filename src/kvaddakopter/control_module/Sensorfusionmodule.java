@@ -93,8 +93,8 @@ public class Sensorfusionmodule implements Runnable{
 		//First Read
 		this.sensorvector = mainbus.getSensorVector();				//Reads sensor data from mainbus
 		sdata.setnewsensordata(sensorvector);						//Update local sensor object		
-		this.controlsignal = mainbus.getControlSignal();			//Reads Control signal from mainbus
-		this.missionobject = mainbus.getMissionObject();			//Reads mission object from mainbus
+//		this.controlsignal = mainbus.getControlSignal();			//Reads Control signal from mainbus
+//		this.missionobject = mainbus.getMissionObject();			//Reads mission object from mainbus
 
 		//Set initials
 		sdata.setinitial();											// Fix local coordinate system XY
@@ -102,9 +102,9 @@ public class Sensorfusionmodule implements Runnable{
 		sdata.xydot2XYdot();										// Transformation velocities to XY(dot)
 		//sdata.print();
 		
-		rrdata.initialize(sdata.getLatitud(),sdata.getLongitud());	// Fix local coordinate system XY
+/*		rrdata.initialize(sdata.getLatitud(),sdata.getLongitud());	// Fix local coordinate system XY
 		rrdata.updateref(referenceextractor.update(missionobject));													// Get first reference 
-		rrdata.print();
+*/		rrdata.print();
 		
 		
 		rsdata.setXstates(skalmanx.timeupdate()); //Kalman filter in X direction
@@ -120,7 +120,7 @@ public class Sensorfusionmodule implements Runnable{
 		System.out.println("Initializing completed");
 		System.out.println("");
 		
-		//Start quad
+/*		//Start quad
 		if(rrdata.getStart() == 1){			
 			controlsignal.setStart(1);			
 			try {
@@ -133,7 +133,7 @@ public class Sensorfusionmodule implements Runnable{
 				e.printStackTrace();
 			}
 		}
-		
+*/		
 				System.out.println("Controllerloop initialized");
 				
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
@@ -146,7 +146,7 @@ public class Sensorfusionmodule implements Runnable{
 				counter ++;
 				time = System.currentTimeMillis();	
 				//For every sample  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-				ControlSignal csignal = new ControlSignal();
+//---			ControlSignal csignal = new ControlSignal();
 				this.sensorvector = mainbus.getSensorVector();				//Reads sensor data from mainbus
 				sdata.setnewsensordata(sensorvector);						//Update local sensor object
 				sdata.GPS2XY();												//Transformation
@@ -191,8 +191,8 @@ public class Sensorfusionmodule implements Runnable{
 				
 				
 				//CONTROLLER  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-				
-				
-				rrdata.update(rsdata, missionobject);						//Update reference data	
+/*
+				rrdata.update(rsdata, missionobject);						//Update reference data					
 				System.out.print("Reference signal:");
 				rrdata.print();
 				
@@ -222,7 +222,7 @@ public class Sensorfusionmodule implements Runnable{
 					
 					mainbus.setControlSignal(csignal);						// Update mainbus controlsignal
 				}				
-
+*/
 				
 				time = sampletime*1000 - (System.currentTimeMillis()-time);
 				
