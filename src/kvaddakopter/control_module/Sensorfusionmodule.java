@@ -226,14 +226,11 @@ public class Sensorfusionmodule implements Runnable{
 				
 				time = sampletime*1000 - (System.currentTimeMillis()-time);
 				
-				System.out.format("Samplingsintervall: %.2f%n",time);
+/*				System.out.format("Samplingsintervall: %.2f%n",time);
 				System.out.println("-------------------------------");
 				System.out.println("");
 				System.out.println("");
-				
-				if(counter == 81){
-					System.out.println("apa");
-				}
+*/				
 				
 				if(time>0){
 				
@@ -244,9 +241,6 @@ public class Sensorfusionmodule implements Runnable{
 				}
 				}
 				}
-				
-				
-				
 				
 				
  // Test

@@ -9,6 +9,7 @@ public interface ControlMainBusInterface {
 	public MissionObject getMissionObject();
 	
 	
-	public void setControlSignal(ControlSignal csignal);
+	public void setControlSignalobject(ControlSignal csignal);
 	public MissionObject setMissionObject();
+	public ControlSignal getControlSignalobject();
 }

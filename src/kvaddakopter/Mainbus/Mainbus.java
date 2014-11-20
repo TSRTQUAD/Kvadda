@@ -12,10 +12,15 @@ import java.util.ArrayList;
 
 // import org.opencv.core.Core;
 
+
+
 import matlabcontrol.MatlabConnectionException;
 import kvaddakopter.ImageProcessingMain;
 import kvaddakopter.assignment_planer.MatlabProxyConnection;
 import kvaddakopter.assignment_planer.MissionObject;
+import kvaddakopter.control_module.Mockmainbus;
+import kvaddakopter.control_module.Sensorfusionmodule;
+import kvaddakopter.control_module.signals.ControlSignal;
 import kvaddakopter.control_module.signals.SensorData;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.data_types.TargetObject;
@@ -44,10 +49,12 @@ import kvaddakopter.interfaces.ControlMainBusInterface;
  * http://www.javaworld.com/article/2074318/java-concurrency/java-101--understanding-java-threads--part-2--thread-synchronization.html
  * 
  */
-public class Mainbus extends Frame implements KeyListener{
+public class Mainbus extends Frame implements KeyListener,ControlMainBusInterface{
 	//Examples
 	private int var;
 	public boolean condVar = false;
+
+	
 	
 	//Programs
 	MyRunnable myRunnable;
@@ -78,6 +85,37 @@ public class Mainbus extends Frame implements KeyListener{
 	float[] NavData = new float[6];
 	//
 	
+	
+	
+	//Control module
+	protected double[] 		sensorvector			= new double[]{0,0,0,0,0};
+	//protected ControlSignal 	controlsignal			= new ControlSignal();
+	
+	
+	public double[] getSensorVector() {		
+		return NavData;
+	}
+
+	@Override
+	public kvaddakopter.control_module.signals.ControlSignal getControlSignalobject() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public void setControlSignalobject(
+			kvaddakopter.control_module.signals.ControlSignal csignal) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public MissionObject setMissionObject() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 	
 	
@@ -153,6 +191,9 @@ public class Mainbus extends Frame implements KeyListener{
 		
 		
 		//
+		// START MODULE
+	    Sensorfusionmodule module = new Sensorfusionmodule(new Mockmainbus());
+	    new Thread(module).start();
 		
 		
 		while(true){
@@ -387,7 +428,9 @@ public class Mainbus extends Frame implements KeyListener{
     	
     	if (keyCode >= KeyEvent.VK_1 && keyCode <= KeyEvent.VK_9) System.out.println("Speed: " + speed);
     }
-	
+
+
+
 	//
 
 
