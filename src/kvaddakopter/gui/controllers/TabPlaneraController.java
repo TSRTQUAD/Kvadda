@@ -168,16 +168,14 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	mission.setSearchAreas(this.planningMap.allNavigationCoordinates());
     	mission.setForbiddenAreas(this.planningMap.allForbiddenAreaCoordinates());
     	
-    	
+
     	//Save mission
     	try {
 			this.storage.saveMission(mission);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     	
-    	System.out.println(this.storage.getSavedMissions().size());
     }
     
     
