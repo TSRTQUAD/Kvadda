@@ -21,45 +21,32 @@ public class AssignmentPlanerRunnable implements Runnable {
 	}
 
 	public void run() {
-		waitOnCondVar();
-		calculatetrajectory = new CalculateTrajectory(mainbus.getMatlabProxy());
-		try {
-			new MatFileHandler().createMatFile("object", mainbus.getMissionObject());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			calculatetrajectory.makeMatlabCall();
-		} catch (MatlabConnectionException | MatlabInvocationException e) {
-			e.printStackTrace();
-		}
-		try {
-			missionobject = new MatFileHandler().readMatFile("results", mainbus.getMissionObject());
-			mainbus.setMissionObject(missionobject);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		resetCondVar();
-
-	}
-
-	public void waitOnCondVar(){
-		while (!mainbus.isAssignmentPlanerOn())
-			try{
-				synchronized(mainbus){
-					mainbus.wait();
+		while (true)
+			if (mainbus.isAssignmentPlanerOn()) {
+				calculatetrajectory = new CalculateTrajectory(mainbus.getMatlabProxy());
+				try {
+					new MatFileHandler().createMatFile("object", mainbus.getMissionObject());
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-
+				try {
+					calculatetrajectory.makeMatlabCall();
+				} catch (MatlabConnectionException | MatlabInvocationException e) {
+					e.printStackTrace();
+				}
+				try {
+					missionobject = new MatFileHandler().readMatFile("results", mainbus.getMissionObject());
+					mainbus.setMissionObject(missionobject);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				resetCondVar();
 			}
-		catch (InterruptedException e) {}
+
 	}
 
 	public synchronized void resetCondVar(){
 		mainbus.setAssignmentPlanerOn(false);
-		synchronized(mainbus){
-			mainbus.notify ();
-		}
-
 	}
 
 }
