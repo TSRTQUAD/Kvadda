@@ -112,15 +112,20 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 	 * @return radius
 	 */
 	public double[] getCircleRadius(){
-		double[] radius = new double[]{};
+		ArrayList<Double> radiusList = new ArrayList<Double>();
 		if(this.owningController.getCurrentSelectedMissionType() == MissionType.AROUND_COORDINATE){
-			int i = 0;
 			for(MapShapeInterface shape : this.navigationMapShapes){
 				if (shape instanceof GPSCircle){
-					radius[i] = ((GPSCircle) shape).getRadus();
-					i++;
+					radiusList.add( ((GPSCircle) shape).getRadus());
 				}
 			}
+		}
+		int listSize = radiusList.size();
+		double[] radius = new double[listSize];
+		int j = 0;
+		for (Double value : radiusList){
+			radius[j] = value.doubleValue();
+			j++;
 		}
 		return radius;
 	}
