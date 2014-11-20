@@ -102,9 +102,10 @@ public class Sensorfusionmodule implements Runnable{
 		sdata.xydot2XYdot();										// Transformation velocities to XY(dot)
 		//sdata.print();
 		
-/*		rrdata.initialize(sdata.getLatitud(),sdata.getLongitud());	// Fix local coordinate system XY
-		rrdata.updateref(referenceextractor.update(missionobject));													// Get first reference 
-*/		rrdata.print();
+		rrdata.initialize(sdata.getLatitud(),sdata.getLongitud());	// Fix local coordinate system XY
+//		rrdata.updateref(referenceextractor.update(missionobject));	
+		rrdata.updateindoor(referenceextractor.updatetest());			// Get first reference 
+		rrdata.print();
 		
 		
 		rsdata.setXstates(skalmanx.timeupdate()); //Kalman filter in X direction
@@ -151,7 +152,7 @@ public class Sensorfusionmodule implements Runnable{
 				sdata.setnewsensordata(sensorvector);						//Update local sensor object
 				sdata.GPS2XY();												//Transformation
 				sdata.xydot2XYdot();										//Transformation
-				System.out.format("Sensordata at sample %d%n",counter);
+				//System.out.format("Sensordata at sample %d%n",counter);
 				//sdata.print();
 													
 
@@ -191,11 +192,12 @@ public class Sensorfusionmodule implements Runnable{
 				
 				
 				//CONTROLLER  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-				
-/*
-				rrdata.update(rsdata, missionobject);						//Update reference data					
+
+//				rrdata.update(rsdata, missionobject);						//Update reference data
+				rrdata.updatetest(rsdata);
 				System.out.print("Reference signal:");
 				rrdata.print();
-				
+/*				
 				
 				//Controlsignal calculation
 				if(rrdata.getMission()==1){

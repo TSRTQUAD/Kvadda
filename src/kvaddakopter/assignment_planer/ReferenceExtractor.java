@@ -78,11 +78,12 @@ public class ReferenceExtractor {
 	
 	
 	
-public double[] updatetest(MissionObject missionobject){			
+public double[] updatetest(){			
 			//System.out.format("Reference first update no. %d%n",this.counter);
-			double[] returnvalue = new double[]{missionobject.getTrajectory()[this.counter][0],			// GPS lat
-												missionobject.getTrajectory()[this.counter][1],			// GPS long
-												2,														// Height
+	this.counter = this.counter + 1; 		
+	double[] returnvalue = new double[]{0,			// GPS lat
+												0,			// GPS long
+												0 + 1*counter,														// Height
 												0,														// Yaw
 												10,														// Time at coordinate
 												0,														// null
@@ -90,7 +91,9 @@ public double[] updatetest(MissionObject missionobject){
 												this.start,												// Set start/land
 												this.land};												// Set start/land
 			return returnvalue;
-		}	
+		}
+
+
 }
 
 

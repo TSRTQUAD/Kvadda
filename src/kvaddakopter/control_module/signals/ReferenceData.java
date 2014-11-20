@@ -84,12 +84,28 @@ public class ReferenceData {
 }
 	
 
+	public void updateindoor(double[] latestreference){
+		// latestreference  = (latitude, longitud, height, yaw, time, 
+//						  forward velocity, mission type, start,land)
+			this.Latitud = latestreference[0];
+			this.Longitud = latestreference[1];
+			this.Height = latestreference[2];
+			this.Yaw = latestreference[3];
+			this.time = latestreference[4];
+			this.ForVel = latestreference[5];
+			this.mission = (int) latestreference[6];
+			this.start = (int) latestreference[7];
+			this.land = (int) latestreference[8];
+			
+			this.Xpos = this.Latitud;
+			this.Ypos = this.Longitud;
+		}
+	
+	
+	
 	
 	public void update(RefinedSensorData rsdata, MissionObject missionobject){
-		//mission = FALSE
-
-
-		
+		//mission = FALSE		
 		if (Math.abs(rsdata.getHeight()-Height)<1 && 
 			Math.abs(rsdata.getXpos()-Xpos)<0.3   && 
 			Math.abs(rsdata.getYpos()-Ypos)<0.3   &&
@@ -166,6 +182,46 @@ public class ReferenceData {
 		}
 		
 	}
+	
+	
+	
+	
+	// BEGIN TESTUPDATE
+	
+	
+	
+	
+	public void updatetest(RefinedSensorData rsdata){
+		//mission = TEST		
+		if (Math.abs(rsdata.getHeight()-Height)<1 && 
+			Math.abs(rsdata.getXpos()-Xpos)<0.3   && 
+			Math.abs(rsdata.getYpos()-Ypos)<0.3   &&
+			mission==0										)
+		
+		{			
+			if (!running){
+				lStartTime= System.currentTimeMillis();
+				this.running = true;
+			}
+			
+			if (running && Math.abs(System.currentTimeMillis() - lStartTime) > time){
+			this.running = false;
+			this.updateref( referenceextractor.updatetest() );	
+			System.out.println("-.-.-.-.-.-.-.-.-.-.-.-"); 		//update ref 
+			System.out.println("Updated referencedata TEST"); 	//update ref 	
+			System.out.println("-.-.-.-.-.-.-.-.-.-.-.-"); 		//update ref 
+			}
+		}	
+
+		
+		
+	}
+	
+	
+	
+	/// END TEST
+	
+	
 	
 	
 	public void print(){

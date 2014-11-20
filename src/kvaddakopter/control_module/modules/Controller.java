@@ -21,8 +21,8 @@ public class Controller{
 
 	public Controller(double sampletime){	
 		KVelHeight = 1; 
-		KVelForward = 0.3;
-		KVelLateral = 0.4;
+		KVelForward = 0.2;
+		KVelLateral = 0.2;
 		KYaw = 0.3;
 		Tintegral = 0.01;
 		Ts = sampletime;
