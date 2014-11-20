@@ -41,6 +41,7 @@ public abstract class AbstractMapShape {
 	public void addCoordinate(LatLong clickedCoordinate) {
 		GPSMarkerNormal newMarker = new GPSMarkerNormal(clickedCoordinate);
 		this.markers.add(newMarker);
+		this.draw();
 		this.map.addUIEventHandler(newMarker.getMarker(), UIEventType.click, (JSObject obj2) -> {
 			newMarker.clearFromMap(this.map);
 			this.removeMarkerFromList(newMarker);
@@ -84,6 +85,7 @@ public abstract class AbstractMapShape {
 	
 	
 	public void remove(){
+		this.unDraw();
 		this.markers.clear();
 	}
 }

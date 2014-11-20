@@ -12,10 +12,6 @@ import com.lynden.gmapsfx.shapes.PolygonOptions;
 public abstract class GPSPolygon extends AbstractMapShape implements MapShapeInterface{
 	
 	
-	/**
-	 * The Map object associated with this Marker
-	 */
-	protected GoogleMap map;
 	
 	
 	/**
@@ -68,8 +64,7 @@ public abstract class GPSPolygon extends AbstractMapShape implements MapShapeInt
 			PolygonOptions polygOpts = this.getOptions(mvc);
 			this.polygon = new Polygon(polygOpts);
 			this.map.addMapShape(this.polygon);
-		}
-
+		} 
 	}
 	
 	
@@ -87,8 +82,8 @@ public abstract class GPSPolygon extends AbstractMapShape implements MapShapeInt
 	
 	@Override
 	public void remove(){
-		super.remove();
 		this.unDraw();
+		super.remove();
 		polygon = null;
 	}
 	

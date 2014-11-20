@@ -176,7 +176,6 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 
 			}
 			if ( this.owningController.addForbiddenAreasMode() ){
-				System.out.format("Area conter is: %d", this.currentActiveForbiddenAreaCounter);
 				this.forbiddenGPSPolygons
 				.get(this.currentActiveForbiddenAreaCounter)
 				.addCoordinate(clickedCoordinate);	
