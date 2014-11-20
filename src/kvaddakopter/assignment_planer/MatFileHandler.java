@@ -182,5 +182,13 @@ public class MatFileHandler {
 		
 		return missionobject;
 	}
+	
+	public void createMatFileFromFlightData(String name, double[][] data) throws IOException {
+		MLDouble datatowrite = new MLDouble(name, data);
+		ArrayList<MLArray> list = new ArrayList<MLArray>();
+		list.add( datatowrite );
+		new MatFileWriter(name + ".mat", list );
+		
+	}
 
 }
