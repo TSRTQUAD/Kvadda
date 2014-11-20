@@ -82,6 +82,9 @@ public class TabPlaneraController extends BaseController implements Initializabl
     private void missionTypeChanged()
     {
     	this.currentSelectedMissionType = this.listMissionType.getSelectionModel().getSelectedItem();
+    	if (this.planningMap != null){
+                this.planningMap.clearNavigationCoordinates();
+    	}
     }
     
     /**

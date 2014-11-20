@@ -37,6 +37,7 @@ public abstract class GPSPolygon extends AbstractMapShape implements MapShapeInt
 	abstract protected PolygonOptions getOptions(MVCArray mvc);
 	
 	
+	
 	/**
 	 * Draw this shape
 	 */

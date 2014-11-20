@@ -39,7 +39,7 @@ public abstract class AbstractMapShape {
 	 * @param clickedCoordinate
 	 */
 	public void addCoordinate(LatLong clickedCoordinate) {
-		GPSMarkerNormal newMarker = new GPSMarkerNormal(clickedCoordinate);
+		AbstractGPSMarker newMarker =    this.usedMarkerType(clickedCoordinate);//new GPSMarkerNormal(clickedCoordinate);
 		this.markers.add(newMarker);
 		this.draw();
 		this.map.addUIEventHandler(newMarker.getMarker(), UIEventType.click, (JSObject obj2) -> {
@@ -49,6 +49,14 @@ public abstract class AbstractMapShape {
 		});
 	}
 	
+	/**
+	 * Use to marker in the shape
+	 * @param clickedCoordinate
+	 * @return
+	 */
+	protected AbstractGPSMarker usedMarkerType(LatLong clickedCoordinate){
+		return new GPSMarkerNormal(clickedCoordinate);
+	}
 	
 	public void draw(){
 		//First start from scratch
