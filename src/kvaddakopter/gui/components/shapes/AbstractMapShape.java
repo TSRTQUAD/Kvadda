@@ -50,6 +50,14 @@ public abstract class AbstractMapShape {
 	}
 	
 	/**
+	 * Return all markers associated with this shape
+	 * @return
+	 */
+	public ArrayList<AbstractGPSMarker> getMarkers(){
+		return this.markers;
+	}
+	
+	/**
 	 * Use to marker in the shape
 	 * @param clickedCoordinate
 	 * @return

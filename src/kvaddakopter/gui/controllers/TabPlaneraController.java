@@ -163,6 +163,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	int descriptorId = (int) this.descriporRadioGroup.getSelectedToggle().getUserData();
     	mission.setDescriptor(descriptorId);
     	
+    	
     	//GPS AREAS
     	mission.setSearchAreas(this.planningMap.allNavigationCoordinates());
     	mission.setForbiddenAreas(this.planningMap.allForbiddenAreaCoordinates());

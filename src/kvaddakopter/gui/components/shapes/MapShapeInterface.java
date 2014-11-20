@@ -1,5 +1,9 @@
 package kvaddakopter.gui.components.shapes;
 
+import java.util.ArrayList;
+
+import kvaddakopter.gui.components.AbstractGPSMarker;
+
 import com.lynden.gmapsfx.javascript.object.LatLong;
 
 
@@ -23,5 +27,12 @@ public interface MapShapeInterface {
 	 */
 	
 	public void remove();
+
+
+	/**
+	 * Returns a Array of all markers associated with this shape
+	 * @return
+	 */
+	public ArrayList<AbstractGPSMarker> getMarkers();
 	
 }

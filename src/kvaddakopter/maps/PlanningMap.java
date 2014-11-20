@@ -11,18 +11,10 @@ import java.util.ArrayList;
 
 import kvaddakopter.assignment_planer.Area;
 import kvaddakopter.assignment_planer.MissionType;
-import kvaddakopter.gui.components.AbstractGPSMarker;
-import kvaddakopter.gui.components.GPSMarkerNormal;
-import kvaddakopter.gui.components.GPSMarkerForbidden;
-import kvaddakopter.gui.components.GPSMarkerWithCircle;
 import kvaddakopter.gui.components.GpsToAreaTransformer;
 import kvaddakopter.gui.components.factories.MapShapeFactory;
-import kvaddakopter.gui.components.shapes.AbstractMapShape;
 import kvaddakopter.gui.components.shapes.GPSCircle;
-import kvaddakopter.gui.components.shapes.GPSPath;
-import kvaddakopter.gui.components.shapes.GreenGPSPolygon;
 import kvaddakopter.gui.components.shapes.MapShapeInterface;
-import kvaddakopter.gui.components.shapes.RedGPSPolygon;
 import kvaddakopter.gui.controllers.TabPlaneraController;
 
 
@@ -38,13 +30,6 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 	private TabPlaneraController owningController;
 
 	
-	/**
-	 * GPS paths 
-	 */
-	private ArrayList<GPSCircle> navigationGPSCoordinate;
-	private ArrayList<GPSPath> navigationGpsTrajectories;
-	private ArrayList<GreenGPSPolygon> navigationGPSPolygons;
-	private ArrayList<RedGPSPolygon> forbiddenGPSPolygons;
 	
 	private ArrayList<MapShapeInterface> navigationMapShapes;
 	private ArrayList<MapShapeInterface> forbiddenShapes;
@@ -76,12 +61,6 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 	public void mapInitialized() {
 		
 		this.createMapWithStartLocation();
-		this.navigationGPSCoordinate = new ArrayList<GPSCircle>();
-		this.navigationGpsTrajectories = new ArrayList<GPSPath>();
-		this.navigationGPSPolygons = new ArrayList<GreenGPSPolygon>();
-		this.forbiddenGPSPolygons = new ArrayList<RedGPSPolygon>();
-
-
 		this.navigationMapShapes = new ArrayList<MapShapeInterface>();
 		this.forbiddenShapes = new ArrayList<MapShapeInterface>();
 		this.isMapInitialized = true;
@@ -115,6 +94,7 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 		}
 	}
 	
+	
 	/**
 	 * Clears both forbidden areas and navigation coordiantes
 	 */
@@ -132,7 +112,17 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 	 * @return radius
 	 */
 	public double[] getCircleRadius(){
-		return new double[]{10.0f};
+		double[] radius = new double[]{};
+		if(this.owningController.getCurrentSelectedMissionType() == MissionType.AROUND_COORDINATE){
+			int i = 0;
+			for(MapShapeInterface shape : this.navigationMapShapes){
+				if (shape instanceof GPSCircle){
+					radius[i] = ((GPSCircle) shape).getRadus();
+					i++;
+				}
+			}
+		}
+		return radius;
 	}
 	
 	
@@ -141,20 +131,17 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 	 * @return list of coordinates
 	 */
 	public ArrayList<Area> allNavigationCoordinates() {
-		return new ArrayList<Area>();
-		//return GpsToAreaTransformer.transform();
+		return GpsToAreaTransformer.transform(this.navigationMapShapes);
 		
 	}
 
-
-
+	
 	/**
 	 * Returns an array of all forbidden area coordinates
 	 * @return list of coordinates
 	 */
 	public ArrayList<Area> allForbiddenAreaCoordinates() {
-		return new ArrayList<Area>();
-	//	return GpsToAreaTransformer.transform( this.forbiddenAreasCoordinates );
+		return GpsToAreaTransformer.transform( this.forbiddenShapes );
 	}
 	
 	/**
@@ -176,27 +163,8 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 			//Coordinate where the user clicked.
 			LatLong clickedCoordinate = new LatLong((JSObject) obj.getMember("latLng"));
 			//MissionType missionType = this.owningController.getCurrentSelectedMissionType();
-			/**
-			if ( this.owningController.addMissionCoordinatesMode() ){
-				// 3 cases for each mission type
-				if (missionType == MissionType.AROUND_COORDINATE){
-					this.navigationGPSCoordinate
-					.get(currentActiveMissionAreaCounter)
-					.addCoordinate(clickedCoordinate);
-				}
-				else if (missionType == MissionType.ALONG_TRAJECTORY ){
-					this.navigationGpsTrajectories
-					.get(this.currentActiveMissionAreaCounter)
-					.addCoordinate(clickedCoordinate);
-				}
-				else if (missionType == MissionType.AREA_COVERAGE){
-					this.navigationGPSPolygons
-					.get(this.currentActiveMissionAreaCounter)
-					.addCoordinate(clickedCoordinate);
-				}
-				
-			} **/
-			if ( this.owningController.addMissionCoordinatesMode() ){
+
+			if (this.owningController.addMissionCoordinatesMode() ){
 				this.navigationMapShapes.get(this.currentActiveMissionAreaCounter)
 				.addCoordinate(clickedCoordinate);
 			}
