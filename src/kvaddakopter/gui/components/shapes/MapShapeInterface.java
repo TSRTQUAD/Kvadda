@@ -1,16 +1,22 @@
 package kvaddakopter.gui.components.shapes;
 
-import java.util.ArrayList;
+import com.lynden.gmapsfx.javascript.object.LatLong;
 
-import kvaddakopter.gui.components.AbstractGPSMarker;
 
 public interface MapShapeInterface {
+	
 	
 	/**
 	 * Uses GPSMarkes in list and draws the shape on the map
 	 */
-	public void draw(ArrayList<AbstractGPSMarker> listOfCoordinates);
+	public void draw();
+
 	
+	/**
+	 *  Add coordinate to Path
+	 */
+	public void addCoordinate(LatLong clickedCoordinate);
+
 	
 	/**
 	 * Remove all traces of the shape from the map

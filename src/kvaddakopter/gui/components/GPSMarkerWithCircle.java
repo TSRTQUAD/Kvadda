@@ -28,11 +28,8 @@ public class GPSMarkerWithCircle extends GPSMarkerNormal{
 		return this.circle;
 	}
 	
-	@Override
-	public void attachToMap(GoogleMap map, ArrayList<AbstractGPSMarker> listOfCoordinates){
+	public void attachToMap(GoogleMap map){
 		
-		super.attachToMap(map, listOfCoordinates);
-
 		CircleOptions cOpts = new CircleOptions()
 		.center(coordinate)
 		.radius(this.circleRadius)

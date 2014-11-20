@@ -1,6 +1,5 @@
 package kvaddakopter.gui.components.shapes;
 
-import java.util.ArrayList;
 
 import kvaddakopter.gui.components.AbstractGPSMarker;
 
@@ -10,7 +9,7 @@ import com.lynden.gmapsfx.javascript.object.MVCArray;
 import com.lynden.gmapsfx.shapes.Polygon;
 import com.lynden.gmapsfx.shapes.PolygonOptions;
 
-public abstract class GPSPolygon implements MapShapeInterface{
+public abstract class GPSPolygon extends AbstractMapShape implements MapShapeInterface{
 	
 	
 	/**
@@ -25,37 +24,15 @@ public abstract class GPSPolygon implements MapShapeInterface{
 	protected Polygon polygon;
 	
 	
+	/**
+	 * Coordinates
+	 */
+	
 	public GPSPolygon(GoogleMap map) {
-		this.map = map;
-	}
-
-
-
-	@Override
-	public void draw(ArrayList<AbstractGPSMarker> listOfCoordinates) {
-		//Clean the current polygon if it exist
-		this.remove();
-		//If the listSize is 1 we are done. No Path can be  drawn for ONE point.
-		int listsize = listOfCoordinates.size();
-		//Draw the new path
-		if ( listsize > 2){
-
-			LatLong[] ary = new LatLong[listsize];
-			int i = 0;
-			for(AbstractGPSMarker marker : listOfCoordinates){
-				ary[i] = new LatLong(marker.getLatitude(),marker.getLongitude());
-				i++;
-			}
-
-			MVCArray mvc = new MVCArray(ary);
-			PolygonOptions polygOpts = this.getOptions(mvc);
-			this.polygon = new Polygon(polygOpts);
-			map.addMapShape(this.polygon);
-		}
-
+		super(map);
 	}
 	
-	
+
 	/**
 	 * Returns a Polygon option object used to create the polygon
 	 * @param mvc
@@ -63,17 +40,57 @@ public abstract class GPSPolygon implements MapShapeInterface{
 	 */
 	abstract protected PolygonOptions getOptions(MVCArray mvc);
 	
-
-
+	
+	/**
+	 * Draw this shape
+	 */
 	@Override
-	public void remove() {
-		if(polygon != null){
-			map.removeMapShape(polygon);
-			polygon = null;
-		}	
+	public void draw() {
+
+		//Undraw everything
+		this.unDraw();
 		
+		//Draw Coordinates
+		super.draw();
+		//If the listSize is 1 we are done. No Path can be  drawn for ONE point.
+		int listsize = this.markers.size();
+		//Draw the new path
+		if ( listsize > 2){
+			LatLong[] ary = new LatLong[listsize];
+			int i = 0;
+			for(AbstractGPSMarker marker : this.markers){
+				//ary[i] = marker.getLatLong();
+				ary[i] = new LatLong(marker.getLatitude(),marker.getLongitude());
+				i++;
+			}
+			MVCArray mvc = new MVCArray(ary);
+
+			PolygonOptions polygOpts = this.getOptions(mvc);
+			this.polygon = new Polygon(polygOpts);
+			this.map.addMapShape(this.polygon);
+		}
+
 	}
 	
+	
+
+	
+	@Override
+	public void unDraw() {
+		//Undraw Coordinates
+		super.unDraw();
+		//Undraw shape
+		if(polygon != null){
+			map.removeMapShape(polygon);
+		}	
+	}
+	
+	@Override
+	public void remove(){
+		super.remove();
+		this.unDraw();
+		polygon = null;
+	}
 	
 	
 }

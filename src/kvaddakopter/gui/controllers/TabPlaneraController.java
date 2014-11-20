@@ -101,12 +101,13 @@ public class TabPlaneraController extends BaseController implements Initializabl
     }
     
     /**
-     * Triggered when user presses btn "Mark mission coordinates"
+     * Triggered when user presses btn "Mark new mission coordinates"
      */
     @FXML
     private void btnStartMissionCoordinates(){
     	this.canEnterMissionCoordinates = true;
     	this.canEnterForbiddenAreaCoordinates = false;	
+    	this.planningMap.createNewMapShape();
     }
     
     /**
@@ -116,6 +117,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     private void btnStartMarkForbiddenAreas(){
     	this.canEnterForbiddenAreaCoordinates = true;
     	this.canEnterMissionCoordinates = false;
+    	this.planningMap.createNewForbiddenArea();
     }
      
     /**
@@ -138,6 +140,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	//Mission Height
     	double[] height = {(double) this.listMissionHeight.getValue().getValue()};
     	mission.setHeight(height);
+    	
     	
     	//Mission Radius
     	double[] radiusValue = this.planningMap.getCircleRadius();
@@ -177,13 +180,9 @@ public class TabPlaneraController extends BaseController implements Initializabl
 	/**
 	 * Public Methods
 	 */
-    
-    
-    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         this.storage = new MissionStorage();
-        
         this.populateListsAndDefaults();
     }
     
@@ -208,17 +207,9 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	return this.currentSelectedMissionType;
     }
     
-    
-    
-    
-    
     /**
      * Private Methods
      */
-    
-    
-    
-    
     
     /**
      * Loads and sets the default values for all GUI options.

@@ -15,6 +15,7 @@ public class MockMainBus implements MainBusGUIInterface{
 	
 	
 	public MockMainBus() {
+		
 		coords.add(new GPSCoordinate(58.406659, 15.620358));
 		coords.add(new GPSCoordinate(58.406674, 15.620414));
 		coords.add(new GPSCoordinate(58.406786, 15.620588));
