@@ -51,10 +51,6 @@ public class BackgroundSubtraction  extends DetectionClass{
 	static final double CONTOUR_AREA_LOWER_THRESHOLD = 0.01;
 	double mContourAreaThreshold = CONTOUR_AREA_LOWER_THRESHOLD;
 
-	@Override
-	public boolean isMethodActive(Mainbus mainbus) {
-		return mainbus.isBackgroundSubtractionOn();
-	}
 
 	@Override
 	public ArrayList<TargetObject> runMethod(ImageObject currentImageData) {
