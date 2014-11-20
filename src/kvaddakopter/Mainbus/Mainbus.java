@@ -5,14 +5,15 @@ import java.util.ArrayList;
 
 import org.opencv.core.Core;
 
-
 import matlabcontrol.MatlabConnectionException;
 import kvaddakopter.ImageProcessingMain;
 import kvaddakopter.assignment_planer.MatlabProxyConnection;
 import kvaddakopter.assignment_planer.MissionObject;
+import kvaddakopter.control_module.signals.SensorData;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.programs.ImageProcessingMainProgram;
+import kvaddakopter.interfaces.ControlMainBusInterface;
 
 /**
  * Mainbus class
@@ -200,5 +201,7 @@ public class Mainbus{
 	public synchronized boolean isAssignmentPlanerOn() {
 		return mAssignmentPlanerRunning;
 	}
+
+
 	
 }

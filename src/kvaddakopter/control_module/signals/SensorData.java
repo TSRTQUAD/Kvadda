@@ -15,22 +15,26 @@ public class SensorData {
 	private double initiallat;
 	private double radius = 6371;
 	
+	private double Longitudold;
+	private double Latitudold;
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	public void setnewsensordata(double[] sensorvector){
+		this.Latitud = sensorvector[0];
+		this.Longitud = sensorvector[1];
+		this.xdot = sensorvector[2];
+		this.ydot = sensorvector[3];
+		this.height = sensorvector[4];
+		this.yaw = sensorvector[5];
+	}
+
 	
 	// Fixes the local coordinate system XY to intitiallat, initiallon
 	public void setinitial(){
 		this.initiallon = Longitud;
-		this.initiallat  = Latitud;	
+		this.initiallat  = Latitud;
+		this.Longitudold = Longitud;
+		this.Latitudold = Latitud;
 	}
 
 	
@@ -92,6 +96,15 @@ public class SensorData {
 		this.Longitud = GPS[1];
 	}
 	
+	public boolean isGPSnew() {
+		if(	this.Longitud == this.Longitudold && this.Latitud == this.Latitudold)		 
+		return false;
+		else{
+			this.Longitudold = this.Longitud;
+			this.Latitudold = this.Latitud;
+			return true;
+		}
+	}
 	
 
 	public void print(){
@@ -260,6 +273,9 @@ public class SensorData {
 	public double getInitiallat() {
 		return initiallat;
 	}
+
+
+
 	
 
 	

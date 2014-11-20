@@ -18,6 +18,7 @@ public class Controller{
 	protected double  errorheigt,errorlateralvel, errorforwardvel, errorheading, Ts;
 	protected double KVelForward, KVelHeight, KVelLateral, KYaw, Tintegral;
 
+
 	public Controller(double sampletime){	
 		KVelHeight = 1; 
 		KVelForward = 0.3;
@@ -33,44 +34,51 @@ public class Controller{
 		
 	
 	
-		public void GetControlSignalSingle(RefinedSensorData rsdata, ReferenceData rrdata){
+		public ControlSignal GetControlSignalMission0(RefinedSensorData rsdata, ReferenceData rrdata,ControlSignal controlsignal){
+		
+		ControlSignal csignal = new ControlSignal();
+			
 		//Coordinate system calculation
-		SimpleMatrix errorpos = new SimpleMatrix(2,1,true,rrdata.getXpos() - rsdata.getXpos(),
-														  rrdata.getYpos() - rsdata.getYpos());	
+		SimpleMatrix errorpos = new SimpleMatrix(2,1,true,rrdata.getYpos() - rsdata.getYpos(),
+														  rrdata.getXpos() - rsdata.getXpos());	
 		SimpleMatrix pos2vel = new SimpleMatrix(2,2,true,Math.cos(rsdata.getYaw()), Math.sin(rsdata.getYaw()),
 														-Math.sin(rsdata.getYaw()), Math.cos(rsdata.getYaw()));					 
 		SimpleMatrix RDataVel = pos2vel.mult(errorpos);
 		
-		//Controlsignals
-		ControlSignal.ForwardVelocity	=	KVelForward*(RDataVel.get(0) - rsdata.getForVel() );
-		ControlSignal.LateralVelocity	=	KVelLateral*(RDataVel.get(1) - rsdata.getLatVel() );	
-		ControlSignal.HeightVelocity	= 	KVelHeight*(rrdata.getHeight() - rsdata.getHeight());	
-		ControlSignal.YawRate			=	KYaw*(rrdata.getYaw() - rsdata.getYaw());
-		 
-		 this.errorheigt = rrdata.getHeight() - rsdata.getHeight();
-		 this.errorforwardvel = rrdata.getForVel() - rsdata.getForVel();
-		 this.errorheading = rrdata.getYaw() - rsdata.getYaw();
 		
+		
+		//Control signals
+		csignal.setForwardvelocity	(	KVelForward*(RDataVel.get(0) - rsdata.getForVel() )		);
+		csignal.setLateralvelocity	(	KVelLateral*(RDataVel.get(1) - rsdata.getLatVel() )		);	
+		csignal.setHeightvelocity	( 	KVelHeight*(rrdata.getHeight() - rsdata.getHeight())	);	
+		csignal.setYawrate			(	KYaw*(rrdata.getYaw() - rsdata.getYaw())				);
+		 
+		
+		this.errorheigt = rrdata.getHeight() - rsdata.getHeight();
+		this.errorforwardvel = rrdata.getForVel() - rsdata.getForVel();
+		this.errorheading = rrdata.getYaw() - rsdata.getYaw();
+		return csignal;		
 		}
 
 		
 		
-		 public void GetControlSignalMission(RefinedSensorData rsdata, ReferenceData rrdata){ 
+		 public ControlSignal GetControlSignalMission1(RefinedSensorData rsdata, ReferenceData rrdata, ControlSignal controlsignal){ 
 		 //Constant speed controlling
-
+			ControlSignal csignal = new ControlSignal();
 			 
-			 ControlSignal.ForwardVelocity		+=	(KVelForward+ Ts*Tintegral/2)*
-					 								(rrdata.getForVel() - rsdata.getForVel())+
-					 								(Ts*Tintegral/2 - KVelForward)*
-					 								errorforwardvel;
+			 csignal.setForwardvelocity		(	controlsignal.getForwardvelocity() + (KVelForward+ Ts*Tintegral/2)*
+					 								(	rrdata.getForVel() - rsdata.getForVel())+
+					 								(	Ts*Tintegral/2 - KVelForward)*
+					 									errorforwardvel															);
 			 
-			 ControlSignal.YawRate 			   	=	KYaw*(rrdata.getYaw() - rsdata.getYaw());
-			 ControlSignal.HeightVelocity		=	KVelHeight*(rrdata.getHeight() - rsdata.getHeight());
+			 csignal.setYawrate 			   	(	KYaw*(rrdata.getYaw() - rsdata.getYaw())							);
+			 csignal.setHeightvelocity		(	KVelHeight*(rrdata.getHeight() - rsdata.getHeight())				);
 			 
 			 //Errors 
 			 this.errorheigt = rrdata.getHeight() - rsdata.getHeight();
 			 this.errorforwardvel = rrdata.getForVel() - rsdata.getForVel();
-			 this.errorheading = rrdata.getYaw() - rsdata.getYaw();			 
+			 this.errorheading = rrdata.getYaw() - rsdata.getYaw();		
+			 return csignal;
 		 }
 		 
 

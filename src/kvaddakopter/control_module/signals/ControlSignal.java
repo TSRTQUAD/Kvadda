@@ -1,28 +1,84 @@
 package kvaddakopter.control_module.signals;
 
 public class ControlSignal{
-	public static double YawRate;
-	public static double HeightVelocity;
-	public static double ForwardVelocity;
-	public static double LateralVelocity;		
 	
 	
+	protected double yawrate;
+	protected double heightvelocity;
+	protected double forwardvelocity;
+	protected double lateralvelocity;
+	protected int start;
+	protected int land;
 	
 	
 	
 	public ControlSignal(){
-		ForwardVelocity = 0;
-		HeightVelocity = 0;
-		LateralVelocity = 0;
-		YawRate = 0;
+		forwardvelocity = 0;
+		heightvelocity = 0;
+		lateralvelocity = 0;
+		yawrate = 0;
+		start = 0;
+		land = 0;
 	}
 	
 	public void print(){
-		System.out.format("Yawrate: %.2f%n", YawRate);
-		System.out.format("Heightvelocity: %.1f%n", HeightVelocity);
-		System.out.format("Forwardvelocity: %.2f%n", ForwardVelocity);
-		System.out.format("Lateralvelocity: %.2f%n", LateralVelocity);
-		
+		System.out.format("yawrate: %.2f%n", yawrate);
+		System.out.format("Heightvelocity: %.1f%n", heightvelocity);
+		System.out.format("Forwardvelocity: %.2f%n", forwardvelocity);
+		System.out.format("Lateralvelocity: %.2f%n", lateralvelocity);
+		System.out.format("Start: %d%n", start);
+		System.out.format("Land: %d%n", land);		
 	}
+
+	public double getYawrate() {
+		return yawrate;
+	}
+
+	public void setYawrate(double yawrate) {
+		this.yawrate = yawrate;
+	}
+
+	public double getHeightvelocity() {
+		return heightvelocity;
+	}
+
+	public void setHeightvelocity(double heightvelocity) {
+		this.heightvelocity = heightvelocity;
+	}
+
+	public double getForwardvelocity() {
+		return forwardvelocity;
+	}
+
+	public void setForwardvelocity(double forwardvelocity) {
+		this.forwardvelocity = forwardvelocity;
+	}
+
+	public double getLateralvelocity() {
+		return lateralvelocity;
+	}
+
+	public void setLateralvelocity(double lateralvelocity) {
+		this.lateralvelocity = lateralvelocity;
+	}
+
+	public int getStart() {
+		return start;
+	}
+
+	public void setStart(int start) {
+		this.start = start;
+	}
+
+	public int getLand() {
+		return land;
+	}
+
+	public void setLand(int land) {
+		this.land = land;
+	}
+
+	
+	
 }
 

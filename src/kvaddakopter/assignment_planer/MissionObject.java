@@ -22,7 +22,7 @@ public class MissionObject {
 	protected int imageTemplte = 0;
 	protected int colorTemplate = 0;
 	protected int descriptor = 0;
-	protected int counter = 0;
+
 	
 	protected double[][] trajectory = null;
 	protected double[][] trajectorylength = null;
@@ -30,15 +30,17 @@ public class MissionObject {
 	protected double[][] missiontime = null;
 	protected double[][] referencevelocity = null;
 	
-	// Get variables
-	public double[] update(){
-		if (counter == 0){
-			
-			
-			
-		}
-	}
+	protected double[] returndata;
+	protected double waitingtime = 15;
+	protected double yaw = 0;
 	
+	
+	
+
+	
+	
+	
+	// Get variables
 	public String getMissionName(){
 		return this.missionName;
 	}
@@ -153,6 +155,22 @@ public class MissionObject {
 			return "Väj ett uppdrag...";
 		}
 		return this.missionName;
+	}
+
+	public double getWaitingtime() {
+		return waitingtime;
+	}
+
+	public void setWaitingtime(double waitingtime) {
+		this.waitingtime = waitingtime;
+	}
+
+	public double getYaw() {
+		return yaw;
+	}
+
+	public void setYaw(double yaw) {
+		this.yaw = yaw;
 	}
 	
 }

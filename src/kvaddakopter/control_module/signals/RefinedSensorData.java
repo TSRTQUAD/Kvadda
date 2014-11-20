@@ -21,7 +21,12 @@ public class RefinedSensorData{
 	public double Xdot;
 	public double Ydot;
 	
-
+	public void s2rs(SensorData sdata){
+		this.yaw = sdata.getYaw();
+		this.Height = sdata.getHeight();		
+	}
+	
+	
 	public void XYdot2Vel(){
 		LatVel =    Math.cos(yaw)*Xdot + Math.sin(yaw)*Ydot;
 		ForVel =  - Math.sin(yaw)*Xdot + Math.cos(yaw)*Ydot;

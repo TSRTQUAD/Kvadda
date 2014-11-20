@@ -1,18 +1,21 @@
 package kvaddakopter.control_module.signals;
 
+import kvaddakopter.assignment_planer.MissionObject;
+import kvaddakopter.assignment_planer.ReferenceExtractor;
 
-/*This module is split into three different functions depending on the integer Mission
+
+/*This module is split into three different functions depending on the integer mission
  * 
- * Mission = 0: If mission is set to 0 then reference data is updated when quadcopter is close 
+ * mission = 0: If mission is set to 0 then reference data is updated when quadcopter is close 
  * enough to reference coordinate and has been there for reference time. 
  * Obs: Yaw is set as a reference and is constant in between reference coordinates
  * 
- * Mission = 1: If mission is set to 1 then the quad is controlled only by adjusting yaw angle
+ * mission = 1: If mission is set to 1 then the quad is controlled only by adjusting yaw angle
  * to always point towards next reference coordinate. Lateral velocity is set to 0 and forward 
  * velocity is set to constant/reference.
  * 
  * 
- * Mission = 2: This kind of mission is for indoor testing. Reference data is updated every 
+ * mission = 2: This kind of mission is for indoor testing. Reference data is updated every 
  * sampling interval and yaw angle is set by reference.
  * 
  * */
@@ -24,7 +27,10 @@ public class ReferenceData {
 	public double Height;
 	public double ForVel;
 	public double time;
-	public int Mission;
+	public int mission;
+	public int start;
+	public int land;
+	public double[] latestreference;
 	
 	public double Xpos;
 	public double Ypos;
@@ -33,7 +39,7 @@ public class ReferenceData {
 	public double initiallat;
 	public double initiallon;
 	public double radius;
-	
+	private ReferenceExtractor referenceextractor = new ReferenceExtractor();
 	
 	
 	// Initialize coordinate system XY with origo in Initiallat and initiallon
@@ -57,15 +63,31 @@ public class ReferenceData {
 		this.Xpos=radius*deltaLat*1000;
 	}
 	
+	public void updateref(double[] latestreference){
+// latestreference  = (latitude, longitud, height, yaw, time, 
+//				  forward velocity, mission type, start,land)
+	this.Latitud = latestreference[0];
+	this.Longitud = latestreference[1];
+	this.Height = latestreference[2];
+	this.Yaw = latestreference[3];
+	this.time = latestreference[4];
+	this.ForVel = latestreference[5];
+	this.mission = (int) latestreference[6];
+	this.start = (int) latestreference[7];
+	this.land = (int) latestreference[8];
+}
 	
-	public void update(RefinedSensorData rsdata){
-		//Mission = FALSE
-		//Update reference data if close enough and reference time at coordinate is reached.
+
+	
+	public void update(RefinedSensorData rsdata, MissionObject missionobject){
+		//mission = FALSE
+
+
+		
 		if (Math.abs(rsdata.getHeight()-Height)<1 && 
 			Math.abs(rsdata.getXpos()-Xpos)<0.3   && 
 			Math.abs(rsdata.getYpos()-Ypos)<0.3   &&
-			Mission==0										){
-			
+			mission==0										){
 			
 			if (!running){
 				lStartTime= System.currentTimeMillis();
@@ -74,39 +96,73 @@ public class ReferenceData {
 			
 			if (running && Math.abs(System.currentTimeMillis() - lStartTime) > time){
 			this.running = false;
-			
-			
-			
-			
+			this.updateref( referenceextractor.update(missionobject) );	
+			System.out.println("-.-.-.-.-.-.-.-.-.-.-.-"); //update ref 
+			System.out.println("Updated referencedata mission = 0"); //update ref 	
+			System.out.println("-.-.-.-.-.-.-.-.-.-.-.-"); //update ref 
 			}
 		}	
-		// Mission = TRUE
+		// mission = TRUE
 		//Update Yaw every iteration and Reference data if close enough
-		if (Math.abs(rsdata.getHeight()-Height)<1 && 
+		else if	(	Math.abs(rsdata.getHeight()-Height)<1 && 
 				Math.abs(rsdata.getXpos()-Xpos)<0.3 && 
 				Math.abs(rsdata.getYpos()-Ypos)<0.3 &&
-				Mission==1){
-		
-			// Update reference data
-			// Update reference data
-			// Update reference data
+				mission==1){
+
+			this.updateref( referenceextractor.update(missionobject) );		//update ref 
+			
+			System.out.println("-.-.-.-.-.-.-.-.-.-.-.-"); //update ref 
+			System.out.println("Updated referencedata mission = 1"); //update ref 	
+			System.out.println("-.-.-.-.-.-.-.-.-.-.-.-"); //update ref 			
 		}		
-		if (Mission==1){
-		Yaw = ( (Yaw - rsdata.getYaw()) > 0) ?
-				Yaw - Math.atan((rsdata.getXpos() - Xpos)/(rsdata.getYpos() - Ypos)):
-				Yaw + Math.atan((rsdata.getXpos() - Xpos)/(rsdata.getYpos() - Ypos));
+		
+		
+		if (mission==1){
+			
+		if (Ypos == rsdata.getYpos()){
+				if (Xpos > rsdata.getXpos()){
+					this.Yaw = -Math.PI/2;
+				}
+				else{
+					this.Yaw = Math.PI/2;
+				}
+					
+		}
+		else if (  Xpos >= rsdata.getXpos()  && Ypos > rsdata.getYpos() ){ 				
+			this.Yaw = Math.atan( (rsdata.getXpos() - Xpos)  /  (Ypos - rsdata.getYpos()) ); 			
+		}
+		else if (  Xpos < rsdata.getXpos()  && Ypos > rsdata.getYpos() ){ 				
+			this.Yaw = Math.atan( (rsdata.getXpos() - Xpos) /   (Ypos - rsdata.getYpos()) ); 			
+		}
+		else if (  Xpos < rsdata.getXpos()  && Ypos < rsdata.getYpos() ){ 				
+			this.Yaw = Math.PI - Math.atan( (rsdata.getXpos() - Xpos) /   (rsdata.getYpos() - Ypos) ); 			
+		}
+		else if (  Xpos > rsdata.getXpos()  && Ypos < rsdata.getYpos() ){ 				
+			this.Yaw = - (Math.PI - Math.atan( (Xpos - rsdata.getXpos()) /   (rsdata.getYpos() - Ypos) )); 			
+		}
+		
 		}
 		
 		
-		if (Mission==2){
-		// Update reference data
-		// Update reference data
-		// Update reference data
-		}
 		
 		
+		if (mission==2){
+			this.updateref( referenceextractor.update(missionobject) );		//update ref  
+		}		
 	}
 	
+	
+	public void print(){
+		System.out.println("");
+		System.out.format("Yaw: %.2f%n", Yaw);
+		System.out.format("X: %.1f%n", Xpos);
+		System.out.format("Y: %.2f%n", Ypos);
+		System.out.format("Forwardvelocity: %.2f%n", ForVel);
+		System.out.format("Start: %d%n", start);
+		System.out.format("Land: %d%n", land);
+		System.out.format("Mission: %d%n", mission);
+		System.out.println("");
+	}
 	
 	
 	// Get Put
@@ -150,6 +206,31 @@ public class ReferenceData {
 
 	public void setTime(double time) {
 		this.time = time;
+	}
+
+
+	public int getStart() {
+		return start;
+	}
+
+
+	public void setStart(int start) {
+		this.start = start;
+	}
+
+
+	public int getLand() {
+		return land;
+	}
+
+
+	public void setLand(int land) {
+		this.land = land;
+	}
+
+
+	public int getMission() {
+		return mission;
 	}
 }
 
