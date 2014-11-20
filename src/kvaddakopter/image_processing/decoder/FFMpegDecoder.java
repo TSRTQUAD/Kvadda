@@ -350,8 +350,9 @@ public class FFMpegDecoder  {
 				mContainer.close();
 				mContainer = null;
 			}
+			/** loook **/
 			
-			mDecoderListener.onConnectionLost();
+//			mDecoderListener.onConnectionLost();
 	
 		}
 		
