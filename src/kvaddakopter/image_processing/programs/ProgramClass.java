@@ -11,13 +11,14 @@ import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
 import kvaddakopter.image_processing.utils.KeyBoardHandler;
 import kvaddakopter.image_processing.utils.KeyBoardListener;
+import kvaddakopter.interfaces.MainBusIPInterface;
 
 import org.opencv.core.Mat;
 
 import com.xuggle.xuggler.demos.VideoImage;
 
 
-public class ProgramClass implements Runnable,DecoderListener,KeyBoardListener {
+public abstract class ProgramClass implements Runnable,DecoderListener,KeyBoardListener {
 
 	//Create image queue, which is a list that is holding the most recent
 	//images
@@ -32,29 +33,30 @@ public class ProgramClass implements Runnable,DecoderListener,KeyBoardListener {
 	protected Tracking mTracker;
 
 	//Decoder
-	//TODO set shared decoder
 	protected FFMpegDecoder mDecoder;
 
 	//Window
 	private static VideoImage mScreen = null;
-
+	
 	//Sleep time / FPS
 	private long mSleepTime = 20;
 	
 	//private volatile Container container;
-	protected Mainbus mMainbus;
+	protected MainBusIPInterface mMainbus;
     protected int mThreadId;
+    
+    //is initiated
+    private boolean mIsInitiated = false;
     
 	
 	// KeyBoard handler
 	KeyBoardHandler mKeyBoardHandler = null;
 
-	public ProgramClass(int threadid, Mainbus mainbus) {
+	public ProgramClass(int threadid, MainBusIPInterface mainbus) {
 		mMainbus = mainbus;
 	    mThreadId = threadid;
-		init();
 	}
-	
+
 	/** 
 	 *Init function of a program class. <br> 
 	 * This function is implicitly called be constructor of the ProgramClass <br>
@@ -111,7 +113,7 @@ public class ProgramClass implements Runnable,DecoderListener,KeyBoardListener {
 		return mCurrentMethod;
 	}
 	public void run()  {
-		
+		checkIsRunning();
 		//Start program
 		while(true){
 			if(!isImageQueueEmpty()){
@@ -124,7 +126,31 @@ public class ProgramClass implements Runnable,DecoderListener,KeyBoardListener {
 			}
 		}
 	}
+	
+	/**
+	 * Check is the image processing unit has been activated
+	 * Waits until some other thread does notify on the mMainbus interface
+	 * Then checks the condition again
+	 */
+	protected void checkIsRunning(){
+		while(!mMainbus.getIsIPRunning()){
+			synchronized(mMainbus){
+				try {
+					mMainbus.wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		if(!mIsInitiated){
+			mIsInitiated = true;
+			System.out.println("Image processing being initiated");
+			init();
+		}
 
+	}
+	
 	protected void setSleepTime(long t){
 		mSleepTime = t;
 	}
@@ -185,6 +211,7 @@ public class ProgramClass implements Runnable,DecoderListener,KeyBoardListener {
 		System.err.print("Disconnected from video source\n");
 		System.exit(0);
 	}
+	
 	@Override
 	public void onKeyBoardInput(String inputString) {};
 

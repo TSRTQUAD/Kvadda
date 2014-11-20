@@ -57,7 +57,8 @@ public class DetectionClass {
 	 * @param drawInImage
 	 * @return
 	 */
-	protected ArrayList<TargetObject> convertToTargets(ArrayList<Rect> boundingBoxes, Mat drawInImage){
+	protected ArrayList<TargetObject> convertToTargets(ArrayList<Rect> boundingBoxes, ArrayList<Long> targetHSVChannels, Mat drawInImage){
+		// TODO: Do with moments instead of boundingBoxes
 		//Initialize
 		ArrayList<TargetObject> targetObjects = new ArrayList<TargetObject>();
 		
@@ -66,7 +67,7 @@ public class DetectionClass {
 		//System.out.println(boundingBoxes.size());
 		for(int i = 0; i < boundingBoxes.size(); i++){
 			Rect boundingBox = boundingBoxes.get(i);
-			targetObjects.add(new TargetObject(boundingBox, 1));
+			targetObjects.add(new TargetObject(boundingBox, 1, targetHSVChannels));
 			Core.rectangle(
 					drawInImage, 
 					new Point(boundingBox.x, boundingBox.y), 

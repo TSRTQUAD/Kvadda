@@ -22,7 +22,7 @@ import org.opencv.features2d.KeyPoint;
 
 public class MatchTests {
 
-	static final double RATIO_THRESHOLD = 0.87;
+	static final double RATIO_THRESHOLD = 0.7;
 	/**
 	 * This function test 
 	 * @param matchesList
@@ -163,10 +163,10 @@ public class MatchTests {
 				points2[i] = p;
 
 			}
-//			System.out.println("NUM KEYPOINTS: "+ points1.length);
-			Mat fundamentalMatrix = Calib3d.findFundamentalMat(new MatOfPoint2f(points1), new MatOfPoint2f(points2),Calib3d.FM_RANSAC,3,0.99);
+			Mat mask = new Mat();
+			Mat fundamentalMatrix = Calib3d.findFundamentalMat(new MatOfPoint2f(points1), new MatOfPoint2f(points2),Calib3d.FM_RANSAC,3,0.99,mask);
 			List<DMatch> inlierMatches = new ArrayList<DMatch>();
-			
+
 			for (int i = 0; i < numMatches; i++) {
 
 				int index1 = i; //inlierMatches.get(i).trainIdx;
@@ -174,7 +174,7 @@ public class MatchTests {
 				m1.put(0, 0, points1[index1].x);
 				m1.put(0, 1, points1[index1].y);
 				m1.put(0, 2, 1.0);
-				
+
 				int index2 = i; //inlierMatches.get(i).queryIdx;
 				Mat m2 = new Mat(1,3,CvType.CV_64F);
 				m2.put(0, 0, points2[index2].x);
@@ -196,29 +196,23 @@ public class MatchTests {
 				double res[] = resMat.get(0, 0);
 				if(Math.abs(res[0]) < epsilon){
 					double dist = Math.sqrt(Math.pow(points1[i].x-points2[i].x,2.0) + Math.pow(points1[i].y-points2[i].y,2.0));
-					if(dist > 40){
-						System.out.println("Distance: " +dist);
-						System.out.println("F: " +fundamentalMatrix.dump());
-						System.out.println("Error: " + Math.abs(res[0]));
-					}
-						inlierMatches.add(matchArray[i]);
-					
+					inlierMatches.add(matchArray[i]);
 				}
 			}
-//			System.out.println("Matches before: " + numMatches + "\nMatches after:" +inlierMatches.size());
+			//			System.out.println("Matches before: " + numMatches + "\nMatches after:" +inlierMatches.size());
 			DMatch[] inlierMatchesArray = new DMatch[inlierMatches.size()];
 			inlierMatches.toArray(inlierMatchesArray);
-			
+
 			outMatches.fromArray(inlierMatchesArray); 
-//			keypoints1.from
+			//			keypoints1.from
 			return fundamentalMatrix;
 		}else{
 			return null;
 		}
 
 	}
-	
-	
+
+
 	public static Mat getHomoMatrix( MatOfKeyPoint keypoints1,MatOfKeyPoint keypoints2){
 		KeyPoint[] kp1Array = keypoints1.toArray();
 		KeyPoint[] kp2Array = keypoints2.toArray();
@@ -240,31 +234,81 @@ public class MatchTests {
 			p = new Point(x, y);
 			points2[i] = p;
 		}
-		
-		Mat hMatrix = Calib3d.findHomography(new MatOfPoint2f(points1), new MatOfPoint2f(points2));
+
+		Mat hMatrix = Calib3d.findHomography(new MatOfPoint2f(points1), new MatOfPoint2f(points2),Calib3d.RANSAC, 1);
 		return hMatrix;
 	}
-	
-	public static void getMatchingKeyPoints(MatOfKeyPoint src1,MatOfKeyPoint src2,MatOfKeyPoint dst1,MatOfKeyPoint dst2,MatOfDMatch matches){
-		
+
+	public static void getInlierKeypoints(MatOfKeyPoint src1,MatOfKeyPoint src2,MatOfKeyPoint dst1,MatOfKeyPoint dst2,MatOfDMatch matches){
+
 		KeyPoint[] kp1Array = src1.toArray();
 		KeyPoint[] kp2Array = src2.toArray();
 		DMatch[] matchArray = matches.toArray();
-		
+
 		int length = (int)(matchArray.length);
 		KeyPoint[] kp1Inlier = new KeyPoint[length];
 		KeyPoint[] kp2Inlier = new KeyPoint[length];
-		
+
 		for (int i = 0; i < length; i++) {
 			kp1Inlier[i] = kp1Array[matchArray[i].queryIdx];
 			kp2Inlier[i] = kp2Array[matchArray[i].trainIdx];
 			matchArray[i].queryIdx = i;
 			matchArray[i].trainIdx = i;
 		}
-		
+
 		dst1.fromArray(kp1Inlier);
 		dst2.fromArray(kp2Inlier);
 		matches.fromArray(matchArray);
 	}
 
+	public static void findHomography_EXT(
+			MatOfDMatch inMatches, 
+			MatOfKeyPoint keypoints1,
+			MatOfKeyPoint keypoints2,
+			double epsilon,
+			MatOfDMatch outMatches)
+	{
+		
+		//Converting to arrays
+		DMatch[] matchArray = inMatches.toArray();
+		int numMatches = matchArray.length;
+		if(numMatches > 7){
+			KeyPoint[] kp1Array = keypoints1.toArray();
+			KeyPoint[] kp2Array = keypoints2.toArray();
+
+			Point[] points1 = new Point[numMatches];
+			Point[] points2 = new Point[numMatches];
+
+			int kpIndex;
+			double x,y;
+
+
+			for (int i = 0; i < numMatches; i++) {
+
+				kpIndex = matchArray[i].queryIdx;
+				x = kp1Array[kpIndex].pt.x;
+				y = kp1Array[kpIndex].pt.y;
+				Point p = new Point(x, y);
+				points1[i] = p;
+
+				kpIndex = matchArray[i].trainIdx;
+				x = kp2Array[kpIndex].pt.x;
+				y = kp2Array[kpIndex].pt.y;
+				p = new Point(x, y);
+				points2[i] = p;
+
+			}
+			Mat mask = new Mat();
+			Mat fundamentalMatrix = Calib3d.findFundamentalMat(new MatOfPoint2f(points1), new MatOfPoint2f(points2),Calib3d.FM_RANSAC,3,0.99,mask);
+
+			int length = mask.cols()*mask.rows(); 
+			int[] maskArray = new int[length];
+			for (int i = 0; i < length; i++) {
+				double[] maskElements = 
+//				maskArray[i] = 
+			}
+			
+		}
+
+	}
 }

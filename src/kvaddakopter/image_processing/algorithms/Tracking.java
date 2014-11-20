@@ -3,7 +3,9 @@ package kvaddakopter.image_processing.algorithms;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Set;
 
+import kvaddakopter.image_processing.data_types.Identifier;
 import kvaddakopter.image_processing.data_types.TargetObject;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
@@ -69,6 +71,7 @@ public class Tracking {
 		if(targetObjects.size() > 0 && mInternalTargets.size() > 0){
 			SimpleMatrix z = new SimpleMatrix(2, 1, true, targetObjects.get(0).getPosition().get(0, 0), targetObjects.get(0).getPosition().get(1, 0));
 			measurementUpdate(mInternalTargets.get(0), z);
+			mInternalTargets.get(0).updateIdentifier(targetObjects.get(0).getIdentifier());
 			trajectoryM.add(new double[]{z.get(0, 0), z.get(1, 0)});
 		} else {
 			trajectoryM.add(new double[]{0, 0});
@@ -87,8 +90,34 @@ public class Tracking {
 	
 	private void matchTargets(ArrayList<TargetObject> targetObjects) {
 		// Match targetObjects against mInternalTargets
+		// Create a grid between mInternalTargets and targetObjects
+		int numInternalTargets = mInternalTargets.size();
+		int numTargets = targetObjects.size();
+		double[][] matchMap = new double[numInternalTargets][numTargets];
+		for(int key : mInternalTargets.keySet()){
+			for(TargetObject target : targetObjects){
+				TargetObject internalTarget = mInternalTargets.get(key);
+				matchMap[key][targetObjects.indexOf(target)] = 
+						(Identifier.compare(internalTarget.getIdentifier(), target.getIdentifier()) + 
+						compareDistance(internalTarget, target)) / 2;
+			}
+		}
+		
+	}
+
+
+	private float compareDistance(TargetObject internalTarget, TargetObject target) {
+		// Compares distance between objects with regard of covariance
+		// XXX uncertainDistance only depends on one axis of the covariance
+		float uncertainDistance = (float)(internalTarget.getCovariance().get(0, 0) + target.getCovariance().get(0, 0));
+		float distance = (float)Math.sqrt(
+				Math.pow(internalTarget.getPosition().get(0, 0) - target.getPosition().get(0, 0), 2) + 
+				Math.pow(internalTarget.getPosition().get(1, 0) - target.getPosition().get(1, 0), 2));
+		
+		// Comparation of distances and uncertainties
 		
 		
+		return 0;
 	}
 
 
@@ -97,7 +126,6 @@ public class Tracking {
 		F = createF(elapsedTime);
 		Q = createQ(elapsedTime, sigmaSquared);
 	}
-
 
 	private void timeUpdate(){ // TODO: Variable time updates
 		for(Entry<Integer, TargetObject> entry: mInternalTargets.entrySet()){

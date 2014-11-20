@@ -15,21 +15,22 @@ import kvaddakopter.control_module.signals.*;
 
 
 public class Controller{		
-	protected double  errorheigt,errorlateralvel, errorforwardvel, errorheading, Ts;
-	protected double KVelForward, KVelHeight, KVelLateral, KYaw, Tintegral;
+	protected double  errorheight,errorlateralvel, errorforwardvel, errorheading, Ts;
+	protected double KVelForward, KVelHeight, KVelLateral, KYaw, Tintegral, integral;
 
 
 	public Controller(double sampletime){	
 		KVelHeight = 1; 
 		KVelForward = 0.3;
 		KVelLateral = 0.4;
-		KYaw = 1.5;
+		KYaw = 0.3;
 		Tintegral = 0.01;
 		Ts = sampletime;
-		errorheigt = 0;
+		errorheight = 0;
 		errorlateralvel = 0;
 		errorforwardvel = 0;
-		errorheading = 0;		
+		errorheading = 0;
+		integral = 0;
 	}
 		
 	
@@ -54,9 +55,10 @@ public class Controller{
 		csignal.setYawrate			(	KYaw*(rrdata.getYaw() - rsdata.getYaw())				);
 		 
 		
-		this.errorheigt = rrdata.getHeight() - rsdata.getHeight();
+		this.errorheight = rrdata.getHeight() - rsdata.getHeight();
 		this.errorforwardvel = rrdata.getForVel() - rsdata.getForVel();
 		this.errorheading = rrdata.getYaw() - rsdata.getYaw();
+
 		return csignal;		
 		}
 
@@ -66,18 +68,18 @@ public class Controller{
 		 //Constant speed controlling
 			ControlSignal csignal = new ControlSignal();
 			 
-			 csignal.setForwardvelocity		(	controlsignal.getForwardvelocity() + (KVelForward+ Ts*Tintegral/2)*
-					 								(	rrdata.getForVel() - rsdata.getForVel())+
-					 								(	Ts*Tintegral/2 - KVelForward)*
-					 									errorforwardvel															);
+			 csignal.setForwardvelocity		(	this.integral + (KVelForward+ Ts*Tintegral/2)*
+					 							(rrdata.getForVel() - rsdata.getForVel())	+
+					 							(Ts*Tintegral/2 - KVelForward)*this.errorforwardvel						);
 			 
-			 csignal.setYawrate 			   	(	KYaw*(rrdata.getYaw() - rsdata.getYaw())							);
+			 csignal.setYawrate 			(	KYaw*(rrdata.getYaw() - rsdata.getYaw())							);
 			 csignal.setHeightvelocity		(	KVelHeight*(rrdata.getHeight() - rsdata.getHeight())				);
 			 
 			 //Errors 
-			 this.errorheigt = rrdata.getHeight() - rsdata.getHeight();
+			 this.errorheight = rrdata.getHeight() - rsdata.getHeight();
 			 this.errorforwardvel = rrdata.getForVel() - rsdata.getForVel();
-			 this.errorheading = rrdata.getYaw() - rsdata.getYaw();		
+			 this.errorheading = rrdata.getYaw() - rsdata.getYaw();
+			 this.integral = csignal.getForwardvelocity();
 			 return csignal;
 		 }
 		 
@@ -87,7 +89,7 @@ public class Controller{
 
 	// Getters
 	public double geterrorheigt() {
-		return errorheigt;
+		return errorheight;
 	}
 
 

@@ -18,6 +18,8 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
+import ch.qos.logback.classic.filter.ThresholdFilter;
+
 
 public class ColorDetection  extends DetectionClass{
 	
@@ -26,7 +28,7 @@ public class ColorDetection  extends DetectionClass{
 	static final int MAXIMUM_OBJECT_SIZE = 15000; //Not used yet
 
 	//Morphology 
-	static final int MORPH_KERNEL_SIZE = 16;
+	static final int MORPH_KERNEL_SIZE = 8;
 	static final int MORPH_KERNEL_TYPE = Imgproc.MORPH_ELLIPSE;
 
 	// Color templates
@@ -40,14 +42,19 @@ public class ColorDetection  extends DetectionClass{
 		colorTemplates = new ArrayList<ColorTemplate>();
 	}
 
-
 	@Override
 	public boolean isMethodActive(Mainbus mainbus) {
-		return mainbus.isColorDetectionOn();
+		//return mainbus.isColorDetectionOn();
+		return false;
 	}
+	
+	
+	/**
+	 * TODO explanation of method functionallity
+	 */
 	@Override
 	public ArrayList<TargetObject> runMethod(ImageObject imageObject) {
-
+		mIntermeditateResult = imageObject.getImage();
 		// Convert RGB to HSV
 		Mat HSVImage = new Mat();
 		Imgproc.cvtColor(imageObject.getImage(), HSVImage, Imgproc.COLOR_BGR2HSV);
@@ -60,7 +67,9 @@ public class ColorDetection  extends DetectionClass{
 		
 		Mat cutoutImage = Mat.zeros(HSVImage.size(), CvType.CV_8UC3);
 		
-		
+		if(colorTemplates.isEmpty())
+			return targetObjects;
+		else{
 		for(ColorTemplate colorTemplate : colorTemplates){
 			//number of targets found from this template
 			int numberOfTargetsFound = 0;
@@ -97,17 +106,17 @@ public class ColorDetection  extends DetectionClass{
 			Core.bitwise_or(cutoutImage, cutout(HSVImage,contours), cutoutImage);
 			
 			//Calculate mean HSV channel values with 10 as value threshhold 
-			ArrayList<Double> targetHSVChannels = calculateMeanHSVValues(cutoutImage, 10);
+			ArrayList<Long> targetHSVChannels = calculateMeanHSVValues(cutoutImage, 10);
 			
 			mIntermeditateResult = cutoutImage;
 			
 			//Convert boundingboxes to targetObjects, draw boundingboxes in resultImage
-			targetObjects = convertToTargets(boundingBoxes, resultImage);
+			targetObjects = convertToTargets(boundingBoxes, targetHSVChannels, resultImage);
 			
 			//Draw target HSV values
 			for(TargetObject target:targetObjects){
 				//System.out.println((int)target.getPosition().get(0,0)[0]);
-				drawTargetHSVValues(cutoutImage, targetHSVChannels, (int)target.getPosition().get(0,0)[0], (int)target.getPosition().get(1,0)[0]);
+				drawTargetHSVValues(cutoutImage, targetHSVChannels, (int)target.getPosition().get(0,0), (int)target.getPosition().get(1,0));
 			}
 			
 			//Adapt color template towards HSV-channels of detected target
@@ -125,6 +134,7 @@ public class ColorDetection  extends DetectionClass{
 		}
 
 		return targetObjects;
+		}
 
 	}
 	
@@ -170,21 +180,21 @@ public class ColorDetection  extends DetectionClass{
 	}
 	
 	/**
-	 * TODO minimize calculation cost, doubles->longs???
 	 * Calculates mean of HSV channels in cutout Image
+	 * Only updates HSV in a pixel if value in that pixel > threshold 
 	 * @param cutout
 	 * @param threshold
 	 * @return ArrayList<Double> where index 0->Hue,1->Saturation,2->Value
 	 */
-	private ArrayList<Double> calculateMeanHSVValues(Mat cutout, double threshold){
-		ArrayList<Double> channelMeanValues = new ArrayList<Double>();
+	private ArrayList<Long> calculateMeanHSVValues(Mat cutout, double threshold){
+		ArrayList<Long> channelMeanValues = new ArrayList<Long>();
 		
-		double HVal = 0, SVal = 0, VVal = 0;
+		long HVal = 0, SVal = 0, VVal = 0;
 		
-		double Htot = 0, Stot = 0, Vtot = 0;
-		double numVals = 0;
+		long Htot = 0, Stot = 0, Vtot = 0;
+		long numVals = 0;
 		double[] tmpHSV;
-		// Worthless mean function
+		
 		for(int r = 0; r < cutout.rows(); r++){
 			for(int c = 0; c < cutout.cols(); c++){
 				tmpHSV = cutout.get(r, c);
@@ -213,15 +223,15 @@ public class ColorDetection  extends DetectionClass{
 	 * @param targetPosX
 	 * @param targetPosY
 	 */
-	private void drawTargetHSVValues(Mat image, ArrayList<Double> targetHSVChannels, int targetPosX, int targetPosY){
+	private void drawTargetHSVValues(Mat image, ArrayList<Long> targetHSVChannels, int targetPosX, int targetPosY){
 		//Draw HSV channels, should be moved and draw under each object
-		String txtString = String.format("H = %4f", targetHSVChannels.get(0));
+		String txtString = String.format("H = %4f", (float)targetHSVChannels.get(0));
 	    Core.putText(image, txtString, new Point(targetPosX, targetPosY+20) , Core.FONT_HERSHEY_SIMPLEX, .5, new Scalar(255, 255, 255), 1, 8, false);
 	    
-		txtString = String.format("S = %4f", targetHSVChannels.get(1));
+		txtString = String.format("S = %4f", (float)targetHSVChannels.get(1));
 	    Core.putText(image, txtString, new Point(targetPosX, targetPosY+40) , Core.FONT_HERSHEY_SIMPLEX, .5, new Scalar(255, 255, 255), 1, 8, false);
 	    
-		txtString = String.format("V = %4f", targetHSVChannels.get(2));
+		txtString = String.format("V = %4f", (float)targetHSVChannels.get(2));
 	    Core.putText(image, txtString, new Point(targetPosX, targetPosY+60) , Core.FONT_HERSHEY_SIMPLEX, .5, new Scalar(255, 255, 255), 1, 8, false);
 	}
 
@@ -238,13 +248,17 @@ public class ColorDetection  extends DetectionClass{
 	 * @return
 	 */
 	public int addTemplate(String description_, int hueLow_, int hueHigh_, int saturationLow_, int saturationHigh_, int valueLow_, int valueHigh_, int form_type_){
+		synchronized (colorTemplates) {
 		colorTemplates.add(new ColorTemplate(description_, hueLow_, hueHigh_, saturationLow_, saturationHigh_, valueLow_, valueHigh_, form_type_));
 		return colorTemplates.size() - 1;
+		}
 	}
 	
 	public int addTemplate(ColorTemplate cTemplate){
+		synchronized (colorTemplates) {
 		colorTemplates.add(cTemplate);
 		return colorTemplates.size() - 1;
+		}
 	}
 
 	/**
@@ -263,8 +277,10 @@ public class ColorDetection  extends DetectionClass{
 	 * @param id
 	 */
 	public void deactivateTemplate(int id){
+		synchronized (colorTemplates) {
 		if(id >= colorTemplates.size() || id < 0) return;
 		colorTemplates.get(id).deactivate();
+		}
 	}
 	
 	/**
@@ -296,5 +312,14 @@ public class ColorDetection  extends DetectionClass{
 	
 	public void setUsingColorAdaption(boolean b){
 		mUsingColorAdaption = b;
+	}
+
+
+	/**
+	 * Assign the member "colorTemplates" of ColorDetection class
+	 * @param colorTemplates_
+	 */
+	public void setTemplates(ArrayList<ColorTemplate> colorTemplates_) {
+		colorTemplates = (ArrayList<ColorTemplate>) colorTemplates_;
 	}
 }

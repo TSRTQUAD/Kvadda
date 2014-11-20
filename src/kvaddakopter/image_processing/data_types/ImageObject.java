@@ -5,12 +5,15 @@ import java.util.List;
 
 import kvaddakopter.image_processing.utils.MatchTests;
 
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDMatch;
 import org.opencv.core.MatOfKeyPoint;
+import org.opencv.core.Scalar;
 import org.opencv.features2d.DescriptorExtractor;
 import org.opencv.features2d.DescriptorMatcher;
 import org.opencv.features2d.FeatureDetector;
+import org.opencv.imgproc.Imgproc;
 
 public class ImageObject {
 	
@@ -116,7 +119,7 @@ public class ImageObject {
 	 * @param externalImageObject
 	 * @return
 	 */
-	public MatOfDMatch findMatches(ImageObject externalImageObject){
+	public MatOfDMatch findMatches(ImageObject externalImageObject,int minNumberOfMatches){
 		ImageObject internalImageObject = this;
 		
 		//First a check if key points and descriptors has been computed for 
@@ -131,9 +134,15 @@ public class ImageObject {
 			computeKeyPoints(FeatureDetector.FAST);
 		if(!internalImageObject.hasDescriptors())
 			externalImageObject.computeDescriptors(DescriptorExtractor.ORB);
+
+		//If we dont have any keypoint return an empty MatOfDMatch
+		if(internalImageObject.numberOfKeyPoints() <= 0 ||
+			externalImageObject.numberOfKeyPoints() <= 0)
+			return new MatOfDMatch();
+
 		
 		//Find matches (referred as correspondences in the design specification)
-		DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
+		DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.FLANNBASED);
 		
 		List<MatOfDMatch> correspondences1 = new ArrayList<MatOfDMatch>();
 		descriptorMatcher.knnMatch(
@@ -152,12 +161,24 @@ public class ImageObject {
 				);
 
 		MatchTests.ratioTest(correspondences1);
-		MatchTests.ratioTest(correspondences2);
+		//MatchTests.ratioTest(correspondences2);
 		
 		MatOfDMatch matches = MatchTests.symmetryTest(correspondences1, correspondences2);
+		
+		//If we less than minNumberOfMatches return null
+		int cols = matches.cols();
+		int rows = matches.rows();
+	
+		if(cols*rows < minNumberOfMatches)
+			return null;
+	
 		return matches;
 	}
 	
+	private int numberOfKeyPoints() {
+		return (int)( mKeyPoints.size().height*mKeyPoints.size().width);
+	}
+
 	/**
 	 * Container for blur levels in horisontal/vertical directions
 	 *
@@ -176,22 +197,26 @@ public class ImageObject {
 		mBlurLevels.v = v;
 	}
 	
+	/**
+	 * Thresholds image with HSV thresholds from ColorTemplate
+	 * @param imageObject
+	 * @param template
+	 * @return
+	 */
+	public void thresholdImage(ColorTemplate template){
+		Mat  HSVImage= new Mat();
+		
+		// Convert RGB to HSV
+		Imgproc.cvtColor(mImage, HSVImage, Imgproc.COLOR_BGR2HSV);
+		//Threshold
+		Scalar lowerBounds;
+		Scalar upperBounds;
+		synchronized(template){
+			lowerBounds = template.getLower().clone();
+			upperBounds = template.getLower().clone();
+		}
+
+		Core.inRange(HSVImage, lowerBounds, upperBounds, mImage);
+	}
 	
-//	public void detectBlur(){
-//		
-//		
-//		
-//		// To gray
-//		
-//		// Sobel x(y)
-//		
-//		// Determine edge width
-//		
-//		// Find local maximum
-//		
-//		// Compute mean value of every local maximum
-//		
-//		// Set blur level 
-//		
-//	}
 }

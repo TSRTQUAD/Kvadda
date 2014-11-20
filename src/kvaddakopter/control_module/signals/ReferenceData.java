@@ -39,22 +39,23 @@ public class ReferenceData {
 	public double initiallat;
 	public double initiallon;
 	public double radius;
-	private ReferenceExtractor referenceextractor = new ReferenceExtractor();
+	private ReferenceExtractor referenceextractor = new ReferenceExtractor(1);
 	
 	
 	// Initialize coordinate system XY with origo in Initiallat and initiallon
 	public void initialize(double inlat, double inlong){		
 	this.initiallat = inlat;
 	this.initiallon = inlong;
+	this.radius = 6371;
 	}
 	
 		
 	public void GPS2XY(){
-		double lat1=initiallat*Math.PI/180;
-		double lon1=initiallon*Math.PI/180;
+		double lat1=this.initiallat*Math.PI/180;
+		double lon1=this.initiallon*Math.PI/180;
 		
-		double lat2=Latitud*Math.PI/180;
-		double lon2=Longitud*Math.PI/180;
+		double lat2=this.Latitud*Math.PI/180;
+		double lon2=this.Longitud*Math.PI/180;
 
 		double deltaLat=lat2-lat1;
 		double deltaLon=lon2-lon1;
@@ -62,6 +63,9 @@ public class ReferenceData {
 		this.Ypos=radius*deltaLon*Math.cos((lat1+lat2)/2)*1000;
 		this.Xpos=radius*deltaLat*1000;
 	}
+	
+	
+	
 	
 	public void updateref(double[] latestreference){
 // latestreference  = (latitude, longitud, height, yaw, time, 
@@ -75,6 +79,8 @@ public class ReferenceData {
 	this.mission = (int) latestreference[6];
 	this.start = (int) latestreference[7];
 	this.land = (int) latestreference[8];
+	
+	this.GPS2XY();
 }
 	
 
@@ -105,9 +111,9 @@ public class ReferenceData {
 		// mission = TRUE
 		//Update Yaw every iteration and Reference data if close enough
 		else if	(	Math.abs(rsdata.getHeight()-Height)<1 && 
-				Math.abs(rsdata.getXpos()-Xpos)<0.3 && 
-				Math.abs(rsdata.getYpos()-Ypos)<0.3 &&
-				mission==1){
+					Math.abs(rsdata.getXpos()-Xpos)<0.3 && 
+					Math.abs(rsdata.getYpos()-Ypos)<0.3 &&
+					mission==1){
 
 			this.updateref( referenceextractor.update(missionobject) );		//update ref 
 			
@@ -146,18 +152,22 @@ public class ReferenceData {
 		
 		
 		
-		if (mission==2){
+		if (2 == this.mission){
 			this.updateref( referenceextractor.update(missionobject) );		//update ref  
-		}		
+		}
+		
 	}
 	
 	
 	public void print(){
 		System.out.println("");
-		System.out.format("Yaw: %.2f%n", Yaw);
+		System.out.format("Yaw: %.2f%n", Yaw*180 / Math.PI);
 		System.out.format("X: %.1f%n", Xpos);
 		System.out.format("Y: %.2f%n", Ypos);
+		System.out.format("Lat: %.8f%n", Latitud);
+		System.out.format("Long: %.8f%n", Longitud);
 		System.out.format("Forwardvelocity: %.2f%n", ForVel);
+		System.out.format("Height: %.2f%n", Height);
 		System.out.format("Start: %d%n", start);
 		System.out.format("Land: %d%n", land);
 		System.out.format("Mission: %d%n", mission);

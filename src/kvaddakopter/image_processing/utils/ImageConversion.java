@@ -3,6 +3,8 @@ package kvaddakopter.image_processing.utils;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
@@ -55,6 +57,7 @@ public class ImageConversion {
 		return out;
 	} 
 	/**
+	 * TODO Is this used anywhere?
 	 * Converts an image into gray scale.
 	 * @param in Color image
 	 * @return Gray scale image
@@ -63,6 +66,20 @@ public class ImageConversion {
 		Mat grayImg = new Mat(in.size(),in.type()); 
 		Imgproc.cvtColor(in, grayImg, Imgproc.COLOR_RGB2GRAY);
 		return grayImg;
+	}
+	
+	/**
+	 * Load image
+	 * @param path
+	 * @return
+	 */
+	public static BufferedImage loadImageFromFile(String path){
+		BufferedImage img = null;
+		try {
+		    img = ImageIO.read(new File(path));
+		} catch (IOException e) {
+		}
+		return img;
 	}
 
 }

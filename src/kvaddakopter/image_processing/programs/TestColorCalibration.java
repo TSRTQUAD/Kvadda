@@ -3,23 +3,25 @@ package kvaddakopter.image_processing.programs;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import kvaddakopter.image_processing.algorithms.BlurDetection;
 import kvaddakopter.image_processing.algorithms.ColorDetection;
 import kvaddakopter.image_processing.algorithms.Tracking;
+import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
 import kvaddakopter.interfaces.MainBusIPInterface;
 
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
 
 import com.xuggle.xuggler.demos.VideoImage;
 
+public class TestColorCalibration extends ProgramClass{
+	
+	public ColorTemplate cTemplate;
 
-public class TestBlurDetection extends ProgramClass{
-	BlurDetection mBlurDetection;
-
-	public TestBlurDetection(int threadid, MainBusIPInterface mainbus) {
+	public TestColorCalibration(int threadid, MainBusIPInterface mainbus) {
 		super(threadid, mainbus);
 	}
 
@@ -46,27 +48,31 @@ public class TestBlurDetection extends ProgramClass{
 		openVideoWindow();
 		
 		mCurrentMethod = new ColorDetection();
-		
-		mBlurDetection = new BlurDetection();
 
+	}
+	
+	public Mat thresholdImage(ImageObject imageObject, ColorTemplate template){
+		Mat  thresh = new Mat();
+		Mat  HSVImage= new Mat();
+		
+		// Convert RGB to HSV
+		Imgproc.cvtColor(imageObject.getImage(), HSVImage, Imgproc.COLOR_BGR2HSV);
+		//Threshold
+		Core.inRange(HSVImage, template.getLower(), template.getUpper(), thresh);
+		return thresh;
 	}
 
 	public void update()  {
 
 		Mat currentImage = getNextFrame();
+		Mat result= new Mat();
 
 		ImageObject imageObject = new ImageObject(currentImage);
 		
-		//((ColorDetection) mCurrentMethod).addTemplate("Yellow square", 20, 40, 100, 255, 100, 255, ColorTemplate.FORM_SQUARE);
-		//ArrayList<TargetObject> targetList = mCurrentMethod.runMethod(imageObject);
-		mBlurDetection.runMethod(imageObject);
-		System.out.println(imageObject.getBlurLevels().h);
-		int resWidth = 0;
-		int resHeight = 0;
+		cTemplate = mMainbus.getIPCalibTemplate();
+		result = thresholdImage(imageObject, cTemplate);
 		
-		BufferedImage out = ImageConversion.mat2Img(mBlurDetection.getGradXImage());
-		resWidth = out.getWidth();
-		resHeight = out.getHeight();
+		BufferedImage out = ImageConversion.mat2Img(result);
 		updateJavaWindow(out);
 		}
 }

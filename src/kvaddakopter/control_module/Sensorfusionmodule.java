@@ -71,7 +71,7 @@ public class Sensorfusionmodule implements Runnable{
 	protected RefinedSensorData 	rsdata  			= new RefinedSensorData();
 	protected Controller			controller			= new Controller(sampletime);
 	protected ReferenceData 		rrdata				= new ReferenceData();   
-	protected ReferenceExtractor	referenceextractor	= new ReferenceExtractor();
+	protected ReferenceExtractor	referenceextractor	= new ReferenceExtractor(0);
 	protected int					counter				= 0;
 	
 	
@@ -103,7 +103,9 @@ public class Sensorfusionmodule implements Runnable{
 		//sdata.print();
 		
 		rrdata.initialize(sdata.getLatitud(),sdata.getLongitud());	// Fix local coordinate system XY
-		rrdata.updateref(referenceextractor.update(missionobject));	// Get first reference 
+		rrdata.updateref(referenceextractor.update(missionobject));													// Get first reference 
+		rrdata.print();
+		
 		
 		rsdata.setXstates(skalmanx.timeupdate()); //Kalman filter in X direction
 		rsdata.setYstates(skalmany.timeupdate()); //Kalman filter in Y direction
@@ -151,10 +153,7 @@ public class Sensorfusionmodule implements Runnable{
 				sdata.xydot2XYdot();										//Transformation
 				System.out.format("Sensordata at sample %d%n",counter);
 				//sdata.print();
-				
-
-				//rrdata.update(rsdata, missionobject);						//Update reference data
-				//rrdata.GPS2XY();											//Transformation
+													
 
 				
 				//SENSORFUSION  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
@@ -172,6 +171,7 @@ public class Sensorfusionmodule implements Runnable{
 				System.out.format("States at sample %d%n",counter);
 				rsdata.print();
 				
+
 				
 				// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 				//For every new GPS measurement-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
@@ -191,7 +191,9 @@ public class Sensorfusionmodule implements Runnable{
 				
 				
 				//CONTROLLER  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-				
-				System.out.println("Reference signal:");
+				
+				rrdata.update(rsdata, missionobject);						//Update reference data	
+				System.out.print("Reference signal:");
 				rrdata.print();
 				
 				

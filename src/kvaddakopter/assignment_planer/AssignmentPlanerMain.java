@@ -13,16 +13,21 @@ public class AssignmentPlanerMain {
 	public static void main(String[] args) throws IOException, MatlabConnectionException, MatlabInvocationException {
 		System.out.println("Program initialized \n");
 
+		
 		// Set up an MatlabProxy, for quiet startup, set argument to true.
 		MatlabProxyConnection Matlab = new MatlabProxyConnection();
-		Matlab.startMatlab("quiet");
+		Matlab.startMatlab("Test");
 		
+
 		// Create an object to analyse
 		MissionObject testobject = new MissionObject();
 		testobject.setStartCoordinate(new double[][] {{58.3948,15.574976}});
 		testobject.setHeight(new double[] {5});
 		testobject.setRadius(new double[] {15});
-		
+		testobject.setColorTemplate(1);
+		testobject.setDescriptor(1);
+		testobject.setImageTemplate(1);
+
 		/*
 		testobject.mission( MissionType.AROUND_COORDINATE );
 		ArrayList<Area> searchareas = new ArrayList<Area>();
@@ -30,8 +35,8 @@ public class AssignmentPlanerMain {
 		targetcoordinate.area = new double[][] {{58.395157,15.574821}};
 		searchareas.add( targetcoordinate );
 		testobject.setSearchAreas(searchareas);
-		*/
-		
+		 */
+
 		/*
 		testobject.mission( MissionType.ALONG_TRAJECTORY );
 		ArrayList<Area> searchareas = new ArrayList<Area>();
@@ -46,10 +51,10 @@ public class AssignmentPlanerMain {
 				{58.395107,15.574526}};
 		searchareas.add( linesearch );
 		testobject.setSearchAreas(searchareas);
-		*/
-		
-		
-		testobject.mission( MissionType.AREA_COVERAGE );
+		 */
+
+
+		testobject.setMissionType( MissionType.AREA_COVERAGE );
 		// Create search areas
 		ArrayList<Area> searchareas = new ArrayList<Area>();
 		Area tmparea = new Area();
@@ -79,12 +84,23 @@ public class AssignmentPlanerMain {
 				{58.394944,15.574912}};
 		forbiddenareas.add( tmpforbiddenarea );
 		testobject.setForbiddenAreas(forbiddenareas);
+
+
+
+		// Calculate the trajectory
+		/*
+		 * Calculates the trajectory and saves all obtained information such as; coverage area, <br>
+		 * estimated time, the trajectory itself and an velocity reference vector for the regulator.
+		 * @param missionobject
+		 */
+		CalculateTrajectory calculatetrajectory = new CalculateTrajectory(Matlab);
+		MatFileHandler matadministartion = new MatFileHandler();
 		
 
-		
-		// Calculate the trajectory
-		CalculateTrajectory calculatetrajectory = new CalculateTrajectory(Matlab);
-		calculatetrajectory.calculateTrajectory(testobject);
+		matadministartion.createMatFile("object", testobject);
+		calculatetrajectory.makeMatlabCall();
+		matadministartion.readMatFile("results", testobject);
+
 
 		// Print the calculated trajectory and corresponding data
 		AssignmentPlanerMain.print3D("Trajectory",testobject.getTrajectory());
@@ -92,8 +108,8 @@ public class AssignmentPlanerMain {
 		AssignmentPlanerMain.print3D("Trajectory length",testobject.getTrajectoryLength());
 		AssignmentPlanerMain.print3D("Coverage area",testobject.getCoverageArea());
 		AssignmentPlanerMain.print3D("Mission time",testobject.getMissionTime());
-		
-		
+
+
 		/*
 		MatlabProxy proxy = Matlab.getMatlabProxy();
 		System.out.println("Matlab called");
@@ -101,20 +117,20 @@ public class AssignmentPlanerMain {
 	    Object[] inmem = proxy.returningFeval("inmem", 3);
 	    System.out.println("Java classes loaded:");
 	    System.out.println(Arrays.toString((String[]) inmem[2]));
-	    
+
 	    long starttime = System.currentTimeMillis();
 	    for (int counter=1; counter < 1001; counter++) {
 	    //Retrieve MATLAB's release date by providing the -date argument
 	    Object[] releaseDate = proxy.returningFeval("version", 1, "-date");
 	    }
 	    System.out.println(System.currentTimeMillis() - starttime + "\n");
-	    */
+		 */
 
-		
+
 		Matlab.terminateMatlab();
 		System.out.println("\nProgram terminated");
 	}
-	
+
 	public static void print3D(String string, double[][] variable) {
 		System.out.println(string + ": ");
 		for (int i = 0; i < variable.length; i++)
