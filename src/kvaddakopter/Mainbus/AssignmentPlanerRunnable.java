@@ -7,15 +7,16 @@ import matlabcontrol.MatlabInvocationException;
 import kvaddakopter.assignment_planer.CalculateTrajectory;
 import kvaddakopter.assignment_planer.MatFileHandler;
 import kvaddakopter.assignment_planer.MissionObject;
+import kvaddakopter.interfaces.AssignmentPlanerInterface;
 
 public class AssignmentPlanerRunnable implements Runnable {
 
-	private Mainbus mainbus;
+	private AssignmentPlanerInterface mainbus;
 	private int mThreadId;
 	private CalculateTrajectory calculatetrajectory;
 	private MissionObject missionobject;
 
-	public AssignmentPlanerRunnable(int threadid, Mainbus MB) {
+	public AssignmentPlanerRunnable(int threadid, AssignmentPlanerInterface MB) {
 		mainbus = MB;
 		mThreadId = threadid;
 	}

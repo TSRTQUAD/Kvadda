@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 
 
+
 import matlabcontrol.MatlabConnectionException;
 import kvaddakopter.ImageProcessingMain;
 import kvaddakopter.assignment_planer.MatlabProxyConnection;
@@ -25,6 +26,7 @@ import kvaddakopter.control_module.signals.SensorData;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.programs.ImageProcessingMainProgram;
+import kvaddakopter.interfaces.AssignmentPlanerInterface;
 import kvaddakopter.interfaces.ControlMainBusInterface;
 
 
@@ -49,7 +51,7 @@ import kvaddakopter.interfaces.ControlMainBusInterface;
  * http://www.javaworld.com/article/2074318/java-concurrency/java-101--understanding-java-threads--part-2--thread-synchronization.html
  * 
  */
-public class Mainbus extends Frame implements KeyListener,ControlMainBusInterface{
+public class Mainbus extends Frame implements KeyListener,ControlMainBusInterface, AssignmentPlanerInterface{
 	//Examples
 	private int var;
 	public boolean condVar = false;
