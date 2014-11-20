@@ -28,9 +28,10 @@ public class NavData implements Runnable {
 	   
 	   float GPS;
 	   
-	   float[] NavData = new float[6];
+	   double[] NavData = new double[6];
 	   public NavData(int threadid,Mainbus mainbus, String name, Communication communicationtest)  {
-		   
+		   	mThreadId = threadid;
+	        mMainbus = mainbus;
 
 		   
 	    	this.communicationtest = communicationtest;
@@ -121,12 +122,12 @@ public class NavData implements Runnable {
 				       	Vy =  Float.intBitsToFloat(communicationtest.get_int(buf_rcv, Communication.NAVDATA_VY))/1000;
 				       	Vz =  Float.intBitsToFloat(communicationtest.get_int(buf_rcv, Communication.NAVDATA_VZ))/1000;
 				       	
-				       	NavData[0] = 0;
-				       	NavData[1] = 0;
-				       	NavData[2] = Vy;
-				       	NavData[3] = Vx;
-				       	NavData[4] = Vz;
-				       	NavData[5] = Yaw;
+				       	NavData[0] = (double)0;
+				       	NavData[1] = (double)0;
+				       	NavData[2] = (double)Vy;
+				       	NavData[3] = (double)Vx;
+				       	NavData[4] = (double)Vz;
+				       	NavData[5] = (double)Yaw;
 				       	
 				       mMainbus.setNavData(NavData);
 				       	

@@ -82,7 +82,7 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
     boolean shift = false;
     boolean space_bar = false; //true = Takeoff, false = Landing
 	public boolean EmerStop = false;
-	float[] NavData = new float[6];
+	double[] NavData = new double[6];
 	//
 	
 	
@@ -270,7 +270,7 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		return ControlSignal;
 	}
 	
-	public synchronized void setNavData(float[] nd){
+	public synchronized void setNavData(double[] nd){
 	  NavData = nd;
 	}
 	
