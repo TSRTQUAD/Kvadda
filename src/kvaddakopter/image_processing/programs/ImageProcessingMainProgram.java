@@ -75,6 +75,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 	public void update(){
 		BufferedImage out = null;
 		BufferedImage colorDetectionImage = null;
+		BufferedImage templateMatchingImage = null;
 		Mat image = getNextFrame();
 		ImageObject imageObject = new ImageObject(image);
 		
@@ -115,6 +116,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 				// DO SOMETHING
 				ArrayList<Template> formTemplates = mMainbus.getIPFormTemplates();
 				targetObjects.addAll(mTemplateMatch.runMethod(imageObject));
+				templateMatchingImage= ImageConversion.mat2Img(mColorDetection.getIntermediateResult());
 			}
 			if(modes[MainBusIPInterface.TRACKING_MODE] == 1){
 				// DO SOMETHING
@@ -140,6 +142,9 @@ public class ImageProcessingMainProgram extends ProgramClass{
 					break;
 				case MainBusIPInterface.SUPRISE_IMAGE :
 					out = ImageConversion.loadImageFromFile("suprise_image.jpg");
+					break;
+				case MainBusIPInterface.TEMPLATE_MATCHING_IMAGE :
+					out = templateMatchingImage;
 					break;
 			}
 			updateJavaWindow(colorDetectionImage);

@@ -20,7 +20,7 @@ import org.opencv.features2d.DMatch;
 import org.opencv.features2d.KeyPoint;
 
 
-public class MatchTests {
+public class MatchesHelpFunctions {
 
 	static final double RATIO_THRESHOLD = 0.7;
 	/**
@@ -260,7 +260,15 @@ public class MatchTests {
 		dst2.fromArray(kp2Inlier);
 		matches.fromArray(matchArray);
 	}
-
+	
+	/**
+	 * This function is not completely implemented...
+	 * @param inMatches
+	 * @param keypoints1
+	 * @param keypoints2
+	 * @param epsilon
+	 * @param outMatches
+	 */
 	public static void findHomography_EXT(
 			MatOfDMatch inMatches, 
 			MatOfKeyPoint keypoints1,
@@ -300,14 +308,14 @@ public class MatchTests {
 			}
 			Mat mask = new Mat();
 			Mat fundamentalMatrix = Calib3d.findFundamentalMat(new MatOfPoint2f(points1), new MatOfPoint2f(points2),Calib3d.FM_RANSAC,3,0.99,mask);
-
-			int length = mask.cols()*mask.rows(); 
-			int[] maskArray = new int[length];
-			for (int i = 0; i < length; i++) {
-				double[] maskElements = 
-//				maskArray[i] = 
-			}
 			
+			int length = mask.cols()*mask.rows(); 
+			double[] maskArray = new double[length];
+			for (int i = 0; i < length; i++) {
+				double[] maskElements = mask.get(i, 0);
+				maskArray[i] = maskElements[0];
+			}
+			int cols =  mask.cols();
 		}
 
 	}

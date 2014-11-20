@@ -7,6 +7,7 @@ import kvaddakopter.image_processing.programs.CameraCalibration;
 import kvaddakopter.image_processing.programs.TestBackgroundSubtraction;
 import kvaddakopter.image_processing.programs.TestBlurDetection;
 import kvaddakopter.image_processing.programs.TestColorDetection;
+import kvaddakopter.image_processing.programs.TestTemplateMatching;
 import kvaddakopter.interfaces.MainBusIPInterface;
 
 import org.opencv.core.Core;
@@ -26,8 +27,8 @@ public class ImageProcessingMain{
 		 * See TestBackgroundSubtraction for an example.
 		 * 
 		 */
-
-		TestBackgroundSubtraction program  = new TestBackgroundSubtraction(0, null);
+//		TestBackgroundSubtraction program  = new TestBackgroundSubtraction(0, null);
+		TestTemplateMatching program  = new TestTemplateMatching(0, null);
 //		CameraCalibration program  = new CameraCalibration();
 		//TestColorDetection program  = new TestColorDetection(0, null);
 //		TestBlurDetection program  = new TestBlurDetection(0, null);

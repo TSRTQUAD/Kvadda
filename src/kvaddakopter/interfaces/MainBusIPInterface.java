@@ -17,6 +17,7 @@ public interface MainBusIPInterface {
 	public static final int TARGET_IMAGE 				= 2;
 	public static final int CUT_OUT_IMAGE 				= 3;
 	public static final int SUPRISE_IMAGE 				= 4;
+	public static final int TEMPLATE_MATCHING_IMAGE		= 5;
 
 	//Intiation
 	public void initIPVariables();
