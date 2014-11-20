@@ -233,7 +233,7 @@ public class Communication implements Runnable{
 	// -------- SEND AT COMMANDS ----------// 
 		public synchronized void send_at_cmd(String AT_CMD) throws Exception {
 	    	
-		System.out.println("AT command: " + AT_CMD);     	
+	//	System.out.println("AT command: " + AT_CMD);     	
 	    	AT_CMD_1 = AT_CMD;
 	    	byte[] buf_snd = (AT_CMD + "\r").getBytes();
 		DatagramPacket packet_snd = new DatagramPacket(buf_snd, buf_snd.length, inet_addr, Communication.AT_PORT);

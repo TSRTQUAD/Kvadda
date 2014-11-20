@@ -10,7 +10,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import org.opencv.core.Core;
+// import org.opencv.core.Core;
 
 import matlabcontrol.MatlabConnectionException;
 import kvaddakopter.ImageProcessingMain;
@@ -75,6 +75,7 @@ public class Mainbus extends Frame implements KeyListener{
     boolean shift = false;
     boolean space_bar = false; //true = Takeoff, false = Landing
 	public boolean EmerStop = false;
+	float[] NavData = new float[6];
 	//
 	
 	
@@ -83,7 +84,7 @@ public class Mainbus extends Frame implements KeyListener{
 	public static void main(String[] args) {
 		
 		//M�ste laddas i b�rjan av programmet... F�rslagsvis h�r.
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+	// 	System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		
 		Mainbus mainbus = new Mainbus();
 		System.out.println("created mainbus");
@@ -228,6 +229,12 @@ public class Mainbus extends Frame implements KeyListener{
 		return ControlSignal;
 	}
 	
+	public synchronized void setNavData(float[] nd){
+	  NavData = nd;
+	}
+	
+	
+	
 	public synchronized void setSelfCheck(boolean b){
 	    selfCheck = true;
 	}
@@ -296,7 +303,7 @@ public class Mainbus extends Frame implements KeyListener{
 	    		
     	    	} else {
     	    	    System.out.println("Go Forward (pitch+)");   	    	   
-     	    	  //  communicationtest.send_pcmd(1, speed, 0, 0, 0);
+     	    	  //  communicationtest.send_pcmd(1, 0, 0, 0, 0);
     	    	    ControlSignal[2] = ControlSignal[2] -  speed;
     	    	}
     	    	break;
