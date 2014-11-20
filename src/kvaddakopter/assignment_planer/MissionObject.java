@@ -15,9 +15,7 @@ public class MissionObject {
 	protected ArrayList<Area> searchareas = null;
 	protected ArrayList<Area> forbiddenareas = null;
 	
-	protected double[][] startcoordinate = null;
-	protected double[] height = null;
-	protected double[] radius = null;
+
 	protected double[][] startcoordinate = {{0}};
 	protected double[] height = {0};
 	protected double[] radius = {0};
