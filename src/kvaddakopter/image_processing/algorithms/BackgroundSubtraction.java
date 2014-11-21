@@ -234,7 +234,8 @@ public class BackgroundSubtraction  extends DetectionClass{
 
 		//Warped background
 		Mat warpedBackgroundImg = new Mat();
-		Imgproc.warpPerspective(mBackgroundImageData.getImage(), warpedBackgroundImg,homoMatrix, mPreviousImageData.getImage().size());
+//		Imgproc.warpPerspective(mBackgroundImageData.getImage(), warpedBackgroundImg,homoMatrix, mPreviousImageData.getImage().size());
+		Core.perspectiveTransform(mBackgroundImageData.getImage(), warpedBackgroundImg,homoMatrix);
 
 		//Subtracting
 		Mat absDifferenceImage = new Mat();

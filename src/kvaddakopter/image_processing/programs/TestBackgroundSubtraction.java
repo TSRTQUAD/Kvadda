@@ -31,7 +31,9 @@ public class TestBackgroundSubtraction extends ProgramClass{
 	Mat mSecondPose = null;
 
 	int FRAME_COUNTER = 0;
-
+	
+	boolean fileWritten = false;
+	
 	public TestBackgroundSubtraction(int threadid, IPMockMainBus mainbus) {
 		super(threadid, mainbus);
 	}
@@ -41,7 +43,7 @@ public class TestBackgroundSubtraction extends ProgramClass{
 
 		//Create and initialize decoder. And select source.
 		mDecoder = new FFMpegDecoder();
-		mDecoder.initialize(/*"tcp://192.168.1.1:5555"*/FFMpegDecoder.STREAM_ADDR_BIPBOP);
+		mDecoder.initialize("tcp://192.168.1.1:5555");
 		// Listen to decoder events
 		mDecoder.setDecoderListener(this);
 
@@ -78,11 +80,16 @@ public class TestBackgroundSubtraction extends ProgramClass{
 		}else{
 			if(state == PoseState.SelectFirstPose|| state == PoseState.SelectSecondPose ){
 				updateWindow(currentImage);
+				
 				return;
 			}
 
 			if(state == PoseState.ConfirmFirstPose){
 				updateWindow(mFirstPose.clone());
+				if(!fileWritten){
+					Highgui.imwrite("kaffe.jpg",mFirstPose);
+					fileWritten = true;
+				}
 				return;
 			}
 

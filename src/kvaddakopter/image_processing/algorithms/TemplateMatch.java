@@ -6,8 +6,8 @@ import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.utils.MatchesHelpFunctions;
 
-import org.ejml.simple.SimpleMatrix;
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDMatch;
 import org.opencv.core.MatOfKeyPoint;
@@ -16,6 +16,7 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.features2d.DescriptorExtractor;
 import org.opencv.features2d.FeatureDetector;
+import org.opencv.features2d.Features2d;
 import org.opencv.features2d.KeyPoint;
 import org.opencv.highgui.Highgui;
 
@@ -29,6 +30,8 @@ public class TemplateMatch  extends DetectionClass{
 
 	double mDetectionWidth = 1.0;
 	double mDetectionHeight = 1.0;
+
+	Mat mBoxPoints;
 
 	public TemplateMatch() {
 		mTemplateImageObjects = new ArrayList<ImageObject>();
@@ -59,13 +62,13 @@ public class TemplateMatch  extends DetectionClass{
 			if(!template.hasKeyPoints()){
 				template.computeKeyPoints(FeatureDetector.SIFT);
 				mIntermeditateResult = template.getImage().clone();
-				estimateAndRemoveOutlier(template.getKeyPoints(),mIntermeditateResult,0.3,0.3);
+				estimateAndRemoveOutlier(template.getKeyPoints(),mIntermeditateResult,0.12,0.35);
 
 				template.computeDescriptors(DescriptorExtractor.SIFT);
 				return targetObjects;
 			}
 		}
-
+		//		return targetObjects;
 		//Compute KP and descriptors for incoming image
 		imageObject.computeKeyPoints(FeatureDetector.SIFT);
 		imageObject.computeDescriptors(DescriptorExtractor.SIFT);
@@ -75,18 +78,38 @@ public class TemplateMatch  extends DetectionClass{
 			MatOfDMatch matches = template.findMatches(imageObject, minumumRequiredMatches);
 			if(matches != null){
 
-				//Retrieve inlier key points
-				MatOfKeyPoint kpTemplateInlier = new MatOfKeyPoint();
-				MatOfKeyPoint kpVideoStreamInlier = new MatOfKeyPoint();
-				MatchesHelpFunctions.getInlierKeypoints(template.getKeyPoints(), imageObject.getKeyPoints(), kpTemplateInlier, kpVideoStreamInlier, matches);
-				
-				//Estimating center and size of object
-				Rect rect = determineDetectionCenter(kpVideoStreamInlier,imageObject.getImage());
-				mIntermeditateResult = imageObject.getImage().clone();
-				//Adding detected object into list
-//				TargetObject target = new TargetObject(rect, 0, null);
-//				targetObjects.add(target);
-				
+				// Save copy of key points
+				MatOfKeyPoint keyPointsTemplate = new MatOfKeyPoint();
+				MatOfKeyPoint keyPointsVideo = new MatOfKeyPoint();
+				Mat homo = MatchesHelpFunctions.findHomography_EXT(matches, template.getKeyPoints(), imageObject.getKeyPoints(),keyPointsTemplate,keyPointsVideo);
+
+				if(homo != null){
+					Mat transformBoxPoints = new Mat();
+					Core.perspectiveTransform(mBoxPoints, transformBoxPoints,homo);
+					for (int i = 0; i < 4; i++) {
+						Point start = new Point(transformBoxPoints.get(i, 0));
+						Point end = new Point(transformBoxPoints.get((i+1) % 4, 0));
+						Core.line(imageObject.getImage(), start, end, new Scalar(255,0,0,255), 3);
+					}
+					//				MatchesHelpFunctions.getInlierKeypoints(template.getKeyPoints(), imageObject.getKeyPoints(), kpTemplateInlier, kpVideoStreamInlier, matches);
+
+					mIntermeditateResult = new Mat();
+					Features2d.drawMatches(
+							template.getImage(),
+							keyPointsTemplate,  
+							imageObject.getImage(),
+							keyPointsVideo, 
+							matches,
+							mIntermeditateResult
+							);
+
+					//					// Estimating center and size of object
+					//					Rect rect = determineDetectionCenter(kpVideoStreamInlier,imageObject.getImage());
+					//					mIntermeditateResult = imageObject.getImage().clone();
+					//					//	Adding detected object into list
+					//					TargetObject target = new TargetObject(rect, 0, null);
+					//					targetObjects.add(target);
+				}
 
 			}
 		}
@@ -171,8 +194,8 @@ public class TemplateMatch  extends DetectionClass{
 		}
 		kp.fromArray(kpArrayRefined);
 
-		//		drawSome(mean,var,image,discardDistanceX,discardDistanceY);
-		//		Features2d.drawKeypoints(image, kp, image);
+		drawSome(mean,var,image,discardDistanceX,discardDistanceY);
+		Features2d.drawKeypoints(image, kp, image);
 
 
 	}
@@ -214,7 +237,7 @@ public class TemplateMatch  extends DetectionClass{
 		if(yMean + scale*yVar < imageHeight) endCoord[1]= yMean + scale*yVar;
 		Point end = new Point(endCoord);
 		// draw enclosing rectangle (all same color, but you could use variable i to make them unique)
-		Core.rectangle(image, start, end, new Scalar(255, 0, 0, 255), 3);
+		//		Core.rectangle(image, start, end, new Scalar(255, 0, 0, 255), 3);
 
 
 		startCoord = new double[2];
@@ -229,8 +252,20 @@ public class TemplateMatch  extends DetectionClass{
 		if(xMean + discardDistanceX < imageWidth) endCoord[0]= xMean + discardDistanceX;
 		if(yMean + discardDistanceY< imageHeight) endCoord[1]= yMean + discardDistanceY;
 		end = new Point(endCoord);
-		//	Core.rectangle(image, start, end, new Scalar(255, 0, 255, 0), 3);
-
+		Core.rectangle(image, start, end, new Scalar(255, 0, 255, 0), 3);
+		Rect rect = new Rect(start,end);
+		
+		
+		double p0[] = new double[]{xMean - discardDistanceX,yMean - discardDistanceY};
+		double p1[] = new double[]{xMean + discardDistanceX,yMean - discardDistanceY};
+		double p2[] = new double[]{xMean + discardDistanceX,yMean + discardDistanceY};
+		double p3[] = new double[]{xMean - discardDistanceX,yMean + discardDistanceY};
+		
+		mBoxPoints = new Mat(4,1,CvType.CV_64FC2); 
+		mBoxPoints.put(0, 0, p0);
+		mBoxPoints.put(1, 0, p1);
+		mBoxPoints.put(2, 0, p2);
+		mBoxPoints.put(3, 0, p3);
 
 	}
 
