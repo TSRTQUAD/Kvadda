@@ -107,17 +107,9 @@ public class TabUtforController extends BaseController implements Initializable 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
     	
-        //this.missionMap = new MissionMap(this.mapViewUtfor, this);
-        try {
-			this.loadFromStorage();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        this.populateDefaultLists();
+    	// this.missionMap = new MissionMap(this.mapViewUtfor, this);
+    	this.loadFromStorage();
+    	this.populateDefaultLists();
     }
     
     
@@ -126,7 +118,7 @@ public class TabUtforController extends BaseController implements Initializable 
      * @throws IOException 
      * @throws FileNotFoundException 
      */
-    private void loadFromStorage() throws FileNotFoundException, IOException{
+    private void loadFromStorage() {
     	this.listOfMissions =  this.missionStorage.getListOfSavedMissions();
     }
     

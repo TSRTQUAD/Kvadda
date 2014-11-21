@@ -123,7 +123,14 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	this.canEnterMissionCoordinates = false;
     	this.planningMap.createNewForbiddenArea();
     }
-     
+    /**
+     * 
+     */
+    @FXML
+    private void btnGenerateTrajectory(){
+    	
+    }
+    
     /**
      * Triggered when the user clicks "Save mission"
      * @throws IOException 
