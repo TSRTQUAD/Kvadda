@@ -113,7 +113,7 @@ public class MatFileHandler {
 			missionobject.setReferenceVelocity(((MLDouble) MLRead.getMLArray("velocity")).getArray());
 		}
 		else {
-			MatFileReader MLRead = new MatFileReader("Mission/" + name + ".mat" );
+			MatFileReader MLRead = new MatFileReader("Missions/" + name + ".mat" );
 			
 			//Set mission name
 			missionobject.setMissionName(name);
