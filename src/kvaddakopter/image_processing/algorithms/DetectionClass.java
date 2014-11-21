@@ -67,7 +67,7 @@ public class DetectionClass {
 		//System.out.println(boundingBoxes.size());
 		for(int i = 0; i < boundingBoxes.size(); i++){
 			Rect boundingBox = boundingBoxes.get(i);
-			targetObjects.add(new TargetObject(boundingBox, 1, targetHSVChannels));
+			targetObjects.add(new TargetObject(boundingBox, 120, targetHSVChannels));
 			Core.rectangle(
 					drawInImage, 
 					new Point(boundingBox.x, boundingBox.y), 

@@ -10,15 +10,24 @@ public class Identifier {
 	// From TemplateMatching
 	float[] templateMatches;  // Number of matches per template where place 
 							// in array corresponds to place in TemplateObjects array
+
 	
 	public Identifier(ArrayList<Long> targetHSVChannels){
 		meanHSVValues = new float[3];
-		meanHSVValuesCertainty = 0.5f;
+		meanHSVValuesCertainty = 0.7f;
 		templateMatches = new float[Template.getTemplates().size()];
 		
 		for(int i = 0; i < 3; i++){
 			meanHSVValues[i] = (float)targetHSVChannels.get(i);
 		}
+	}
+	
+	public Identifier(int templateID, long numMatches){
+		meanHSVValues = new float[3];
+		meanHSVValuesCertainty = 0.7f;
+		templateMatches = new float[Template.getTemplates().size()];
+		
+		templateMatches[templateID] = numMatches;
 	}
 	
 	public static float compare(Identifier first, Identifier second){
@@ -29,9 +38,9 @@ public class Identifier {
 		if(first.meanHSVValuesCertainty > 0 && second.meanHSVValuesCertainty > 0){
 			// TODO: Add check if array is initialized
 			certaintyFromColorDetection += first.meanHSVValuesCertainty * second.meanHSVValuesCertainty * 
-					(1 - Math.abs(first.meanHSVValues[0] - second.meanHSVValues[0]) / 255) *  
-					(1 - Math.abs(first.meanHSVValues[1] - second.meanHSVValues[1]) / 255) *
-					(1 - Math.abs(first.meanHSVValues[2] - second.meanHSVValues[2]) / 255);
+					Math.pow((1 - Math.abs(first.meanHSVValues[0] - second.meanHSVValues[0]) / 255), 4) *  
+					Math.pow((1 - Math.abs(first.meanHSVValues[1] - second.meanHSVValues[1]) / 255), 4) *
+					Math.pow((1 - Math.abs(first.meanHSVValues[2] - second.meanHSVValues[2]) / 255), 4);
 		}
 		
 		
@@ -49,7 +58,7 @@ public class Identifier {
 			float maxNumMatches = Template.getTemplates().get(i).getNumDescriptors();
 			float a = first.templateMatches[i] / maxNumMatches;
 			float b = second.templateMatches[i] / maxNumMatches;
-			certaintyFromTemplates += (1 - Math.abs(a - b));
+			certaintyFromTemplates *= (1 - Math.abs(a - b));
 			
 			templateMatchingPower += a * b;
 		}
@@ -80,7 +89,10 @@ public class Identifier {
 		for(int i = 0; i < numberOfTemplates; i++){
 			templateMatches[i] += (newMeasured.templateMatches[i] - templateMatches[i]) / timeConstant;
 		}
-		
-		System.out.println(meanHSVValuesCertainty);
+	}
+	
+	public Identifier setmeanHSVValuesCertainty(float val){
+		meanHSVValuesCertainty = val;
+		return this;
 	}
 }

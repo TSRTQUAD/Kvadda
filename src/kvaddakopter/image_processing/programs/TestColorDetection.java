@@ -10,6 +10,7 @@ import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
+import kvaddakopter.interfaces.MainBusIPInterface;
 
 import org.opencv.core.Mat;
 
@@ -19,7 +20,7 @@ import com.xuggle.xuggler.demos.VideoImage;
 public class TestColorDetection extends ProgramClass{
 
 
-	public TestColorDetection(int threadid, Mainbus mainbus) {
+	public TestColorDetection(int threadid, MainBusIPInterface mainbus) {
 		super(threadid, mainbus);
 	}
 
@@ -35,7 +36,7 @@ public class TestColorDetection extends ProgramClass{
 		mDecoder = new FFMpegDecoder();
 		//mDecoder.initialize("tcp://192.168.1.1:5555");
 		//mDecoder.initialize("rtsp://130.236.214.20:8086");
-		mDecoder.initialize("mvi2.mp4");
+		mDecoder.initialize("mvi3.mp4");
 		// Listen to decoder events
 		mDecoder.setDecoderListener(this);
 
@@ -79,9 +80,6 @@ public class TestColorDetection extends ProgramClass{
 			BufferedImage outT = ImageConversion.mat2Img(outputT);
 			trackingWindow.setImage(outT);
 
-		}
-		
-		
-		
+		}		
 	}
 }
