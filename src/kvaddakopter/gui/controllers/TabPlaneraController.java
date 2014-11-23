@@ -20,6 +20,8 @@ import javafx.scene.layout.AnchorPane;
 import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.assignment_planer.MissionType;
 import kvaddakopter.gui.components.MissionHeight;
+import kvaddakopter.gui.components.shapes.GPSPath;
+import kvaddakopter.interfaces.MainBusGUIInterface;
 import kvaddakopter.maps.PlanningMap;
 import kvaddakopter.storage.MissionStorage;
 
@@ -123,11 +125,34 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	this.canEnterMissionCoordinates = false;
     	this.planningMap.createNewForbiddenArea();
     }
-    /**
-     * 
-     */
+
+    
     @FXML
     private void btnGenerateTrajectory(){
+    	//Get mission data from GUI and set it to MainBus
+    	setMissionDataFromGUI();
+    	
+    	//Get MainBus
+    	MainBusGUIInterface mainbus = this.getParent().getMainBus();
+    	
+    	//Start AssignmentPlaner
+    	mainbus.setAssignmentPlanerOn(true);
+		synchronized(mainbus){
+			mainbus.notify ();
+		}
+    	
+    	//Check for results from AssignmentPlaner
+		while ( mainbus.isAssignmentPlanerOn() )
+			try{
+				synchronized(mainbus){
+					mainbus.wait();
+				}
+
+			}
+		catch (InterruptedException e) {}
+		
+		System.out.println("Results retrived");
+		
     	
     }
     
@@ -137,47 +162,12 @@ public class TabPlaneraController extends BaseController implements Initializabl
      * @throws FileNotFoundException 
      */
     @FXML 
-    private void btnSaveMission() throws FileNotFoundException, IOException{
+    private void btnSaveMission() {
+
+    	btnGenerateTrajectory();
     	
-    	
-    	//Create new mission object
-    	MissionObject mission = new MissionObject();
-    	
-    	
-    	//Mission Name
-    	mission.setMissionName(this.txtMissionName.getText());
-    	
-    	//MissionType
-    	mission.setMissionType(this.listMissionType.getValue());
-    	
-    	//Mission Height
-    	double[] height = {(double) this.listMissionHeight.getValue().getValue()};
-    	mission.setHeight(height);
-    	
-    	
-    	//Mission Radius
-    	double[] radiusValue = this.planningMap.getCircleRadius();
-    	mission.setRadius(radiusValue);
-    	
-    	//Image template
-    	String selectedTemplate = this.listTargetTemplate.getValue();
-    	int templateId = this.targetTemplates.indexOf(selectedTemplate);
-    	mission.setImageTemplate(templateId);
-    	
-    	//Image color
-    	String selectedColor = this.listTargetColor.getValue();
-    	int colorId = this.colorTemplates.indexOf(selectedColor);
-    	mission.setColorTemplate(colorId);
-    	
-    	//Image Descriptor
-    	int descriptorId = (int) this.descriporRadioGroup.getSelectedToggle().getUserData();
-    	mission.setDescriptor(descriptorId);
-    	
-    	
-    	//GPS AREAS
-    	mission.setSearchAreas(this.planningMap.allNavigationCoordinates());
-    	mission.setForbiddenAreas(this.planningMap.allForbiddenAreaCoordinates());
-    	
+    	//Get current mission from MainBus
+    	MissionObject mission = this.getParent().getMainBus().getMissionObject();
 
     	//Save mission
     	try {
@@ -267,6 +257,56 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	//Set up descriptors Radios
     	this.radioDescriptor1.setUserData(0);
     	this.radioDescriptor2.setUserData(1);
+    	
+	}
+    
+    /**
+     * Get all the mission data from the GUI
+     * @return
+     */
+	public void setMissionDataFromGUI() {
+		
+    	//Create new mission object
+    	MissionObject mission = new MissionObject();
+    	
+    	//Temporary set startcoordinates
+    	mission.setStartCoordinate(new double[][] {{58.406632934898347, 15.619798600673676}});
+    	
+    	//Mission Name
+    	mission.setMissionName(this.txtMissionName.getText());
+    	
+    	//MissionType
+    	mission.setMissionType(this.listMissionType.getValue());
+    	
+    	//Mission Height
+    	double[] height = {(double) this.listMissionHeight.getValue().getValue()};
+    	mission.setHeight(height);
+    	
+    	//Mission Radius
+    	double[] radiusValue = this.planningMap.getCircleRadius();
+    	mission.setRadius(radiusValue);
+    	
+    	//Image template
+    	String selectedTemplate = this.listTargetTemplate.getValue();
+    	int templateId = this.targetTemplates.indexOf(selectedTemplate);
+    	mission.setImageTemplate(templateId);
+    	
+    	//Image color
+    	String selectedColor = this.listTargetColor.getValue();
+    	int colorId = this.colorTemplates.indexOf(selectedColor);
+    	mission.setColorTemplate(colorId);
+    	
+    	//Image Descriptor
+    	int descriptorId = (int) this.descriporRadioGroup.getSelectedToggle().getUserData();
+    	mission.setDescriptor(descriptorId);
+    	
+    	//GPS AREAS
+    	mission.setSearchAreas(this.planningMap.allNavigationCoordinates());
+    	mission.setForbiddenAreas(this.planningMap.allForbiddenAreaCoordinates());
+    	
+    	//Set mission to MainBus
+    	this.getParent().getMainBus().setMissionObject(mission);
+		
 	}
 
 

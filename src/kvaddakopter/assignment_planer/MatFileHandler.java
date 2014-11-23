@@ -107,7 +107,7 @@ public class MatFileHandler {
 
 		//Save data to missionobject
 		if (name.equals("results")) {
-			MatFileReader MLRead = new MatFileReader("src/kvaddakopter/assignment_planer/Matlab/Data" + name + ".mat" );
+			MatFileReader MLRead = new MatFileReader("src/kvaddakopter/assignment_planer/Matlab/Data/" + name + ".mat" );
 			missionobject.setTrajectory(((MLDouble) MLRead.getMLArray("trajectory")).getArray());
 			missionobject.setTrajectoryLength(((MLDouble) MLRead.getMLArray("trajectorylength")).getArray());
 			missionobject.setCoverageArea(((MLDouble) MLRead.getMLArray("coveragearea")).getArray());

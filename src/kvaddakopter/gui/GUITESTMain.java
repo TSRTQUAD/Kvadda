@@ -1,7 +1,6 @@
 package kvaddakopter.gui;
 
-import matlabcontrol.MatlabConnectionException;
-import kvaddakopter.Mainbus.AssignmentPlanerRunnable;
+import kvaddakopter.assignment_planer.AssignmentPlanerRunnable;
 import kvaddakopter.assignment_planer.MatlabProxyConnection;
 import kvaddakopter.gui.interfaces.MockMainBus;
 
@@ -10,13 +9,11 @@ public class GUITESTMain{
 	public static void main(String[] args) {
 		MockMainBus mainbus = new MockMainBus();
 		
-		MatlabProxyConnection proxy = new MatlabProxyConnection();
-		try {
-			proxy.startMatlab("quiet");
-		} catch (MatlabConnectionException e) {
-			System.out.println("Could not start Matlab");
-			e.printStackTrace();
-		}
+		// Start Matlab
+		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
+		mainbus.setMatlabProxyConnection(matlabproxy);
+		matlabproxy.startMatlab("quiet");
+	
 		
 		// START MODULE
 	    GUIModule gui = new GUIModule(mainbus);

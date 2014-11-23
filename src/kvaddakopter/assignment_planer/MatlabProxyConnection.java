@@ -1,5 +1,8 @@
 package kvaddakopter.assignment_planer;
 
+import java.io.File;
+
+import matlabcontrol.LoggingMatlabProxy;
 import matlabcontrol.MatlabConnectionException;
 import matlabcontrol.MatlabProxy;
 import matlabcontrol.MatlabProxyFactory;
@@ -20,8 +23,10 @@ public class MatlabProxyConnection {
 	 * @param option
 	 * @throws MatlabConnectionException
 	 */
-	public void startMatlab(String option) throws MatlabConnectionException{
+	public void startMatlab(String option) {
 		System.out.println("Setting up the Matlab proxy");
+		File file = new File("src/kvaddakopter/assignment_planer/Matlab");
+		
 		//Create a proxy, which will be used to control MATLAB
 		if (option.equals("quiet")) {
 			//If option is set to quiet the Matlab session will start quiet
@@ -29,10 +34,16 @@ public class MatlabProxyConnection {
 			System.out.println("Setting up a quiet Matlab session ...");
 			Builder buildoptions = new MatlabProxyFactoryOptions.Builder();
 			buildoptions.setHidden(true);
+			buildoptions.setMatlabStartingDirectory(file);
 			MatlabProxyFactoryOptions options = buildoptions.build();
 
 			MatlabProxyFactory factory = new MatlabProxyFactory(options);
-			this.proxy = factory.getProxy();
+			try {
+				this.proxy = factory.getProxy();
+			} catch (MatlabConnectionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		else if (option.equals("existing")) {
 			//If option is set to existing the proxy will try to connect to
@@ -40,15 +51,31 @@ public class MatlabProxyConnection {
 			System.out.println("Connecting to running session of Matlab ...");
 			Builder buildoptions = new MatlabProxyFactoryOptions.Builder();
 			buildoptions.setUsePreviouslyControlledSession(true);
+			buildoptions.setMatlabStartingDirectory(file);
 			MatlabProxyFactoryOptions options = buildoptions.build();
 
 			MatlabProxyFactory factory = new MatlabProxyFactory(options);
-			this.proxy = factory.getProxy();
+			try {
+				this.proxy = factory.getProxy();
+			} catch (MatlabConnectionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		else {
-			MatlabProxyFactory factory = new MatlabProxyFactory();
-			this.proxy = factory.getProxy();
+			Builder buildoptions = new MatlabProxyFactoryOptions.Builder();
+			buildoptions.setMatlabStartingDirectory(file);
+			MatlabProxyFactoryOptions options = buildoptions.build();
+			
+			MatlabProxyFactory factory = new MatlabProxyFactory(options);
+			try {
+				this.proxy = factory.getProxy();
+			} catch (MatlabConnectionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+
 	}
 
 	/**
