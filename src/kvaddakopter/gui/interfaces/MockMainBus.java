@@ -16,7 +16,7 @@ public class MockMainBus implements MainBusGUIInterface, AssignmentPlanerInterfa
 	protected int counter = -1;
 	protected int inc = 1;
 	protected MissionObject missionobject;
-	protected boolean assignmentplanerstatus;
+	protected boolean assignmentplanerstatus = false;
 	protected MatlabProxyConnection matlabproxy;
 	
 	
@@ -83,12 +83,13 @@ public class MockMainBus implements MainBusGUIInterface, AssignmentPlanerInterfa
 	}
 
 	@Override
-	public MatlabProxyConnection getMatlabProxy() {
-		return matlabproxy;
+	public MatlabProxyConnection getMatlabProxyConnection() {
+		return this.matlabproxy;
 	}
-	
-	public void setMatlabProxy(MatlabProxyConnection MP) {
-		matlabproxy = MP;
+
+	@Override
+	public void setMatlabProxyConnection(MatlabProxyConnection MPC) {
+		this.matlabproxy = MPC;
 	}
 	
 }

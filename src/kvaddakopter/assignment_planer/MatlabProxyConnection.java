@@ -20,7 +20,7 @@ public class MatlabProxyConnection {
 	 * @param option
 	 * @throws MatlabConnectionException
 	 */
-	public void startMatlab(String option) throws MatlabConnectionException{
+	public void startMatlab(String option) {
 		System.out.println("Setting up the Matlab proxy");
 		//Create a proxy, which will be used to control MATLAB
 		if (option.equals("quiet")) {
@@ -32,7 +32,12 @@ public class MatlabProxyConnection {
 			MatlabProxyFactoryOptions options = buildoptions.build();
 
 			MatlabProxyFactory factory = new MatlabProxyFactory(options);
-			this.proxy = factory.getProxy();
+			try {
+				this.proxy = factory.getProxy();
+			} catch (MatlabConnectionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		else if (option.equals("existing")) {
 			//If option is set to existing the proxy will try to connect to
@@ -43,11 +48,21 @@ public class MatlabProxyConnection {
 			MatlabProxyFactoryOptions options = buildoptions.build();
 
 			MatlabProxyFactory factory = new MatlabProxyFactory(options);
-			this.proxy = factory.getProxy();
+			try {
+				this.proxy = factory.getProxy();
+			} catch (MatlabConnectionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		else {
 			MatlabProxyFactory factory = new MatlabProxyFactory();
-			this.proxy = factory.getProxy();
+			try {
+				this.proxy = factory.getProxy();
+			} catch (MatlabConnectionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 

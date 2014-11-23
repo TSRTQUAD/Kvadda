@@ -10,19 +10,14 @@ import matlabcontrol.MatlabProxy;
  *
  */
 public class CalculateTrajectory {
-	protected MatlabProxyConnection Matlab;
-
-	public CalculateTrajectory(MatlabProxyConnection matlab) {
-		this.Matlab = matlab;
-	}
 
 	/**
 	 * Calls the Matlabscript, the output is saved in a Mat-file called results.mat.
 	 * @throws MatlabConnectionException
 	 * @throws MatlabInvocationException
 	 */
-	public void makeMatlabCall() throws MatlabConnectionException, MatlabInvocationException{
-		MatlabProxy proxy = this.Matlab.getMatlabProxy();
+	public void makeMatlabCall(MatlabProxyConnection matlabproxy) throws MatlabConnectionException, MatlabInvocationException{
+		MatlabProxy proxy = matlabproxy.getMatlabProxy();
 
 		System.out.println("Making Matlab call");
 
