@@ -19,10 +19,9 @@ public class CalculateTrajectory {
 	public void makeMatlabCall(MatlabProxyConnection matlabproxy) throws MatlabConnectionException, MatlabInvocationException{
 		MatlabProxy proxy = matlabproxy.getMatlabProxy();
 
-		System.out.println("Making Matlab call");
+		System.out.println("Calculating Trajectory in Matlab ...");
 
 		//Make script call
-		proxy.eval("cd('src/kvaddakopter/assignment_planer/Matlab')");
 		proxy.eval("assignmentplaner");
 
 	}

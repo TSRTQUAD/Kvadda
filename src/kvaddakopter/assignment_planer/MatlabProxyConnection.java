@@ -1,5 +1,8 @@
 package kvaddakopter.assignment_planer;
 
+import java.io.File;
+
+import matlabcontrol.LoggingMatlabProxy;
 import matlabcontrol.MatlabConnectionException;
 import matlabcontrol.MatlabProxy;
 import matlabcontrol.MatlabProxyFactory;
@@ -22,6 +25,8 @@ public class MatlabProxyConnection {
 	 */
 	public void startMatlab(String option) {
 		System.out.println("Setting up the Matlab proxy");
+		File file = new File("src/kvaddakopter/assignment_planer/Matlab");
+		
 		//Create a proxy, which will be used to control MATLAB
 		if (option.equals("quiet")) {
 			//If option is set to quiet the Matlab session will start quiet
@@ -29,6 +34,7 @@ public class MatlabProxyConnection {
 			System.out.println("Setting up a quiet Matlab session ...");
 			Builder buildoptions = new MatlabProxyFactoryOptions.Builder();
 			buildoptions.setHidden(true);
+			buildoptions.setMatlabStartingDirectory(file);
 			MatlabProxyFactoryOptions options = buildoptions.build();
 
 			MatlabProxyFactory factory = new MatlabProxyFactory(options);
@@ -45,6 +51,7 @@ public class MatlabProxyConnection {
 			System.out.println("Connecting to running session of Matlab ...");
 			Builder buildoptions = new MatlabProxyFactoryOptions.Builder();
 			buildoptions.setUsePreviouslyControlledSession(true);
+			buildoptions.setMatlabStartingDirectory(file);
 			MatlabProxyFactoryOptions options = buildoptions.build();
 
 			MatlabProxyFactory factory = new MatlabProxyFactory(options);
@@ -56,7 +63,11 @@ public class MatlabProxyConnection {
 			}
 		}
 		else {
-			MatlabProxyFactory factory = new MatlabProxyFactory();
+			Builder buildoptions = new MatlabProxyFactoryOptions.Builder();
+			buildoptions.setMatlabStartingDirectory(file);
+			MatlabProxyFactoryOptions options = buildoptions.build();
+			
+			MatlabProxyFactory factory = new MatlabProxyFactory(options);
 			try {
 				this.proxy = factory.getProxy();
 			} catch (MatlabConnectionException e) {
@@ -64,6 +75,7 @@ public class MatlabProxyConnection {
 				e.printStackTrace();
 			}
 		}
+
 	}
 
 	/**

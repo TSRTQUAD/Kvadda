@@ -20,6 +20,7 @@ import javafx.scene.layout.AnchorPane;
 import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.assignment_planer.MissionType;
 import kvaddakopter.gui.components.MissionHeight;
+import kvaddakopter.gui.components.shapes.GPSPath;
 import kvaddakopter.interfaces.MainBusGUIInterface;
 import kvaddakopter.maps.PlanningMap;
 import kvaddakopter.storage.MissionStorage;
@@ -151,6 +152,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
 		catch (InterruptedException e) {}
 		
 		System.out.println("Results retrived");
+		
     	
     }
     
@@ -161,10 +163,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
      */
     @FXML 
     private void btnSaveMission() {
-    	/*
-    	//Get mission data from GUI and set it to MainBus
-    	setMissionDataFromGUI();
-    	*/
+
     	btnGenerateTrajectory();
     	
     	//Get current mission from MainBus
