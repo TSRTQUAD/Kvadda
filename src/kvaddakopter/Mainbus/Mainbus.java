@@ -17,7 +17,8 @@ import java.util.ArrayList;
 
 
 
-import matlabcontrol.MatlabConnectionException;
+
+
 import kvaddakopter.ImageProcessingMain;
 import kvaddakopter.assignment_planer.AssignmentPlanerRunnable;
 import kvaddakopter.assignment_planer.MatFileHandler;
@@ -255,14 +256,6 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		return missionobject;
 	}
 	
-	public synchronized void setMatlabProxy(MatlabProxyConnection MP){
-		matlabproxy = MP;
-	}
-	
-	public synchronized MatlabProxyConnection getMatlabProxy() {
-		return matlabproxy;
-	}
-	
 	public synchronized void setAssignmentPlanerOn(boolean state){
 		mAssignmentPlanerRunning = state;
 	}
@@ -299,6 +292,7 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		NavDataOverAll[seq][3] = nd[3];
 		NavDataOverAll[seq][4] = nd[4];
 		NavDataOverAll[seq][5] = nd[5];
+
 		seq = seq + 1;
 		NavData = nd;
 	}
