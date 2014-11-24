@@ -75,15 +75,6 @@ for ii = 2:nrofnodes
                 boundarymat(ii,jj) = boundarypenalty;
                 boundarymat(jj,ii) = boundarypenalty;
             end
-            % Plot intersections for analytical purposes
-%             figure(1)
-%             hold on
-%             if any(not(isnan(intersections)))
-%                 plot(linebetweennodes([2 4]),linebetweennodes([1 3]),'r')
-%             else
-%                 plot(linebetweennodes([2 4]),linebetweennodes([1 3]),'g')
-%             end
-%             hold off
         end
     end
 end

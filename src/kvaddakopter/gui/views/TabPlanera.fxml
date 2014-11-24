@@ -180,14 +180,28 @@
                         <Insets top="20.0" />
                      </padding>
                   </VBox>
-                  <HBox fx:id="txtEstimatedTime" alignment="CENTER" prefHeight="26.0" prefWidth="401.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                  <VBox layoutY="612.0" prefHeight="66.0" prefWidth="343.0">
                      <children>
-                        <Button fx:id="btnSaveMission" alignment="CENTER" mnemonicParsing="false" onAction="#btnSaveMission" prefHeight="26.0" prefWidth="198.0" text="Spara uppdrag">
-                           <HBox.margin>
-                              <Insets bottom="40.0" />
-                           </HBox.margin></Button>
+                        <HBox fx:id="txtEstimatedTime" alignment="CENTER" prefHeight="26.0" prefWidth="401.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                           <children>
+                              <Button fx:id="btnGenerateTrajectory" alignment="CENTER" mnemonicParsing="false" onAction="#btnGenerateTrajectory" prefHeight="26.0" prefWidth="198.0" text="Generera trajektoria">
+                                 <HBox.margin>
+                                    <Insets bottom="10.0" />
+                                 </HBox.margin>
+                              </Button>
+                           </children>
+                        </HBox>
+                        <HBox fx:id="txtEstimatedTime1" alignment="CENTER" prefHeight="0.0" prefWidth="343.0">
+                           <children>
+                              <Button fx:id="btnSaveMission" alignment="CENTER" mnemonicParsing="false" onAction="#btnSaveMission" prefHeight="26.0" prefWidth="198.0" text="Spara uppdrag">
+                                 <HBox.margin>
+                                    <Insets bottom="40.0" />
+                                 </HBox.margin>
+                              </Button>
+                           </children>
+                        </HBox>
                      </children>
-                  </HBox>
+                  </VBox>
                </children>
             </AnchorPane>
           <AnchorPane fx:id="mapContainer" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">

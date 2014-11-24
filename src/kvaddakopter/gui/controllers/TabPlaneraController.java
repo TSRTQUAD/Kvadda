@@ -153,6 +153,8 @@ public class TabPlaneraController extends BaseController implements Initializabl
 		
 		System.out.println("Results retrived");
 		
+		this.planningMap.drawResultingTrajectory(mainbus.getMissionObject().getTrajectoryFullSize());
+		
     	
     }
     
@@ -163,8 +165,6 @@ public class TabPlaneraController extends BaseController implements Initializabl
      */
     @FXML 
     private void btnSaveMission() {
-
-    	btnGenerateTrajectory();
     	
     	//Get current mission from MainBus
     	MissionObject mission = this.getParent().getMainBus().getMissionObject();

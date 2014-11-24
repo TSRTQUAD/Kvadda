@@ -34,6 +34,7 @@ public class MissionObject {
 	
 	// Get variables
 	protected double[][] trajectory 			= {{0}};
+	protected double[][] trajectoryfullsize 	= {{0}};
 	protected double[][] trajectorylength 		= {{0}};
 	protected double[][] coveragearea 			= {{0}};
 	protected double[][] missiontime 			= {{0}};
@@ -77,6 +78,9 @@ public class MissionObject {
 	}
 	public double[][] getTrajectory(){
 		return this.trajectory;
+	}
+	public double[][] getTrajectoryFullSize(){
+		return this.trajectoryfullsize;
 	}
 	public double[][] getTrajectoryLength(){
 		return this.trajectorylength;
@@ -134,6 +138,10 @@ public class MissionObject {
 	
 	public void setTrajectory(double[][] tmptrajectory){
 		this.trajectory =  tmptrajectory;
+	}
+	
+	public void setTrajectoryFullSize(double[][] tmptrajectoryfullsize){
+		this.trajectoryfullsize =  tmptrajectoryfullsize;
 	}
 	
 	public void setTrajectoryLength(double[][] length){
