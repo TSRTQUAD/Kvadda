@@ -9,6 +9,7 @@ import kvaddakopter.image_processing.algorithms.ColorDetection;
 import kvaddakopter.image_processing.algorithms.TemplateMatch;
 import kvaddakopter.image_processing.algorithms.Tracking;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
+import kvaddakopter.image_processing.data_types.FormTemplate;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.data_types.Template;
@@ -45,7 +46,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 		mDecoder = new FFMpegDecoder();
 
 		//mDecoder.initialize("tcp://192.168.1.1:5555"/*FFMpegDecoder.STREAM_ADDR_BIPBOP*/);
-		mDecoder.initialize("mvi2.mp4");
+		mDecoder.initialize(FFMpegDecoder.STREAM_ADDR_BIPBOP);
 		// Listen to decoder events
 		mDecoder.setDecoderListener(this);
 
@@ -114,7 +115,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 			}
 			if(modes[MainBusIPInterface.TEMPLATE_MATCHING_MODE] == 1){
 				// DO SOMETHING
-				ArrayList<Template> formTemplates = mMainbus.getIPFormTemplates();
+				ArrayList<FormTemplate> formTemplates = mMainbus.getIPFormTemplates();
 				//mTemplateMatch.setTamplates(formTemplates) TODO function to se formt templates from GUI
 				targetObjects.addAll(mTemplateMatch.runMethod(imageObject));
 				templateMatchingImage= mColorDetection.getIntermediateResult();
@@ -130,6 +131,11 @@ public class ImageProcessingMainProgram extends ProgramClass{
 							currentImage);
 				}
 			}
+			if(modes[MainBusIPInterface.TEMPLATE_CALIBRATION_MODE] == 1){
+				FormTemplate formTemplate = mMainbus.getCalibFormTemplate();
+				mTemplateMatch.calibrateTemplate(formTemplate);
+				templateMatchingImage = mTemplateMatch.getIntermediateResult();
+			}
 			
 			mMainbus.setIPTargetList(targetObjects);
 			
@@ -144,10 +150,13 @@ public class ImageProcessingMainProgram extends ProgramClass{
 				case MainBusIPInterface.TARGET_IMAGE:
 					out = ImageConversion.mat2Img(trackingImage);
 					break;
-				case MainBusIPInterface.SURPRISE_IMAGE :
+				case MainBusIPInterface.SURPRISE_IMAGE:
 					out = ImageConversion.loadImageFromFile("suprise_image.jpg");
 					break;
 				case MainBusIPInterface.TEMPLATE_MATCHING_IMAGE :
+					out = ImageConversion.mat2Img(templateMatchingImage);
+					break;
+				case MainBusIPInterface.TEMPLATE_CALIBRATE_IMAGE :
 					out = ImageConversion.mat2Img(templateMatchingImage);
 					break;
 			}
