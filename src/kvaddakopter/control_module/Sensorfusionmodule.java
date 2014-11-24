@@ -53,8 +53,7 @@ import kvaddakopter.interfaces.ControlMainBusInterface;
 
 
 
-public class Sensorfusionmodule implements Runnable{
-	
+public class Sensorfusionmodule implements Runnable{	
 	protected ControlMainBusInterface mainbus;
 	protected double 				sampletime			= 0.2; //seconds
 	protected double 				time;
@@ -63,7 +62,7 @@ public class Sensorfusionmodule implements Runnable{
 	
 	protected SensorData 			sdata				= new SensorData();
 	protected ControlSignal 		controlsignal		= new ControlSignal();
-	protected MissionObject 		missionobject		= new MissionObject(); // TODO move to mainbus
+	protected MissionObject 		missionobject		= new MissionObject(); 
 	
 	
 	protected KalmanFilter			skalmanx 			= new KalmanFilter(sampletime,1,0.1,1,0,0);
@@ -74,12 +73,7 @@ public class Sensorfusionmodule implements Runnable{
 	protected ReferenceExtractor	referenceextractor	= new ReferenceExtractor(0);
 	protected int					counter				= 0;
 	protected int					controllingmode		= 2; // 0 for autonomous 
-	
-	//public Sensorfusionmodule(ControlMainBusInterface mainbus){
-	//	this.mainbus = mainbus;
-	//}
-	
-	
+		
 	public Sensorfusionmodule(ControlMainBusInterface mainbus) {
 		this.mainbus = mainbus;
 	}
@@ -168,8 +162,7 @@ public class Sensorfusionmodule implements Runnable{
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				System.out.println("Controllerloop initialized");
 				while(true)
-				{
-					
+				{					
 				//For every sample  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				counter ++;
 				time = System.currentTimeMillis();		

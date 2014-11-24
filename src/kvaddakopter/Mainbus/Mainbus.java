@@ -98,13 +98,10 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 	
 	
 	
-	//Control modules
-	
+	//Control modules	
 	public double[] getSensorVector() {		
 		return NavData;
 	}
-
-
 	public void setControlSignalobject(
 			kvaddakopter.control_module.signals.ControlSignal csignal) {
 		//Controlsignal[Landing/Start Roll Pitch Gaz Yaw ]		
@@ -129,9 +126,9 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		//System.out.println("imageprocessing initiated");
 		
 		//Setting up a Matlab Proxy Server
-		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
+		/*MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
 		mainbus.setMatlabProxyConnection(matlabproxy);
-		matlabproxy.startMatlab("quiet");
+		matlabproxy.startMatlab("quiet"); */
 		
 		//Thread t3 = new Thread(imageProcessing);
 		//t3.setPriority(1);
@@ -186,9 +183,7 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		
 		
 		//
-		// START MODULE
-	    
-	
+		// START MODULE	    	
 	    Sensorfusionmodule sensmodule = new Sensorfusionmodule(new Mainbus());
 		Thread t7 = new Thread(sensmodule);
 		t7.setDaemon(true);
