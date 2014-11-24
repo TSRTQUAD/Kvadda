@@ -153,6 +153,8 @@ public class TabPlaneraController extends BaseController implements Initializabl
 		
 		System.out.println("Results retrived");
 		
+		this.planningMap.drawResultingTrajectory(mainbus.getMissionObject().getTrajectory());
+		
     	
     }
     

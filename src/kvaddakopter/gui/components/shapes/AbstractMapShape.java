@@ -49,6 +49,11 @@ public abstract class AbstractMapShape {
 		});
 	}
 	
+	public void addCoordinateWithoutDrawing(LatLong clickedCoordinate){
+		AbstractGPSMarker newMarker =    this.usedMarkerType(clickedCoordinate);//new GPSMarkerNormal(clickedCoordinate);
+		this.markers.add(newMarker);
+	}
+	
 	/**
 	 * Return all markers associated with this shape
 	 * @return
