@@ -323,7 +323,7 @@ public class MatchesHelpFunctions {
 				}
 			}
 			//If there are 2 few inlier -> abort 
-			if(numInliers < 5)
+			if(numInliers < 3)
 				return null;
 			
 			//Store inliers,

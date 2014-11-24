@@ -46,7 +46,7 @@ public class TestTemplateMatching extends ProgramClass{
 		openVideoWindow();
 
 		mCurrentMethod = new TemplateMatch();
-		((TemplateMatch)mCurrentMethod).addNewTemplateImage("kaffe.jpg");
+//		((TemplateMatch)mCurrentMethod).addNewTemplateImage("kaffe.jpg");
 
 	}
 

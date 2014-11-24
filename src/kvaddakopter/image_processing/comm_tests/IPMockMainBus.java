@@ -23,13 +23,8 @@ import kvaddakopter.maps.GPSCoordinate;
 public class IPMockMainBus implements MainBusIPInterface{
 	
 
-	
-	private ColorTemplate mIPCalibTemplate;
-	private FormTemplate mIPCalibFormTemplate;
-	//private ImageObject mImageObject;
-	private Image mIPImageToShow;
 	private boolean mIsIPRunning;
-	int mIPImageMode = 0;
+	
 	public static void main(String[] args) {
 		//Has to be run to be working
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -44,7 +39,7 @@ public class IPMockMainBus implements MainBusIPInterface{
 	    Thread t1 = new Thread(imageProcessing);
 	    //t1.setDaemon(true);
 	    t1.start();
-	    
+	  
 	    while(true){
 	    	
 	    }
@@ -55,15 +50,17 @@ public class IPMockMainBus implements MainBusIPInterface{
 		// TODO More initializations needed (probably)
 	
 		//activateIPMode(COLOR_DETECTION_MODE);
-		activateIPMode(TEMPLATE_CALIBRATION_MODE);
-		setIPImageMode(TEMPLATE_CALIBRATE_IMAGE);
+		//activateIPMode(TEMPLATE_CALIBRATION_MODE);
+		//setIPImageMode(TEMPLATE_CALIBRATE_IMAGE);
 		//activateIPMode(TRACKING_MODE);
 		//setIPImageMode(DEFAULT_IMAGE);
+		
 		mColorTemplates.add(new ColorTemplate("Pink square", 120, 200, 50, 90, 180, 245, ColorTemplate.FORM_SQUARE));	
 		mColorTemplates.add(new ColorTemplate("Yellow square", 30, 120, 50, 120, 130, 255, ColorTemplate.FORM_SQUARE));
 		
-		mIPCalibTemplate = new ColorTemplate();
-		mIPImageToShow = null;
+		mIPCalibTemplate[0] = new ColorTemplate();
+		mIPImageToShow[0] = null;
+		
 		mIsIPRunning = false;
 	}
 
@@ -100,12 +97,12 @@ public class IPMockMainBus implements MainBusIPInterface{
 
 	@Override
 	public synchronized int getIPImageMode() {
-		return mIPImageMode;
+		return mIPImageMode[0];
 	}
 
 	@Override
 	public synchronized void setIPImageMode(int imageMode) {
-		mIPImageMode = imageMode;
+		mIPImageMode[0] =imageMode;
 	}
 
 	@Override
@@ -158,17 +155,17 @@ public class IPMockMainBus implements MainBusIPInterface{
                 }
             }
         }
-        mIPImageToShow = wr;
+        mIPImageToShow[0] = wr;
 	}
 	
 	@Override
 	public synchronized Image getIPImageToShow() {
-		return mIPImageToShow;
+		return mIPImageToShow[0];
 	}
 
 	@Override
 	public synchronized void setIPCalibTemplate(ColorTemplate cTemplate) {
-		mIPCalibTemplate = cTemplate;	
+		mIPCalibTemplate[0] = cTemplate;	
 	}
 
 	@Override
@@ -184,17 +181,17 @@ public class IPMockMainBus implements MainBusIPInterface{
 
 	@Override
 	public synchronized ColorTemplate getIPCalibTemplate() {
-		return mIPCalibTemplate;
+		return mIPCalibTemplate[0];
 	}
 
 	@Override
 	public FormTemplate getCalibFormTemplate() {
-		return mIPCalibFormTemplate;
+		return mIPCalibFormTemplate[0];
 	}
 
 	@Override
 	public void setCalibFormTemplate(FormTemplate template) {
-		mIPCalibFormTemplate = template;
+		mIPCalibFormTemplate[0] = template;
 	}
 	
 	

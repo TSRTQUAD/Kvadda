@@ -18,6 +18,7 @@ import kvaddakopter.image_processing.utils.ImageConversion;
 import kvaddakopter.interfaces.MainBusIPInterface;
 
 import org.opencv.core.Mat;
+import org.opencv.highgui.Highgui;
 
 
 public class ImageProcessingMainProgram extends ProgramClass{
@@ -61,67 +62,63 @@ public class ImageProcessingMainProgram extends ProgramClass{
 
 		//Color detection
 		mColorDetection = new ColorDetection();
+		ArrayList<ColorTemplate> colorTemplates = mMainbus.getIPColorTemplates();	
+		mColorDetection.setTemplates(colorTemplates);
 
 		//Color Template matching
 		mTemplateMatch = new TemplateMatch();
+		ArrayList<FormTemplate> formTemplates = mMainbus.getIPFormTemplates();
+		mTemplateMatch.setTemplates(formTemplates);
 
 		// Blur detection 
 		mBlurDetection = new BlurDetection();
 
 		//Create Trackers
 		//mTracker = new Tracking();
-		
+
 	}
 
 	public void update(){
 		//Images to show
 		BufferedImage out = null;
 		Mat colorDetectionImage = null;
+		Mat colorCalibrationImage = null;
 		Mat templateMatchingImage = null;
 		Mat trackingImage = null;
-		
+
 		Mat image = getNextFrame();
 		ImageObject imageObject = new ImageObject(image);
-		
+
 		ArrayList<TargetObject> targetObjects = new ArrayList<TargetObject>();
-		
+
 		//GPSCoordinate gpsCoordinate = mMainbus.getGPSCoordinate(); 
-		
+
 		int[] modes = mMainbus.getIPActiveModes(); 
-	    
-		if(modes[MainBusIPInterface.COLOR_CALIBRATION_MODE] == 1){
+
+		if(modes[MainBusIPInterface.MODE_COLOR_CALIBRATION] == 1){
 			// Show Color calibration image
 			ColorTemplate cTemplate = mMainbus.getIPCalibTemplate();
 			imageObject.thresholdImage(cTemplate);
-			out = ImageConversion.mat2Img(imageObject.getImage());			
+			colorCalibrationImage = imageObject.getImage();			
 		}else{
-			if(modes[MainBusIPInterface.BLUR_DETECTION_MODE] == 1){
-				// DO SOMETHING
+			if(modes[MainBusIPInterface.MODE_BLUR_DETECTION] == 1){
 				mBlurDetection.runMethod(imageObject);
 				//TODO some way to present the blur data
 			}
 
-			if(modes[MainBusIPInterface.COLOR_DETECTION_MODE] == 1){
-				// DO SOMETHING
-				ArrayList<ColorTemplate> colorTemplates = mMainbus.getIPColorTemplates();	
-				mColorDetection.setTemplates(colorTemplates);
+			if(modes[MainBusIPInterface.MODE_COLOR_DETECTION] == 1){
 				targetObjects.addAll(mColorDetection.runMethod(imageObject));
 				colorDetectionImage = mColorDetection.getIntermediateResult();
-				
 			}
-			if(modes[MainBusIPInterface.BACKGROUND_SUBTRACION_MODE] == 1){
-				// DO SOMETHING
+			if(modes[MainBusIPInterface.MODE_BACKGROUND_SUBTRACION] == 1){
 				targetObjects.addAll(mBackgroundSubtraction.runMethod(imageObject));
 			}
-			if(modes[MainBusIPInterface.TEMPLATE_MATCHING_MODE] == 1){
-				// DO SOMETHING
-				ArrayList<FormTemplate> formTemplates = mMainbus.getIPFormTemplates();
-				//mTemplateMatch.setTamplates(formTemplates) TODO function to se formt templates from GUI
+			if(modes[MainBusIPInterface.MODE_TEMPLATE_MATCHING] == 1){
+
 				targetObjects.addAll(mTemplateMatch.runMethod(imageObject));
-				templateMatchingImage= mColorDetection.getIntermediateResult();
+				templateMatchingImage= mTemplateMatch.getIntermediateResult();
 			}
-			if(modes[MainBusIPInterface.TRACKING_MODE] == 1){
-				// DO SOMETHING
+			if(modes[MainBusIPInterface.MODE_TRACKING] == 1){
 				if(targetObjects.size() > 0){
 					mTracker.update(targetObjects);
 					Mat currentImage = imageObject.getImage();
@@ -131,66 +128,53 @@ public class ImageProcessingMainProgram extends ProgramClass{
 							currentImage);
 				}
 			}
-			if(modes[MainBusIPInterface.TEMPLATE_CALIBRATION_MODE] == 1){
+			if(modes[MainBusIPInterface.MODE_TEMPLATE_CALIBRATION] == 1){
 				FormTemplate formTemplate = mMainbus.getCalibFormTemplate();
-				mTemplateMatch.calibrateTemplate(formTemplate);
-				templateMatchingImage = mTemplateMatch.getIntermediateResult();
+				if(formTemplate != null){
+					mTemplateMatch.calibrateTemplate(formTemplate);
+					templateMatchingImage = mTemplateMatch.getIntermediateResult();
+				}
 			}
-			
+
 			mMainbus.setIPTargetList(targetObjects);
-			
-			//What image to show
-			switch(mMainbus.getIPImageMode()){
-				case MainBusIPInterface.DEFAULT_IMAGE:
-					out = ImageConversion.mat2Img(imageObject.getImage());
-					break;
-				case MainBusIPInterface.CUT_OUT_IMAGE:
-					out = ImageConversion.mat2Img(colorDetectionImage);
-					break;
-				case MainBusIPInterface.TARGET_IMAGE:
-					out = ImageConversion.mat2Img(trackingImage);
-					break;
-				case MainBusIPInterface.SURPRISE_IMAGE:
-					out = ImageConversion.loadImageFromFile("suprise_image.jpg");
-					break;
-				case MainBusIPInterface.TEMPLATE_MATCHING_IMAGE :
-					out = ImageConversion.mat2Img(templateMatchingImage);
-					break;
-				case MainBusIPInterface.TEMPLATE_CALIBRATE_IMAGE :
-					out = ImageConversion.mat2Img(templateMatchingImage);
-					break;
-			}
-			
+
+
+		}
+		//What image to show
+		switch(mMainbus.getIPImageMode()){
+		case MainBusIPInterface.IMAGE_DEFAULT:
+			out = ImageConversion.mat2Img(imageObject.getImage());
+			break;
+		case MainBusIPInterface.IMAGE_CUT_OUT:
+			if(colorDetectionImage!=null)
+				out = ImageConversion.mat2Img(colorDetectionImage);
+			break;
+		case MainBusIPInterface.IMAGE_TARGET:
+			if(trackingImage!= null)
+				out = ImageConversion.mat2Img(trackingImage);
+			break;
+		case MainBusIPInterface.IMAGE_SURPRISE:
+			out = ImageConversion.loadImageFromFile("suprise_image.jpg");
+			break;
+		case MainBusIPInterface.IMAGE_TEMPLATE_MATCHING :
+			if(templateMatchingImage != null)
+				out = ImageConversion.mat2Img(templateMatchingImage);
+			break;
+		case MainBusIPInterface.IMAGE_TEMPLATE_CALIBRATE :
+			if(templateMatchingImage != null)
+				out = ImageConversion.mat2Img(templateMatchingImage);
+			break;
+
+		case MainBusIPInterface.IMAGE_COLOR_CALIBRRATE:
+			if(colorCalibrationImage != null)
+				out = ImageConversion.mat2Img(colorCalibrationImage);
+			break;
+		}
+		if(out != null){
 			mMainbus.setIPImageToShow(out);
 			updateJavaWindow(out);
 		}
-
-		//For debugging
-		//Select Method that u want 2 dbug
-//		DetectionClass debuggedMethod = getDetectionMethod(BackgroundSubtraction.class);
-//		if(debuggedMethod == null || !debuggedMethod.isMethodActive(mMainbus)){
-//			if(!userHasBeenWarned){
-//				userHasBeenWarned= true;
-//				System.err.println("ImageProcessing  WARING: Selected Detection method for debugging has been not created or has not activated");
-//			}
-//		}else{	
-//			if(debuggedMethod.hasIntermediateResult()){
-//				Mat output = debuggedMethod.getIntermediateResult();
-//				//Convert Mat to BufferedImage
-//				BufferedImage out = ImageConversion.mat2Img(output);
-//				output.release();
-//				updateJavaWindow(out);
-//			}
-//		}
 	}	
 
-
-//	private DetectionClass getDetectionMethod(Object object ){
-//		for(DetectionClass detectionMethod : mDetectionMethodList){
-//			if(detectionMethod.getClass().equals(object))
-//				return detectionMethod;
-//		}
-//		return null;
-//	}
 }
 

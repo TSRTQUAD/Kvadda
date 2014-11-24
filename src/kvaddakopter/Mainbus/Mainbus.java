@@ -269,7 +269,7 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		ControlSignalAll[seq][2] = (double)ControlSignal[2];
 		ControlSignalAll[seq][3] = (double)ControlSignal[3];
 		ControlSignalAll[seq][4] = (double)ControlSignal[4];
- 	*//
+ 	*/
 		seq_signal = seq_signal + 1;
 		return ControlSignal;
 	}
