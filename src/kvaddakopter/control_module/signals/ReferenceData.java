@@ -30,6 +30,7 @@ public class ReferenceData {
 	public int mission;
 	public int start;
 	public int land;
+	private int counter = 0;
 	public double[] latestreference;
 	
 	public double Xpos;
@@ -64,6 +65,11 @@ public class ReferenceData {
 		this.Xpos=radius*deltaLat*1000;
 	}
 	
+	public void GPS2XYtest(){
+		this.Ypos=Longitud;
+		this.Xpos=Latitud;
+	}
+	
 	
 	
 	
@@ -83,7 +89,54 @@ public class ReferenceData {
 	this.GPS2XY();
 }
 	
+	
+	public void updatereftest(double[] latestreference){
+		// latestreference  = (latitude, longitud, height, yaw, time, 
+//						  forward velocity, mission type, start,land)
+			this.Latitud = latestreference[0];
+			this.Longitud = latestreference[1];
+			this.Height = latestreference[2];
+			this.Yaw = latestreference[3];
+			this.time = latestreference[4];
+			this.ForVel = latestreference[5];
+			this.mission = (int) latestreference[6];
+			this.start = (int) latestreference[7];
+			this.land = (int) latestreference[8];			
+			this.GPS2XYtest();
+		}
+	
+	
+	public void settestpoint(){
+		this.Latitud = initiallat;
+		this.Longitud = initiallon;
+		this.Height = 1;
+		this.Yaw = 0;
+		this.time = 10;
+		this.ForVel = 1;
+		this.mission = 0;
+		this.start = 1;
+		this.land = 0;	
+	}
+	
+	public void wiggle(){
+		this.Latitud = initiallat;
+		this.Longitud = initiallon + 0.000012*Math.pow(-1, counter);
+		this.Height = 1;
+		this.Yaw = 0;
+		this.time = 1000;
+		this.ForVel = 1;
+		this.mission = 0;
+		this.start = 1;
+		this.land = 0;	
+		
+		this.counter = this.counter + 1;
+		
+	}
+	
+	
+	
 
+	
 	public void updateindoor(double[] latestreference){
 		// latestreference  = (latitude, longitud, height, yaw, time, 
 //						  forward velocity, mission type, start,land)
@@ -137,6 +190,8 @@ public class ReferenceData {
 			System.out.println("Updated referencedata mission = 1"); //update ref 	
 			System.out.println("-.-.-.-.-.-.-.-.-.-.-.-"); //update ref 			
 		}		
+		
+		
 		
 		
 		if (mission==1){
@@ -193,31 +248,47 @@ public class ReferenceData {
 	
 	public void updatetest(RefinedSensorData rsdata){
 		//mission = TEST		
-		if (Math.abs(rsdata.getHeight()-Height)<1 && 
-			Math.abs(rsdata.getXpos()-Xpos)<0.3   && 
-			Math.abs(rsdata.getYpos()-Ypos)<0.3   &&
+		if (Math.abs(rsdata.getHeight()-Height)<2 && 
+			Math.abs(rsdata.getXpos()-Xpos)<1	&& 
+			Math.abs(rsdata.getYpos()-Ypos)<1   &&
 			mission==0										)
 		
 		{			
-			if (!running){
-				lStartTime= System.currentTimeMillis();
+			if (!running){ 
+				this.lStartTime= System.currentTimeMillis();
 				this.running = true;
-			}
-			
-			if (running && Math.abs(System.currentTimeMillis() - lStartTime) > time){
+			}			
+			if (running && ((double)Math.abs(System.currentTimeMillis() - lStartTime)) > time){
 			this.running = false;
-			this.updateref( referenceextractor.updatetest() );	
+			this.updatereftest( referenceextractor.updatetest() );	//Indoor flight
 			System.out.println("-.-.-.-.-.-.-.-.-.-.-.-"); 		//update ref 
 			System.out.println("Updated referencedata TEST"); 	//update ref 	
 			System.out.println("-.-.-.-.-.-.-.-.-.-.-.-"); 		//update ref 
 			}
-		}	
-
-		
-		
+		}			
 	}
 	
-	
+	public void updatewiggle(RefinedSensorData rsdata){
+		//mission = TEST		
+		if (Math.abs(rsdata.getHeight()-Height)<2 && 
+			Math.abs(rsdata.getXpos()-Xpos)<1	&& 
+			Math.abs(rsdata.getYpos()-Ypos)<1   &&
+			mission==0										)
+		
+		{			
+			if (!running){ 
+				this.lStartTime= System.currentTimeMillis();
+				this.running = true;
+			}			
+			if (running && ((double)Math.abs(System.currentTimeMillis() - lStartTime)) > time){
+			this.running = false;
+			this.wiggle();	//Indoor flight
+			System.out.println("-.-.-.-.-.-.-.-.-.-.-.-"); 		//update ref 
+			System.out.println("Updated referencedata TEST"); 	//update ref 	
+			System.out.println("-.-.-.-.-.-.-.-.-.-.-.-"); 		//update ref 
+			}
+		}			
+	}
 	
 	/// END TEST
 	

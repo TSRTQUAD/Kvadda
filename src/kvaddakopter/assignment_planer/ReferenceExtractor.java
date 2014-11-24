@@ -81,11 +81,11 @@ public class ReferenceExtractor {
 public double[] updatetest(){			
 			//System.out.format("Reference first update no. %d%n",this.counter);
 	this.counter = this.counter + 1; 		
-	double[] returnvalue = new double[]{0,			// GPS lat
-												0,			// GPS long
-												0 + 1*counter,														// Height
+	double[] returnvalue = new double[]{		0,														// GPS lat
+												0+ 2*Math.pow(-1, counter),			 					// GPS long
+												1,														// Height
 												0,														// Yaw
-												10,														// Time at coordinate
+												1000,														// Time at coordinate
 												0,														// null
 												0,														// Mission type
 												this.start,												// Set start/land
