@@ -9,7 +9,7 @@ import kvaddakopter.Mainbus.Mainbus;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.utils.ImageConversion;
-import kvaddakopter.image_processing.utils.MatchTests;
+import kvaddakopter.image_processing.utils.MatchesHelpFunctions;
 
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
@@ -144,15 +144,15 @@ public class BackgroundSubtraction  extends DetectionClass{
 			MatOfDMatch inlierMatches = new MatOfDMatch();
 			//computeFundamentalMatrix(
 			Mat fundamentalMatrix = new Mat(); 
-			MatchTests.findHomography_EXT(matches, currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(),0.1, inlierMatches);
+			MatchesHelpFunctions.computeFundamentalMatrix(matches, currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(),0.1, inlierMatches);
 			if(fundamentalMatrix != null){
 
 				//2.a Getting inlier keypoints
 				MatOfKeyPoint kpCurrent = new MatOfKeyPoint();
 				MatOfKeyPoint kpPrev = new MatOfKeyPoint();
-				MatchTests.getInlierKeypoints(currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(), kpCurrent, kpPrev, inlierMatches);
+				MatchesHelpFunctions.getInlierKeypoints(currentImageData.getKeyPoints(), mPreviousImageData.getKeyPoints(), kpCurrent, kpPrev, inlierMatches);
 				//Out
-				mIntermeditateResult = new Mat();
+//				mIntermeditateResult = new Mat();
 //				Features2d.drawMatches(
 //						currentImageData.getImage(),
 //						kpCurrent, 
@@ -167,7 +167,7 @@ public class BackgroundSubtraction  extends DetectionClass{
 				System.out.println("NUM INLIERS: " + inlierMatches.cols() *inlierMatches.rows());
 				if(inlierMatches.cols() *inlierMatches.rows() >=40){
 
-					Mat homo = MatchTests.getHomoMatrix(kpCurrent, kpPrev);
+					Mat homo = MatchesHelpFunctions.getHomoMatrix(kpCurrent, kpPrev);
 					//2.c Warp Image
 					//Output
 //					Mat homoImg = new Mat();
@@ -234,7 +234,8 @@ public class BackgroundSubtraction  extends DetectionClass{
 
 		//Warped background
 		Mat warpedBackgroundImg = new Mat();
-		Imgproc.warpPerspective(mBackgroundImageData.getImage(), warpedBackgroundImg,homoMatrix, mPreviousImageData.getImage().size());
+//		Imgproc.warpPerspective(mBackgroundImageData.getImage(), warpedBackgroundImg,homoMatrix, mPreviousImageData.getImage().size());
+		Core.perspectiveTransform(mBackgroundImageData.getImage(), warpedBackgroundImg,homoMatrix);
 
 		//Subtracting
 		Mat absDifferenceImage = new Mat();

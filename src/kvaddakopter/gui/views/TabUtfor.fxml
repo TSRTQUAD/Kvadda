@@ -8,22 +8,37 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import com.lynden.gmapsfx.*?>
 
-<AnchorPane prefHeight="800.0" prefWidth="1400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kvaddakopter.gui.controllers.TabUtforController">
+<AnchorPane prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kvaddakopter.gui.controllers.TabUtforController">
 	<children>
-		<Pane prefHeight="800.0" prefWidth="1400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+		<Pane prefHeight="700.0" prefWidth="1200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 			<children>
-				<AnchorPane fx:id="mapContainer" minHeight="0.0" minWidth="0.0" prefHeight="800.0" prefWidth="1400.0">
-					<!--  
-					<children>
-						<GoogleMapView fx:id="mapViewUtfor" prefHeight="750.0" prefWidth="761.0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0.0" />
-					</children>
-					-->
-				</AnchorPane>
-<ToolBar layoutX="-2.0" layoutY="-4.0" prefHeight="50.0" prefWidth="1406.0">
+				<AnchorPane fx:id="mapContainer" minHeight="0.0" minWidth="0.0" prefHeight="700.0" prefWidth="1200.0">
+               <children>
+      <AnchorPane layoutX="373.0" layoutY="607.0" prefHeight="93.0" prefWidth="455.0">
+      	<children>
+      		<VBox alignment="CENTER" prefHeight="200.0" prefWidth="455.0" style="-fx-background-color: #ccc; -fx-border-color: black;" stylesheets="@../../application.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      			<children>
+      				<HBox alignment="CENTER" prefHeight="23.0" prefWidth="453.0">
+      					<children>
+      						<Label text="Tid kvar:" />
+      						<Label fx:id="lblTimeLeft" text="300 sek">
+      							<HBox.margin>
+      								<Insets left="30.0" />
+      							</HBox.margin>
+      						</Label>
+      					</children>
+      				</HBox>
+      				<Button fx:id="btnAbortMission" mnemonicParsing="false" onAction="#abortMission" prefHeight="42.0" prefWidth="178.0" styleClass="btn-danger" text="Avbryt uppdrag" />
+      			</children>
+      		</VBox>
+      	</children>
+      </AnchorPane>
+               </children></AnchorPane>
+<ToolBar layoutX="-2.0" layoutY="-4.0" prefHeight="50.0" prefWidth="1207.0">
 	<items>
-		<ComboBox fx:id="cmbListOfMissions" prefWidth="150.0" onAction="#changeSelectedMission" />
-		<Button onAction="#startMission" fx:id="btnStartMission" mnemonicParsing="false" text="Utför" />
-		<Label  text="Uppdragstyp:">
+		<ComboBox fx:id="cmbListOfMissions" onAction="#changeSelectedMission" prefWidth="150.0" />
+		<Button fx:id="btnStartMission" mnemonicParsing="false" onAction="#startMission" text="Utför" />
+		<Label text="Uppdragstyp:">
 			<padding>
 				<Insets left="100.0" />
 			</padding>
@@ -55,51 +70,6 @@
 		</Label>
 	</items>
 </ToolBar>
-<AnchorPane layoutX="473.0" layoutY="693.0" prefHeight="93.0" prefWidth="455.0">
-	<children>
-		<VBox alignment="CENTER" prefHeight="200.0" prefWidth="455.0" style="-fx-background-color: #ccc; -fx-border-color: black;" stylesheets="@../../application.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-			<children>
-				<HBox alignment="CENTER" prefHeight="23.0" prefWidth="453.0">
-					<children>
-						<Label text="Tid kvar:" />
-						<Label fx:id="lblTimeLeft" text="300 sek">
-							<HBox.margin>
-								<Insets left="30.0" />
-							</HBox.margin>
-						</Label>
-					</children>
-				</HBox>
-				<Button fx:id="btnAbortMission" onAction="#abortMission" mnemonicParsing="false" prefHeight="42.0" prefWidth="178.0" styleClass="btn-danger" text="Avbryt uppdrag" />
-			</children>
-		</VBox>
-	</children>
-</AnchorPane>
-<AnchorPane layoutX="942.0" layoutY="486.0" prefHeight="300.0" prefWidth="442.0">
-	<children>
-		<VBox alignment="CENTER" layoutY="-235.0" prefHeight="93.0" prefWidth="445.0" style="-fx-background-color: #ccc; -fx-border-color: black;" stylesheets="@../../application.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-			<children>
-				<AnchorPane prefHeight="300.0" prefWidth="440.0">
-					<children>
-						<MediaView fitHeight="200.0" fitWidth="200.0" layoutX="120.0" layoutY="49.0" />
-					</children>
-				</AnchorPane>
-			</children>
-		</VBox>
-	</children>
-</AnchorPane>
-<AnchorPane layoutX="20.0" layoutY="486.0" prefHeight="300.0" prefWidth="442.0">
-	<children>
-		<VBox alignment="CENTER" layoutX="-1.0" prefHeight="300.0" prefWidth="442.0" style="-fx-background-color: #ccc; -fx-border-color: black;" stylesheets="@../../application.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="0.0">
-			<children>
-				<AnchorPane prefHeight="304.0" prefWidth="440.0">
-					<children>
-						<MediaView fitHeight="200.0" fitWidth="200.0" layoutX="120.0" layoutY="49.0" />
-					</children>
-				</AnchorPane>
-			</children>
-		</VBox>
-	</children>
-</AnchorPane>
 </children>
 </Pane>
 </children>

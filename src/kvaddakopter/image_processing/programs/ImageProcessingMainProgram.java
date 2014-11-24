@@ -9,6 +9,7 @@ import kvaddakopter.image_processing.algorithms.ColorDetection;
 import kvaddakopter.image_processing.algorithms.TemplateMatch;
 import kvaddakopter.image_processing.algorithms.Tracking;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
+import kvaddakopter.image_processing.data_types.FormTemplate;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.data_types.Template;
@@ -45,7 +46,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 		mDecoder = new FFMpegDecoder();
 
 		//mDecoder.initialize("tcp://192.168.1.1:5555"/*FFMpegDecoder.STREAM_ADDR_BIPBOP*/);
-		mDecoder.initialize("mvi2.mp4");
+		mDecoder.initialize(FFMpegDecoder.STREAM_ADDR_BIPBOP);
 		// Listen to decoder events
 		mDecoder.setDecoderListener(this);
 
@@ -62,7 +63,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 		mColorDetection = new ColorDetection();
 
 		//Color Template matching
-		//mTemplateMatch = new TemplateMatch();
+		mTemplateMatch = new TemplateMatch();
 
 		// Blur detection 
 		mBlurDetection = new BlurDetection();
@@ -73,8 +74,12 @@ public class ImageProcessingMainProgram extends ProgramClass{
 	}
 
 	public void update(){
+		//Images to show
 		BufferedImage out = null;
-		BufferedImage colorDetectionImage = null;
+		Mat colorDetectionImage = null;
+		Mat templateMatchingImage = null;
+		Mat trackingImage = null;
+		
 		Mat image = getNextFrame();
 		ImageObject imageObject = new ImageObject(image);
 		
@@ -88,10 +93,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 			// Show Color calibration image
 			ColorTemplate cTemplate = mMainbus.getIPCalibTemplate();
 			imageObject.thresholdImage(cTemplate);
-			out = ImageConversion.mat2Img(imageObject.getImage());
-			mMainbus.setIPImageToShow(out);
-			updateJavaWindow(mMainbus.getIPImageToShow());//TODO should be in the gui
-			
+			out = ImageConversion.mat2Img(imageObject.getImage());			
 		}else{
 			if(modes[MainBusIPInterface.BLUR_DETECTION_MODE] == 1){
 				// DO SOMETHING
@@ -104,7 +106,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 				ArrayList<ColorTemplate> colorTemplates = mMainbus.getIPColorTemplates();	
 				mColorDetection.setTemplates(colorTemplates);
 				targetObjects.addAll(mColorDetection.runMethod(imageObject));
-				colorDetectionImage = ImageConversion.mat2Img(mColorDetection.getIntermediateResult());
+				colorDetectionImage = mColorDetection.getIntermediateResult();
 				
 			}
 			if(modes[MainBusIPInterface.BACKGROUND_SUBTRACION_MODE] == 1){
@@ -113,14 +115,26 @@ public class ImageProcessingMainProgram extends ProgramClass{
 			}
 			if(modes[MainBusIPInterface.TEMPLATE_MATCHING_MODE] == 1){
 				// DO SOMETHING
-				ArrayList<Template> formTemplates = mMainbus.getIPFormTemplates();
+				ArrayList<FormTemplate> formTemplates = mMainbus.getIPFormTemplates();
+				//mTemplateMatch.setTamplates(formTemplates) TODO function to se formt templates from GUI
 				targetObjects.addAll(mTemplateMatch.runMethod(imageObject));
+				templateMatchingImage= mColorDetection.getIntermediateResult();
 			}
 			if(modes[MainBusIPInterface.TRACKING_MODE] == 1){
 				// DO SOMETHING
 				if(targetObjects.size() > 0){
 					mTracker.update(targetObjects);
+					Mat currentImage = imageObject.getImage();
+					trackingImage = mTracker.getImage(
+							currentImage.width(),
+							currentImage.height(),
+							currentImage);
 				}
+			}
+			if(modes[MainBusIPInterface.TEMPLATE_CALIBRATION_MODE] == 1){
+				FormTemplate formTemplate = mMainbus.getCalibFormTemplate();
+				mTemplateMatch.calibrateTemplate(formTemplate);
+				templateMatchingImage = mTemplateMatch.getIntermediateResult();
 			}
 			
 			mMainbus.setIPTargetList(targetObjects);
@@ -131,18 +145,24 @@ public class ImageProcessingMainProgram extends ProgramClass{
 					out = ImageConversion.mat2Img(imageObject.getImage());
 					break;
 				case MainBusIPInterface.CUT_OUT_IMAGE:
-					out = colorDetectionImage;
-					System.out.println("set cut out image");
+					out = ImageConversion.mat2Img(colorDetectionImage);
 					break;
 				case MainBusIPInterface.TARGET_IMAGE:
-					//imageFromMethod = mTracker.getImage();
-					//out = ImageConversion.mat2Img(imageFromMethod);
+					out = ImageConversion.mat2Img(trackingImage);
 					break;
-				case MainBusIPInterface.SUPRISE_IMAGE :
+				case MainBusIPInterface.SURPRISE_IMAGE:
 					out = ImageConversion.loadImageFromFile("suprise_image.jpg");
 					break;
+				case MainBusIPInterface.TEMPLATE_MATCHING_IMAGE :
+					out = ImageConversion.mat2Img(templateMatchingImage);
+					break;
+				case MainBusIPInterface.TEMPLATE_CALIBRATE_IMAGE :
+					out = ImageConversion.mat2Img(templateMatchingImage);
+					break;
 			}
-			updateJavaWindow(colorDetectionImage);
+			
+			mMainbus.setIPImageToShow(out);
+			updateJavaWindow(out);
 		}
 
 		//For debugging

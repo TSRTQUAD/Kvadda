@@ -55,6 +55,7 @@ public abstract class ProgramClass implements Runnable,DecoderListener,KeyBoardL
 	public ProgramClass(int threadid, MainBusIPInterface mainbus) {
 		mMainbus = mainbus;
 	    mThreadId = threadid;
+	    //init(); Put in run()
 	}
 
 	/** 
@@ -133,8 +134,12 @@ public abstract class ProgramClass implements Runnable,DecoderListener,KeyBoardL
 	 * Then checks the condition again
 	 */
 	protected void checkIsRunning(){
+		if(mMainbus == null)
+			return;
+		
 		while(!mMainbus.getIsIPRunning()){
 			synchronized(mMainbus){
+				System.out.println("!!!");
 				try {
 					mMainbus.wait();
 				} catch (InterruptedException e) {

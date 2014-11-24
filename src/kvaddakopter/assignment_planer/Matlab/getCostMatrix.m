@@ -20,9 +20,9 @@ allboundaries = [object.area object.forbiddenarea];
 boundarylines = [];
 for ii = 1:length(allboundaries);
     for kk = 2:length(allboundaries{ii})
-        boundarylines = [boundarylines;[allboundaries{ii}(kk-1,2)...
-            allboundaries{ii}(kk-1,1) allboundaries{ii}(kk,2)...
-            allboundaries{ii}(kk,1)]];
+        boundarylines = [boundarylines;[allboundaries{ii}(kk-1,1)...
+            allboundaries{ii}(kk-1,2) allboundaries{ii}(kk,1)...
+            allboundaries{ii}(kk,2)]];
     end
 end
 nrofboundarylines = length(boundarylines);
@@ -71,7 +71,7 @@ for ii = 2:nrofnodes
                 intersections((2*kk-1):(2*kk)) = [x y];
             end
             % If any intersection with a boundaryline is found, add penalty
-            if any(not(isnan(intersections)));
+            if any(not(isnan(intersections)))
                 boundarymat(ii,jj) = boundarypenalty;
                 boundarymat(jj,ii) = boundarypenalty;
             end
@@ -149,6 +149,12 @@ ml2=(l2(4)-l2(2))/(l2(3)-l2(1));
 bl1=l1(2)-ml1*l1(1);
 bl2=l2(2)-ml2*l2(1);
 b=[bl1 bl2]';
-a=[1 -ml1; 1 -ml2];
-Pint=a\b;
+
+% If lines are orthogonal with infinity intersection set values to NaN
+if (any(abs(b)==Inf))
+    Pint=[nan nan];
+else
+    a=[1 -ml1; 1 -ml2];
+    Pint=a\b;
+end
 end

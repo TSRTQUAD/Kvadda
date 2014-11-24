@@ -48,7 +48,7 @@ public class TabUtforController extends BaseController implements Initializable 
     @FXML
     private Button btnAbortMission;
     @FXML
-    private ComboBox<MissionObject> cmbListOfMissions;
+    private ComboBox<String> cmbListOfMissions;
     
 	/**
      * Properties
@@ -56,8 +56,9 @@ public class TabUtforController extends BaseController implements Initializable 
 	
 	public MissionMap missionMap;
 	 
-    private ArrayList<MissionObject> listOfMissions;
+    private ArrayList<String> listOfMissions;
     private MissionObject currentSelectedMissionObject;
+    private String currentSelectedMissionName;
     
     private MissionStorage missionStorage = new MissionStorage();
 
@@ -67,10 +68,13 @@ public class TabUtforController extends BaseController implements Initializable 
  
     /**
      * UI Events
+     * @throws IOException 
+     * @throws FileNotFoundException 
      */
     @FXML
-    private void changeSelectedMission(){
-    	this.currentSelectedMissionObject = this.cmbListOfMissions.getSelectionModel().getSelectedItem();
+    private void changeSelectedMission() throws FileNotFoundException, IOException{
+    	this.currentSelectedMissionName = this.cmbListOfMissions.getSelectionModel().getSelectedItem();
+    	this.currentSelectedMissionObject = this.missionStorage.loadMission(this.currentSelectedMissionName);
     	this.drawMission();
     }
 
@@ -103,17 +107,9 @@ public class TabUtforController extends BaseController implements Initializable 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
     	
-        //this.missionMap = new MissionMap(this.mapViewUtfor, this);
-        try {
-			this.loadFromStorage();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        this.populateDefaultLists();
+    	// this.missionMap = new MissionMap(this.mapViewUtfor, this);
+    	this.loadFromStorage();
+    	this.populateDefaultLists();
     }
     
     
@@ -122,8 +118,8 @@ public class TabUtforController extends BaseController implements Initializable 
      * @throws IOException 
      * @throws FileNotFoundException 
      */
-    private void loadFromStorage() throws FileNotFoundException, IOException{
-    	this.listOfMissions =  this.missionStorage.getSavedMissions();
+    private void loadFromStorage() {
+    	this.listOfMissions =  this.missionStorage.getListOfSavedMissions();
     }
     
     
@@ -144,7 +140,7 @@ public class TabUtforController extends BaseController implements Initializable 
 		this.cmbListOfMissions.setItems( FXCollections.observableArrayList(
 				this.listOfMissions
 				));
-		this.cmbListOfMissions.getSelectionModel().select(0);
+		//this.cmbListOfMissions.getSelectionModel().select(0);
 	}
 	
 	

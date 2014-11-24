@@ -20,7 +20,7 @@ import org.opencv.features2d.DMatch;
 import org.opencv.features2d.KeyPoint;
 
 
-public class MatchTests {
+public class MatchesHelpFunctions {
 
 	static final double RATIO_THRESHOLD = 0.7;
 	/**
@@ -260,17 +260,22 @@ public class MatchTests {
 		dst2.fromArray(kp2Inlier);
 		matches.fromArray(matchArray);
 	}
-
-	public static void findHomography_EXT(
-			MatOfDMatch inMatches, 
-			MatOfKeyPoint keypoints1,
-			MatOfKeyPoint keypoints2,
-			double epsilon,
-			MatOfDMatch outMatches)
+	
+	/**
+	 * This function is not completely implemented...
+	 * @param inMatches
+	 * @param keypoints1
+	 * @param keypoints2
+	 * @param outKeyPoints2 
+	 * @param outKeyPoints1 
+	 * @param epsilon
+	 * @param outMatches
+	 */
+	public static Mat findHomography_EXT(MatOfDMatch matches, MatOfKeyPoint keypoints1, MatOfKeyPoint keypoints2, MatOfKeyPoint outKeyPoints1, MatOfKeyPoint outKeyPoints2)
 	{
 		
-		//Converting to arrays
-		DMatch[] matchArray = inMatches.toArray();
+		//Converting to array of Points
+		DMatch[] matchArray = matches.toArray();
 		int numMatches = matchArray.length;
 		if(numMatches > 7){
 			KeyPoint[] kp1Array = keypoints1.toArray();
@@ -298,17 +303,71 @@ public class MatchTests {
 				points2[i] = p;
 
 			}
+			//Converting end
+			
+			
+			//Computing fundamental matrix.
 			Mat mask = new Mat();
 			Mat fundamentalMatrix = Calib3d.findFundamentalMat(new MatOfPoint2f(points1), new MatOfPoint2f(points2),Calib3d.FM_RANSAC,3,0.99,mask);
-
-			int length = mask.cols()*mask.rows(); 
-			int[] maskArray = new int[length];
-			for (int i = 0; i < length; i++) {
-				double[] maskElements = 
-//				maskArray[i] = 
-			}
 			
-		}
+			//Count number of inliers ( which is the number of elements in the mat mask than are not equal to zero)
+			// This is used for allocation of inlier arrays
+			int numInliers = 0;
+			
+			
+			int length = mask.cols()*mask.rows();
+			for (int i = 0; i < length; i++) {
+				double[] maskElements = mask.get(i, 0);
+				if(maskElements[0] != 0.0){
+					numInliers++;	
+				}
+			}
+			//If there are 2 few inlier -> abort 
+			if(numInliers < 5)
+				return null;
+			
+			//Store inliers,
+			KeyPoint[] kp1Inlier = new KeyPoint[numInliers];
+			KeyPoint[] kp2Inlier = new KeyPoint[numInliers];
+			DMatch[] inlierMatches  = new DMatch[numInliers];
+			
+			// Allocate array of points, used as argument to findHomography
+			Point[] points1Homo = new Point[numInliers];
+			Point[] points2Homo = new Point[numInliers];
+			
+			int n = 0;
+			for (int i = 0; i < length; i++) {
+				double[] maskElements = mask.get(i, 0);
+				if(maskElements[0] != 0.0){
+					//Store inlier key points
+					kp1Inlier[n] = kp1Array[matchArray[i].queryIdx];
+					kp2Inlier[n] = kp2Array[matchArray[i].trainIdx];
+					
+					//Store Points
+					points1Homo[n] = new Point(kp1Inlier[n].pt.x, kp1Inlier[n].pt.y);
+					points2Homo[n] = new Point(kp2Inlier[n].pt.x, kp2Inlier[n].pt.y);
+					
+					//Reassign train and query index for the current match 
+					matchArray[i].queryIdx = n;
+					matchArray[i].trainIdx = n;
+					
+					//Store inlier match
+					inlierMatches[n] = matchArray[i];				
+					
+					n++;
+				}
+				
+			}
 
+	
+			Mat hMatrix = Calib3d.findHomography(new MatOfPoint2f(points1Homo), new MatOfPoint2f(points2Homo),Calib3d.RANSAC, 1);
+			
+			//Store inlier data to the output arguments
+			outKeyPoints1.fromArray(kp1Inlier);
+			outKeyPoints2.fromArray(kp2Inlier);
+			matches.fromArray(inlierMatches);
+			return hMatrix;
+		}
+		return null;
 	}
 }

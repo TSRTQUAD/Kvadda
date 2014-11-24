@@ -1,4 +1,5 @@
-function besttrajectory = getTrajectory( tmpcostmat, nodes, startpoint )
+function [besttrajectory,besttrajectoryfullsize] = ...
+    getTrajectory( tmpcostmat, nodes, startpoint )
 % The TSP-solver kan only handle integers, rescale the costmatrix to fit
 % each element in an 32-bit unsigned variable.
 normalizationfactor = 2^16/max([max(max(tmpcostmat.lon)),max(max...
@@ -17,7 +18,7 @@ for ii = 1:3
     
     % Interpolate using parametric splines, the first argument determines
     % the nr of nodes to interpolate between each nodpair in the trajectory
-    rawtrajectory = interparc(5e2,tmptrajectory(:,1),...
+    rawtrajectory = interparc(1e3,tmptrajectory(:,1),...
         tmptrajectory(:,2),'spline');
     DPtrajectory = DouglasPeucker(rawtrajectory);
     
@@ -28,6 +29,7 @@ for ii = 1:3
     currentsolution = totaltime;
     if currentsolution < bestsolution
         besttrajectory = DPtrajectory;
+        besttrajectoryfullsize = rawtrajectory;
         bestsolution = currentsolution;
     end
 end

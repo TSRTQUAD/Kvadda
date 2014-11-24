@@ -101,6 +101,8 @@ public class Communication implements Runnable{
          	Thread.sleep(INTERVAL);
          	send_at_cmd("AT*CONFIG=" + get_seq() + ",\"general:navdata_demo\",\"TRUE\"");
          	Thread.sleep(INTERVAL);
+        	send_at_cmd("AT*CONFIG=" + get_seq() + ",\"general:navdata_options\",\"777060865\"");
+         	Thread.sleep(INTERVAL);
           	send_at_cmd("AT*CONFIG=" + get_seq() + ",\"general:video_enable\",\"TRUE\"");
           	Thread.sleep(INTERVAL);
          	//send_at_cmd("AT*CONFIG=" + get_seq() + ",\"network:owner_mac\",\"00:18:DE:9D:E9:5D\""); //my PC

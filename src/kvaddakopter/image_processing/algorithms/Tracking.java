@@ -1,9 +1,11 @@
 package kvaddakopter.image_processing.algorithms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import kvaddakopter.image_processing.data_types.Identifier;
 import kvaddakopter.image_processing.data_types.TargetObject;
@@ -18,11 +20,11 @@ import org.opencv.core.Size;
 
 public class Tracking {	
 	HashMap<Integer, TargetObject> mInternalTargets;	
-
+	int highestKey = -1;
+	
 	SimpleMatrix H; // Measurments from state matrix
 	SimpleMatrix F; // Matrix describing the dynamics (constant acceleration)
 	SimpleMatrix Q; // G*G'
-	SimpleMatrix R; // Measurement noise
 	
 	double Ts = 0.15;
 	double sigmaSquared = 50;
@@ -30,6 +32,8 @@ public class Tracking {
 	CircularFifoQueue<double[]> trajectoryX = new CircularFifoQueue<double[]>(30);
 	CircularFifoQueue<double[]> trajectoryM = new CircularFifoQueue<double[]>(30);
 	long lastTime = 0;
+	
+	boolean debugPrintMatches = false;
 	/**
 	 *  <Lägg till beskrivning utav track här>
 	 * 
@@ -40,8 +44,7 @@ public class Tracking {
 		// Initialize matrices
 		H = new SimpleMatrix(2, 4, true, 
 				1, 0, 0, 0, 
-				0, 1, 0, 0);				
-		R = SimpleMatrix.diag(1, 1).scale(50);
+				0, 1, 0, 0);
 		
 		// Initialize target list
 		mInternalTargets = new HashMap<Integer, TargetObject>();
@@ -53,71 +56,132 @@ public class Tracking {
 		double elapsedTime = ((double)(System.currentTimeMillis() - lastTime)) / 1000;
 		lastTime = System.currentTimeMillis();
 		updateTimeDependentMatrices(elapsedTime);
-		
+		System.out.println(elapsedTime);
 		
 		// Perform time update
 		timeUpdate();
 		
-		if(mInternalTargets.size() > 0){
+		/*if(mInternalTargets.size() > 0){
 			trajectoryX.add(new double[]{mInternalTargets.get(0).getPosition().get(0, 0), mInternalTargets.get(0).getPosition().get(1, 0)});
-		}
+		}*/
+		
+		if(targetObjects.size() == 0) return;
 		
 		// Match new targetObjects with mInternalTargets by analyzing position difference and identifiers
-		matchTargets(targetObjects);
+		int[] matchedIDs = matchTargets(targetObjects);
 		
 		// Perform measurement update with matched objects
-		
-		// DEBUG!
-		if(targetObjects.size() > 0 && mInternalTargets.size() > 0){
-			SimpleMatrix z = new SimpleMatrix(2, 1, true, targetObjects.get(0).getPosition().get(0, 0), targetObjects.get(0).getPosition().get(1, 0));
-			measurementUpdate(mInternalTargets.get(0), z);
-			mInternalTargets.get(0).updateIdentifier(targetObjects.get(0).getIdentifier());
-			trajectoryM.add(new double[]{z.get(0, 0), z.get(1, 0)});
-		} else {
-			trajectoryM.add(new double[]{0, 0});
-		}
-		//measurementUpdate(getZ(targetObjects));
-		
-		// Add non-matched objects to internal list
-		if(mInternalTargets.size() == 0 && targetObjects.size() > 0){
-			mInternalTargets.put(0, (TargetObject)targetObjects.get(0));
-			System.out.print("Length of mInternalTargets: ");
-			System.out.println(mInternalTargets.size());
-			
+		for(int i = 0; i < matchedIDs.length; i++){
+			if(matchedIDs[i] == -1){
+				// Create new target
+				mInternalTargets.put(++highestKey, targetObjects.get(i));
+				continue;
+			}
+			// Extract position measurment and noise from measurments
+			SimpleMatrix z = H.mult(targetObjects.get(i).getState());
+			SimpleMatrix R = (H.mult(targetObjects.get(i).getCovariance())).mult(H.transpose());
+			measurementUpdate(mInternalTargets.get(matchedIDs[i]), z, R);
 		}
 		
+		// Remove old internal targets with too high covariance
+		// If P > threshold we remove the target from internal targets
+		Iterator<Map.Entry<Integer, TargetObject>> iter = mInternalTargets.entrySet().iterator();
+		while(iter.hasNext()){
+		    Map.Entry<Integer, TargetObject> entry = iter.next();
+			if(entry.getValue().getCovariance().normF() > 1000){
+				iter.remove();
+		    }
+		}		
 	}
 	
-	private void matchTargets(ArrayList<TargetObject> targetObjects) {
+	private int[] matchTargets(ArrayList<TargetObject> targetObjects) {
 		// Match targetObjects against mInternalTargets
-		// Create a grid between mInternalTargets and targetObjects
+		// Create a table with mInternalTargets and targetObjects
 		int numInternalTargets = mInternalTargets.size();
 		int numTargets = targetObjects.size();
-		double[][] matchMap = new double[numInternalTargets][numTargets];
-		for(int key : mInternalTargets.keySet()){
+		int[] matchedIDs = new int[numTargets];
+		Arrays.fill(matchedIDs, -1);
+		
+		// If no internal targets exist, return -1 array.
+		if(numInternalTargets == 0) return matchedIDs; 
+		
+		
+		float matchThreshold = 0.3f;
+		float[][] matchTable = new float[numInternalTargets][numTargets];
+		
+		
+		
+		// Print table
+		if(debugPrintMatches){
+			System.out.print("   |");
 			for(TargetObject target : targetObjects){
-				TargetObject internalTarget = mInternalTargets.get(key);
-				matchMap[key][targetObjects.indexOf(target)] = 
-						(Identifier.compare(internalTarget.getIdentifier(), target.getIdentifier()) + 
+				System.out.format("%4d|", targetObjects.indexOf(target));
+			}
+			System.out.println();
+		}
+		
+		ArrayList<Integer> keyArray = new ArrayList<Integer>(mInternalTargets.keySet());
+		for(int keyI = 0; keyI < numInternalTargets; keyI++){
+			if(debugPrintMatches) System.out.format("|%2d|", keyArray.get(keyI));
+			for(TargetObject target : targetObjects){
+				TargetObject internalTarget = mInternalTargets.get(keyArray.get(keyI));
+				
+				matchTable[keyI][targetObjects.indexOf(target)] = 
+						(Identifier.compare(internalTarget.getIdentifier(), target.getIdentifier().setmeanHSVValuesCertainty(1)) + 
 						compareDistance(internalTarget, target)) / 2;
+				if(debugPrintMatches) System.out.format("%.2f|", matchTable[keyI][targetObjects.indexOf(target)]);
+			}
+			if(debugPrintMatches) System.out.println();
+		}
+		if(debugPrintMatches) System.out.println();
+		
+		
+		
+		
+		// For each target found. Say the highest likely match is a match if the likelihood is large enough.
+		// Each internal target could in that way be updated with multiple new targets.
+		for(int i = 0; i < numTargets; i++){
+			float bestMatchVal = 0;
+			int bestMatchId = -1;
+			for(int keyI = 0; keyI < numInternalTargets; keyI++){
+				if(matchTable[keyI][i] > bestMatchVal){
+					bestMatchVal = matchTable[keyI][i];
+					bestMatchId = keyArray.get(keyI);
+				}
+			}
+			if(bestMatchVal > matchThreshold){
+				matchedIDs[i] = bestMatchId;
 			}
 		}
 		
+		return matchedIDs;
 	}
 
 
 	private float compareDistance(TargetObject internalTarget, TargetObject target) {
 		// Compares distance between objects with regard of covariance
 		// XXX uncertainDistance only depends on one axis of the covariance
-		float uncertainDistance = (float)(internalTarget.getCovariance().get(0, 0) + target.getCovariance().get(0, 0));
-		float distance = (float)Math.sqrt(
-				Math.pow(internalTarget.getPosition().get(0, 0) - target.getPosition().get(0, 0), 2) + 
-				Math.pow(internalTarget.getPosition().get(1, 0) - target.getPosition().get(1, 0), 2));
+
+		// For now use distances converted from pixels 
+		double uncertainDistance = (.1) * (float)(internalTarget.getCovariance().get(0, 0) + target.getCovariance().get(0, 0));
+		double distance = (float)Math.sqrt(
+				Math.pow((0.01) * (internalTarget.getPosition().get(0, 0) - target.getPosition().get(0, 0)), 2) + 
+				Math.pow((0.01) * (internalTarget.getPosition().get(1, 0) - target.getPosition().get(1, 0)), 2));
 		
 		// Comparation of distances and uncertainties
+		double retVal = 0;
 		
+		// Uncertain distance effect
+		double scale = 0.5f;
+		retVal = (Math.exp((double)(scale * (-uncertainDistance) - 2)) *
+				Math.pow((double)((scale * (-uncertainDistance) - 2)),2) / 
+				(Math.exp(-2) * 4));
 		
-		return 0;
+		// Ratio between distance and uncertain distance
+		scale = 1.7f;
+		retVal *= Math.max(0, (1 - Math.pow(((distance / uncertainDistance) / scale), 2)));
+		
+		return (float)retVal;
 	}
 
 
@@ -146,7 +210,7 @@ public class Tracking {
 		}
 	}
 	
-	private void measurementUpdate(TargetObject target, SimpleMatrix z){
+	private void measurementUpdate(TargetObject target, SimpleMatrix z, SimpleMatrix R){
 		SimpleMatrix x = target.getState();
 		SimpleMatrix P = target.getCovariance();
 		
@@ -195,17 +259,6 @@ public class Tracking {
 		return res;
 	}
 	
-	public SimpleMatrix getZ(ArrayList<TargetObject> targetObjects){
-		SimpleMatrix res = new SimpleMatrix();/*Mat(targetObjects.size(), 1, CvType.CV_64F);
-		for(TargetObject targetObject : targetObjects){
-			Mat pos = targetObject.getPosition();
-			//res.put();
-		}*/
-			
-		
-		return res;
-	}
-	
 	public Mat getImage(int w_, int h_, Mat res){
 		//Mat res = new Mat(w_, h_, CvType.CV_8U);
 		//res.setTo(new Scalar(0, 0, 0));
@@ -246,10 +299,6 @@ public class Tracking {
 
 				String txtString = String.format("ID:%d", key);
 			    Core.putText(res, txtString, new Point(pos.get(0, 0) - 12, pos.get(1, 0) + 22) , Core.FONT_HERSHEY_SIMPLEX, .4, new Scalar(255, 255, 255), 1, 8, false);
-
-			    SimpleMatrix x = target.getState();
-			    String stateString = String.format("X:%1$dn Y:%2$d, nX:%3$d, nY:%4$d.", (int)x.get(0,0), (int)x.get(1,0), (int)x.get(2,0), (int)x.get(3,0));
-			    Core.putText(res, stateString, new Point(20, 20) , Core.FONT_HERSHEY_SIMPLEX, .4, new Scalar(255, 255, 255), 1, 8, false);
 			}
 		}
 		

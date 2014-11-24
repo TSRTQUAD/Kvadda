@@ -72,14 +72,17 @@ public class MatFileHandler {
 		list.add( colorTemplate );
 		list.add( descriptor );
 
+		// The Mat-file to be written is probably a mission object that are about to be saved.
 		if (!name.equals("object")) {
 			//Read calculated data
 			MLDouble trajectory = new MLDouble("trajectory", missionobject.getTrajectory() );
+			MLDouble trajectoryfullsize = new MLDouble("trajectory", missionobject.getTrajectoryFullSize() );
 			MLDouble trajectorylength = new MLDouble("trajectorylength", missionobject.getTrajectoryLength() );
 			MLDouble coveragearea = new MLDouble("coveragearea", missionobject.getCoverageArea() );
 			MLDouble time = new MLDouble("time", missionobject.getMissionTime() );
 			MLDouble velocity = new MLDouble("velocity", missionobject.getReferenceVelocity() );
 			list.add( trajectory );
+			list.add( trajectoryfullsize );
 			list.add( trajectorylength );
 			list.add( coveragearea );
 			list.add( time );
@@ -88,6 +91,7 @@ public class MatFileHandler {
 			//Write arrays to file			
 			new MatFileWriter("Missions/" + name + ".mat", list );
 		}
+		// The Mat-file to be written only contains results obtained by the Matlab script.
 		else {
 			//Write arrays to file
 			new MatFileWriter("src/kvaddakopter/assignment_planer/Matlab/Data/" + name + ".mat", list );
@@ -105,15 +109,16 @@ public class MatFileHandler {
 
 		//Save data to missionobject
 		if (name.equals("results")) {
-			MatFileReader MLRead = new MatFileReader("src/kvaddakopter/assignment_planer/Matlab/Data" + name + ".mat" );
+			MatFileReader MLRead = new MatFileReader("src/kvaddakopter/assignment_planer/Matlab/Data/" + name + ".mat" );
 			missionobject.setTrajectory(((MLDouble) MLRead.getMLArray("trajectory")).getArray());
+			missionobject.setTrajectoryFullSize(((MLDouble) MLRead.getMLArray("trajectoryfullsize")).getArray());
 			missionobject.setTrajectoryLength(((MLDouble) MLRead.getMLArray("trajectorylength")).getArray());
 			missionobject.setCoverageArea(((MLDouble) MLRead.getMLArray("coveragearea")).getArray());
 			missionobject.setMissionTime(((MLDouble) MLRead.getMLArray("time")).getArray());
 			missionobject.setReferenceVelocity(((MLDouble) MLRead.getMLArray("velocity")).getArray());
 		}
 		else {
-			MatFileReader MLRead = new MatFileReader("Mission/" + name + ".mat" );
+			MatFileReader MLRead = new MatFileReader("Missions/" + name + ".mat" );
 			
 			//Set mission name
 			missionobject.setMissionName(name);
@@ -160,6 +165,7 @@ public class MatFileHandler {
 
 			//Write calculated data
 			missionobject.setTrajectory(((MLDouble) MLRead.getMLArray("trajectory")).getArray());
+			missionobject.setTrajectoryFullSize(((MLDouble) MLRead.getMLArray("trajectoryfullsize")).getArray());
 			missionobject.setTrajectoryLength(((MLDouble) MLRead.getMLArray("trajectorylength")).getArray());
 			missionobject.setCoverageArea(((MLDouble) MLRead.getMLArray("coveragearea")).getArray());
 			missionobject.setMissionTime(((MLDouble) MLRead.getMLArray("time")).getArray());
@@ -181,6 +187,14 @@ public class MatFileHandler {
 		}
 		
 		return missionobject;
+	}
+	
+	public void createMatFileFromFlightData(String name, double[][] data) throws IOException {
+		MLDouble datatowrite = new MLDouble(name, data);
+		ArrayList<MLArray> list = new ArrayList<MLArray>();
+		list.add( datatowrite );
+		new MatFileWriter(name + ".mat", list );
+		
 	}
 
 }

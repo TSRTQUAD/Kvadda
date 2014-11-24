@@ -146,26 +146,36 @@ public class Mockmainbus implements ControlMainBusInterface{
         if(this.counter == sensorarray.size() -1){this.inc = -1;}
 		return sensorarray.get(this.counter);
 	}
-
+/*
 	@Override
 	public ControlSignal getControlSignal() {
 			
 		return controlsignal;
-	}
+	}*/
 
 	@Override
 	public MissionObject getMissionObject() {
 		
 		return missionobject;
 	}
-
+/*
 	@Override
 	public void setControlSignal(ControlSignal csignal) {
 		this.controlsignal = csignal;
-	}
+	}*/
 
 	@Override
 	public MissionObject setMissionObject() {
+		return null;
+	}
+	@Override
+	public void setControlSignalobject(ControlSignal csignal) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public ControlSignal getControlSignalobject() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 

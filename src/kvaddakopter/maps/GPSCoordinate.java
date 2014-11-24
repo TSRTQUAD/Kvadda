@@ -33,8 +33,8 @@ public class GPSCoordinate {
     }
 
 
-    public List coordAsArray() {
-        List coords = new ArrayList<Double>();
+    public List<Double> coordAsArray() {
+        List<Double> coords = new ArrayList<Double>();
         coords.add(this.latitude);
         coords.add(this.longitude);
         return coords;

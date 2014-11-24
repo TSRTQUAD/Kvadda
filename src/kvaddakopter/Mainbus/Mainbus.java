@@ -14,8 +14,14 @@ import java.util.ArrayList;
 
 
 
-import matlabcontrol.MatlabConnectionException;
+
+
+
+
+
 import kvaddakopter.ImageProcessingMain;
+import kvaddakopter.assignment_planer.AssignmentPlanerRunnable;
+import kvaddakopter.assignment_planer.MatFileHandler;
 import kvaddakopter.assignment_planer.MatlabProxyConnection;
 import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.control_module.Mockmainbus;
@@ -25,6 +31,7 @@ import kvaddakopter.control_module.signals.SensorData;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.programs.ImageProcessingMainProgram;
+import kvaddakopter.interfaces.AssignmentPlanerInterface;
 import kvaddakopter.interfaces.ControlMainBusInterface;
 
 
@@ -49,7 +56,7 @@ import kvaddakopter.interfaces.ControlMainBusInterface;
  * http://www.javaworld.com/article/2074318/java-concurrency/java-101--understanding-java-threads--part-2--thread-synchronization.html
  * 
  */
-public class Mainbus extends Frame implements KeyListener,ControlMainBusInterface{
+public class Mainbus extends Frame implements KeyListener,ControlMainBusInterface, AssignmentPlanerInterface{
 	//Examples
 	private int var;
 	public boolean condVar = false;
@@ -83,6 +90,10 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
     boolean space_bar = false; //true = Takeoff, false = Landing
 	public boolean EmerStop = false;
 	double[] NavData = new double[6];
+	double[][] NavDataOverAll = new double[3000][6];
+	double[][] ControlSignalAll = new double[3000][5];
+	public int seq = 0;
+	public int seq_signal = 0;
 	//
 	
 	
@@ -131,12 +142,8 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		
 		//Setting up a Matlab Proxy Server
 		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
-		try {
-			matlabproxy.startMatlab("quiet");
-		} catch (MatlabConnectionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		mainbus.setMatlabProxyConnection(matlabproxy);
+		matlabproxy.startMatlab("quiet");
 		
 		//Thread t3 = new Thread(imageProcessing);
 		//t3.setPriority(1);
@@ -249,14 +256,6 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		return missionobject;
 	}
 	
-	public synchronized void setMatlabProxy(MatlabProxyConnection MP){
-		matlabproxy = MP;
-	}
-	
-	public synchronized MatlabProxyConnection getMatlabProxy() {
-		return matlabproxy;
-	}
-	
 	public synchronized void setAssignmentPlanerOn(boolean state){
 		mAssignmentPlanerRunning = state;
 	}
@@ -264,16 +263,39 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 	public synchronized boolean isAssignmentPlanerOn() {
 		return mAssignmentPlanerRunning;
 	}
+
+	public void setMatlabProxyConnection(MatlabProxyConnection MPC) {
+		this.matlabproxy = MPC;
+		
+	}
+
+	public MatlabProxyConnection getMatlabProxyConnection() {
+		return this.matlabproxy;
+	}
+	
 	//Communication
 
 	public synchronized float[] getControlSignal(){
+		ControlSignalAll[seq][0] = (double)ControlSignal[0];
+		ControlSignalAll[seq][1] = (double)ControlSignal[1];
+		ControlSignalAll[seq][2] = (double)ControlSignal[2];
+		ControlSignalAll[seq][3] = (double)ControlSignal[3];
+		ControlSignalAll[seq][4] = (double)ControlSignal[4];
+
+		seq_signal = seq_signal + 1;
 		return ControlSignal;
 	}
 	
 	public synchronized void setNavData(double[] nd){
-	  NavData = nd;
+		NavDataOverAll[seq][1] = nd[1];
+		NavDataOverAll[seq][2] = nd[2];
+		NavDataOverAll[seq][3] = nd[3];
+		NavDataOverAll[seq][4] = nd[4];
+		NavDataOverAll[seq][5] = nd[5];
+
+		seq = seq + 1;
+		NavData = nd;
 	}
-	
 	
 	
 	public synchronized void setSelfCheck(boolean b){
@@ -399,11 +421,13 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
    	    if (space_bar && (ControlSignal[0]) == 0) {
     	    	 System.out.println("Takeoff");
    	    		 ControlSignal[0] = 1;
-    	
-   	    		
-   		} else if (space_bar && ControlSignal[0] == 1 ) {
-    	    	    System.out.println("Landing");
-    	    	    ControlSignal[0] = 0; 
+
+
+   	    } else if (space_bar && ControlSignal[0] == 1 ) {
+   	    	System.out.println("Landing");
+   	    	new MatFileHandler().createMatFileFromFlightData("FlightData", NavDataOverAll);
+   	    	new MatFileHandler().createMatFileFromFlightData("ControlData", ControlSignalAll);
+   	    	ControlSignal[0] = 0;
     	}
 
     	    	break;   	    	

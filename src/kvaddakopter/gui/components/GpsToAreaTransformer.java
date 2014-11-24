@@ -3,21 +3,27 @@ package kvaddakopter.gui.components;
 import java.util.ArrayList;
 
 import kvaddakopter.assignment_planer.Area;
+import kvaddakopter.gui.components.shapes.MapShapeInterface;
 
 public class GpsToAreaTransformer {
-	public static ArrayList<Area> transform(ArrayList<AbstractGPSMarker> gpsCoordinates){
-		Area areaList = new Area();
-		areaList.area = new double[gpsCoordinates.size()][2];
+	public static ArrayList<Area> transform(ArrayList<MapShapeInterface> shapes){
 		ArrayList<Area> list = new ArrayList<Area>();
+		
+		
+		int j = 0;
+		for(MapShapeInterface shape: shapes){
 
-		int i = 0;
-		for(AbstractGPSMarker coord: gpsCoordinates){
-				areaList.area[i][0] = coord.getLatitude();
-				areaList.area[i][1] = coord.getLongitude();
-			i++;
+			ArrayList<AbstractGPSMarker> markers = shape.getMarkers();
+			Area currentAreaCoordinates = new Area();
+			currentAreaCoordinates.area = new double[markers.size()][2];
+			j = 0;
+			for (AbstractGPSMarker marker: markers){
+				currentAreaCoordinates.area[j][0] = marker.getLatitude();
+				currentAreaCoordinates.area[j][1] = marker.getLongitude();
+				j++;
+			}
+			list.add(currentAreaCoordinates);
 		}
-
-		list.add(areaList);
 
 		return list;
 	}

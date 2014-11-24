@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.opencv.core.Core;
 
 import kvaddakopter.image_processing.data_types.ColorTemplate;
+import kvaddakopter.image_processing.data_types.FormTemplate;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.data_types.Template;
@@ -17,15 +18,14 @@ import kvaddakopter.maps.GPSCoordinate;
 
 public class IPMockMainBus implements MainBusIPInterface{
 	
-	private ArrayList<TargetObject> mTargetList;
-	private ArrayList<ColorTemplate> mColorTemplates;
+
+	
 	private ColorTemplate mIPCalibTemplate;
+	private FormTemplate mIPCalibFormTemplate;
 	//private ImageObject mImageObject;
 	private BufferedImage mIPImageToShow;
 	private boolean mIsIPRunning;
-	private int[] mIPActiveModes;
-	private int mIPImageMode = 0;
-	
+	int mIPImageMode = 0;
 	public static void main(String[] args) {
 		//Has to be run to be working
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -49,11 +49,15 @@ public class IPMockMainBus implements MainBusIPInterface{
 	@Override
 	public synchronized void initIPVariables() {
 		// TODO More initializations needed (probably)
-		mIPActiveModes = new int[6];
-		activateIPMode(COLOR_DETECTION_MODE);
-		setIPImageMode(DEFAULT_IMAGE);
-		mTargetList = new ArrayList<TargetObject>();
-		mColorTemplates = new ArrayList<ColorTemplate>();
+	
+		//activateIPMode(COLOR_DETECTION_MODE);
+		activateIPMode(TEMPLATE_CALIBRATION_MODE);
+		setIPImageMode(TEMPLATE_CALIBRATE_IMAGE);
+		//activateIPMode(TRACKING_MODE);
+		//setIPImageMode(DEFAULT_IMAGE);
+		mColorTemplates.add(new ColorTemplate("Pink square", 120, 200, 50, 90, 180, 245, ColorTemplate.FORM_SQUARE));	
+		mColorTemplates.add(new ColorTemplate("Yellow square", 30, 120, 50, 120, 130, 255, ColorTemplate.FORM_SQUARE));
+		
 		mIPCalibTemplate = new ColorTemplate();
 		mIPImageToShow = null;
 		mIsIPRunning = false;
@@ -65,9 +69,9 @@ public class IPMockMainBus implements MainBusIPInterface{
 		return mIPActiveModes;
 	}
 
-	@Override
+@Override
 	public synchronized void setIPActiveModes(int[] modes) {
-		mIPActiveModes = modes;
+		//mIPActiveModes = modes;
 	}
 
 	@Override
@@ -107,26 +111,18 @@ public class IPMockMainBus implements MainBusIPInterface{
 
 	@Override
 	public synchronized void setIPColorTemplates(ArrayList<ColorTemplate> colorTemplates) {
-		mColorTemplates = colorTemplates;
+		//mColorTemplates = colorTemplates;
 		
 	}
 
 	@Override
-	public synchronized ArrayList<Template> getIPFormTemplates() {
-		// TODO Auto-generated method stub
-		return null;
+	public synchronized ArrayList<FormTemplate> getIPFormTemplates() {
+		return mFormTemplates;
 	}
 
 	@Override
-	public synchronized void setIPFormTemplates(ArrayList<Template> templates) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public synchronized void addIPFormTemplate(Template template) {
-		// TODO Auto-generated method stub
-		
+	public synchronized void addIPFormTemplate(FormTemplate template) {
+		mFormTemplates.add(template);
 	}
 
 	@Override
@@ -143,7 +139,7 @@ public class IPMockMainBus implements MainBusIPInterface{
 
 	@Override
 	public synchronized void setIPTargetList(ArrayList<TargetObject> listOfTargets) {
-		mTargetList = listOfTargets;
+		//mTargetList = listOfTargets;
 	}
 
 	@Override
@@ -175,6 +171,16 @@ public class IPMockMainBus implements MainBusIPInterface{
 	@Override
 	public synchronized ColorTemplate getIPCalibTemplate() {
 		return mIPCalibTemplate;
+	}
+
+	@Override
+	public FormTemplate getCalibFormTemplate() {
+		return mIPCalibFormTemplate;
+	}
+
+	@Override
+	public void setCalibFormTemplate(FormTemplate template) {
+		mIPCalibFormTemplate = template;
 	}
 	
 	

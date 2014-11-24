@@ -49,27 +49,12 @@ public abstract class AbstractGPSMarker {
 	 * @param map
 	 * @param listOfCoordinates
 	 */
-	public void attachToMap(GoogleMap map, ArrayList<AbstractGPSMarker> listOfCoordinates){
+	public void attachToMap(GoogleMap map){
 		
-		
-		listOfCoordinates.add(this);
 		map.addMarker(this.getMarker());
-		map.addUIEventHandler(this.getMarker(), UIEventType.click, (JSObject obj) -> {
-			this.markerClickedEvent(map, listOfCoordinates);
-		});
 		
 	}
 	
-	/**
-	 * Removes this marker from the supplied list.
-	 * @param listOfCoordinates
-	 */
-	public void removeMarkerFromList(ArrayList<AbstractGPSMarker> listOfCoordinates){
-		int markerIndex = listOfCoordinates.indexOf(this);
-		if(markerIndex != -1){
-            listOfCoordinates.remove(markerIndex);
-		}
-	}
 	
 	/**
 	 * Clear  marker from map.
@@ -79,15 +64,6 @@ public abstract class AbstractGPSMarker {
 		map.removeMarker(this.getMarker());
 	}	
 	
-	/**
-	 *  Action to take when this marker is clicked.
-	 * @param map
-	 * @param listOfCoordinates
-	 */
-	public void markerClickedEvent(GoogleMap map,  ArrayList<AbstractGPSMarker> listOfCoordinates){
-		
-			this.clearFromMap(map);
-			this.removeMarkerFromList(listOfCoordinates);
-	};
+	
 	
 }

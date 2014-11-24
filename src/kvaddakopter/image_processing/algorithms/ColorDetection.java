@@ -24,7 +24,7 @@ import ch.qos.logback.classic.filter.ThresholdFilter;
 public class ColorDetection  extends DetectionClass{
 	
 	// Minimum object size
-	static final int MINIMUM_OBJECT_SIZE = 2000;
+	static final int MINIMUM_OBJECT_SIZE = 500;
 	static final int MAXIMUM_OBJECT_SIZE = 15000; //Not used yet
 
 	//Morphology 
@@ -104,17 +104,23 @@ public class ColorDetection  extends DetectionClass{
 			boundingBoxes = getBoundingBoxes(contours, hierarchy, MINIMUM_OBJECT_SIZE);
 			numberOfTargetsFound  = boundingBoxes.size();
 			Core.bitwise_or(cutoutImage, cutout(HSVImage,contours), cutoutImage);
-			
+					
+			mIntermeditateResult = cutoutImage;
+			// Do next iteration in for loop if no targets are found
+			if(numberOfTargetsFound == 0){
+				continue;
+			}
 			//Calculate mean HSV channel values with 10 as value threshhold 
 			ArrayList<Long> targetHSVChannels = calculateMeanHSVValues(cutoutImage, 10);
 			
-			mIntermeditateResult = cutoutImage;
+
 			
 			//Convert boundingboxes to targetObjects, draw boundingboxes in resultImage
-			targetObjects = convertToTargets(boundingBoxes, targetHSVChannels, resultImage);
+			ArrayList<TargetObject> newTargets = convertToTargets(boundingBoxes, targetHSVChannels, resultImage);
+			targetObjects.addAll(newTargets);
 			
 			//Draw target HSV values
-			for(TargetObject target:targetObjects){
+			for(TargetObject target:newTargets){
 				//System.out.println((int)target.getPosition().get(0,0)[0]);
 				drawTargetHSVValues(cutoutImage, targetHSVChannels, (int)target.getPosition().get(0,0), (int)target.getPosition().get(1,0));
 			}
@@ -205,6 +211,10 @@ public class ColorDetection  extends DetectionClass{
 					Vtot += tmpHSV[2];
 				}
 			}
+		}
+		if(numVals == 0){
+			System.out.println("calculateMeanHSVValues has 0 numVals > threshold");
+			return channelMeanValues;
 		}
 		HVal = Htot/numVals;
 		channelMeanValues.add(HVal);
