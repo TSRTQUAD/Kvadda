@@ -2,6 +2,7 @@ package kvaddakopter.image_processing.algorithms;
 
 import java.util.ArrayList;
 
+import kvaddakopter.image_processing.data_types.FormTemplate;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.utils.MatchesHelpFunctions;
@@ -62,7 +63,7 @@ public class TemplateMatch  extends DetectionClass{
 			if(!template.hasKeyPoints()){
 				template.computeKeyPoints(FeatureDetector.SIFT);
 				mIntermeditateResult = template.getImage().clone();
-				estimateAndRemoveOutlier(template.getKeyPoints(),mIntermeditateResult,0.12,0.35);
+				//estimateAndRemoveOutlier(template.getKeyPoints(),mIntermeditateResult,0.12,0.35);
 
 				template.computeDescriptors(DescriptorExtractor.SIFT);
 				return targetObjects;
@@ -140,7 +141,7 @@ public class TemplateMatch  extends DetectionClass{
 
 		computeMeanAndVar(x, y,discardDistanceX, discardDistanceY ,mean,var);
 
-		drawSome(mean,var,image,mDetectionWidth,mDetectionHeight);
+		drawSome(mean,var,image);
 
 		mDetectionWidth -= (mDetectionWidth  - var[0]*MagicVarianceScaleX);
 		mDetectionHeight-= (mDetectionHeight - var[1]*MagicVarianceScaleY);
@@ -165,38 +166,51 @@ public class TemplateMatch  extends DetectionClass{
 	 * @param cutoffX
 	 * @param cutOffY
 	 */
-	private void estimateAndRemoveOutlier(MatOfKeyPoint kp,Mat image,double cutoffX,double cutOffY){
-
-		KeyPoint[] kpArray = kp.toArray();
+	private void estimateAndRemoveOutlier(FormTemplate template){
+		Mat image = template.getTemplateImage().getImage().clone();
+		KeyPoint[] kpArray = template.getTemplateImage().getKeyPoints().toArray();
+		
+		
 		int numKeyPoints = kpArray.length;
-
 		double imageWidth = image.cols();
 		double imageHeight = image.rows();
 
 		double x[] = new double[numKeyPoints];
 		double y[] = new double[numKeyPoints];
-
+		
+		double[] boxCenter = template.getScaledBoxCenter(imageWidth, imageHeight);
+		double[] boxSize   = template.getScaledBoxSize(imageWidth, imageHeight);
+		
+		boxSize[0] /=2.0;
+		boxSize[1] /=2.0;
+		
 		for (int i = 0; i < numKeyPoints; i++) {
 			x[i] = kpArray[i].pt.x;
 			y[i] = kpArray[i].pt.y;
 		}
-		double mean[] = new double[2];
-		double var[] = new double[2];
-
-		double discardDistanceX = cutoffX*imageWidth;
-		double discardDistanceY = cutOffY*imageHeight;
-
-		int indices[] = computeMeanAndVar(x, y,discardDistanceX, discardDistanceY ,mean,var);
-
+		
+		int[] indicesTemp = new int[numKeyPoints];
+		int ptr = 0;
+		for (int i = 0; i < numKeyPoints; i++) {
+			double distanceX = Math.abs(x[i] - boxCenter[0]);
+			double distanceY = Math.abs(y[i] - boxCenter[1]);
+			if(distanceX < boxSize[0] && distanceY < boxSize[1]){	
+				indicesTemp[ptr++] = i;
+			}
+		}
+		int indices[] = new int[ptr];
+		System.arraycopy(indicesTemp, 0, indices, 0, ptr);
 		KeyPoint[] kpArrayRefined = new KeyPoint[indices.length];
+		
 		for (int i = 0; i < kpArrayRefined.length; i++) {
 			kpArrayRefined[i] = kpArray[indices[i]]; 
 		}
-		kp.fromArray(kpArrayRefined);
+		
+		template.getTemplateImage().getKeyPoints().fromArray(kpArrayRefined);
 
-		drawSome(mean,var,image,discardDistanceX,discardDistanceY);
-		Features2d.drawKeypoints(image, kp, image);
-
+		drawSome(boxCenter,boxSize,image);
+		Features2d.drawKeypoints(image, template.getTemplateImage().getKeyPoints(), image);
+		mIntermeditateResult = image;
 
 	}
 
@@ -217,7 +231,7 @@ public class TemplateMatch  extends DetectionClass{
 	 * @param discardDistanceX
 	 * @param discardDistanceY
 	 */
-	private void drawSome(double[] mean,double [] var,Mat image,double discardDistanceX ,double discardDistanceY){
+	private void drawSome(double[] mean,double [] var,Mat image){
 		double xMean = mean[0];
 		double yMean = mean[1];
 		double xVar = var[0];
@@ -225,42 +239,24 @@ public class TemplateMatch  extends DetectionClass{
 		double imageWidth = image.cols();
 		double imageHeight = image.rows();
 		double startCoord[] = new double[2];
-		double scale = 2.0;
-		if(xMean - scale*xVar > 0) startCoord[0]= xMean - scale*xVar;
-		if(yMean - scale*yVar > 0) startCoord[1]= yMean - scale*yVar;
+		if(xMean - xVar > 0) startCoord[0]= xMean - xVar;
+		if(yMean - yVar > 0) startCoord[1]= yMean - yVar;
 		Point start = new Point(startCoord);
 
 		double endCoord[] = new double[2];
 		endCoord[0] = imageWidth;
 		endCoord[1] = imageHeight;
-		if(xMean + scale*xVar < imageWidth) endCoord[0]= xMean + scale*xVar;
-		if(yMean + scale*yVar < imageHeight) endCoord[1]= yMean + scale*yVar;
+		if(xMean + xVar < imageWidth) endCoord[0]= xMean +  xVar;
+		if(yMean + yVar < imageHeight) endCoord[1]= yMean + yVar;
 		Point end = new Point(endCoord);
 		// draw enclosing rectangle (all same color, but you could use variable i to make them unique)
-		//		Core.rectangle(image, start, end, new Scalar(255, 0, 0, 255), 3);
-
-
-		startCoord = new double[2];
-		scale = 2.0;
-		if(xMean - discardDistanceX > 0) startCoord[0]= xMean - discardDistanceX;
-		if(yMean - discardDistanceY > 0) startCoord[1]= yMean - discardDistanceY;
-		start = new Point(startCoord);
-
-		endCoord = new double[2];
-		endCoord[0] = imageWidth;
-		endCoord[1] = imageHeight;
-		if(xMean + discardDistanceX < imageWidth) endCoord[0]= xMean + discardDistanceX;
-		if(yMean + discardDistanceY< imageHeight) endCoord[1]= yMean + discardDistanceY;
-		end = new Point(endCoord);
-		Core.rectangle(image, start, end, new Scalar(255, 0, 255, 0), 3);
-		Rect rect = new Rect(start,end);
+		Core.rectangle(image, start, end, new Scalar(255, 0, 0, 255), 3);
 		
-		
-		double p0[] = new double[]{xMean - discardDistanceX,yMean - discardDistanceY};
-		double p1[] = new double[]{xMean + discardDistanceX,yMean - discardDistanceY};
-		double p2[] = new double[]{xMean + discardDistanceX,yMean + discardDistanceY};
-		double p3[] = new double[]{xMean - discardDistanceX,yMean + discardDistanceY};
-		
+		double p0[] = new double[]{xMean - xVar,yMean - yVar};
+		double p1[] = new double[]{xMean + xVar,yMean - yVar};
+		double p2[] = new double[]{xMean + xVar,yMean + yVar};
+		double p3[] = new double[]{xMean - xVar,yMean + yVar};
+
 		mBoxPoints = new Mat(4,1,CvType.CV_64FC2); 
 		mBoxPoints.put(0, 0, p0);
 		mBoxPoints.put(1, 0, p1);
@@ -325,5 +321,17 @@ public class TemplateMatch  extends DetectionClass{
 
 		return indices;
 	}
+
+	public void calibrateTemplate(FormTemplate formTemplate) {
+		if(formTemplate != null){
+			/* Start of with computing properties of the template image */
+			formTemplate.getTemplateImage().computeKeyPoints(FeatureDetector.SIFT);
+			estimateAndRemoveOutlier(formTemplate);
+			formTemplate.getTemplateImage().computeDescriptors(DescriptorExtractor.SIFT);
+		}else{
+			mIntermeditateResult = new Mat();
+		}
+	}
+
 }
 
