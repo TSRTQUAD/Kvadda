@@ -190,12 +190,12 @@ public class NavData implements Runnable {
 				    	}
 //			    	}
 	
-				    	NavData[0] = (double)0;
-				       	NavData[1] = (double)0;
+				    	NavData[0] = GPS_Lat;
+				       	NavData[1] = GPS_Long;
 				       	NavData[2] = (double)Vy;
 				       	NavData[3] = (double)Vx;
-				       	NavData[4] = (double)Vz;
-				       	NavData[5] = (double)Altitude;
+				       	NavData[4] = (double)Altitude;
+				       	NavData[5] = (double)Yaw;
 				       	
 				       mMainbus.setNavData(NavData);
 				       	
