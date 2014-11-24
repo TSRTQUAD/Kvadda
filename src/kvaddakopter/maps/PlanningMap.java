@@ -4,6 +4,8 @@ import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.event.UIEventType;
 import com.lynden.gmapsfx.javascript.object.*;
+import com.lynden.gmapsfx.shapes.Polyline;
+import com.lynden.gmapsfx.shapes.PolylineOptions;
 
 import netscape.javascript.JSObject;
 
@@ -11,9 +13,11 @@ import java.util.ArrayList;
 
 import kvaddakopter.assignment_planer.Area;
 import kvaddakopter.assignment_planer.MissionType;
+import kvaddakopter.gui.components.AbstractGPSMarker;
 import kvaddakopter.gui.components.GpsToAreaTransformer;
 import kvaddakopter.gui.components.factories.MapShapeFactory;
 import kvaddakopter.gui.components.shapes.GPSCircle;
+import kvaddakopter.gui.components.shapes.GPSPath;
 import kvaddakopter.gui.components.shapes.MapShapeInterface;
 import kvaddakopter.gui.controllers.TabPlaneraController;
 
@@ -33,6 +37,8 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 	
 	private ArrayList<MapShapeInterface> navigationMapShapes;
 	private ArrayList<MapShapeInterface> forbiddenShapes;
+	
+	private Polyline generatedPath;
 	
 	private int currentActiveMissionAreaCounter = 0;
 	private int currentActiveForbiddenAreaCounter = 0;
@@ -63,6 +69,7 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 		this.createMapWithStartLocation();
 		this.navigationMapShapes = new ArrayList<MapShapeInterface>();
 		this.forbiddenShapes = new ArrayList<MapShapeInterface>();
+		
 		this.isMapInitialized = true;
 		
 		
@@ -224,6 +231,25 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 		MapShapeInterface newShape =  MapShapeFactory.make(MissionType.NULL_MISSION, this.map);
 		this.forbiddenShapes.add(newShape);
 		this.currentActiveForbiddenAreaCounter = this.forbiddenShapes.size() - 1;
+	}
+
+	public void drawResultingTrajectory(double[][] trajectory) {
+
+		if (this.generatedPath != null){
+			this.map.removeMapShape(this.generatedPath);
+		}
+		System.out.println("Drawing coordinates on map...");
+		LatLong[] ary = new LatLong[trajectory.length];
+		for(int i = 0; i < trajectory.length; i++){
+			ary[i] = new LatLong(trajectory[i][0], trajectory[i][1]);
+			System.out.println(i);
+		}
+		MVCArray mvc = new MVCArray(ary);
+		PolylineOptions options = new PolylineOptions().path(mvc).strokeColor("blue").strokeWeight(3);
+		this.generatedPath = new Polyline(options);
+		//Draw the trajectory
+		this.map.addMapShape(this.generatedPath);
+		
 	}
 	
 

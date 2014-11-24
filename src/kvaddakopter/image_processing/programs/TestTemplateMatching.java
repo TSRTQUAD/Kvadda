@@ -33,7 +33,7 @@ public class TestTemplateMatching extends ProgramClass{
 
 		//Create and initialize decoder. And select source.
 		mDecoder = new FFMpegDecoder();
-		mDecoder.initialize("flaska.mp4");
+		mDecoder.initialize("tcp://192.168.1.1:5555");
 		//mDecoder.initialize("rtsp://130.236.214.20:8086");
 		//mDecoder.initialize("mvi2.mp4");
 		// Listen to decoder events
@@ -46,7 +46,7 @@ public class TestTemplateMatching extends ProgramClass{
 		openVideoWindow();
 
 		mCurrentMethod = new TemplateMatch();
-		((TemplateMatch)mCurrentMethod).addNewTemplateImage("template_flaska.jpg");
+		((TemplateMatch)mCurrentMethod).addNewTemplateImage("kaffe.jpg");
 
 	}
 
