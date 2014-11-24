@@ -73,7 +73,7 @@ public class Sensorfusionmodule implements Runnable{
 	protected ReferenceData 		rrdata				= new ReferenceData();   
 	protected ReferenceExtractor	referenceextractor	= new ReferenceExtractor(0);
 	protected int					counter				= 0;
-	
+	protected int					controllingmode		= 2; // 0 for autonomous 
 	
 	//public Sensorfusionmodule(ControlMainBusInterface mainbus){
 	//	this.mainbus = mainbus;
@@ -83,45 +83,60 @@ public class Sensorfusionmodule implements Runnable{
 	public Sensorfusionmodule(ControlMainBusInterface mainbus) {
 		this.mainbus = mainbus;
 	}
-
-
-	
 	
 	public void run(){
-		
+	
+		//Initialize -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 		System.out.println("Initializing modules ..");
-		//First Read
 		this.sensorvector = mainbus.getSensorVector();				//Reads sensor data from mainbus
-		sdata.setnewsensordata(sensorvector);						//Update local sensor object		
-//		this.controlsignal = mainbus.getControlSignal();			//Reads Control signal from mainbus
-//		this.missionobject = mainbus.getMissionObject();			//Reads mission object from mainbus
-
-		//Set initials
+		sdata.setnewsensordata(sensorvector);						//Update local sensor object
+		
+		if (0 == controllingmode){
+		this.missionobject = mainbus.getMissionObject();			//Reads mission object from mainbus	
 		sdata.setinitial();											// Fix local coordinate system XY
 		sdata.GPS2XY();												// Transformation GPS to XY coordinates
-		sdata.xydot2XYdot();										// Transformation velocities to XY(dot)
-		//sdata.print();
-		
+		sdata.xydot2XYdot();
 		rrdata.initialize(sdata.getLatitud(),sdata.getLongitud());	// Fix local coordinate system XY
-//		rrdata.updateref(referenceextractor.update(missionobject));	
-		rrdata.updateindoor(referenceextractor.updatetest());			// Get first reference 
+		rrdata.updateref(referenceextractor.update(missionobject));	// update ref @ Autonomous flight mode
+		
+		}															
+
+		else if (1 == controllingmode){
+		sdata.setinitial();											// Fix local coordinate system XY
+		sdata.GPS2XY();												// Transformation GPS to XY coordinates
+		sdata.xydot2XYdot();
+		rrdata.initialize(sdata.getLatitud(),sdata.getLongitud());	// Fix local coordinate system XY
+		rrdata.settestpoint();										// Primitive fixed reference @ initial-lat/lon		
+		}
+		
+		else if (2 == controllingmode){
+			sdata.setGPSposition(new double[]{0,0});					// Set initial gps to {0,0}
+			sdata.setinitial();											// Fix local coordinate system XY
+			sdata.GPS2XY();												// Transformation GPS to XY coordinates
+			sdata.xydot2XYdot();										// Transformation velocities to XY(dot)
+			rrdata.initialize(sdata.getLatitud(),sdata.getLongitud());	// Fix local coordinate system XY
+			rrdata.updateindoor(referenceextractor.updatetest());		// Indoor flight mode GPS has to be [0,0]
+		}													
 		rrdata.print();
+		//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 		
-		
-		rsdata.setXstates(skalmanx.timeupdate()); //Kalman filter in X direction
-		rsdata.setYstates(skalmany.timeupdate()); //Kalman filter in Y direction
+		//SENSORFUSION  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+		rsdata.setXstates(skalmanx.timeupdate()); 							//Kalman filter in X direction
+		rsdata.setYstates(skalmany.timeupdate()); 							//Kalman filter in Y direction
 		rsdata.setXstates(skalmanx.velmeasurementupdate(sdata.getXdot())); 	// Kalmanfilter in X direction
 		rsdata.setYstates(skalmany.velmeasurementupdate(sdata.getYdot())); 	// Kalmanfilter in Y direction
-		rsdata.setYaw(sdata.getYaw());								// Set Yaw
-		rsdata.setHeight(sdata.getHeight());						// Set Height
-		rsdata.XYdot2Vel();											//Transform Xdot,Ydot to velocities
+		rsdata.setYaw(sdata.getYaw());										// Set Yaw
+		rsdata.setHeight(sdata.getHeight());								// Set Height
+		rsdata.XYdot2Vel();													//Transform Xdot,Ydot to velocities
+		//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 		
-		//rsdata.print();
 		
+		//rsdata.print();		
 		System.out.println("Initializing completed");
 		System.out.println("");
 		
-/*		//Start quad
+		//Start Quad-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-		
+		if (0 == controllingmode){
 		if(rrdata.getStart() == 1){			
 			controlsignal.setStart(1);			
 			try {
@@ -134,106 +149,125 @@ public class Sensorfusionmodule implements Runnable{
 				e.printStackTrace();
 			}
 		}
-*/		
-				System.out.println("Controllerloop initialized");
+}
+		//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+
+		try {
+			System.out.println("Sleep");
+			Thread.sleep((long) 10000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		
+
 				
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-
+				System.out.println("Controllerloop initialized");
 				while(true)
 				{
-				counter ++;
-				time = System.currentTimeMillis();	
+					
 				//For every sample  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-//---			ControlSignal csignal = new ControlSignal();
+				counter ++;
+				time = System.currentTimeMillis();		
+				ControlSignal csignal = new ControlSignal();
 				this.sensorvector = mainbus.getSensorVector();				//Reads sensor data from mainbus
 				sdata.setnewsensordata(sensorvector);						//Update local sensor object
+				
+
+				if (0 == controllingmode || 1 == controllingmode){
 				sdata.GPS2XY();												//Transformation
 				sdata.xydot2XYdot();										//Transformation
+				}
+				else if (2 == controllingmode){
+				sdata.setGPSposition(new double[]{0,0});					// Set gps to {0,0}
+				sdata.GPS2XY();												//Transformation
+				sdata.xydot2XYdot();										//Transformation
+				}
+				
+				
 				//System.out.format("Sensordata at sample %d%n",counter);
 				//sdata.print();
 													
 
 				
 				//SENSORFUSION  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-			    //Statements
-										//transformation
-
-				
-				//Update states from kalman filter
+				//Update states from Kalman filter
 				rsdata.setXstates(skalmanx.timeupdate()); //Kalman filter in X direction
 				rsdata.setYstates(skalmany.timeupdate()); //Kalman filter in Y direction
 				rsdata.setXstates(skalmanx.velmeasurementupdate(sdata.getXdot())); //Kalman filter in X direction
 				rsdata.setYstates(skalmany.velmeasurementupdate(sdata.getYdot())); //Kalman filter in Y direction
 				rsdata.XYdot2Vel();										 //Transform Xdot,Ydot to velocities
-				rsdata.s2rs(sdata);
+				rsdata.s2rs(sdata);	
+						//For every new GPS measurement-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+						if(sdata.isGPSnew() )
+						{	
+						System.out.println("New GPS measurement");
+						rsdata.setXstates(skalmanx.gpsmeasurementupdate(sdata.getX()));	// Measurement update in kalmanfilter
+						rsdata.setYstates(skalmany.gpsmeasurementupdate(sdata.getY()));	// Measurement update in kalmanfilter
+						rsdata.XYdot2Vel();												//Transform Xdot,Ydot to velocities								
+						}
+						// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_				
 				System.out.format("States at sample %d%n",counter);
 				rsdata.print();
+				// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				
-
 				
-				// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
-				//For every new GPS measurement-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-				if(sdata.isGPSnew() )
-				{	
-				System.out.println("New GPS measurement");
-				//sdata.GPS2XY();												// Transformation GPS to XY coordinates
-
-				rsdata.setXstates(skalmanx.gpsmeasurementupdate(sdata.getX()));// Measurement update in kalmanfilter
-				rsdata.setYstates(skalmany.gpsmeasurementupdate(sdata.getY()));// Measurement update in kalmanfilter
-				rsdata.XYdot2Vel();											//Transform Xdot,Ydot to velocities
 				
-				System.out.println("New states:");
-				rsdata.print();	
-				// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+				//Reference update  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-				
+				if (0 == controllingmode){
+				rrdata.update(rsdata, missionobject);						//Update reference data
 				}
-				
-				
-				//CONTROLLER  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-				
-
-//				rrdata.update(rsdata, missionobject);						//Update reference data
-				rrdata.updatetest(rsdata);
+				if (1 == controllingmode){
+				//rrdata.updatewiggle(rsdata);								//Reference is init+-(0.000012 longitud)
+				}
+				else if (2 == controllingmode){
+				rrdata.updatetest(rsdata);									//Reference is init+-(2m)
+				}	
 				System.out.print("Reference signal:");
 				rrdata.print();
-/*				
+				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 				
-				//Controlsignal calculation
+				
+				
+				//Control-signal -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 				if(rrdata.getMission()==1){
-					csignal = controller.GetControlSignalMission1(rsdata, rrdata, controlsignal);
+					csignal = controller.GetControlSignalMission1(rsdata, rrdata);
 					System.out.println("Controller Mission = 1, controlsignal:");
-					csignal.print();
+					//csignal.print();
 				}
 				else if(rrdata.getMission()==0 || rrdata.getMission()==2){
-					csignal = controller.GetControlSignalMission0(rsdata, rrdata, controlsignal);
+					csignal = controller.GetControlSignalMission0(rsdata, rrdata);
 					System.out.println("Controller Mission = 0, controlsignal:");
-					csignal.print();
+					//csignal.print();
 				}
 				
-				
-				
 				if( rrdata.getLand() == 1){									//Initiate landing?
-					csignal.setLand(1);										//
+					csignal.setStart(0);									//
 					try {													//
 						Thread.sleep((long) 10);							//
 					} catch (InterruptedException e) {						//
 						e.printStackTrace();								//
-					}
-					
-					
-					mainbus.setControlSignal(csignal);						// Update mainbus controlsignal
-				}				
-*/
+					}					
+				}
+
+				csignal = controller.saturation(csignal,0.1,0.1,0.1,1);		// Saturate control-signal
+				mainbus.setControlSignalobject(csignal);					// Update main-bus control-signal
+				csignal.print();
+				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 				
-				time = sampletime*1000 - (System.currentTimeMillis()-time);
 				
-/*				System.out.format("Samplingsintervall: %.2f%n",time);
+				
+				
+				//Sample-time -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
+				time = sampletime*1000 - (System.currentTimeMillis()-time);				
+//				System.out.format("Samplingsintervall: %.2f%n",time); 
 				System.out.println("-------------------------------");
 				System.out.println("");
 				System.out.println("");
-*/				
-				
 				if(time>0){
 				
 				try {
@@ -242,51 +276,7 @@ public class Sensorfusionmodule implements Runnable{
 					e.printStackTrace();
 				}
 				}
-				}
-				
-				
- // Test
-/*				//First Read
-				sdata.setGPSposition(new double[]{58.401122,15.595410});	// New GPS measurement
-				sdata.setydot(1);											// New velocity read (ydot)
-				sdata.setxdot(0);											// New velocity read (xdot)
-				sdata.setYaw(0);											// New Yaw read
-				sdata.setHeight(4);											// New Height measurement
-				
-				sdata.setinitial();											// Fix local coordinate system XY
-				sdata.GPS2XY();												// Transformation GPS to XY coordinates
-				sdata.xydot2XYdot();										// Transformation velocities to XY(dot)
-				sdata.print();
-				
-				//Refined
-				rsdata.setXstates(skalmanx.timeupdate(sdata.getXdot())); 	// Kalmanfilter in X direction
-				rsdata.setYstates(skalmany.timeupdate(sdata.getYdot())); 	// Kalmanfilter in Y direction				
-				rsdata.setYaw(sdata.getYaw());								// Set Yaw
-				rsdata.setHeight(sdata.getHeight());						// Set Height
-				rsdata.XYdot2Vel();											//Transform Xdot,Ydot to velocities
-				rsdata.print();
-				
-				
-				//Refined
-				rsdata.setXstates(skalmanx.timeupdate(sdata.getXdot())); 	// Kalmanfilter in X direction
-				rsdata.setYstates(skalmany.timeupdate(sdata.getYdot())); 	// Kalmanfilter in Y direction				
-				rsdata.setYaw(sdata.getYaw());								// Set Yaw
-				rsdata.setHeight(sdata.getHeight());						// Set Height
-				rsdata.XYdot2Vel();											//Transform Xdot,Ydot to velocities
-				rsdata.print();
-		
-				rsdata.setXstates(skalmanx.measurementupdate(0));			// Measurement update in kalmanfilter
-				rsdata.setYstates(skalmany.measurementupdate(0.5));			// Measurement update in kalmanfilter
-				rsdata.XYdot2Vel();
-				rsdata.print();
-				
-				rsdata.setXstates(skalmanx.timeupdate(sdata.getXdot())); 	// Kalmanfilter in X direction
-				rsdata.setYstates(skalmany.timeupdate(sdata.getYdot())); 	// Kalmanfilter in Y direction				
-				rsdata.setYaw(sdata.getYaw());								// Set Yaw
-				rsdata.setHeight(sdata.getHeight());						// Set Height
-				rsdata.XYdot2Vel();											//Transform Xdot,Ydot to velocities
-				rsdata.print();*/
-				
-	}
-	
+				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+		}				
+	}	
 }

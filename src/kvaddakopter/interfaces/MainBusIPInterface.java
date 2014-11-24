@@ -13,15 +13,30 @@ public interface MainBusIPInterface {
 	public static final int BLUR_DETECTION_MODE 			= 3;
 	public static final int COLOR_CALIBRATION_MODE 			= 4;
 	public static final int TRACKING_MODE		 			= 5;
+	public static final int TEMPLATE_CALIBRATION_MODE		= 6;
 
 	public static final int DEFAULT_IMAGE				= 0;
 	public static final int TARGET_IMAGE 				= 2;
 	public static final int CUT_OUT_IMAGE 				= 3;
 	public static final int SURPRISE_IMAGE 				= 4;
 	public static final int TEMPLATE_MATCHING_IMAGE		= 5;
+	public static final int TEMPLATE_CALIBRATE_IMAGE	= 6;
 
+	//Interface variables
+	
+	//Lists
+	ArrayList<FormTemplate> mFormTemplates = new ArrayList<FormTemplate>();
+	ArrayList<TargetObject> mTargetList = new ArrayList<TargetObject>();
+	ArrayList<ColorTemplate> mColorTemplates = new ArrayList<ColorTemplate>();
+	
+	//Modes
+	int[] mIPActiveModes = new int[10];
+
+	
 	//Intiation
 	public void initIPVariables();
+	
+	
 	
 	//Flags
 	/**
@@ -47,9 +62,10 @@ public interface MainBusIPInterface {
 	public void addIPColorTemplate(ColorTemplate template); //TODO in GUI interface
 	
 	//Form
-	public ArrayList<Template> getIPFormTemplates();
-	public void setIPFormTemplates(ArrayList<Template> templates); //TODO in GUI interface
-	public void addIPFormTemplate(Template template); //TODO in GUI interface
+	public ArrayList<FormTemplate> getIPFormTemplates();
+	public void addIPFormTemplate(FormTemplate template); //TODO in GUI interface
+	public FormTemplate getCalibFormTemplate();
+	public void setCalibFormTemplate(FormTemplate template);
 	
 	//GPS
 	public void setIPGPSCoordinate(GPSCoordinate coord); //TODO somewhere

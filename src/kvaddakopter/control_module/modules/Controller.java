@@ -20,10 +20,10 @@ public class Controller{
 
 
 	public Controller(double sampletime){	
-		KVelHeight = 1; 
-		KVelForward = 0.2;
-		KVelLateral = 0.2;
-		KYaw = 0.3;
+		KVelHeight = 0.1; 
+		KVelForward = 0.05;
+		KVelLateral = 0.05;
+		KYaw = 1;
 		Tintegral = 0.01;
 		Ts = sampletime;
 		errorheight = 0;
@@ -35,7 +35,7 @@ public class Controller{
 		
 	
 	
-		public ControlSignal GetControlSignalMission0(RefinedSensorData rsdata, ReferenceData rrdata,ControlSignal controlsignal){
+		public ControlSignal GetControlSignalMission0(RefinedSensorData rsdata, ReferenceData rrdata){
 		
 		ControlSignal csignal = new ControlSignal();
 			
@@ -53,6 +53,7 @@ public class Controller{
 		csignal.setLateralvelocity	(	KVelLateral*(RDataVel.get(1) - rsdata.getLatVel() )		);	
 		csignal.setHeightvelocity	( 	KVelHeight*(rrdata.getHeight() - rsdata.getHeight())	);	
 		csignal.setYawrate			(	KYaw*(rrdata.getYaw() - rsdata.getYaw())				);
+
 		 
 		
 		this.errorheight = rrdata.getHeight() - rsdata.getHeight();
@@ -64,7 +65,7 @@ public class Controller{
 
 		
 		
-		 public ControlSignal GetControlSignalMission1(RefinedSensorData rsdata, ReferenceData rrdata, ControlSignal controlsignal){ 
+		 public ControlSignal GetControlSignalMission1(RefinedSensorData rsdata, ReferenceData rrdata){ 
 		 //Constant speed controlling
 			ControlSignal csignal = new ControlSignal();
 			 
@@ -84,7 +85,27 @@ public class Controller{
 		 }
 		 
 
-		 
+	public ControlSignal saturation(ControlSignal csignal,double forvel,double latvel,double heightvel,double yawdot){
+		double refforvel,reflatvel,refheightvel; //,refyawdot;
+		
+		
+		if (Math.abs(csignal.getForwardvelocity()) > forvel){
+			refforvel = (csignal.getForwardvelocity() > forvel) ? forvel : -forvel;
+			csignal.setForwardvelocity(refforvel);
+		}
+		if (Math.abs(csignal.getLateralvelocity()  ) > latvel){
+			reflatvel = (csignal.getLateralvelocity() > latvel) ? latvel : -latvel;
+			csignal.setLateralvelocity(reflatvel);
+		}
+		if (Math.abs(csignal.getHeightvelocity()  ) > heightvel){
+			refheightvel = (csignal.getHeightvelocity() > heightvel) ? heightvel : - heightvel;
+			csignal.setHeightvelocity(refheightvel);
+		}
+		
+		//TODO  yawdot
+
+		return csignal;		
+	}
 		 
 
 	// Getters

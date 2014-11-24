@@ -8,7 +8,6 @@ public class ControlSignal{
 	protected double forwardvelocity;
 	protected double lateralvelocity;
 	protected int start;
-	protected int land;
 	
 	
 	
@@ -18,7 +17,6 @@ public class ControlSignal{
 		lateralvelocity = 0;
 		yawrate = 0;
 		start = 0;
-		land = 0;
 	}
 	
 	public void print(){
@@ -26,8 +24,7 @@ public class ControlSignal{
 		System.out.format("Heightvelocity: %.1f%n", heightvelocity);
 		System.out.format("Forwardvelocity: %.2f%n", forwardvelocity);
 		System.out.format("Lateralvelocity: %.2f%n", lateralvelocity);
-		System.out.format("Start: %d%n", start);
-		System.out.format("Land: %d%n", land);		
+		System.out.format("Start: %d%n", start);		
 	}
 
 	public double getYawrate() {
@@ -68,14 +65,6 @@ public class ControlSignal{
 
 	public void setStart(int start) {
 		this.start = start;
-	}
-
-	public int getLand() {
-		return land;
-	}
-
-	public void setLand(int land) {
-		this.land = land;
 	}
 
 	
