@@ -31,6 +31,3 @@ end
 % Calculate the total trajectory length
 trajectorylength = sum(localtrajectorylength);
 
-% Calculate the estimated time needed to fly along the trajectory
-totaltime = totaltime/60;               % [min]
-

@@ -3,6 +3,7 @@ package kvaddakopter.interfaces;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import javafx.scene.image.Image;
 import kvaddakopter.image_processing.data_types.*;
 import kvaddakopter.maps.GPSCoordinate;
 public interface MainBusIPInterface {
@@ -76,7 +77,7 @@ public interface MainBusIPInterface {
 	
 	//Image object
 	public void setIPImageToShow(BufferedImage image);
-	public BufferedImage getIPImageToShow(); //TODO in GUI interface
+	public Image getIPImageToShow(); //TODO in GUI interface
 	
 	//Color Calibration
 	public void setIPCalibTemplate(ColorTemplate cTemplate); //TODO in GUI interface

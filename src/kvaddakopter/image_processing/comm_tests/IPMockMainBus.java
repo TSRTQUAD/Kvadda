@@ -3,6 +3,10 @@ package kvaddakopter.image_processing.comm_tests;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
+
 import org.opencv.core.Core;
 
 import kvaddakopter.image_processing.data_types.ColorTemplate;
@@ -23,7 +27,7 @@ public class IPMockMainBus implements MainBusIPInterface{
 	private ColorTemplate mIPCalibTemplate;
 	private FormTemplate mIPCalibFormTemplate;
 	//private ImageObject mImageObject;
-	private BufferedImage mIPImageToShow;
+	private Image mIPImageToShow;
 	private boolean mIsIPRunning;
 	int mIPImageMode = 0;
 	public static void main(String[] args) {
@@ -144,11 +148,21 @@ public class IPMockMainBus implements MainBusIPInterface{
 
 	@Override
 	public synchronized void setIPImageToShow(BufferedImage image) {
-		mIPImageToShow = image;
+		WritableImage wr = null;
+        if (image != null) {
+            wr = new WritableImage(image.getWidth(), image.getHeight());
+            PixelWriter pw = wr.getPixelWriter();
+            for (int x = 0; x < image.getWidth(); x++) {
+                for (int y = 0; y < image.getHeight(); y++) {
+                    pw.setArgb(x, y, image.getRGB(x, y));
+                }
+            }
+        }
+        mIPImageToShow = wr;
 	}
 	
 	@Override
-	public synchronized BufferedImage getIPImageToShow() {
+	public synchronized Image getIPImageToShow() {
 		return mIPImageToShow;
 	}
 
