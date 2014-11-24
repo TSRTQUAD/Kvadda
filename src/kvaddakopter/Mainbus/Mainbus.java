@@ -98,36 +98,24 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 	
 	
 	
-	//Control module
-	protected double[] 		sensorvector			= new double[]{0,0,0,0,0};
-	//protected ControlSignal 	controlsignal			= new ControlSignal();
-	
+	//Control modules
 	
 	public double[] getSensorVector() {		
 		return NavData;
 	}
 
-	@Override
-	public kvaddakopter.control_module.signals.ControlSignal getControlSignalobject() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-
-	@Override
 	public void setControlSignalobject(
 			kvaddakopter.control_module.signals.ControlSignal csignal) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public MissionObject setMissionObject() {
-		// TODO Auto-generated method stub
-		return null;
+		//Controlsignal[Landing/Start Roll Pitch Gaz Yaw ]		
+		//ControlSignal[0] = csignal.getStart();
+		//ControlSignal[1] = (float) csignal.getLateralvelocity();
+		//ControlSignal[2] = (float) -csignal.getForwardvelocity();
+		//ControlSignal[3] = (float)  csignal.getHeightvelocity();
+		//ControlSignal[4] = (float)  csignal.getYawrate();	
 	}
 	
+
 	
 	
 	public static void main(String[] args) {
@@ -199,8 +187,13 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		
 		//
 		// START MODULE
-	    Sensorfusionmodule module = new Sensorfusionmodule(new Mockmainbus());
-	    new Thread(module).start();
+	    
+	
+	    Sensorfusionmodule sensmodule = new Sensorfusionmodule(new Mainbus());
+		Thread t7 = new Thread(sensmodule);
+		t7.setDaemon(true);
+		t7.setPriority(1);
+		t7.start();
 		
 		
 		while(true){

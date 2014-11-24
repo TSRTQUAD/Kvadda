@@ -25,7 +25,7 @@ public class SensorData {
 		this.xdot = sensorvector[2];
 		this.ydot = sensorvector[3];
 		this.height = sensorvector[4];
-		this.yaw = sensorvector[5];
+		this.yaw = Math.PI/180*sensorvector[5];
 	}
 
 	
@@ -55,6 +55,7 @@ public class SensorData {
 		this.Y=radius*deltaLon*Math.cos((lat1+lat2)/2)*1000;
 		this.X=radius*deltaLat*1000;
 	}
+	
 	
 	
 	/* Transforms local coordinate system XY into coordinate system 
