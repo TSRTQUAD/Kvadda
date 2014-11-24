@@ -92,6 +92,26 @@ public class IPTestGUI extends Application implements Runnable{
             }
         });
         
+        Button imgModeBtn3 = new Button();
+        imgModeBtn3.setText("Surprise");
+
+        imgModeBtn3.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	mMainbus.setIPImageMode(MainBusIPInterface.SURPRISE_IMAGE);
+            }
+        });
+        
+        Button imgModeBtn4 = new Button();
+        imgModeBtn4.setText("Template matching image");
+
+        imgModeBtn4.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	mMainbus.setIPImageMode(MainBusIPInterface.TEMPLATE_MATCHING_IMAGE);
+            }
+        });
+        
         StackPane root = new StackPane();
         root.setAlignment(Pos.TOP_CENTER);
         //Place buttons
@@ -101,12 +121,22 @@ public class IPTestGUI extends Application implements Runnable{
         cCalibBtn.setTranslateY(90);
         root.getChildren().add(cCalibBtn);
         
+        //Image buttons
         imgModeBtn1.setTranslateX(150);
         root.getChildren().add(imgModeBtn1);
+        
         imgModeBtn2.setTranslateX(150);
         imgModeBtn2.setTranslateY(30);
         root.getChildren().add(imgModeBtn2);
-
+        
+        imgModeBtn3.setTranslateX(150);
+        imgModeBtn3.setTranslateY(60);
+        root.getChildren().add(imgModeBtn3);
+        
+        
+        imgModeBtn4.setTranslateX(150);
+        imgModeBtn4.setTranslateY(90);
+        root.getChildren().add(imgModeBtn4);
          
         Scene scene = new Scene(root, 500, 250);
          

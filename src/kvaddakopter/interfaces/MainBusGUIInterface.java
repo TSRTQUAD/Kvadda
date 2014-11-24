@@ -37,6 +37,12 @@ public interface MainBusGUIInterface {
 	 */
 	public void setAssignmentPlanerOn(boolean state);
 	
+	/**
+	 * Checks the status of the AssignmentPlaner
+	 * @return
+	 */
+	public boolean isAssignmentPlanerOn();
+	
 	
 	/**
 	 * 	Sets a mission object to the mainbus

@@ -120,6 +120,7 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 				}
 			}
 		}
+		
 		int listSize = radiusList.size();
 		double[] radius = new double[listSize];
 		int j = 0;
@@ -127,6 +128,11 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 			radius[j] = value.doubleValue();
 			j++;
 		}
+		
+		if (radiusList.isEmpty()) {
+			radius = new double[] {0};
+		}
+		
 		return radius;
 	}
 	

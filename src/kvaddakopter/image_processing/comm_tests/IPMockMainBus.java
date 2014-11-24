@@ -51,9 +51,15 @@ public class IPMockMainBus implements MainBusIPInterface{
 		// TODO More initializations needed (probably)
 		mIPActiveModes = new int[6];
 		activateIPMode(COLOR_DETECTION_MODE);
+		//activateIPMode(TEMPLATE_MATCHING_MODE);
+		activateIPMode(TRACKING_MODE);
 		setIPImageMode(DEFAULT_IMAGE);
 		mTargetList = new ArrayList<TargetObject>();
+		
 		mColorTemplates = new ArrayList<ColorTemplate>();
+		mColorTemplates.add(new ColorTemplate("Pink square", 120, 200, 50, 90, 180, 245, ColorTemplate.FORM_SQUARE));	
+		mColorTemplates.add(new ColorTemplate("Yellow square", 30, 120, 50, 120, 130, 255, ColorTemplate.FORM_SQUARE));
+		
 		mIPCalibTemplate = new ColorTemplate();
 		mIPImageToShow = null;
 		mIsIPRunning = false;

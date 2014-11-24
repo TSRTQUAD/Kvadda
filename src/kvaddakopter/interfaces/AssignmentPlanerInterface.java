@@ -28,8 +28,15 @@ public interface AssignmentPlanerInterface {
 	public boolean isAssignmentPlanerOn();
 	
 	/**
+	 * Set the Matlab proxy connection variable of class MatlabProxyConnection
+	 * @return
+	 */
+	public void setMatlabProxyConnection(MatlabProxyConnection MPC);
+	
+	/**
 	 * Get the Matlab proxy connection variable of class MatlabProxyConnection
 	 * @return
 	 */
-	public MatlabProxyConnection getMatlabProxy();
+	public MatlabProxyConnection getMatlabProxyConnection();
+	
 }

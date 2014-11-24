@@ -15,8 +15,10 @@ import java.util.ArrayList;
 
 
 
+
 import matlabcontrol.MatlabConnectionException;
 import kvaddakopter.ImageProcessingMain;
+import kvaddakopter.assignment_planer.AssignmentPlanerRunnable;
 import kvaddakopter.assignment_planer.MatlabProxyConnection;
 import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.control_module.Mockmainbus;
@@ -133,12 +135,8 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		
 		//Setting up a Matlab Proxy Server
 		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
-		try {
-			matlabproxy.startMatlab("quiet");
-		} catch (MatlabConnectionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		mainbus.setMatlabProxyConnection(matlabproxy);
+		matlabproxy.startMatlab("quiet");
 		
 		//Thread t3 = new Thread(imageProcessing);
 		//t3.setPriority(1);
@@ -266,6 +264,16 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 	public synchronized boolean isAssignmentPlanerOn() {
 		return mAssignmentPlanerRunning;
 	}
+
+	public void setMatlabProxyConnection(MatlabProxyConnection MPC) {
+		this.matlabproxy = MPC;
+		
+	}
+
+	public MatlabProxyConnection getMatlabProxyConnection() {
+		return this.matlabproxy;
+	}
+	
 	//Communication
 
 	public synchronized float[] getControlSignal(){

@@ -2,16 +2,23 @@ package kvaddakopter.gui.interfaces;
 
 import java.util.ArrayList;
 
+import kvaddakopter.assignment_planer.MatlabProxyConnection;
+import kvaddakopter.assignment_planer.MissionObject;
+import kvaddakopter.interfaces.AssignmentPlanerInterface;
 import kvaddakopter.interfaces.MainBusGUIInterface;
 import kvaddakopter.maps.GPSCoordinate;
 
-public class MockMainBus implements MainBusGUIInterface{
+public class MockMainBus implements MainBusGUIInterface, AssignmentPlanerInterface{
 	
 	protected ArrayList<GPSCoordinate> coords = new ArrayList<>();
 	
 	
 	protected int counter = -1;
 	protected int inc = 1;
+	protected MissionObject missionobject;
+	protected boolean assignmentplanerstatus = false;
+	protected MatlabProxyConnection matlabproxy;
+	
 	
 	
 	public MockMainBus() {
@@ -39,6 +46,50 @@ public class MockMainBus implements MainBusGUIInterface{
         if(this.counter == coords.size() -1){this.inc = -1;}
 		
 		return coords.get(this.counter);
+	}
+
+	@Override
+	public boolean wifiFixOk() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean gpsFixOk() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setAssignmentPlanerOn(boolean state) {
+		this.assignmentplanerstatus = state;
+		
+	}
+
+	@Override
+	public void setMissionObject(MissionObject MO) {
+		this.missionobject = MO;
+		
+	}
+
+	@Override
+	public MissionObject getMissionObject() {
+		return missionobject;
+	}
+
+	@Override
+	public boolean isAssignmentPlanerOn() {
+		return assignmentplanerstatus;
+	}
+
+	@Override
+	public MatlabProxyConnection getMatlabProxyConnection() {
+		return this.matlabproxy;
+	}
+
+	@Override
+	public void setMatlabProxyConnection(MatlabProxyConnection MPC) {
+		this.matlabproxy = MPC;
 	}
 	
 }

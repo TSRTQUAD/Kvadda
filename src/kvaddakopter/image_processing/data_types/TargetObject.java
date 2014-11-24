@@ -3,6 +3,7 @@ package kvaddakopter.image_processing.data_types;
 import java.util.ArrayList;
 
 import org.ejml.simple.SimpleMatrix;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 
 public class TargetObject {
@@ -31,6 +32,26 @@ public class TargetObject {
 		P = P.scale(noise_level);
 
 		identifier = new Identifier(targetHSVChannels);
+	}
+
+	public TargetObject(ArrayList<Point> rectCorners, float noise_level,
+			ArrayList<Long> targetNumMatches) {
+		// Create the state matrix with given position measurements
+		float meanX = 0;
+		float meanY = 0;
+		for(Point point : rectCorners){
+			meanX += point.x;
+			meanY += point.y;
+		}
+		meanX /= 4;
+		meanY /= 4;
+		x = new SimpleMatrix(4, 1, true, meanX, meanY, 0, 0);
+
+		// Create the covariance matrix with noise_level on diagonal
+		P = SimpleMatrix.diag(1, 1, 3, 3);
+		P = P.scale(noise_level);
+
+		identifier = new Identifier(targetNumMatches);
 	}
 
 	public SimpleMatrix getState() {

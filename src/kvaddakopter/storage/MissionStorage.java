@@ -11,13 +11,13 @@ import kvaddakopter.assignment_planer.MissionObject;
 
 public class MissionStorage {
 	
-	public List<String> getListOfSavedMissions() {
-		List<String> listofstoredmissions = new ArrayList<String>();
-		File[] files = new File("Missions").listFiles();
+	public ArrayList<String> getListOfSavedMissions() {
+		ArrayList<String> listofstoredmissions = new ArrayList<String>();
+		ArrayList<File> files = this.listMatFiles();
 
 		for (File file : files) {
 		    if (file.isFile()) {
-		        listofstoredmissions.add(file.getName());
+		        listofstoredmissions.add(file.getName().replaceFirst("\\.mat$", ""));
 		    }
 		}
 	
@@ -26,11 +26,11 @@ public class MissionStorage {
 	
 	public ArrayList<MissionObject> getSavedMissions() throws FileNotFoundException, IOException{
 		ArrayList<MissionObject> storedmissions = new ArrayList<MissionObject>();
-		File[] files = new File("Missions").listFiles();
+		ArrayList<File> files = this.listMatFiles();
 		
 		for (File file : files) {
 		    if (file.isFile()) {
-		        storedmissions.add( loadMission(file.getName()) );
+		        storedmissions.add( loadMission(file.getName().replaceFirst("\\.mat$", "")) );
 		    }
 		}
 	
@@ -50,6 +50,19 @@ public class MissionStorage {
 		missionstorage.readMatFile(missionname, mission);
 		
 		return mission;
+	}
+	
+	
+	private ArrayList<File> listMatFiles(){
+		File[] files = new File("Missions").listFiles();
+		ArrayList<File> checkedFile = new ArrayList<>();
+		for (File file : files){
+			String fileName = file.getName();
+			if( fileName.matches(".*\\.mat$")){
+				 checkedFile.add(file);
+			}
+		}
+		return checkedFile;
 	}
 	
 }

@@ -85,6 +85,17 @@ elseif object.mission == 3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                  Area Coverage                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Plot intersections for report
+% figure(1)
+% hold on
+% h1 = fill(object.area{1}(:,2),object.area{1}(:,1),[0.5 0.5 0.5]);
+% h2 = fill(object.forbiddenarea{1}(:,2),object.forbiddenarea{1}(:,1),'w');
+% alpha(0.5)
+% legend([h1 h2],'Sökområde','Förbjudet område')
+% xlabel('Longitud')
+% ylabel('Latitud')
+% hold off
+
 % ================= Place nodes ====================
 % Create nodes within the polygon
 nodes = getPolygonGrid(object,ppa);

@@ -6,43 +6,38 @@ import java.util.ArrayList;
  * Definition of an object for trajectory planing.
  */
 public class MissionObject {
-	// Variable declaration
 	
+	// Variable declaration
 	protected String missionName = "";
 	
 	protected MissionType mission = MissionType.NULL_MISSION;
 	
-	protected ArrayList<Area> searchareas = null;
-	protected ArrayList<Area> forbiddenareas = null;
-	
+	protected ArrayList<Area> searchareas 		= null;
+	protected ArrayList<Area> forbiddenareas 	= null;
 
-	protected double[][] startcoordinate = {{0}};
-	protected double[] height = {0};
-	protected double[] radius = {0};
+	protected double[][] startcoordinate 		= {{0}};
+	protected double[] height 					= {0};
+	protected double[] radius 					= {0};
 	
-	protected int imageTemplte = 0;
-	protected int imageTemplate = 0;
-	protected int colorTemplate = 0;
-	protected int descriptor = 0;
+	protected int imageTemplte 					= 0;
+	protected int imageTemplate 				= 0;
+	protected int colorTemplate 				= 0;
+	protected int descriptor 					= 0;
 
-	
 
 	protected double[] returndata;
-	protected double waitingtime = 15;
-	protected double yaw = 0;
+	protected double waitingtime 				= 15;
+	protected double yaw 						= 0;
 	
-	
-	
-
 	
 	
 	
 	// Get variables
-	protected double[][] trajectory = {{0}};
-	protected double[][] trajectorylength = {{0}};
-	protected double[][] coveragearea = {{0}};
-	protected double[][] missiontime = {{0}};
-	protected double[][] referencevelocity = {{0}};
+	protected double[][] trajectory 			= {{0}};
+	protected double[][] trajectorylength 		= {{0}};
+	protected double[][] coveragearea 			= {{0}};
+	protected double[][] missiontime 			= {{0}};
+	protected double[][] referencevelocity 		= {{0}};
 
 
 	/*
@@ -140,6 +135,7 @@ public class MissionObject {
 	public void setTrajectory(double[][] tmptrajectory){
 		this.trajectory =  tmptrajectory;
 	}
+	
 	public void setTrajectoryLength(double[][] length){
 		this.trajectorylength = length;
 	}

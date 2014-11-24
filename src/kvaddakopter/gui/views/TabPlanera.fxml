@@ -7,13 +7,13 @@
 <?import javafx.scene.layout.*?>
 <?import com.lynden.gmapsfx.*?>
 
-<AnchorPane prefHeight="800.0" prefWidth="1400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kvaddakopter.gui.controllers.TabPlaneraController">
+<AnchorPane prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kvaddakopter.gui.controllers.TabPlaneraController">
    <children>
       <SplitPane dividerPositions="0.28969957081545067" prefHeight="1200.0" prefWidth="1600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>
-                  <VBox alignment="TOP_CENTER" prefHeight="740.0" prefWidth="401.0" AnchorPane.bottomAnchor="58.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <VBox alignment="TOP_CENTER" prefHeight="605.0" prefWidth="343.0" AnchorPane.bottomAnchor="93.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
                         <Label text="Skapa nytt uppdrag">
                            <font>
@@ -182,7 +182,10 @@
                   </VBox>
                   <HBox fx:id="txtEstimatedTime" alignment="CENTER" prefHeight="26.0" prefWidth="401.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                      <children>
-                        <Button fx:id="btnSaveMission" alignment="CENTER" mnemonicParsing="false" onAction="#btnSaveMission" prefHeight="26.0" prefWidth="198.0" text="Spara uppdrag" />
+                        <Button fx:id="btnSaveMission" alignment="CENTER" mnemonicParsing="false" onAction="#btnSaveMission" prefHeight="26.0" prefWidth="198.0" text="Spara uppdrag">
+                           <HBox.margin>
+                              <Insets bottom="40.0" />
+                           </HBox.margin></Button>
                      </children>
                   </HBox>
                </children>
