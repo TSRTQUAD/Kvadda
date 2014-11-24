@@ -76,11 +76,13 @@ public class MatFileHandler {
 		if (!name.equals("object")) {
 			//Read calculated data
 			MLDouble trajectory = new MLDouble("trajectory", missionobject.getTrajectory() );
+			MLDouble trajectoryfullsize = new MLDouble("trajectory", missionobject.getTrajectoryFullSize() );
 			MLDouble trajectorylength = new MLDouble("trajectorylength", missionobject.getTrajectoryLength() );
 			MLDouble coveragearea = new MLDouble("coveragearea", missionobject.getCoverageArea() );
 			MLDouble time = new MLDouble("time", missionobject.getMissionTime() );
 			MLDouble velocity = new MLDouble("velocity", missionobject.getReferenceVelocity() );
 			list.add( trajectory );
+			list.add( trajectoryfullsize );
 			list.add( trajectorylength );
 			list.add( coveragearea );
 			list.add( time );
@@ -109,6 +111,7 @@ public class MatFileHandler {
 		if (name.equals("results")) {
 			MatFileReader MLRead = new MatFileReader("src/kvaddakopter/assignment_planer/Matlab/Data/" + name + ".mat" );
 			missionobject.setTrajectory(((MLDouble) MLRead.getMLArray("trajectory")).getArray());
+			missionobject.setTrajectoryFullSize(((MLDouble) MLRead.getMLArray("trajectoryfullsize")).getArray());
 			missionobject.setTrajectoryLength(((MLDouble) MLRead.getMLArray("trajectorylength")).getArray());
 			missionobject.setCoverageArea(((MLDouble) MLRead.getMLArray("coveragearea")).getArray());
 			missionobject.setMissionTime(((MLDouble) MLRead.getMLArray("time")).getArray());
@@ -162,6 +165,7 @@ public class MatFileHandler {
 
 			//Write calculated data
 			missionobject.setTrajectory(((MLDouble) MLRead.getMLArray("trajectory")).getArray());
+			missionobject.setTrajectoryFullSize(((MLDouble) MLRead.getMLArray("trajectoryfullsize")).getArray());
 			missionobject.setTrajectoryLength(((MLDouble) MLRead.getMLArray("trajectorylength")).getArray());
 			missionobject.setCoverageArea(((MLDouble) MLRead.getMLArray("coveragearea")).getArray());
 			missionobject.setMissionTime(((MLDouble) MLRead.getMLArray("time")).getArray());

@@ -57,8 +57,9 @@ spiraltrajectory = [spanlat*th.*cos(th) spanlon*th.*sin(th)]...
 rawtrajectory = getStartEndPath(object.startcoordinate, spiraltrajectory);
 % Interpolate using parametric splines, the first argument determines the
 % nr of nodes to interpolate between each nodpair in the trajectory.
-trajectory = interparc(5e2,rawtrajectory(:,1),rawtrajectory(:,2),'spline');
-trajectory = DouglasPeucker(trajectory);
+trajectoryfullsize = interparc(5e2,rawtrajectory(:,1),...
+    rawtrajectory(:,2),'spline');
+trajectory = DouglasPeucker(trajectoryfullsize);
 
 % =============== Present results ==================
 [trajectorylength,coveragearea,time,velocity] = getResults( object, [],...
@@ -73,8 +74,9 @@ elseif object.mission == 2
 rawtrajectory = getStartEndPath(object.startcoordinate, object.area{1});
 % Interpolate using parametric splines, the first argument determines the
 % nr of nodes to interpolate between each nodpair in the trajectory.
-trajectory = interparc(5e2,rawtrajectory(:,1),rawtrajectory(:,2),'spline');
-trajectory = DouglasPeucker(trajectory);
+trajectoryfullsize = interparc(5e2,rawtrajectory(:,1),...
+    rawtrajectory(:,2),'spline');
+trajectory = DouglasPeucker(trajectoryfullsize);
 
 % =============== Present results ==================
 [trajectorylength,coveragearea,time,velocity] = getResults( object, [],...
@@ -95,11 +97,12 @@ tmpcostmat = getCostMatrix(nodes,object);
 
 % =============== Find trajectory ==================
 % The interpolation and Douglas Peucker algoritms are run inside.
-trajectory = getTrajectory(tmpcostmat,nodes,object.startcoordinate);
+[trajectory,trajectoryfullsize] = getTrajectory(tmpcostmat,nodes,...
+    object.startcoordinate);
 
 % =============== Present results ==================
-[trajectorylength,coveragearea,time,velocity] = getResults( object, nodes,...
-    trajectory, [], imagelength_meter, 0 );
+[trajectorylength,coveragearea,time,velocity] = getResults( object,...
+    nodes, trajectory, [], imagelength_meter, 0 );
 
 end
 
@@ -107,5 +110,5 @@ end
 % --------------------------------------------------
 % ============== Save results to file ==============
 % --------------------------------------------------
-save('Data/results.mat','trajectory','trajectorylength',...
-    'coveragearea','time','velocity');
+save('Data/results.mat','trajectory','trajectoryfullsize',...
+    'trajectorylength','coveragearea','time','velocity');
