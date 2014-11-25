@@ -14,7 +14,12 @@
 			<children>
 				<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="700.0" prefWidth="1200.0">
                <children>
-                  <AnchorPane fx:id="mapContainer" prefHeight="700.0" prefWidth="1200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <AnchorPane fx:id="mapContainer" prefHeight="700.0" prefWidth="1200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <Button fx:id="emergency" layoutX="286.0" layoutY="641.0" mnemonicParsing="false" onAction="#emergency" text="Emergency" />
+                        <Button fx:id="toggleControl" layoutX="275.0" layoutY="601.0" mnemonicParsing="false" onAction="#toggleControl" text="Toggle Control" />
+                     </children>
+                  </AnchorPane>
       <AnchorPane layoutX="373.0" layoutY="593.0" prefHeight="93.0" prefWidth="455.0">
       	<children>
       		<VBox alignment="CENTER" prefHeight="200.0" prefWidth="455.0" style="-fx-background-color: #ccc; -fx-border-color: black;" stylesheets="@../../application.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -29,7 +34,7 @@
       						</Label>
       					</children>
       				</HBox>
-      				<Button fx:id="btnAbortMission" mnemonicParsing="false" onAction="#abortMission" prefHeight="42.0" prefWidth="178.0" styleClass="btn-danger" text="Avbryt uppdrag" />
+      				<Button fx:id="btnAbortMission" mnemonicParsing="false" onAction="#abortMission" prefHeight="42.0" prefWidth="178.0" styleClass="btn-danger" text="Abort" />
       			</children>
       		</VBox>
       	</children>

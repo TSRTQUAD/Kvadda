@@ -137,7 +137,7 @@ public class NavData implements Runnable {
 				    	    //System.out.println("Length: " + length);
 				    	    
 				    	    byte[] content;
-					    	// length includes header (4 bytes)
+					    	// length includes 4 byte header
 				    		content = reader.getSubArray(length-4);
 				    		NavReader contentReader = new NavReader(content);
 				    	    
@@ -148,9 +148,9 @@ public class NavData implements Runnable {
 				    			int controlState 		= contentReader.uint16();
 				    			BatteryLevel 			= contentReader.uint32();
 				    			Pitch					= contentReader.float32()/1000;
-				    			Yaw 					= contentReader.float32()/1000;
-				    			Roll	 				= contentReader.float32()/1000;
-				    			Altitude	 			= (float)contentReader.int32()/1000;
+				    			Roll 					= contentReader.float32()/1000;
+				    			Yaw		 				= contentReader.float32()/1000;
+				    			Altitude	 			= (float)(contentReader.int32())/1000;
 				    			Vx 						= contentReader.float32()/1000;
 				    			Vy 						= contentReader.float32()/1000;
 				    			Vz						= contentReader.float32();
