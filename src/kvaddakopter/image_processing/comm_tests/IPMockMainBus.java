@@ -15,8 +15,8 @@ import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.data_types.Template;
 import kvaddakopter.image_processing.programs.ImageProcessingMainProgram;
-import kvaddakopter.image_processing.programs.TestBlurDetection;
-import kvaddakopter.image_processing.programs.TestColorCalibration;
+import kvaddakopter.image_processing.test_programs.TestBlurDetection;
+import kvaddakopter.image_processing.test_programs.TestColorCalibration;
 import kvaddakopter.interfaces.MainBusIPInterface;
 import kvaddakopter.maps.GPSCoordinate;
 
