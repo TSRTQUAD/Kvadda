@@ -89,6 +89,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 
 	public void update(){
 		//Images to show
+		checkIsRunning();
 		BufferedImage out = null;
 		Mat colorDetectionImage = null;
 		Mat colorCalibrationImage = null;
