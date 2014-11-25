@@ -48,6 +48,10 @@ public class TabUtforController extends BaseController implements Initializable 
     @FXML
     private Button btnAbortMission;
     @FXML
+    private Button btnToggleControl;
+    @FXML
+    private Button btnEmergency;
+    @FXML
     private ComboBox<String> cmbListOfMissions;
     
 	/**
@@ -94,6 +98,15 @@ public class TabUtforController extends BaseController implements Initializable 
     	this.shouldStart = false;
     }
     
+    @FXML
+    private void emergency(){
+    	this.getParent().getMainBus().setEmergencyStop(true);
+    }
+
+    @FXML
+    private void toggleControl(){
+    	this.getParent().getMainBus().toggleController();
+    }
 
 	
 	public boolean shouldStart(){
@@ -180,7 +193,7 @@ public class TabUtforController extends BaseController implements Initializable 
 		
 	}
  
-    
+
 
     
     

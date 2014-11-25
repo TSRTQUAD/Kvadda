@@ -19,7 +19,7 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 
 public class Tracking {	
-	HashMap<Integer, TargetObject> mInternalTargets;	
+	HashMap<Integer, TargetObject> mInternalTargets;
 	int highestKey = -1;
 	
 	SimpleMatrix H; // Measurments from state matrix
@@ -27,19 +27,17 @@ public class Tracking {
 	SimpleMatrix Q; // G*G'
 	
 	double Ts = 0.15;
-	double sigmaSquared = 50;
+	double sigmaSquared = 200;
 
 	CircularFifoQueue<double[]> trajectoryX = new CircularFifoQueue<double[]>(30);
 	CircularFifoQueue<double[]> trajectoryM = new CircularFifoQueue<double[]>(30);
-	long lastTime = 0;
+	long lastTime;
 	
 	boolean debugPrintMatches = false;
-	/**
-	 *  <Lägg till beskrivning utav track här>
-	 * 
-	 * @param targetObject - List of detected targets
-	 */
 	
+	/**
+	 * Constructor which initializes lastTime as current time.
+	 */
 	public Tracking(){
 		// Initialize matrices
 		H = new SimpleMatrix(2, 4, true, 
@@ -48,23 +46,29 @@ public class Tracking {
 		
 		// Initialize target list
 		mInternalTargets = new HashMap<Integer, TargetObject>();
+		lastTime = System.currentTimeMillis();
 	}
 	
-	
+
+	/**
+	 * Updates the tracker by running time update in the Kalman filter, matching tracked targets with 
+	 * incoming targetObjects and then running measurement update in the Kalman filter. 
+	 * 
+	 * @param targetObjects ArrayList of type {@link TargetObject} with new observations of targets.
+	 * @see TargetObject
+	 * @see #measurementUpdate
+	 */
 	public void update(ArrayList<TargetObject> targetObjects){
-		// Elapsed time since last update
+		// Elapsed time since last update  
 		double elapsedTime = ((double)(System.currentTimeMillis() - lastTime)) / 1000;
 		lastTime = System.currentTimeMillis();
+		// Updates matrices F and Q that are time dependent
 		updateTimeDependentMatrices(elapsedTime);
-		System.out.println(elapsedTime);
 		
 		// Perform time update
 		timeUpdate();
 		
-		/*if(mInternalTargets.size() > 0){
-			trajectoryX.add(new double[]{mInternalTargets.get(0).getPosition().get(0, 0), mInternalTargets.get(0).getPosition().get(1, 0)});
-		}*/
-		
+		// If no targets are observed, skip matching and measurement update and return instead
 		if(targetObjects.size() == 0) return;
 		
 		// Match new targetObjects with mInternalTargets by analyzing position difference and identifiers
@@ -80,11 +84,14 @@ public class Tracking {
 			// Extract position measurment and noise from measurments
 			SimpleMatrix z = H.mult(targetObjects.get(i).getState());
 			SimpleMatrix R = (H.mult(targetObjects.get(i).getCovariance())).mult(H.transpose());
+			// Perform measurement update on target
 			measurementUpdate(mInternalTargets.get(matchedIDs[i]), z, R);
+			
+			// TODO Add optinal trajectories again for debugging purposes
 		}
 		
 		// Remove old internal targets with too high covariance
-		// If P > threshold we remove the target from internal targets
+		// If ||P|| > threshold we remove the target from tracked targets
 		Iterator<Map.Entry<Integer, TargetObject>> iter = mInternalTargets.entrySet().iterator();
 		while(iter.hasNext()){
 		    Map.Entry<Integer, TargetObject> entry = iter.next();
@@ -93,7 +100,69 @@ public class Tracking {
 		    }
 		}		
 	}
+
+	/**
+	 * Performs the Kalman filter time update aka. prediction step on all tracked targets.
+	 */
+	private void timeUpdate(){ // TODO: Variable time updates
+		for(Entry<Integer, TargetObject> entry: mInternalTargets.entrySet()){
+			// Get state and covariance
+			TargetObject target = entry.getValue();
+			SimpleMatrix x = target.getState();
+			SimpleMatrix P = target.getCovariance();
+			
+			// Predicted state estimate:	x 	= F*x
+			x = F.mult(x);
+			
+			// Predicted covariance:		P	= F*P*F' + Q
+			P = (F.mult(P)).mult(F.transpose()).plus(Q);
+			// Make sure P is symmetric
+			P = (P.plus(P.transpose())).scale(.5);
+			
+			// Update state and covariance	
+			target.setState(x);
+			target.setCovariance(P);
+		}
+	}
 	
+	/**
+	 * Performs the Kalman filter measurement update aka. update step on a single target.
+	 * @param target 	The tracked target that is observed.
+	 * @param z 		The observed measurement.
+	 * @param R 		The covariance of the measurement.
+	 */
+	private void measurementUpdate(TargetObject target, SimpleMatrix z, SimpleMatrix R){ 
+		SimpleMatrix x = target.getState();
+		SimpleMatrix P = target.getCovariance();
+		
+		// Innovation of measurement: 	y	= z-H*x
+		SimpleMatrix y = z.minus(H.mult(x));
+		
+		// Covariance innovation:		S	= H*P*H' + R
+		SimpleMatrix S = ((H.mult(P)).mult(H.transpose())).plus(R);
+		
+		// Optimal Kalman gain: 		K	= P*H'*inv(S)
+		SimpleMatrix K = (P.mult(H.transpose()).mult(S.pseudoInverse()));
+		
+		// Updated estimate:			x	= x + K*y
+		x = x.plus(K.mult(y));
+		
+		// Updated covariance			P	= (I - K*H)*P = P - K*H*P
+		P = P.minus((K.mult(H)).mult(P));
+		// Make sure P is symmetric
+		P = (P.plus(P.transpose())).scale(.5);
+
+		target.setState(x);
+		target.setCovariance(P);
+	}
+	
+	/**
+	 * Matches observed targets with tracked targets.
+	 * @param targetObjects
+	 * @return List of tracked target IDs for each observed target or -1 if no match is good enough.
+	 * @see #compareDistance(TargetObject, TargetObject) compareDistance which compares two positions with regard to covariance.
+	 * @see Identifier#compare(Identifier, Identifier) which compares two identifiers.
+	 */
 	private int[] matchTargets(ArrayList<TargetObject> targetObjects) {
 		// Match targetObjects against mInternalTargets
 		// Create a table with mInternalTargets and targetObjects
@@ -111,15 +180,17 @@ public class Tracking {
 		
 		
 		
-		// Print table
+		// Enables debug output of table of matches
 		if(debugPrintMatches){
 			System.out.print("   |");
 			for(TargetObject target : targetObjects){
 				System.out.format("%4d|", targetObjects.indexOf(target));
 			}
 			System.out.println();
-		}
+		}		
 		
+		
+		// For each entry in the matching table, set matching value as a combination of methods Identigier.compare and compareDistance.
 		ArrayList<Integer> keyArray = new ArrayList<Integer>(mInternalTargets.keySet());
 		for(int keyI = 0; keyI < numInternalTargets; keyI++){
 			if(debugPrintMatches) System.out.format("|%2d|", keyArray.get(keyI));
@@ -138,8 +209,9 @@ public class Tracking {
 		
 		
 		
-		// For each target found. Say the highest likely match is a match if the likelihood is large enough.
-		// Each internal target could in that way be updated with multiple new targets.
+		// For each observed target. Say the highest likely match is a match if the likelihood is large enough.
+		// Each internal target could in that way be updated with multiple observed targets.
+		// If best matched value is lower than matchThreshold then the initial -1 is not overwritten by tracked target ID. 
 		for(int i = 0; i < numTargets; i++){
 			float bestMatchVal = 0;
 			int bestMatchId = -1;
@@ -157,10 +229,16 @@ public class Tracking {
 		return matchedIDs;
 	}
 
-
+	/**
+	 * Compares the matching probability by comparing the distance between two objects and their uncertainty. 
+	 * @param internalTarget 	The tracked target.
+	 * @param target			The observed target.
+	 * @return					The matching probability. 
+	 */
 	private float compareDistance(TargetObject internalTarget, TargetObject target) {
 		// Compares distance between objects with regard of covariance
 		// XXX uncertainDistance only depends on one axis of the covariance
+		// TODO calculate eigen values for the covariance to solve the uncertainDistance directions.
 
 		// For now use distances converted from pixels 
 		double uncertainDistance = (.1) * (float)(internalTarget.getCovariance().get(0, 0) + target.getCovariance().get(0, 0));
@@ -184,57 +262,21 @@ public class Tracking {
 		return (float)retVal;
 	}
 
-
+	/**
+	 * Updates the time dependent matrices F and Q for the Kalman filter.
+	 * @param elapsedTime
+	 */
 	private void updateTimeDependentMatrices(double elapsedTime) {
 		// Updates matrices F and Q
 		F = createF(elapsedTime);
 		Q = createQ(elapsedTime, sigmaSquared);
 	}
 
-	private void timeUpdate(){ // TODO: Variable time updates
-		for(Entry<Integer, TargetObject> entry: mInternalTargets.entrySet()){
-			// Get state and covariance
-			TargetObject target = entry.getValue();
-			SimpleMatrix x = target.getState();
-			SimpleMatrix P = target.getCovariance();
-			
-			// Predicted state estimate:	x 	= F*x
-			x = F.mult(x);
-			
-			// Predicted covariance:		P	= F*P*F' + Q
-			P = (F.mult(P)).mult(F.transpose()).plus(Q);
-			
-			// Update state and covariance	
-			target.setState(x);
-			target.setCovariance(P);
-		}
-	}
-	
-	private void measurementUpdate(TargetObject target, SimpleMatrix z, SimpleMatrix R){
-		SimpleMatrix x = target.getState();
-		SimpleMatrix P = target.getCovariance();
-		
-		// TODO make y = 0 where no measurments are found for the object
-		// Innovation of measurement: 	y	= z-H*x 			// y = 0 where we have no matching targets
-		SimpleMatrix y = z.minus(H.mult(x));
-		
-		// Covariance innovation:		S	= H*P*H' + R
-		SimpleMatrix S = ((H.mult(P)).mult(H.transpose())).plus(R);
-		
-		// Optimal Kalman gain: 		K	= P*H'*inv(S)
-		SimpleMatrix K = (P.mult(H.transpose()).mult(S.pseudoInverse()));
-		
-		// Updated estimate:			x	= x + K*y
-		x = x.plus(K.mult(y));
-		
-		// Updated covariance			P	= (I - K*H)*P = P - K*H*P
-		P = P.minus((K.mult(H)).mult(P));
-
-		// DEBUG!
-		target.setState(x);
-		target.setCovariance(P);
-	}
-
+	/**
+	 * Creates the matrix F for the Kalman filter which describes the dynamics of the system.
+	 * @param Ts	Time passed since last update.
+	 * @return F
+	 */
 	private SimpleMatrix createF(double Ts){
 		// Creates the dynamic matrix F as FSmall = [1 0 Ts 0; 0 1 0 Ts; 0 0 1 0; 0 0 0 1]
 		return new SimpleMatrix(4, 4, true,
@@ -244,6 +286,12 @@ public class Tracking {
 				0, 0, 0, 1);
 	}
 	
+	/**
+	 * Creates the noise matrix Q for the Kalman filter which describes the noise effect on the system.
+	 * @param Ts			Time passed since last update.
+	 * @param sigmaSquared	System noise.
+	 * @return Q
+	 */
 	private SimpleMatrix createQ(double Ts, double sigmaSquared){
 		// Creates the system noise Q = G*G'*sigma_squared
 		// Given a1 = Ts^4/4, a2 = Ts^3/2, a3 = Ts^2 we have Q as follows
@@ -259,44 +307,26 @@ public class Tracking {
 		return res;
 	}
 	
+	/**
+	 * Overlays tracking information with tracked targets on inputed image res. The covariance is
+	 * currently displayed to only work with equal amount of uncertainty in both axis.
+	 * @param res	The input image to be overlayed.
+	 * @return 		The resulting image.
+	 */
 	public Mat getImage(int w_, int h_, Mat res){
-		//Mat res = new Mat(w_, h_, CvType.CV_8U);
-		//res.setTo(new Scalar(0, 0, 0));
+		// TODO: Remove w_ and h_ in method call
 		if(mInternalTargets.size() > 0){
 			for(int key : mInternalTargets.keySet()) {
 			    TargetObject target = mInternalTargets.get(key);
 			    
-			    // Draw trajectory
-			    Object[] trajs = trajectoryX.toArray();
-			    for(int i = 1; i < trajs.length; i++){
-			    	Core.line(
-			    			res, 
-			    			new Point(((double[])trajs[i - 1])[0], ((double[])trajs[i - 1])[1]), 
-			    			new Point(((double[])trajs[i])[0], ((double[])trajs[i])[1]), 
-			    			new Scalar(0, 200, 0));
-			    }
-
-			    // Draw measurements
-			    Object[] measurements = trajectoryM.toArray();
-			    for(int i = 1; i < measurements.length; i++){
-			    	Core.circle(
-			    			res, 
-			    			new Point(((double[])measurements[i - 1])[0], ((double[])measurements[i - 1])[1]), 
-			    			3, 
-			    			new Scalar(0, 0, 255));
-			    }
-			    
 			    SimpleMatrix pos = target.getPosition();
-				Core.rectangle(
-						res, 
-						new Point(pos.get(0, 0) - 10, pos.get(1, 0) - 10),
-						new Point(pos.get(0, 0) + 10, pos.get(1, 0) + 10),
-						new Scalar(255, 0, 0), 
-						1);
-				
 				SimpleMatrix cov = target.getCovariance();
+				
+				// Draw ellipse corresponding to the covariance of the position
+				// TODO Calculate eigenvectors and eigenvalues to visualize the covariance correctly
 				Core.ellipse(res, new Point(pos.get(0, 0), pos.get(1, 0)), new Size(new double[]{cov.get(0, 0), cov.get(1, 1)}), 0.0, 0.0, 360.0, new Scalar(255, 255, 255));
 
+				// Draw ID information
 				String txtString = String.format("ID:%d", key);
 			    Core.putText(res, txtString, new Point(pos.get(0, 0) - 12, pos.get(1, 0) + 22) , Core.FONT_HERSHEY_SIMPLEX, .4, new Scalar(255, 255, 255), 1, 8, false);
 			}

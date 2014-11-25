@@ -62,4 +62,10 @@ public interface MainBusGUIInterface {
 	 */
 	public Image getImage();
 	
+	/**
+	 * Sets emergency stop to newBool
+	 * @param newBool
+	 */
+	public void setEmergencyStop(boolean newBool);
+	
 }

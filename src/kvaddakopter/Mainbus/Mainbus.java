@@ -258,8 +258,11 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 	}
 	
 	public synchronized boolean EmergencyStop(){
-	return EmerStop;
-//	return true;
+		return EmerStop;
+	}
+	
+	public synchronized void setEmergencyStop(boolean newBool){
+		EmerStop = newBool;
 	}
 	
 	
@@ -293,7 +296,7 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
     	switch (keyCode) {
     		case KeyEvent.VK_C:
     			if (false == this.runcontroller){
-    			this.runcontroller = true;
+    				this.runcontroller = true;
     			}
     			else if (true == this.runcontroller){
     				this.runcontroller = false;
@@ -308,7 +311,7 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
     	        shift = true;
     	    	break;
     	    case KeyEvent.VK_E:
-    	    	EmerStop = true;;
+    	    	EmerStop = true;
     	    	break;
     	    case KeyEvent.VK_UP:
     	    	if (shift) {
@@ -584,5 +587,10 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 	@Override
 	public synchronized Image getImage() {
 		return mIPImageToShow[0];
+	}
+	
+	@Override
+	public synchronized void toggleController(){
+		this.runcontroller = !this.runcontroller;
 	}
 }
