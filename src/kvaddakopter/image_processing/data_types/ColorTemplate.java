@@ -4,6 +4,11 @@ import java.util.ArrayList;
 
 import org.opencv.core.Scalar;
 
+/**
+ * ColorTemplate class
+ * Holds HSV (hue-saturation-value) threshold values for color detection algorithm
+ * Includes constructors, functionality to get and set thresholds and adaptation functions
+ */
 public class ColorTemplate {
 	private static final String DEFAULT_DESCRIPTION = "undefined";
 	private static final int DEFAULT_HUE_LOW = 0;
@@ -49,6 +54,17 @@ public class ColorTemplate {
 		adaptationConstant = 30;
 	}
 	
+	/**
+	 * Constructor from threshold values
+	 * @param description_
+	 * @param hueLow_
+	 * @param hueHigh_
+	 * @param saturationLow_
+	 * @param saturationHigh_
+	 * @param valueLow_
+	 * @param valueHigh_
+	 * @param form_
+	 */
 	public ColorTemplate(String description_, int hueLow_, int hueHigh_, int saturationLow_, int saturationHigh_, int valueLow_, int valueHigh_, int form_){
 		description = description_;
 		hueLow = hueLow_;
@@ -71,6 +87,11 @@ public class ColorTemplate {
 		adaptationConstant = 30;
 	}
 	
+	/**
+	 * Copy constructor
+	 * Constructs this template from another template
+	 * @param fromTemplate
+	 */
 	public ColorTemplate(ColorTemplate fromTemplate){
 		this(	fromTemplate.getDescription(),
 				fromTemplate.getHueLow(), 
@@ -82,30 +103,50 @@ public class ColorTemplate {
 				0);
 	}
 	
-	public void setThresholds(){
-		
-	}
-	
+	/**
+	 * Get the lower bounds of HSV-values
+	 * @return Scalar [hueLow, saturationLow, valueLow]
+	 */
 	public Scalar getLower(){
 		return new Scalar(hueLow, saturationLow, valueLow);
 	}
 	
+	/**
+	 * Get upper bounds of HSV values
+	 * @return Scalar [hueHigh, saturationHigh, valueHigh]
+	 */
 	public Scalar getUpper(){
 		return new Scalar(hueHigh, saturationHigh, valueHigh);
 	}
 	
+	/**
+	 * Get template description
+	 * @return String template description
+	 */
 	public String getDescription(){
 		return description;
 	}
 	
+	/**
+	 * Activates the template
+	 * Set active flag to true
+	 */
 	public void activate(){
 		isActive = true;
 	}
 	
+	/**
+	 * Deactivates the template
+	 * Set the active flag to false
+	 */
 	public void deactivate(){
 		isActive = false;
 	}
 	
+	/**
+	 * Check if template is active or not
+	 * @return boolean isActive flag
+	 */
 	public boolean isActive(){
 		return isActive;
 	}
@@ -113,7 +154,7 @@ public class ColorTemplate {
 	/**
 	 * Adapt colorTemplate according to object HSV channels with low pass filtering
 	 * @param objectHSVChannels
-	 * @param hueWindow Value [0:255]
+	 * @param hueWindow Value [0:179]
 	 * @param satWindow Value [0:255]
 	 * @param valWindow [0:255]
 	 */
@@ -134,6 +175,7 @@ public class ColorTemplate {
 	
 	/**
 	 * Adapt color template towards original bounds
+	 * Implements low pass filtering towards original bounds
 	 * Use this to adapt if no targets are found
 	 */
 	public void adaptToOriginalBounds(){
@@ -151,50 +193,98 @@ public class ColorTemplate {
 		valueHigh = (int) ((float)(valueHigh + (oValueHigh - valueHigh))/T);
 	}
 
+	/**
+	 * Set lower hue bound
+	 * @param val new huew low value
+	 */
 	public void setHueLow(int val) {
 		hueLow = val;
 	}
 	
+	/**
+	 * Set upper hue bound
+	 * @param val new hue high value
+	 */
 	public void setHueHigh(int val) {
 		hueHigh = val;
 	}
 	
+	/**
+	 * Set lower saturation bound
+	 * @param val new sat low value
+	 */
 	public void setSatLow(int val) {
 		saturationLow = val;
 	}
 	
+	/**
+	 * Set upper saturation bound
+	 * @param val new sat high value
+	 */
 	public void setSatHigh(int val) {
 		saturationHigh = val;
 	}
 	
+	/**
+	 * Set lower value bound
+	 * @param val new value low value
+	 */
 	public void setValLow(int val) {
 		valueLow = val;	
 	}
 	
+	/**
+	 * Set upper value bound
+	 * @param val new value high value
+	 */
 	public void setValHigh(int val) {
 		valueHigh = val;	
 	}
 	
+	/**
+	 * Get lower hue bound
+	 * @return hueLow
+	 */
 	public int getHueLow() {
 		return hueLow;
 	}
 	
+	/**
+	 * Get upper hue bound
+	 * @return hueHigh
+	 */
 	public int getHueHigh() {
 		return hueHigh;
 	}
 	
+	/**
+	 * Get lower saturation bound
+	 * @return saturationLow
+	 */
 	public int getSatLow() {
 		return saturationLow;
 	}
 	
+	/**
+	 * Get upper saturation bound
+	 * @return saturationHigh
+	 */
 	public int getSatHigh() {
 		return saturationHigh;
 	}
 	
+	/**
+	 * Get lower value bound
+	 * @return valueLow
+	 */
 	public int getValLow() {
 		return valueLow;
 	}
 	
+	/**
+	 * Get upper value bound
+	 * @return valueHigh
+	 */
 	public int getValHigh() {
 		return valueHigh;	
 	}

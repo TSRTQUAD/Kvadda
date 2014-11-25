@@ -14,6 +14,10 @@ import javafx.stage.Stage;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.interfaces.MainBusIPInterface;
 
+/**
+ * HSVSliders class
+ * Implements functionality to modify and add custom made color templates
+ */
 public class HSVSliders{
 		static final int MIN_HUE = 0;
 		static final int MAX_HUE = 179;
@@ -26,10 +30,24 @@ public class HSVSliders{
 		
 		Scene secondScene;
 		Stage secondStage;
+	/**
+	 * Constructs the stage
+	 */
 	public HSVSliders(){
 		secondStage = new Stage();
 	}
 		
+	/**
+	 * Adds buttons and sliders to the stage associated with this object
+	 * 6 sliders: huewLow, hueHigh, satLow, satHigh, valLow, valHigh
+	 * Sets calib template in mainbus and modifies this
+	 * 
+	 * To show the result the Image processing has to threshold image according to the calib template and return the
+	 * thresholded image
+	 * 
+	 * @param mainbus Holds the calib template and template list to add new templates to
+	 * @param primaryStage The stage which the HSVSliders popup from
+	 */
 	public void setHSVChannels( final MainBusIPInterface mainbus, Stage primaryStage){
 		final ColorTemplate template = new ColorTemplate();
 		mainbus.setIPCalibTemplate(template);
