@@ -17,8 +17,8 @@
 % Hardcoded values:
 % main              - Camera propterties
 % getResults        - Arial velocities
-% DouglasPeucker    - Epsilon describing minimum distance between two
-%                     points
+% DouglasPeucker    - Epsilon describing minimum prependicular distance between two
+%                     points and the evaluated one.
 % interpolation     - Number of points to be set between each nodpair
 % lldistkm          - Earth radius
 
@@ -46,14 +46,27 @@ if object.mission == 1
 %                Coordinate Search                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ======= Draw trajectory around coordinate ========
-rotations = object.radius/(imagelength_meter/2);
-th = transpose(2*pi:pi/50:rotations*2*pi);
+spiraltrajectory = []; pointsinbetween = [];
+for ii = 1:length(area);
+rotations = object.radius(ii)/(imagelength_meter/2);
+th = transpose(2*pi:pi/100:rotations*2*pi);
 spanlat = 0.5*imagelength_meter/(2*pi*1.1119e+05);
 spanlon = 0.5*imagelength_meter/(2*pi*5.8924e+04);
 span = imagelength/(2*2*pi*rotations);
-spiraltrajectory = [spanlat*th.*cos(th) spanlon*th.*sin(th)]...
-    + repmat(object.area{1},size(th));
-% Add a path to and from the spiral
+if ii == 1
+    spiraltrajectory = [spanlat*th.*cos(th) spanlon*th.*sin(th)]...
+    + repmat(object.area{ii},size(th));
+else
+    currentspiral = [spanlat*th.*cos(th) spanlon*th.*sin(th)]...
+    + repmat(object.area{ii},size(th));
+    pointsinbetween = interparc(10,[spiraltrajectory(end,1) ...
+        currentspiral(1,1)],[spiraltrajectory(end,2) ...
+        currentspiral(1,2)],'linear');
+    spiraltrajectory = [spiraltrajectory; pointsinbetween(3:end-3,:);...
+        currentspiral];
+end
+end
+% Add a path to and from the spirals
 rawtrajectory = getStartEndPath(object.startcoordinate, spiraltrajectory);
 % Interpolate using parametric splines, the first argument determines the
 % nr of nodes to interpolate between each nodpair in the trajectory.
@@ -71,7 +84,11 @@ elseif object.mission == 2
 %                   Line Search                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ============ Interpolate trajectory ==============
-rawtrajectory = getStartEndPath(object.startcoordinate, object.area{1});
+lines = [];
+for ii = 1:length(object.area)
+    lines = [lines; object.area{ii}(:,:)];
+end
+rawtrajectory = getStartEndPath(object.startcoordinate, lines);
 % Interpolate using parametric splines, the first argument determines the
 % nr of nodes to interpolate between each nodpair in the trajectory.
 trajectoryfullsize = interparc(5e2,rawtrajectory(:,1),...
