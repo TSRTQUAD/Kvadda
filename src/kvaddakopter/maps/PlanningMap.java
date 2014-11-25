@@ -13,11 +13,9 @@ import java.util.ArrayList;
 
 import kvaddakopter.assignment_planer.Area;
 import kvaddakopter.assignment_planer.MissionType;
-import kvaddakopter.gui.components.AbstractGPSMarker;
 import kvaddakopter.gui.components.GpsToAreaTransformer;
 import kvaddakopter.gui.components.factories.MapShapeFactory;
 import kvaddakopter.gui.components.shapes.GPSCircle;
-import kvaddakopter.gui.components.shapes.GPSPath;
 import kvaddakopter.gui.components.shapes.MapShapeInterface;
 import kvaddakopter.gui.controllers.TabPlaneraController;
 
