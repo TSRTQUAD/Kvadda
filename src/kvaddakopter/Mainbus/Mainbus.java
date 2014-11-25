@@ -186,7 +186,6 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 			ex1.printStackTrace();	
 		}
 		
-		
 		//GUI MODULE
 		GUIModule guiModule = new GUIModule(mainbus);
 		Thread t10 = new Thread(guiModule);
@@ -194,8 +193,7 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		t10.setPriority(5);
 		t10.start();
 		
-		//
-		// START MODULE	    	
+		// Control module MODULE	    	
 		Sensorfusionmodule sensmodule = new Sensorfusionmodule(mainbus);
 		Thread t8 = new Thread(sensmodule);
 		t8.setDaemon(true);
