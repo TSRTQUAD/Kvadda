@@ -8,17 +8,22 @@ import com.lynden.gmapsfx.javascript.object.LatLong;
 import com.lynden.gmapsfx.shapes.Circle;
 import com.lynden.gmapsfx.shapes.CircleOptions;
 
+/**
+ * Uses to represent a GPS circle on the map.
+ * @author per
+ *
+ */
 public class GPSCircle extends AbstractMapShape implements MapShapeInterface{
 
 	public GPSCircle(GoogleMap map) {
 		super(map);
 	}
-	
 
 	/**
-	 * Polyline representation of the path  
+	 * Poly line representation of the path  
 	 */
 	protected Circle circle = null;
+	
 	
 	
 	@Override
@@ -29,10 +34,7 @@ public class GPSCircle extends AbstractMapShape implements MapShapeInterface{
 	}
 	
 	
-	/**
-	 * Draws a polyLine Path to the current Map.
-	 * @param listOfCoordinates
-	 */
+	
 	@Override
 	public void draw(){
 		
@@ -62,6 +64,11 @@ public class GPSCircle extends AbstractMapShape implements MapShapeInterface{
 		
 	}
 	
+	
+	/**
+	 * Gets the current circle radius.
+	 * @return
+	 */
 	public double getRadus(){
 		return this.circle.getRadius();
 	}

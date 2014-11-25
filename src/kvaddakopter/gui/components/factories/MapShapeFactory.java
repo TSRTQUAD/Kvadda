@@ -11,6 +11,12 @@ import kvaddakopter.gui.components.shapes.RedGPSPolygon;
 
 public class MapShapeFactory {
 
+	/**
+	 * Returns the correct map shape (that is linked to a map) for a specified mission type. 
+	 * @param typeOfMission  The current selected MissionType
+	 * @param map A Google map
+	 * @return A new mapShape
+	 */
 	public static MapShapeInterface make(MissionType typeOfMission, GoogleMap map){
 
 		MapShapeInterface shape;

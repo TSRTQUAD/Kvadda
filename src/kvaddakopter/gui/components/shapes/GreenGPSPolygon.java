@@ -10,11 +10,7 @@ public class GreenGPSPolygon extends GPSPolygon{
 		super(map);
 	}
 
-	/**
-	 * Returns the shape Options
-	 * @param mvc
-	 * @return
-	 */
+	@Override
 	protected PolygonOptions getOptions(MVCArray mvc){
 		return new PolygonOptions()
 			.paths(mvc)
