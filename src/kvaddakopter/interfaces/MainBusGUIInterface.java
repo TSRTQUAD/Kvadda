@@ -1,5 +1,6 @@
 package kvaddakopter.interfaces;
 
+import javafx.scene.image.Image;
 import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.maps.GPSCoordinate;
 
@@ -54,5 +55,11 @@ public interface MainBusGUIInterface {
 	 * @return
 	 */
 	public MissionObject getMissionObject();
+	
+	/**
+	 * Fetches the image on mainbus
+	 * @return
+	 */
+	public Image getImage();
 	
 }

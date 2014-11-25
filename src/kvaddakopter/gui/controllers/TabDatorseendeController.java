@@ -17,6 +17,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -31,7 +33,8 @@ import kvaddakopter.interfaces.MainBusIPInterface;
 
 public class TabDatorseendeController extends BaseController implements Initializable{
 
-
+	private StackPane root;
+	private ImageView view;
 	public MainBusIPInterface mainbus;
 
 	/*Background colors*/
@@ -39,9 +42,13 @@ public class TabDatorseendeController extends BaseController implements Initiali
 	final Background LightGrayBackground  = new Background(new BackgroundFill(Color.LIGHTGOLDENRODYELLOW,new CornerRadii(4.5),new Insets(1.0)));
 	final Background GreenBackground  = new Background(new BackgroundFill(Color.LIGHTGREEN,new CornerRadii(4.5),new Insets(1.0)));
 
-
+	/*Image pos*/
+	final static int IMAGE_POS_X = -400;
+	final static int IMAGE_POS_Y = 200;
+	
 	/*Buttons Common */
-	final static int BUTTON_X_START = 300;
+	final static int MODES_POS_X=200;
+	final static int BUTTON_X_START = 600;
 	final static int BUTTON_Y_START = 20;
 	final static int BUTTON_GROUP_SEPARATION = 40;
 
@@ -63,13 +70,12 @@ public class TabDatorseendeController extends BaseController implements Initiali
 
 	/*Options Buttons */
 	final static int OPT_BUTTON_X_START = -150;
-	final static int OPT_BUTTON_Y_START = -150;
+	final static int OPT_BUTTON_Y_START = -250;
 	final static int OPT_BUTTON_Y_SPACE = 40;
+	final static int OPT_BUTTON_WIDTH = 200;
 
 	@FXML
 	private AnchorPane ipRoot;
-
-
 
 	private void initializeModeButtons(VBox vbox ){
 
@@ -224,14 +230,15 @@ public class TabDatorseendeController extends BaseController implements Initiali
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		System.out.println("IP DONE");
+		root = new StackPane();
 	}
 
 	
 	public void loadIPGUI(AnchorPane root2) {
-		StackPane root = new StackPane();
 		mainbus = this.getParent().getMainBus();
 		VBox vbox = new VBox();
-		vbox.backgroundProperty().set(LightGrayBackground);
+		//vbox.backgroundProperty().set(LightGrayBackground);
+		vbox.setTranslateX(MODES_POS_X);
 		root.getChildren().add(vbox);
 		initializeModeButtons(vbox);
 		initializeImageButtons(vbox);
@@ -250,6 +257,18 @@ public class TabDatorseendeController extends BaseController implements Initiali
 					mainbus.notify();
 				}
 				System.out.println("Image Processing started from GUI");
+			}
+		});
+		
+		Button stopIPBtn = new Button();
+		stopIPBtn.setText("Stop Image Processing Unit");
+		stopIPBtn.setTranslateX(OPT_BUTTON_X_START+OPT_BUTTON_WIDTH);
+		stopIPBtn.setTranslateY(OPT_BUTTON_Y_START);
+		root.getChildren().add(stopIPBtn);
+		stopIPBtn.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				mainbus.setIsIPRunning(false);
 			}
 		});
 
@@ -282,6 +301,12 @@ public class TabDatorseendeController extends BaseController implements Initiali
 			}
 		});
 		
+		view = new ImageView();
+		view.setTranslateX(IMAGE_POS_X);
+		view.setTranslateX(IMAGE_POS_Y);
+		root.getChildren().add(view);
+		
+		
 		AnchorPane.setTopAnchor(root, 100.0);
 		AnchorPane.setBottomAnchor(root, 100.0);
 		AnchorPane.setLeftAnchor(root, 100.0);
@@ -289,6 +314,16 @@ public class TabDatorseendeController extends BaseController implements Initiali
 		root2.getChildren().add(root);
 
 
+	}
+
+
+	public void updateImage() {
+		Image image = mainbus.getIPImageToShow();
+		if(image != null){
+			view.setImage(image);			
+		}
+
+		
 	}
 
 }

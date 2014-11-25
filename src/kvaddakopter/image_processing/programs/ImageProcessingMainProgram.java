@@ -37,7 +37,9 @@ public class ImageProcessingMainProgram extends ProgramClass{
 	private Tracking mTracker;
 
 	int count = 0;
-
+	
+	private boolean mStandAloneTest = false;
+	
 	public ImageProcessingMainProgram(int threadid, MainBusIPInterface mainbus)  {
 		super(threadid,mainbus);
 	}
@@ -53,14 +55,16 @@ public class ImageProcessingMainProgram extends ProgramClass{
 
 		//mDecoder.initialize("tcp://192.168.1.1:5555"/*FFMpegDecoder.STREAM_ADDR_BIPBOP*/);
 		mDecoder.initialize(FFMpegDecoder.STREAM_ADDR_BIPBOP);
+		//mDecoder.initialize("mvi2.mp4");
 		// Listen to decoder events
 		mDecoder.setDecoderListener(this);
 
 		//Start stream on a separate thread
 		mDecoder.startStream();
 
-		//Open window 
-		openVideoWindow();
+		//Open window
+		if(mStandAloneTest)
+			openVideoWindow();
 
 		//Create and add background subtraction method and add it to the list of active methods
 		//mBackgroundSubtraction = new BackgroundSubtraction();
@@ -175,9 +179,11 @@ public class ImageProcessingMainProgram extends ProgramClass{
 				out = ImageConversion.mat2Img(colorCalibrationImage);
 			break;
 		}
+		
 		if(out != null){
 			mMainbus.setIPImageToShow(out);
-			updateJavaWindow(out);
+			if(mStandAloneTest)
+				updateJavaWindow(out);
 		}
 	}	
 

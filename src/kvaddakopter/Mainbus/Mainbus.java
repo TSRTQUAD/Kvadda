@@ -47,6 +47,7 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 	
 	//Image processing storage
 	private boolean mIsIPRunning;
+
 	
 	//Assignment planer storage
 	private MatlabProxyConnection matlabproxy;
@@ -103,51 +104,47 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		Mainbus mainbus = new Mainbus();
 		
 		
-		//Setting up a Matlab Proxy Server
-		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
-		mainbus.setMatlabProxyConnection(matlabproxy);
-		matlabproxy.startMatlab("quiet");
-
-		//Thread t3 = new Thread(imageProcessing);
-		//t3.setPriority(1);
-		//t3.start(); 
-		
-		AssignmentPlanerRunnable assignmentplanerrunnable = new AssignmentPlanerRunnable(3,mainbus);
-		Thread t4 = new Thread(assignmentplanerrunnable);
-		t4.setPriority(1);
-		t4.start();
-
-		//Communication
-		try{
-			ControlSignal = new float[] {0, 0, 0, 0, 0};
-			Communication communicationtest = new Communication(3,mainbus,"Communication");
-			Thread t7 = new Thread(communicationtest);
-			t7.setDaemon(true);
-			t7.setPriority(1);
-			t7.start();
-			System.out.println("Communication-link initiated");
-
-
-			NavData navdatatest = new NavData(4,mainbus,"NavData", communicationtest);	
-			Thread t5 = new Thread(navdatatest);
-			t5.setDaemon(true);
-			t5.setPriority(1);
-			t5.start();
-			System.out.println("NavData-link initiated");
-
-
-
-		} catch (Exception ex1){
-
-			Security security = new Security(5,mainbus);
-			Thread t6 = new Thread(security);
-			t6.setDaemon(true);
-			t6.setPriority(1);
-			t6.start();
-			System.out.println("Security-link initiated");
-
-			ex1.printStackTrace();	
-		}
+//		//Setting up a Matlab Proxy Server
+//		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
+//		mainbus.setMatlabProxyConnection(matlabproxy);
+//		matlabproxy.startMatlab("quiet");
+//		
+//		AssignmentPlanerRunnable assignmentplanerrunnable = new AssignmentPlanerRunnable(3,mainbus);
+//		Thread t4 = new Thread(assignmentplanerrunnable);
+//		t4.setPriority(1);
+//		t4.start();
+//
+//		//Communication
+//		try{
+//			ControlSignal = new float[] {0, 0, 0, 0, 0};
+//			Communication communicationtest = new Communication(3,mainbus,"Communication");
+//			Thread t7 = new Thread(communicationtest);
+//			t7.setDaemon(true);
+//			t7.setPriority(1);
+//			t7.start();
+//			System.out.println("Communication-link initiated");
+//
+//
+//			NavData navdatatest = new NavData(4,mainbus,"NavData", communicationtest);	
+//			Thread t5 = new Thread(navdatatest);
+//			t5.setDaemon(true);
+//			t5.setPriority(1);
+//			t5.start();
+//			System.out.println("NavData-link initiated");
+//
+//
+//
+//		} catch (Exception ex1){
+//
+//			Security security = new Security(5,mainbus);
+//			Thread t6 = new Thread(security);
+//			t6.setDaemon(true);
+//			t6.setPriority(1);
+//			t6.start();
+//			System.out.println("Security-link initiated");
+//
+//			ex1.printStackTrace();	
+//		}
 		
 		//GUI MODULE
 		GUIModule guiModule = new GUIModule(mainbus);
@@ -438,7 +435,6 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 	
 	@Override
 	public synchronized void initIPVariables() {
-		// TODO More initializations needed (probably)
 	
 		//activateIPMode(COLOR_DETECTION_MODE);
 		//activateIPMode(TEMPLATE_CALIBRATION_MODE);
@@ -576,15 +572,17 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 	}
 
 	@Override
-	public FormTemplate getCalibFormTemplate() {
+	public synchronized FormTemplate getCalibFormTemplate() {
 		return mIPCalibFormTemplate[0];
 	}
 
 	@Override
-	public void setCalibFormTemplate(FormTemplate template) {
+	public synchronized void setCalibFormTemplate(FormTemplate template) {
 		mIPCalibFormTemplate[0] = template;
 	}
 
-
-	
+	@Override
+	public synchronized Image getImage() {
+		return mIPImageToShow[0];
+	}
 }

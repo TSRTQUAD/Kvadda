@@ -56,6 +56,13 @@ public class GUIWorker implements Runnable{
    							mainController.tabUtforController.updateWIFIStatus();
    						}
    					 });
+   					 //Update gui image
+   					 Platform.runLater(new Runnable() {
+   						@Override
+   						public void run() {
+   							mainController.tabDatorseendeController.updateImage();
+   						}
+   					 });
                 	
                 }
                 Thread.sleep(clock.stopAndGetSleepTime(1000));
