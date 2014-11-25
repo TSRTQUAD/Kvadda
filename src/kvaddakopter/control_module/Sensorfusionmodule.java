@@ -80,10 +80,21 @@ public class Sensorfusionmodule implements Runnable{
 	
 	public void run(){
 	
+		try {
+			System.out.println("Waiting for quadcopter...");
+			System.out.println("Quad is starting .. startsignal =  ");
+			System.out.println(controlsignal.getStart());
+			System.out.println("");
+			Thread.sleep((long) 5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
 		//Initialize -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 		System.out.println("Initializing modules ..");
 		this.sensorvector = mainbus.getSensorVector();				//Reads sensor data from mainbus
 		sdata.setnewsensordata(sensorvector);						//Update local sensor object
+		//sdata.print();
 		
 		if (0 == controllingmode){
 		this.missionobject = mainbus.getMissionObject();			//Reads mission object from mainbus	
@@ -182,8 +193,8 @@ public class Sensorfusionmodule implements Runnable{
 				}
 				
 				
-				//System.out.format("Sensordata at sample %d%n",counter);
-				//sdata.print();
+				System.out.format("Sensordata at sample %d%n",counter);
+				sdata.print();
 													
 
 				
@@ -224,8 +235,7 @@ public class Sensorfusionmodule implements Runnable{
 				rrdata.print();
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 				
-				
-				
+								
 				//Control-signal -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 				if(rrdata.getMission()==1){
 					csignal = controller.GetControlSignalMission1(rsdata, rrdata);

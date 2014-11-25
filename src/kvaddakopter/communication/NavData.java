@@ -32,7 +32,7 @@ public class NavData implements Runnable {
 	   float LinkQuality;
 	   
 	   
-	   double[] NavData = new double[6];
+	   //double[] NavData = new double[6];
 	   public NavData(int threadid,Mainbus mainbus, String name, Communication communicationtest)  {
 		   	mThreadId = threadid;
 	        mMainbus = mainbus;
@@ -179,7 +179,7 @@ public class NavData implements Runnable {
 				    		    long checksum = contentReader.uint32();
 
 				    		    if (checksum != expectedChecksum) {
-				    		      System.err.println("Checksum fail, expected: " + expectedChecksum + ", got: " + checksum);
+				    		     // System.err.println("Checksum fail, expected: " + expectedChecksum + ", got: " + checksum);
 				    		    }
 
 				    		    // checksum is the last option
@@ -189,17 +189,17 @@ public class NavData implements Runnable {
 				    		}
 				    	}
 //			    	}
-	
+				    	double[] NavData = new double[6];
 				    	NavData[0] = GPS_Lat;
 				       	NavData[1] = GPS_Long;
 				       	NavData[2] = (double)Vy;
 				       	NavData[3] = (double)Vx;
 				       	NavData[4] = (double)Altitude;
 				       	NavData[5] = (double)Yaw;
+				      
+				        mMainbus.setNavData(NavData);
 				       	
-				       mMainbus.setNavData(NavData);
-				       	
-				        	System.out.println("Vx:    " + Vx + "  Vy:    " + Vy +  "   GPS_Long     :" + GPS_Long);
+				        	// System.out.println("Vx:    " + Vx + "  Vy:    " + Vy +  "   GPS_Long     :" + GPS_Long);
 
 				} catch(SocketTimeoutException ex3) {
 		    	    System.out.println("socket_nav.receive(): Timeout");
