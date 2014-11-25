@@ -15,15 +15,14 @@ public abstract class GPSPolygon extends AbstractMapShape implements MapShapeInt
 	
 	
 	/**
-	 * The Gmaps polygon 
+	 * The Google maps polygon 
 	 */
 	protected Polygon polygon;
 	
 	
 	/**
-	 * Coordinates
+	* Creates a relation to a Google Map
 	 */
-	
 	public GPSPolygon(GoogleMap map) {
 		super(map);
 	}
@@ -31,16 +30,12 @@ public abstract class GPSPolygon extends AbstractMapShape implements MapShapeInt
 
 	/**
 	 * Returns a Polygon option object used to create the polygon
-	 * @param mvc
-	 * @return
+	 * @param mvc Google Maps Mvc array used to create the polygon.
+	 * @return A options object
 	 */
 	abstract protected PolygonOptions getOptions(MVCArray mvc);
 	
 	
-	
-	/**
-	 * Draw this shape
-	 */
 	@Override
 	public void draw() {
 

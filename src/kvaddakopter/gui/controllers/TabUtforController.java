@@ -78,8 +78,8 @@ public class TabUtforController extends BaseController implements Initializable 
     	
     	this.drawMission();
     	this.lblMissionType.setText(this.currentSelectedMissionObject.getMissionType().toString());
-    	this.lblEstimatedDistance.setText(String.valueOf(this.currentSelectedMissionObject.getTrajectoryLength()[0][0]));
-    	this.lblEstimatedDistance.setText(String.valueOf(this.currentSelectedMissionObject.getMissionTime()[0][0]));
+    	this.lblEstimatedDistance.setText(String.valueOf((int) this.currentSelectedMissionObject.getTrajectoryLength()[0][0])+ " m");
+    	this.lblEstimatedTime.setText(SecToMinSec.transform((long) this.currentSelectedMissionObject.getMissionTime()[0][0]));
     }
 
     @FXML

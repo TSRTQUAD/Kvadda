@@ -11,10 +11,15 @@ import com.lynden.gmapsfx.shapes.PolylineOptions;
 public class GPSPath extends AbstractMapShape implements MapShapeInterface{
 
 	/**
-	 * Polyline representation of the path  
+	 * Poly line representation of the path  
 	 */
 	protected Polyline path = null;
 	
+	
+	/**
+	 * Creates and sets a Google Map to this shape.
+	 * @param map
+	 */
 	public GPSPath(GoogleMap map) {
 		super(map);
 	}
