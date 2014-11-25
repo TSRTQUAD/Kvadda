@@ -44,6 +44,8 @@ public class TabUtforController extends BaseController implements Initializable 
     @FXML
     private Label lblTimeLeft;
     @FXML
+    private Label lblSpeed;
+    @FXML
     private Button btnStartMission;
     @FXML
     private Button btnAbortMission;
@@ -151,6 +153,7 @@ public class TabUtforController extends BaseController implements Initializable 
 		this.lblEstimatedTime.setText("");
 		this.lblEstimatedDistance.setText("");
 		this.lblTimeLeft.setText("");
+		this.lblSpeed.setText("");
 		
 		
 		
@@ -193,7 +196,10 @@ public class TabUtforController extends BaseController implements Initializable 
 		
 	}
  
-
+	public void updateSpeed(float newSpeed){
+		this.lblSpeed.setText(String.format("%.1f", newSpeed));	
+		System.out.println("halla");
+	}
 
     
     

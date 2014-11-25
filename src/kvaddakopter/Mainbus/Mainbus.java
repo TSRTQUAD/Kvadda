@@ -593,4 +593,9 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 	public synchronized void toggleController(){
 		this.runcontroller = !this.runcontroller;
 	}
+	
+	@Override
+	public synchronized float getSpeed(){
+		return speed;
+	}
 }
