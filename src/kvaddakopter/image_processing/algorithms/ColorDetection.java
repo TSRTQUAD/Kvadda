@@ -20,7 +20,11 @@ import org.opencv.imgproc.Imgproc;
 
 import ch.qos.logback.classic.filter.ThresholdFilter;
 
-
+/**
+ * ColorDetection class
+ * Implements functionality to identify objects from  color
+ *
+ */
 public class ColorDetection  extends DetectionClass{
 	
 	// Minimum object size
@@ -50,7 +54,13 @@ public class ColorDetection  extends DetectionClass{
 	
 	
 	/**
-	 * TODO explanation of method functionallity
+	 * Method to detect targets from active color templates
+	 * Converts image to HSV
+	 * 
+	 * For every color template
+	 * Then thresholds the HSV-image, extracts bounding boxes and sets targets depending on blobSize
+	 * 
+	 * Sets mIntermediateImage to cutout-image which can be extracted and showed somewhere
 	 */
 	@Override
 	public ArrayList<TargetObject> runMethod(ImageObject imageObject) {
@@ -255,7 +265,7 @@ public class ColorDetection  extends DetectionClass{
 	 * @param valueLow_
 	 * @param valueHigh_
 	 * @param form_type_
-	 * @return
+	 * @return index of last color template
 	 */
 	public int addTemplate(String description_, int hueLow_, int hueHigh_, int saturationLow_, int saturationHigh_, int valueLow_, int valueHigh_, int form_type_){
 		synchronized (colorTemplates) {
@@ -264,6 +274,11 @@ public class ColorDetection  extends DetectionClass{
 		}
 	}
 	
+	/**
+	 * Add colortemplate to method
+	 * @param cTemplate
+	 * @return index of last color template
+	 */
 	public int addTemplate(ColorTemplate cTemplate){
 		synchronized (colorTemplates) {
 		colorTemplates.add(cTemplate);
@@ -316,10 +331,18 @@ public class ColorDetection  extends DetectionClass{
 		return res;
 	}
 	
+	/**
+	 * Check if method is using color adaption of color templates or not
+	 * @return boolean mUsingColorAdaptation
+	 */
 	public boolean isUsingColorAdaption(){
 		return mUsingColorAdaption;
 	}
 	
+	/**
+	 * Set if the method is using color adaption of color templates or not
+	 * @param b true to activate color adaption, false to deactivate color adaption
+	 */
 	public void setUsingColorAdaption(boolean b){
 		mUsingColorAdaption = b;
 	}

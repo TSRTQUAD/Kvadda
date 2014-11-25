@@ -17,10 +17,26 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 //TODO calculate moments of contours to get center of mass
+
+/**
+ * Detection class
+ * Super class of detection methods
+ * 
+ * Includes
+ *	runMethod(imageObject) : To be implemented in sub class
+ *
+ *	Utilities: 
+ *	getIntermediateResult()
+ *	hasIntermediateResult()
+ *	convertToTargets(ArrayList<Rect> boundingBoxes, ArrayList<Long> targetHSVChannels, Mat drawInImage)
+ *	getBoundingBoxes(List<MatOfPoint> contours, Mat hierarchy, double areaThreshold)
+ *		
+ *
+ */
 public class DetectionClass {
 	Mat mIntermeditateResult;
 
-	public ArrayList<TargetObject> runMethod(ImageObject imageObject){
+	protected ArrayList<TargetObject> runMethod(ImageObject imageObject){
 		return null;
 	};
 	
@@ -33,10 +49,12 @@ public class DetectionClass {
 	}
 	
 	/**
-	 * 
-	 * @param binaryImage
-	 * @param areaThreshold
-	 * @return
+	 * Get bounding boxes from contours extracted from image
+	 * depending on area threshold, i.e. The detected blob has to be bigger than the area threshold
+	 * @param contours Contours from image
+	 * @param hierarchy Hierarchy from image
+	 * @param areaThreshold Blob size threshold
+	 * @return ArrayList<Rect> Bounding boxes
 	 */
 	protected ArrayList<Rect> getBoundingBoxes(List<MatOfPoint> contours, Mat hierarchy, double areaThreshold){	
 		//Selecting blobs that are big enough
