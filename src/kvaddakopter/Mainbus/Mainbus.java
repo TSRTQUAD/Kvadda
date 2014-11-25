@@ -1,7 +1,5 @@
 package kvaddakopter.Mainbus;
 
-import kvaddakopter.communication.*;
-
 import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -10,36 +8,28 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-// import org.opencv.core.Core;
-
-
-
-
-
-
-
-
-
-
-
-
-import kvaddakopter.ImageProcessingMain;
+import javafx.scene.image.Image;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import kvaddakopter.assignment_planer.AssignmentPlanerRunnable;
 import kvaddakopter.assignment_planer.MatFileHandler;
 import kvaddakopter.assignment_planer.MatlabProxyConnection;
 import kvaddakopter.assignment_planer.MissionObject;
-import kvaddakopter.control_module.Mockmainbus;
+import kvaddakopter.communication.Communication;
+import kvaddakopter.communication.NavData;
+import kvaddakopter.communication.Security;
 import kvaddakopter.control_module.Sensorfusionmodule;
-import kvaddakopter.control_module.signals.ControlSignal;
-import kvaddakopter.control_module.signals.SensorData;
 import kvaddakopter.gui.GUIModule;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
+import kvaddakopter.image_processing.data_types.FormTemplate;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.programs.ImageProcessingMainProgram;
 import kvaddakopter.interfaces.AssignmentPlanerInterface;
 import kvaddakopter.interfaces.ControlMainBusInterface;
 import kvaddakopter.interfaces.MainBusGUIInterface;
+import kvaddakopter.interfaces.MainBusIPInterface;
 import kvaddakopter.maps.GPSCoordinate;
+// import org.opencv.core.Core;
 
 
 /**
@@ -51,39 +41,11 @@ import kvaddakopter.maps.GPSCoordinate;
  * 2) Create thread with your runnable
  * 3) start thread
  * 
- * Ex)
- * MyRunnable myRunnable = new MyRunnable(other variables,mainbus);
- *       
- * Thread t = new Thread(myRunnable);
- * t.setPriority(1); //Sets priority (how much sheduled time the thread gets)
- * t.start(); 
- * 
- * -----------------------------------
- * If unsure about synchronization read the following:
- * http://www.javaworld.com/article/2074318/java-concurrency/java-101--understanding-java-threads--part-2--thread-synchronization.html
- * 
  */
-public class Mainbus extends Frame implements KeyListener,ControlMainBusInterface, AssignmentPlanerInterface, MainBusGUIInterface{
-	//Examples
-	private int var;
-	public boolean condVar = false;
-
-	
-	
-	//Programs
-	MyRunnable myRunnable;
-	MyRunnable2 myRunnable2;
-	AssignmentPlanerRunnable assignmentplanerrunnable;
-	
-	ImageProcessingMainProgram imageProcessing;
+public class Mainbus extends Frame implements KeyListener,ControlMainBusInterface, AssignmentPlanerInterface, MainBusGUIInterface, MainBusIPInterface{
 	
 	//Image processing storage
-	//TODO
-	
-	
-	//GUI VARS
-	
-	
+	private boolean mIsIPRunning;
 	
 	//Assignment planer storage
 	private MatlabProxyConnection matlabproxy;
@@ -200,6 +162,13 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		t8.setPriority(1);
 		t8.start();
 		
+		// Image processing MODULE
+		ImageProcessingMainProgram imageProcessing = new ImageProcessingMainProgram(1,mainbus);
+		mainbus.initIPVariables();
+		Thread t9 = new Thread(imageProcessing);
+		t9.setDaemon(true);
+		t9.setPriority(1);
+		t9.start();
 		
 		while(true){
 			//			System.out.println("Mainbus running");
@@ -224,29 +193,6 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		
 
 	}
-	
-	
-	
-	public synchronized void setVar(int i){
-		var = i;
-	}
-	
-	public synchronized int getVar(){
-		return var;
-	}
-	
-	public synchronized boolean getCondVar(){
-		return condVar;
-	}
-	
-	public synchronized void setCondVar(boolean b){
-		condVar = true;
-	}
-	
-	/*
-	 * Get/set functions for image processing
-	 */
-	//TODO image processing bus functionallity (being implemented in IPMockMainbus)
 	
 	/*
 	 * Get/set functions for Mission Planing
@@ -493,7 +439,156 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 
 
 
-	//
+	//Image processing-------------------------------------
+	
+	@Override
+	public synchronized void initIPVariables() {
+		// TODO More initializations needed (probably)
+	
+		//activateIPMode(COLOR_DETECTION_MODE);
+		//activateIPMode(TEMPLATE_CALIBRATION_MODE);
+		//setIPImageMode(TEMPLATE_CALIBRATE_IMAGE);
+		//activateIPMode(TRACKING_MODE);
+		//setIPImageMode(DEFAULT_IMAGE);
+		
+		mColorTemplates.add(new ColorTemplate("Pink square", 120, 200, 50, 90, 180, 245, ColorTemplate.FORM_SQUARE));	
+		mColorTemplates.add(new ColorTemplate("Yellow square", 30, 120, 50, 120, 130, 255, ColorTemplate.FORM_SQUARE));
+		
+		mIPCalibTemplate[0] = new ColorTemplate();
+		mIPImageToShow[0] = null;
+		
+		mIsIPRunning = false;
+	}
+
+	
+	@Override
+	public synchronized int[] getIPActiveModes() {
+		return mIPActiveModes;
+	}
+
+@Override
+	public synchronized void setIPActiveModes(int[] modes) {
+		//mIPActiveModes = modes;
+	}
+
+	@Override
+	public synchronized void deactivateIPMode(int i) {
+		mIPActiveModes[i] = 0;
+	}
+	
+	@Override
+	public synchronized void activateIPMode(int i) {
+		mIPActiveModes[i] = 1;
+	}
+
+	@Override
+	public synchronized boolean getIsIPRunning() {
+		return mIsIPRunning;
+	}
+
+	@Override
+	public synchronized void setIsIPRunning(boolean b) {
+		mIsIPRunning = b;
+	}
+
+	@Override
+	public synchronized int getIPImageMode() {
+		return mIPImageMode[0];
+	}
+
+	@Override
+	public synchronized void setIPImageMode(int imageMode) {
+		mIPImageMode[0] =imageMode;
+	}
+
+	@Override
+	public synchronized ArrayList<ColorTemplate> getIPColorTemplates() {
+		return mColorTemplates;
+	}
+
+	@Override
+	public synchronized void setIPColorTemplates(ArrayList<ColorTemplate> colorTemplates) {
+		//mColorTemplates = colorTemplates;
+		
+	}
+
+	@Override
+	public synchronized ArrayList<FormTemplate> getIPFormTemplates() {
+		return mFormTemplates;
+	}
+
+	@Override
+	public synchronized void addIPFormTemplate(FormTemplate template) {
+		mFormTemplates.add(template);
+	}
+
+	@Override
+	public synchronized void setIPGPSCoordinate(GPSCoordinate coord) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public synchronized GPSCoordinate getGPSCoordinate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public synchronized void setIPTargetList(ArrayList<TargetObject> listOfTargets) {
+		//mTargetList = listOfTargets;
+	}
+
+	@Override
+	public synchronized void setIPImageToShow(BufferedImage image) {
+		WritableImage wr = null;
+        if (image != null) {
+            wr = new WritableImage(image.getWidth(), image.getHeight());
+            PixelWriter pw = wr.getPixelWriter();
+            for (int x = 0; x < image.getWidth(); x++) {
+                for (int y = 0; y < image.getHeight(); y++) {
+                    pw.setArgb(x, y, image.getRGB(x, y));
+                }
+            }
+        }
+        mIPImageToShow[0] = wr;
+	}
+	
+	@Override
+	public synchronized Image getIPImageToShow() {
+		return mIPImageToShow[0];
+	}
+
+	@Override
+	public synchronized void setIPCalibTemplate(ColorTemplate cTemplate) {
+		mIPCalibTemplate[0] = cTemplate;	
+	}
+
+	@Override
+	public synchronized void addIPColorTemplate(ColorTemplate template) {
+		mColorTemplates.add(template);
+		
+	}
+
+	@Override
+	public synchronized ArrayList<TargetObject> getIPTargetList() {
+		return mTargetList;
+	}
+
+	@Override
+	public synchronized ColorTemplate getIPCalibTemplate() {
+		return mIPCalibTemplate[0];
+	}
+
+	@Override
+	public FormTemplate getCalibFormTemplate() {
+		return mIPCalibFormTemplate[0];
+	}
+
+	@Override
+	public void setCalibFormTemplate(FormTemplate template) {
+		mIPCalibFormTemplate[0] = template;
+	}
 
 
 	
