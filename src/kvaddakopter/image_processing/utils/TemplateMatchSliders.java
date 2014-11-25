@@ -64,7 +64,7 @@ public class TemplateMatchSliders{
  * @param mainBus
  * @param primaryStage
  */
-	public void setTemplateGeomtry( final  MainBusIPInterface mainBus, AnchorPane primaryStage){
+	public void setTemplateGeomtry( final  MainBusIPInterface mainBus, Stage primaryStage){
 		
 		StackPane secondaryLayout = new StackPane();
 		mTemplateList = mainBus.getIPFormTemplates();
@@ -119,8 +119,11 @@ public class TemplateMatchSliders{
 		secondStage.setScene(secondScene);
 
 		//Set position of second window, related to primary window.
-		//secondStage.setX(primaryStage.getX() - 250);
-		//secondStage.setY(primaryStage.getY() - 100);
+		if(primaryStage!=null){
+			secondStage.setX(primaryStage.getX() - 250);
+			secondStage.setY(primaryStage.getY() - 100);	
+		}
+
 
 		secondStage.show();
 	}

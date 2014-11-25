@@ -235,8 +235,11 @@ public class HSVSliders{
         secondStage.setScene(secondScene);
          
         //Set position of second window, related to primary window.
-        //secondStage.setX(primaryStage.getX() + 550);
-        //secondStage.setY(primaryStage.getY());
+        if(primaryStage != null){
+            secondStage.setX(primaryStage.getX() + 550);
+            secondStage.setY(primaryStage.getY());
+        }
+
 
         secondStage.show();
 	}
