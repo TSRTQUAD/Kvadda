@@ -3,8 +3,8 @@ package kvaddakopter.gui.controllers;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.ResourceBundle;
 import java.util.Map.Entry;
+import java.util.ResourceBundle;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -13,7 +13,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
@@ -26,16 +25,14 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.Stage;
-import kvaddakopter.image_processing.comm_tests.IPMockMainBus;
 import kvaddakopter.image_processing.utils.HSVSliders;
 import kvaddakopter.image_processing.utils.TemplateMatchSliders;
 import kvaddakopter.interfaces.MainBusIPInterface;
 
-public class TabIPGUI extends BaseController implements Initializable{
-	
-	
-	static MainBusIPInterface mMainbus;
+public class TabDatorseendeController extends BaseController implements Initializable{
+
+
+	public MainBusIPInterface mainbus;
 
 	/*Background colors*/
 	final Background GrayBackground  = new Background(new BackgroundFill(Color.GRAY,new CornerRadii(4.5),new Insets(1.0)));
@@ -47,7 +44,7 @@ public class TabIPGUI extends BaseController implements Initializable{
 	final static int BUTTON_X_START = 300;
 	final static int BUTTON_Y_START = 20;
 	final static int BUTTON_GROUP_SEPARATION = 40;
-	
+
 	final Background SelectedColor = GreenBackground;
 	final Background DeselectedColor = GrayBackground;
 
@@ -68,14 +65,12 @@ public class TabIPGUI extends BaseController implements Initializable{
 	final static int OPT_BUTTON_X_START = -150;
 	final static int OPT_BUTTON_Y_START = -150;
 	final static int OPT_BUTTON_Y_SPACE = 40;
-	
-	@FXML
-	private AnchorPane primaryStage;
 
-	public IPTestGUI(MainBusIPInterface mainbus){
-		mMainbus = mainbus;
-	}
-	
+	@FXML
+	private AnchorPane ipRoot;
+
+
+
 	private void initializeModeButtons(VBox vbox ){
 
 		mModeButtonMap = new HashMap<>(); 
@@ -88,14 +83,14 @@ public class TabIPGUI extends BaseController implements Initializable{
 		mModeButtonMap.put(MainBusIPInterface.MODE_TRACKING, "Tracking");
 
 		mModeButtonGroup = new ToggleGroup();
-	
+
 		/*Add listener */
 		mModeButtonGroup.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
 			@Override
 			public void changed(ObservableValue<? extends Toggle> arg0,
 					Toggle toggle, Toggle newToggle) {
 				//Get list of modes
-				int[] activeModes = mMainbus.getIPActiveModes();
+				int[] activeModes = mainbus.getIPActiveModes();
 				//Read toggle event
 				int mode;
 				ToggleButton toggledButton;
@@ -110,10 +105,10 @@ public class TabIPGUI extends BaseController implements Initializable{
 				//Check previous state of the mode and toggle it.
 				if(activeModes[mode] == 0){
 					toggledButton.setBackground(SelectedColor);
-					mMainbus.activateIPMode(mode);
+					mainbus.activateIPMode(mode);
 				}else{
 					toggledButton.setBackground(DeselectedColor);
-					mMainbus.deactivateIPMode(mode);
+					mainbus.deactivateIPMode(mode);
 				}
 			}
 		});
@@ -168,7 +163,7 @@ public class TabIPGUI extends BaseController implements Initializable{
 			public void changed(ObservableValue<? extends Toggle> arg0,
 					Toggle toggle, Toggle newToggle) {
 				//Get active image mode
-				int currentImageMode = mMainbus.getIPImageMode();
+				int currentImageMode = mainbus.getIPImageMode();
 				//Read toggle event
 				int mode;
 				ToggleButton toggledButton;
@@ -179,7 +174,7 @@ public class TabIPGUI extends BaseController implements Initializable{
 					toggledButton = (ToggleButton)toggle;
 					mode = Integer.parseInt(toggledButton.getId());
 				}
-				
+
 				//Set all image buttons to gray
 				for (int j = 0; j < mImageButtons.length; j++) {
 					mImageButtons[j].setBackground(DeselectedColor);
@@ -188,9 +183,9 @@ public class TabIPGUI extends BaseController implements Initializable{
 				//Check previous state of the mode and toggle it.
 				if(currentImageMode != mode){
 					toggledButton.setBackground(SelectedColor);
-					mMainbus.setIPImageMode(mode);
+					mainbus.setIPImageMode(mode);
 				}else{
-					mMainbus.setIPImageMode(-1);
+					mainbus.setIPImageMode(-1);
 				}
 			}
 		});
@@ -199,13 +194,13 @@ public class TabIPGUI extends BaseController implements Initializable{
 		int i = 0;
 		while (it.hasNext()) {
 			Entry<Integer, String> pairs = (Entry<Integer, String>)it.next();
-			
+
 			//Create new button
 			final ToggleButton newButton = new ToggleButton();
-			
+
 			//Set text
 			newButton.setText(pairs.getValue());
-			
+
 			//Set X and Y position
 			newButton.setTranslateX(BUTTON_X_START);
 			newButton.setTranslateY(BUTTON_Y_START+BUTTON_GROUP_SEPARATION);
@@ -216,26 +211,31 @@ public class TabIPGUI extends BaseController implements Initializable{
 
 			//Add button to toggle group
 			newButton.setToggleGroup(mImageButtonGroup);
-			
+
 			//Set button id to the image mode
 			final int imageCode = pairs.getKey();
 			newButton.setId(String.valueOf(imageCode));
 			vbox.getChildren().add(newButton);
 			mImageButtons[i++] = newButton;			
-		
+
 		}
 	}
-	
+
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-StackPane root = new StackPane();
-		
+		System.out.println("IP DONE");
+	}
+
+	
+	public void loadIPGUI(AnchorPane root2) {
+		StackPane root = new StackPane();
+		mainbus = this.getParent().getMainBus();
 		VBox vbox = new VBox();
 		vbox.backgroundProperty().set(LightGrayBackground);
 		root.getChildren().add(vbox);
 		initializeModeButtons(vbox);
 		initializeImageButtons(vbox);
-	
+
 		Button startIPBtn = new Button();
 		startIPBtn.setText("Start Image Processing Unit");
 		startIPBtn.setTranslateX(OPT_BUTTON_X_START);
@@ -244,10 +244,10 @@ StackPane root = new StackPane();
 		startIPBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				//mMainbus.setColorCalibrationMode(true);
-				mMainbus.setIsIPRunning(true);
-				synchronized(mMainbus){
-					mMainbus.notify();
+				//mainbus.setColorCalibrationMode(true);
+				mainbus.setIsIPRunning(true);
+				synchronized(mainbus){
+					mainbus.notify();
 				}
 				System.out.println("Image Processing started from GUI");
 			}
@@ -265,7 +265,7 @@ StackPane root = new StackPane();
 		cCalibBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				hsvSliders.setHSVChannels(mMainbus,primaryStage);
+				hsvSliders.setHSVChannels(mainbus, null);
 			}
 		});
 
@@ -278,18 +278,17 @@ StackPane root = new StackPane();
 		imgCalibrateTemplateButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				templateSliders.setTemplateGeomtry(mMainbus, primaryStage);
+				templateSliders.setTemplateGeomtry(mainbus, null);
 			}
 		});
-	
-
-
-		Scene scene = new Scene(root, 500, 500);
-
-		primaryStage.setTitle("GUI/Imageprocessing test");
-		primaryStage.setScene(scene);
-		primaryStage.show();
 		
+		AnchorPane.setTopAnchor(root, 100.0);
+		AnchorPane.setBottomAnchor(root, 100.0);
+		AnchorPane.setLeftAnchor(root, 100.0);
+		AnchorPane.setRightAnchor(root, 100.0);
+		root2.getChildren().add(root);
+
+
 	}
 
 }

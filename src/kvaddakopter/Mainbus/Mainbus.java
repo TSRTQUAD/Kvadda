@@ -26,6 +26,7 @@ import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.programs.ImageProcessingMainProgram;
 import kvaddakopter.interfaces.AssignmentPlanerInterface;
 import kvaddakopter.interfaces.ControlMainBusInterface;
+import kvaddakopter.interfaces.IPAndGUIInterface;
 import kvaddakopter.interfaces.MainBusGUIInterface;
 import kvaddakopter.interfaces.MainBusIPInterface;
 import kvaddakopter.maps.GPSCoordinate;
@@ -42,7 +43,7 @@ import kvaddakopter.maps.GPSCoordinate;
  * 3) start thread
  * 
  */
-public class Mainbus extends Frame implements KeyListener,ControlMainBusInterface, AssignmentPlanerInterface, MainBusGUIInterface, MainBusIPInterface{
+public class Mainbus extends Frame implements KeyListener,ControlMainBusInterface, AssignmentPlanerInterface, MainBusGUIInterface, MainBusIPInterface, IPAndGUIInterface{
 	
 	//Image processing storage
 	private boolean mIsIPRunning;
@@ -412,29 +413,23 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 
 	@Override
 	public double getCurrentSpeed() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 1.23;
 	}
 
 
 	@Override
 	public GPSCoordinate getCurrentQuadPosition() {
-		// TODO Auto-generated method stub
-		return null;
+		return new GPSCoordinate(getSensorVector()[0] , getSensorVector()[1]);
 	}
-
 
 	@Override
 	public boolean wifiFixOk() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
-
 
 	@Override
 	public boolean gpsFixOk() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 

@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -63,7 +64,7 @@ public class TemplateMatchSliders{
  * @param mainBus
  * @param primaryStage
  */
-	public void setTemplateGeomtry( final  MainBusIPInterface mainBus, Stage primaryStage){
+	public void setTemplateGeomtry( final  MainBusIPInterface mainBus, AnchorPane primaryStage){
 		
 		StackPane secondaryLayout = new StackPane();
 		mTemplateList = mainBus.getIPFormTemplates();
@@ -118,8 +119,8 @@ public class TemplateMatchSliders{
 		secondStage.setScene(secondScene);
 
 		//Set position of second window, related to primary window.
-		secondStage.setX(primaryStage.getX() - 250);
-		secondStage.setY(primaryStage.getY() - 100);
+		//secondStage.setX(primaryStage.getX() - 250);
+		//secondStage.setY(primaryStage.getY() - 100);
 
 		secondStage.show();
 	}

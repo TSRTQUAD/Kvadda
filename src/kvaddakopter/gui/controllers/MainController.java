@@ -3,8 +3,6 @@ package kvaddakopter.gui.controllers;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import com.lynden.gmapsfx.GoogleMapView;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -13,9 +11,12 @@ import javafx.scene.Parent;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
 import kvaddakopter.gui.GUIWorker;
+import kvaddakopter.interfaces.IPAndGUIInterface;
 import kvaddakopter.interfaces.MainBusGUIInterface;
 import kvaddakopter.maps.MissionMap;
 import kvaddakopter.maps.PlanningMap;
+
+import com.lynden.gmapsfx.GoogleMapView;
 
 public class MainController implements Initializable {
 
@@ -49,6 +50,14 @@ public class MainController implements Initializable {
 	
 	
 	@FXML
+	public AnchorPane tabDatorseende;
+	
+	@FXML 
+	public TabDatorseendeController tabDatorseendeController;
+	
+	
+	
+	@FXML
 	public TabPane mainTabPane;
 	
 	/**
@@ -72,16 +81,16 @@ public class MainController implements Initializable {
 	/**
 	 * MainBus
 	 */
-	protected MainBusGUIInterface mainBus;
-
+	protected IPAndGUIInterface mainBus;
+	
 	/**
 	 * Runs When GUI is initialized.
 	 */
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-
 			this.tabUtforController.setParent(this);
 			this.tabPlaneraController.setParent(this);
+			this.tabDatorseendeController.setParent(this);
 			this.createGoogleMapViewOnTab(0);
 		
 		this.mainTabPane.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
@@ -98,6 +107,7 @@ public class MainController implements Initializable {
 		t1.setDaemon(true);
 		t1.start();
 		
+		
 	}
 	
 	
@@ -111,12 +121,12 @@ public class MainController implements Initializable {
 	 * Public Methods
 	 */
 	
-	public void setMainBus(MainBusGUIInterface mainBus){
+	public void setMainBus(IPAndGUIInterface mainBus){
 		this.mainBus = mainBus;
 		
 	}
 	
-	public MainBusGUIInterface getMainBus(){
+	public IPAndGUIInterface getMainBus(){
 		return this.mainBus;
 	}
 	
@@ -133,8 +143,12 @@ public class MainController implements Initializable {
                 this.tabPlaneraController.mapContainer.getChildren().add(this.tabPlaneraController.mapView);
                 this.tabPlaneraController.planningMap = new PlanningMap(this.tabPlaneraController.mapView, this.tabPlaneraController);
 
+		}else if (1 == tabNr){
+			
+			System.out.println(this.mainBus);
+			this.tabDatorseendeController.loadIPGUI(this.tabDatorseende);
 		}
-		else if(1 == tabNr){
+		else if(2 == tabNr){
 			
 				// ADD GoogleMap To new View
                 this.tabUtforController.mapViewUtfor = new GoogleMapView();
@@ -143,6 +157,7 @@ public class MainController implements Initializable {
                 this.tabUtforController.mapContainer.getChildren().add(this.tabUtforController.mapViewUtfor);
                 this.tabUtforController.missionMap = new MissionMap(this.tabUtforController.mapViewUtfor, this.tabUtforController);
 		}
+		
 	}
 	
 	

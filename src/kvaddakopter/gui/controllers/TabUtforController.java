@@ -79,6 +79,7 @@ public class TabUtforController extends BaseController implements Initializable 
     	this.drawMission();
     	this.lblMissionType.setText(this.currentSelectedMissionObject.getMissionType().toString());
     	this.lblEstimatedDistance.setText(String.valueOf(this.currentSelectedMissionObject.getTrajectoryLength()[0][0]));
+    	this.lblEstimatedDistance.setText(String.valueOf(this.currentSelectedMissionObject.getMissionTime()[0][0]));
     }
 
     @FXML
@@ -169,6 +170,15 @@ public class TabUtforController extends BaseController implements Initializable 
     	GPSCoordinate gps = this.getParent().getMainBus().getCurrentQuadPosition();
     	this.missionMap.drawQuad(gps.getLatitude(), gps.getLongitude());
     }
+
+	public void updateGPSStatus() {
+		// TODO Auto-generated method stub
+	}
+
+	public void updateWIFIStatus() {
+		// TODO Auto-generated method stub
+		
+	}
  
     
 

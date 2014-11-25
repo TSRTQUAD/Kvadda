@@ -48,9 +48,16 @@ public class GUIWorker implements Runnable{
    						}
    					 });
                 	}
+                	//CHECK LINKSTATUS
+   					 Platform.runLater(new Runnable() {
+   						@Override
+   						public void run() {
+   							mainController.tabUtforController.updateGPSStatus();
+   							mainController.tabUtforController.updateWIFIStatus();
+   						}
+   					 });
                 	
                 }
-                
                 Thread.sleep(clock.stopAndGetSleepTime(1000));
 			} catch (InterruptedException e) {
 				e.printStackTrace();

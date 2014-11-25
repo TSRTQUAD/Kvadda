@@ -189,6 +189,8 @@ public class TabPlaneraController extends BaseController implements Initializabl
 	 */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+    	System.out.println("Planera DONE");
+    	
         this.storage = new MissionStorage();
         this.populateListsAndDefaults();
     }

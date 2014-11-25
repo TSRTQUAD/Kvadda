@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
@@ -234,8 +235,8 @@ public class HSVSliders{
         secondStage.setScene(secondScene);
          
         //Set position of second window, related to primary window.
-        secondStage.setX(primaryStage.getX() + 550);
-        secondStage.setY(primaryStage.getY());
+        //secondStage.setX(primaryStage.getX() + 550);
+        //secondStage.setY(primaryStage.getY());
 
         secondStage.show();
 	}

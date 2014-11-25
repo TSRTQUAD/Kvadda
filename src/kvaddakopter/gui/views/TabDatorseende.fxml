@@ -8,6 +8,6 @@
 <?import com.lynden.gmapsfx.*?>
 
 
-<AnchorPane fx:id="primaryStage" prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kvaddakopter.gui.controllers.TabIPGUI">
+<AnchorPane fx:id="ipRoot" prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kvaddakopter.gui.controllers.TabDatorseendeController">
    
 </AnchorPane>
