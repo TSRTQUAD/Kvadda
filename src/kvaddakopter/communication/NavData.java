@@ -150,7 +150,7 @@ public class NavData implements Runnable {
 				    			Pitch					= contentReader.float32()/1000;
 				    			Yaw 					= contentReader.float32()/1000;
 				    			Roll	 				= contentReader.float32()/1000;
-				    			Altitude	 			= contentReader.int32()/1000;
+				    			Altitude	 			= (float)contentReader.int32()/1000;
 				    			Vx 						= contentReader.float32()/1000;
 				    			Vy 						= contentReader.float32()/1000;
 				    			Vz						= contentReader.float32();
@@ -179,7 +179,7 @@ public class NavData implements Runnable {
 				    		    long checksum = contentReader.uint32();
 
 				    		    if (checksum != expectedChecksum) {
-				    		      System.err.println("Checksum fail, expected: " + expectedChecksum + ", got: " + checksum);
+				    		    //  System.err.println("Checksum fail, expected: " + expectedChecksum + ", got: " + checksum);
 				    		    }
 
 				    		    // checksum is the last option
@@ -199,7 +199,7 @@ public class NavData implements Runnable {
 				       	
 				       mMainbus.setNavData(NavData);
 				       	
-				        	System.out.println("Vx:    " + Vx + "  Vy:    " + Vy +  "   GPS_Long     :" + GPS_Long);
+				        	System.out.println("Vx:    " + Vx + "  Vy:    " + Vy +  "   GPS_Long     :" + GPS_Long + "  Altitude:   " + Altitude);
 
 				} catch(SocketTimeoutException ex3) {
 		    	    System.out.println("socket_nav.receive(): Timeout");
