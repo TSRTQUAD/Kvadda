@@ -76,7 +76,7 @@ public class MatFileHandler {
 		if (!name.equals("object")) {
 			//Read calculated data
 			MLDouble trajectory = new MLDouble("trajectory", missionobject.getTrajectory() );
-			MLDouble trajectoryfullsize = new MLDouble("trajectory", missionobject.getTrajectoryFullSize() );
+			MLDouble trajectoryfullsize = new MLDouble("trajectoryfullsize", missionobject.getTrajectoryFullSize() );
 			MLDouble trajectorylength = new MLDouble("trajectorylength", missionobject.getTrajectoryLength() );
 			MLDouble coveragearea = new MLDouble("coveragearea", missionobject.getCoverageArea() );
 			MLDouble time = new MLDouble("time", missionobject.getMissionTime() );

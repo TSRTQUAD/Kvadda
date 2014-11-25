@@ -38,7 +38,6 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 	private ArrayList<MapShapeInterface> navigationMapShapes;
 	private ArrayList<MapShapeInterface> forbiddenShapes;
 	
-	private Polyline generatedPath;
 	
 	private int currentActiveMissionAreaCounter = 0;
 	private int currentActiveForbiddenAreaCounter = 0;
@@ -77,11 +76,23 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 
 	}
 	
+	
+	/**
+	 * Clear generated trajectory
+	 */
+	
+	public void clearGeneratedTrajectory(){
+		if (this.generatedPath != null){
+			this.map.removeMapShape(this.generatedPath);
+			this.generatedPath = null;
+		}
+	}
 	/**
 	 * Clear all navigation markers on the map.
 	 */
 	public void clearNavigationCoordinates(){
 		if (this.isMapInitialized){
+			this.clearGeneratedTrajectory();
 			for(MapShapeInterface shape : this.navigationMapShapes){
 				shape.remove();
 			}
@@ -108,10 +119,12 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 	public void clearMap(){
 		
 		if (isMapInitialized){
+			this.clearGeneratedTrajectory();
 			this.clearForbiddenAreasCoordinates();
 			this.clearNavigationCoordinates();
 		}
 	}
+	
 	
 	
 	/**
@@ -198,22 +211,7 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 	
 	
 	public void createNewMapShape() {
-		/**
-		MissionType missionType = this.owningController.getCurrentSelectedMissionType();
-		if (missionType == MissionType.AROUND_COORDINATE){
-			GPSCircle coordinate = new GPSCircle(this.map);
-			this.navigationGPSCoordinate.add(coordinate);
-			this.currentActiveMissionAreaCounter = this.navigationGPSCoordinate.size() -1;
-		} else if (missionType == MissionType.ALONG_TRAJECTORY){
-			GPSPath trajectory = new GPSPath(this.map);
-			this.navigationGpsTrajectories.add(trajectory);
-			this.currentActiveMissionAreaCounter = this.navigationGpsTrajectories.size() -1;
-		}else if(missionType == MissionType.AREA_COVERAGE){
-			GreenGPSPolygon polygon = new GreenGPSPolygon(this.map);
-			this.navigationGPSPolygons.add(polygon);
-			this.currentActiveMissionAreaCounter = this.navigationGPSPolygons.size() - 1;
-		}
-		**/
+		this.clearGeneratedTrajectory();
 		MissionType missionType = this.owningController.getCurrentSelectedMissionType();
 		MapShapeInterface newShape =  MapShapeFactory.make(missionType, this.map);
 		System.out.println(newShape);
@@ -223,11 +221,7 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 
 
 	public void createNewForbiddenArea(){
-		/**
-		RedGPSPolygon redPolygon = new RedGPSPolygon(this.map);
-		this.forbiddenGPSPolygons.add(redPolygon);
-		this.currentActiveForbiddenAreaCounter = this.forbiddenGPSPolygons.size() - 1;
-		**/
+		this.clearGeneratedTrajectory();
 		MapShapeInterface newShape =  MapShapeFactory.make(MissionType.NULL_MISSION, this.map);
 		this.forbiddenShapes.add(newShape);
 		this.currentActiveForbiddenAreaCounter = this.forbiddenShapes.size() - 1;
@@ -242,7 +236,6 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 		LatLong[] ary = new LatLong[trajectory.length];
 		for(int i = 0; i < trajectory.length; i++){
 			ary[i] = new LatLong(trajectory[i][0], trajectory[i][1]);
-			System.out.println(i);
 		}
 		MVCArray mvc = new MVCArray(ary);
 		PolylineOptions options = new PolylineOptions().path(mvc).strokeColor("blue").strokeWeight(3);

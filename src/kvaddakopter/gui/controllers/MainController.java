@@ -88,6 +88,7 @@ public class MainController implements Initializable {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				createGoogleMapViewOnTab(newValue.intValue());
+				updateAvailableMission();
 			}
 		}); 
 		
@@ -101,6 +102,11 @@ public class MainController implements Initializable {
 	
 	
 	
+	protected void updateAvailableMission() {
+		this.tabUtforController.updateMissionList();
+		
+	}
+
 	/**
 	 * Public Methods
 	 */

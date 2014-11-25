@@ -24,6 +24,7 @@ import kvaddakopter.gui.components.shapes.GPSPath;
 import kvaddakopter.interfaces.MainBusGUIInterface;
 import kvaddakopter.maps.PlanningMap;
 import kvaddakopter.storage.MissionStorage;
+import kvaddakopter.utils.SecToMinSec;
 
 
 public class TabPlaneraController extends BaseController implements Initializable {
@@ -157,11 +158,9 @@ public class TabPlaneraController extends BaseController implements Initializabl
 		System.out.println("Results retrived");
 		MissionObject mission = mainbus.getMissionObject();
 		
-		this.txtEstimatedTime.setText(String.format("%s sek" , (int) mission.getMissionTime()[0][0]));
+		this.txtEstimatedTime.setText(String.format("%s" , SecToMinSec.transform( (long) mission.getMissionTime()[0][0])));
 		this.txtEstimatedDistance.setText(String.format("%s meter", (int)mission.getTrajectoryLength()[0][0]));
 		this.planningMap.drawResultingTrajectory(mission.getTrajectoryFullSize());
-		
-    	
     }
     
     /**
@@ -318,7 +317,6 @@ public class TabPlaneraController extends BaseController implements Initializabl
 	}
 
 
-    
 
 
 }

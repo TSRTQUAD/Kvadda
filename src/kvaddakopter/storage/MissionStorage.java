@@ -47,6 +47,7 @@ public class MissionStorage {
 	public MissionObject loadMission(String missionname) throws FileNotFoundException, IOException {
 		MatFileHandler missionstorage = new MatFileHandler();
 		MissionObject mission = new MissionObject();
+		System.out.println(missionname);
 		missionstorage.readMatFile(missionname, mission);
 		
 		return mission;
