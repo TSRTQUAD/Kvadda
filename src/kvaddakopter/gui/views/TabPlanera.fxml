@@ -191,7 +191,7 @@
                               </Button>
                            </children>
                         </HBox>
-                        <HBox fx:id="txtEstimatedTime1" alignment="CENTER" prefHeight="0.0" prefWidth="343.0">
+                        <HBox  alignment="CENTER" prefHeight="0.0" prefWidth="343.0">
                            <children>
                               <Button fx:id="btnSaveMission" alignment="CENTER" mnemonicParsing="false" onAction="#btnSaveMission" prefHeight="26.0" prefWidth="198.0" text="Spara uppdrag">
                                  <HBox.margin>

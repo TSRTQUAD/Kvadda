@@ -81,7 +81,8 @@ public class TabUtforController extends BaseController implements Initializable 
     @FXML
     private void startMission(){
     	this.shouldStart = true;
-    	this.timeLeft = 5000; // (long) this.currentSelectedMissionObject.getMissionTime()[0][0];
+    	this.timeLeft = (long) this.currentSelectedMissionObject.getMissionTime()[0][0];
+    	this.missionMap.drawResultingTrajectory(this.currentSelectedMissionObject.getTrajectoryFullSize());
     }
     
     @FXML
@@ -143,13 +144,19 @@ public class TabUtforController extends BaseController implements Initializable 
 		//this.cmbListOfMissions.getSelectionModel().select(0);
 	}
 	
+	public void updateMissionList(){
+		this.loadFromStorage();
+		this.cmbListOfMissions.setItems( FXCollections.observableArrayList(
+				this.listOfMissions
+				));
+	}
 	
     
     /**
      * Draw the mission coordinates to the map Map
      */
     private void drawMission() {
-    	//TODO: Implement drawing.
+    	this.missionMap.drawResultingTrajectory(this.currentSelectedMissionObject.getTrajectoryFullSize());
 	}
     
     /**
