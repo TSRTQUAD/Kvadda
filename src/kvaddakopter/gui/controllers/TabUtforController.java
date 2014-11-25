@@ -75,7 +75,10 @@ public class TabUtforController extends BaseController implements Initializable 
     private void changeSelectedMission() throws FileNotFoundException, IOException{
     	this.currentSelectedMissionName = this.cmbListOfMissions.getSelectionModel().getSelectedItem();
     	this.currentSelectedMissionObject = this.missionStorage.loadMission(this.currentSelectedMissionName);
+    	
     	this.drawMission();
+    	this.lblMissionType.setText(this.currentSelectedMissionObject.getMissionType().toString());
+    	this.lblEstimatedDistance.setText(String.valueOf(this.currentSelectedMissionObject.getTrajectoryLength()[0][0]));
     }
 
     @FXML
