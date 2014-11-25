@@ -47,7 +47,7 @@ if object.mission == 1
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ======= Draw trajectory around coordinate ========
 rotations = object.radius/(imagelength_meter/2);
-th = transpose(0:pi/50:rotations*2*pi);
+th = transpose(2*pi:pi/50:rotations*2*pi);
 spanlat = 0.5*imagelength_meter/(2*pi*1.1119e+05);
 spanlon = 0.5*imagelength_meter/(2*pi*5.8924e+04);
 span = imagelength/(2*2*pi*rotations);

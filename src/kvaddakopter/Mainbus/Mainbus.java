@@ -19,6 +19,10 @@ import java.util.ArrayList;
 
 
 
+
+
+
+
 import kvaddakopter.ImageProcessingMain;
 import kvaddakopter.assignment_planer.AssignmentPlanerRunnable;
 import kvaddakopter.assignment_planer.MatFileHandler;
@@ -28,11 +32,14 @@ import kvaddakopter.control_module.Mockmainbus;
 import kvaddakopter.control_module.Sensorfusionmodule;
 import kvaddakopter.control_module.signals.ControlSignal;
 import kvaddakopter.control_module.signals.SensorData;
+import kvaddakopter.gui.GUIModule;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.programs.ImageProcessingMainProgram;
 import kvaddakopter.interfaces.AssignmentPlanerInterface;
 import kvaddakopter.interfaces.ControlMainBusInterface;
+import kvaddakopter.interfaces.MainBusGUIInterface;
+import kvaddakopter.maps.GPSCoordinate;
 
 
 /**
@@ -56,7 +63,7 @@ import kvaddakopter.interfaces.ControlMainBusInterface;
  * http://www.javaworld.com/article/2074318/java-concurrency/java-101--understanding-java-threads--part-2--thread-synchronization.html
  * 
  */
-public class Mainbus extends Frame implements KeyListener,ControlMainBusInterface, AssignmentPlanerInterface{
+public class Mainbus extends Frame implements KeyListener,ControlMainBusInterface, AssignmentPlanerInterface, MainBusGUIInterface{
 	//Examples
 	private int var;
 	public boolean condVar = false;
@@ -72,6 +79,11 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 	
 	//Image processing storage
 	//TODO
+	
+	
+	//GUI VARS
+	
+	
 	
 	//Assignment planer storage
 	private MatlabProxyConnection matlabproxy;
@@ -126,32 +138,21 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		// 	System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
 		Mainbus mainbus = new Mainbus();
-		System.out.println("created mainbus");
-		//ImageProcessingMainProgram imageProcessing = new ImageProcessingMainProgram(1,mainbus);
-		//System.out.println("imageprocessing initiated");
-
+		
+		
 		//Setting up a Matlab Proxy Server
-		/*MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
+		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
 		mainbus.setMatlabProxyConnection(matlabproxy);
-		matlabproxy.startMatlab("quiet"); */
+		matlabproxy.startMatlab("quiet");
 
 		//Thread t3 = new Thread(imageProcessing);
 		//t3.setPriority(1);
 		//t3.start(); 
-
-		MyRunnable myRunnable = new MyRunnable(1,mainbus);
-		MyRunnable2 myRunnable2 = new MyRunnable2(2,mainbus);
+		
 		AssignmentPlanerRunnable assignmentplanerrunnable = new AssignmentPlanerRunnable(3,mainbus);
-
-
-
-		Thread t = new Thread(myRunnable);
-		t.setPriority(1);
-		t.start();
-
-		/*Thread t4 = new Thread(assignmentplanerrunnable);
+		Thread t4 = new Thread(assignmentplanerrunnable);
 		t4.setPriority(1);
-		t4.start();*/
+		t4.start();
 
 		//Communication
 		try{
@@ -173,7 +174,6 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 
 
 
-
 		} catch (Exception ex1){
 
 			Security security = new Security(5,mainbus);
@@ -185,8 +185,15 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 
 			ex1.printStackTrace();	
 		}
-
-
+		
+		
+		//GUI MODULE
+		GUIModule guiModule = new GUIModule(mainbus);
+		Thread t10 = new Thread(guiModule);
+		t10.setDaemon(true);
+		t10.setPriority(5);
+		t10.start();
+		
 		//
 		// START MODULE	    	
 		Sensorfusionmodule sensmodule = new Sensorfusionmodule(mainbus);
@@ -194,8 +201,15 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		t8.setDaemon(true);
 		t8.setPriority(1);
 		t8.start();
+		
+		
 		while(true){
 			//			System.out.println("Mainbus running");
+			try {
+				Thread.sleep(60000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -450,6 +464,34 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
     	
     	if (keyCode >= KeyEvent.VK_1 && keyCode <= KeyEvent.VK_9) System.out.println("Speed: " + speed);
     }
+
+
+	@Override
+	public double getCurrentSpeed() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+	@Override
+	public GPSCoordinate getCurrentQuadPosition() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public boolean wifiFixOk() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
+	@Override
+	public boolean gpsFixOk() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 
 
