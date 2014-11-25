@@ -35,7 +35,7 @@ public class ColorTemplate {
 		saturationHigh = DEFAULT_SAT_HIGH;
 		valueLow = DEFAULT_VAL_LOW;
 		valueHigh = DEFAULT_VAL_HIGH;
-		isActive = false;
+		isActive = true;
 		
 		//original values
 		oHueLow = hueLow;
@@ -71,6 +71,17 @@ public class ColorTemplate {
 		adaptationConstant = 30;
 	}
 	
+	public ColorTemplate(ColorTemplate fromTemplate){
+		this(	fromTemplate.getDescription(),
+				fromTemplate.getHueLow(), 
+				fromTemplate.getHueHigh(),
+				fromTemplate.getSatLow(),
+				fromTemplate.getSatHigh(),
+				fromTemplate.getValLow(),
+				fromTemplate.getValHigh(),
+				0);
+	}
+	
 	public void setThresholds(){
 		
 	}
@@ -100,7 +111,6 @@ public class ColorTemplate {
 	}
 	
 	/**
-	 * TODO Might need more fine tuning
 	 * Adapt colorTemplate according to object HSV channels with low pass filtering
 	 * @param objectHSVChannels
 	 * @param hueWindow Value [0:255]
@@ -181,11 +191,11 @@ public class ColorTemplate {
 		return saturationHigh;
 	}
 	
-	public int setValLow() {
+	public int getValLow() {
 		return valueLow;
 	}
 	
-	public int setValHigh() {
+	public int getValHigh() {
 		return valueHigh;	
 	}
 	

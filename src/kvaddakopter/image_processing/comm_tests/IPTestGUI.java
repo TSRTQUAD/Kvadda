@@ -109,7 +109,7 @@ public class IPTestGUI extends Application implements Runnable{
 
 
 		Button cCalibBtn = new Button();
-		cCalibBtn.setText("Color calibration");
+		cCalibBtn.setText("Color Template Settings");
 		cCalibBtn.setTranslateX(OPT_BUTTON_X_START);
 		cCalibBtn.setTranslateY(OPT_BUTTON_Y_START+OPT_BUTTON_Y_SPACE);
 		root.getChildren().add(cCalibBtn);
@@ -119,8 +119,7 @@ public class IPTestGUI extends Application implements Runnable{
 		cCalibBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				mMainbus.setIPCalibTemplate(mMainbus.getIPColorTemplates().get(mMainbus.getIPColorTemplates().size()-1));
-				hsvSliders.setHSVChannels(mMainbus.getIPCalibTemplate(),primaryStage);
+				hsvSliders.setHSVChannels(mMainbus,primaryStage);
 			}
 		});
 
@@ -221,9 +220,7 @@ public class IPTestGUI extends Application implements Runnable{
 			newButton.setId(String.valueOf(imageCode));
 			vbox.getChildren().add(newButton);
 
-			mModeButtons[i++] = newButton;		
-
-
+			mModeButtons[i++] = newButton;
 		}
 	}
 

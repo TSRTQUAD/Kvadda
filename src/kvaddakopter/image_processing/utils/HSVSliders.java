@@ -2,13 +2,17 @@ package kvaddakopter.image_processing.utils;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
+import kvaddakopter.interfaces.MainBusIPInterface;
 
 public class HSVSliders{
 		static final int MIN_HUE = 0;
@@ -26,7 +30,10 @@ public class HSVSliders{
 		secondStage = new Stage();
 	}
 		
-	public void setHSVChannels( final  ColorTemplate template, Stage primaryStage){
+	public void setHSVChannels( final MainBusIPInterface mainbus, Stage primaryStage){
+		final ColorTemplate template = new ColorTemplate();
+		mainbus.setIPCalibTemplate(template);
+		
 		Label secondLabel = new Label("HSV Channels");
 		Label hueLowLabel = new Label("HUE LOW");
 		Label hueHighLabel = new Label("HUE HIGH");
@@ -47,7 +54,7 @@ public class HSVSliders{
 					public void changed(ObservableValue<? extends Number> arg0,
 							Number arg1, Number arg2) {
 						synchronized(template){
-						template.setHueLow(arg1.intValue());
+							template.setHueLow(arg1.intValue());
 						}
 					}
 					});
@@ -64,7 +71,7 @@ public class HSVSliders{
 					public void changed(ObservableValue<? extends Number> arg0,
 							Number arg1, Number arg2) {
 						synchronized(template){
-						template.setHueHigh(arg1.intValue());
+							template.setHueHigh(arg1.intValue());
 						}
 					}
 					});
@@ -81,7 +88,7 @@ public class HSVSliders{
 					public void changed(ObservableValue<? extends Number> arg0,
 							Number arg1, Number arg2) {
 						synchronized(template){
-						template.setSatLow(arg1.intValue());
+							template.setSatLow(arg1.intValue());
 						}
 					}
 					});
@@ -98,7 +105,7 @@ public class HSVSliders{
 					public void changed(ObservableValue<? extends Number> arg0,
 							Number arg1, Number arg2) {
 						synchronized(template){
-						template.setSatHigh(arg1.intValue());
+							template.setSatHigh(arg1.intValue());
 						}
 					}
 					});
@@ -115,7 +122,7 @@ public class HSVSliders{
 					public void changed(ObservableValue<? extends Number> arg0,
 							Number arg1, Number arg2) {
 						synchronized(template){
-						template.setValLow(arg1.intValue());
+							template.setValLow(arg1.intValue());
 						}
 					}
 					});
@@ -132,12 +139,28 @@ public class HSVSliders{
 					public void changed(ObservableValue<? extends Number> arg0,
 							Number arg1, Number arg2) {
 						synchronized(template){
-							
-						template.setValHigh(arg1.intValue());
-						System.out.println(template.getHueLow());
+							template.setValHigh(arg1.intValue());
 						}
 					}
 					});
+		
+		Button addTemplateBtn = new Button();
+		addTemplateBtn.setText("Add template");
+		addTemplateBtn.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				mainbus.addIPColorTemplate(new ColorTemplate(template));
+			}
+		});
+		
+		Button closeBtn = new Button();
+		closeBtn.setText("Finnished");
+		closeBtn.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				secondStage.close();
+			}
+		});
         
         StackPane secondaryLayout = new StackPane();
         secondaryLayout.setAlignment(Pos.TOP_CENTER);
@@ -180,15 +203,21 @@ public class HSVSliders{
         sliderValHigh.setMaxWidth(180);
         secondaryLayout.getChildren().add(sliderValHigh);
         
+        addTemplateBtn.setTranslateY(300);
+		secondaryLayout.getChildren().add(addTemplateBtn);
+        
+        closeBtn.setTranslateY(330);
+		secondaryLayout.getChildren().add(closeBtn);
+        
          
-        secondScene = new Scene(secondaryLayout, 200, 320);
+        secondScene = new Scene(secondaryLayout, 200, 370);
 
         secondStage.setTitle("HSVCalibration");
         secondStage.setScene(secondScene);
          
         //Set position of second window, related to primary window.
-        secondStage.setX(primaryStage.getX() - 250);
-        secondStage.setY(primaryStage.getY() - 100);
+        secondStage.setX(primaryStage.getX() + 550);
+        secondStage.setY(primaryStage.getY());
 
         secondStage.show();
 	}
