@@ -165,7 +165,7 @@
                                     <Font name="Lato Regular" size="14.0" />
                                  </font>
                               </Label>
-                              <TextField editable="false" minHeight="-Infinity" prefHeight="26.0" prefWidth="243.0" styleClass="disabled-textbox" stylesheets="@../../application.css">
+                              <TextField fx:id="txtEstimatedTime" editable="false" minHeight="-Infinity" prefHeight="26.0" prefWidth="243.0" styleClass="disabled-textbox" stylesheets="@../../application.css">
                                  <padding>
                                     <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                                  </padding>
@@ -182,7 +182,7 @@
                   </VBox>
                   <VBox layoutY="612.0" prefHeight="66.0" prefWidth="343.0">
                      <children>
-                        <HBox fx:id="txtEstimatedTime" alignment="CENTER" prefHeight="26.0" prefWidth="401.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                        <HBox alignment="CENTER" prefHeight="26.0" prefWidth="401.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                            <children>
                               <Button fx:id="btnGenerateTrajectory" alignment="CENTER" mnemonicParsing="false" onAction="#btnGenerateTrajectory" prefHeight="26.0" prefWidth="198.0" text="Generera trajektoria">
                                  <HBox.margin>
@@ -191,7 +191,7 @@
                               </Button>
                            </children>
                         </HBox>
-                        <HBox fx:id="txtEstimatedTime1" alignment="CENTER" prefHeight="0.0" prefWidth="343.0">
+                        <HBox  alignment="CENTER" prefHeight="0.0" prefWidth="343.0">
                            <children>
                               <Button fx:id="btnSaveMission" alignment="CENTER" mnemonicParsing="false" onAction="#btnSaveMission" prefHeight="26.0" prefWidth="198.0" text="Spara uppdrag">
                                  <HBox.margin>

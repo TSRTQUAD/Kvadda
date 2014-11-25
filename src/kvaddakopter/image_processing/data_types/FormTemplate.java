@@ -5,7 +5,7 @@ import org.opencv.core.Mat;
 public class FormTemplate {
 	
 	ImageObject mImageObject;
-	
+	boolean isCalibrated = false;
 	int mId =-1;
 	double mBoxWidth = 0.5;
 	double mBoxHeight = 0.5;
@@ -27,6 +27,14 @@ public class FormTemplate {
 		mBoxOffsetY= newOffsetY;
 	}
 	
+	public void setCalibrated(boolean b){
+		isCalibrated = b;
+	}
+	
+	public boolean hasBeenCalibrated(){
+		return isCalibrated;
+	}
+	
 	public double getBoxWitdh(){
 		return mBoxWidth;
 	}
@@ -45,7 +53,7 @@ public class FormTemplate {
 		mImageObject = new ImageObject(image);
 	}
 	
-	public ImageObject getTemplateImage(){
+	public ImageObject getImageObject(){
 		return mImageObject;
 	}
 	public double[] getBoxCenter() {

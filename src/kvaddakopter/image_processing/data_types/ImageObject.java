@@ -217,7 +217,7 @@ public class ImageObject {
 		Scalar upperBounds;
 		synchronized(template){
 			lowerBounds = template.getLower().clone();
-			upperBounds = template.getLower().clone();
+			upperBounds = template.getUpper().clone();
 		}
 
 		Core.inRange(HSVImage, lowerBounds, upperBounds, mImage);
