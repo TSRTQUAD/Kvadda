@@ -53,7 +53,10 @@ public class TabPlaneraController extends BaseController implements Initializabl
     private RadioButton radioDescriptor1;
     @FXML
     private RadioButton radioDescriptor2;
-
+    @FXML
+    private TextField txtEstimatedDistance;
+    @FXML
+    private TextField txtEstimatedTime;
     
     /**
      * Properties
@@ -152,8 +155,11 @@ public class TabPlaneraController extends BaseController implements Initializabl
 		catch (InterruptedException e) {}
 		
 		System.out.println("Results retrived");
+		MissionObject mission = mainbus.getMissionObject();
 		
-		this.planningMap.drawResultingTrajectory(mainbus.getMissionObject().getTrajectoryFullSize());
+		this.txtEstimatedTime.setText(String.format("%s sek" , (int) mission.getMissionTime()[0][0]));
+		this.txtEstimatedDistance.setText(String.format("%s meter", (int)mission.getTrajectoryLength()[0][0]));
+		this.planningMap.drawResultingTrajectory(mission.getTrajectoryFullSize());
 		
     	
     }
@@ -259,6 +265,8 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	this.radioDescriptor2.setUserData(1);
     	
 	}
+    
+    
     
     /**
      * Get all the mission data from the GUI

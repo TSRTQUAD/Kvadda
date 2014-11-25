@@ -26,10 +26,7 @@ import org.opencv.highgui.Highgui;
 public class TemplateMatchSliders{
 	static final float MIN_SIZE = 0.0f;
 	static final float MAX_SIZE = 1.0f;
-
-
-
-
+	
 	double mCurrentWidth  = 0.5;
 	double mCurrentHeight = 0.5;
 
@@ -43,6 +40,10 @@ public class TemplateMatchSliders{
 	FormTemplate activeTempate = null;
 	ArrayList<FormTemplate> mTemplateList;
 
+	static int FirstItemOffset = 20;
+
+	Button mSaveTemplateButton;
+	
 	public TemplateMatchSliders(){
 		secondStage = new Stage();
 	}
@@ -55,11 +56,78 @@ public class TemplateMatchSliders{
 		mCurrentOffsetY = 0.5;
 		
 		activeTempate = null;
+		
 	}
-
+/**
+ * 
+ * @param mainBus
+ * @param primaryStage
+ */
 	public void setTemplateGeomtry( final  MainBusIPInterface mainBus, Stage primaryStage){
 		
+		StackPane secondaryLayout = new StackPane();
 		mTemplateList = mainBus.getIPFormTemplates();
+		addSliders(secondaryLayout);
+		
+		mSaveTemplateButton = new Button("Save Template"); 
+		mSaveTemplateButton.setTranslateY(FirstItemOffset+270);
+		secondaryLayout.getChildren().add(mSaveTemplateButton);
+		mSaveTemplateButton.setDisable(true);
+		mSaveTemplateButton.setOnMouseClicked(new EventHandler<Event>() {
+
+			@Override
+			public void handle(Event arg0) {
+				if(activeTempate != null){
+					mTemplateList.add(activeTempate);
+					resetActiveTemplate();
+					mSaveTemplateButton.setDisable(true);
+					mainBus.setCalibFormTemplate(null);
+				}
+			}
+			
+		});
+		
+		
+		final Button fileSelectButton = new Button("Select Template Image"); 
+		fileSelectButton.setTranslateY(FirstItemOffset+240);
+		secondaryLayout.getChildren().add(fileSelectButton);
+		fileSelectButton.setOnMouseClicked(new EventHandler<Event>() {
+
+			@Override
+			public void handle(Event arg0) {
+				FileChooser fileChooser = new FileChooser();
+				fileChooser.getExtensionFilters().addAll(
+						new ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif","*.pdf")
+						);
+				File selectedFile = fileChooser.showOpenDialog(secondStage);
+
+				if(selectedFile != null){	
+					Mat templateImage = Highgui.imread(selectedFile.getPath());
+					activeTempate = new FormTemplate();
+					activeTempate.setId(mIdCounter++);
+					activeTempate.setTemplateImage(templateImage);
+					mainBus.setCalibFormTemplate(activeTempate);
+				}
+			}
+		});
+
+	
+		secondScene = new Scene(secondaryLayout, 200, 350);
+
+		secondStage.setTitle("Template Match Calibration");
+		secondStage.setScene(secondScene);
+
+		//Set position of second window, related to primary window.
+		secondStage.setX(primaryStage.getX() - 250);
+		secondStage.setY(primaryStage.getY() - 100);
+
+		secondStage.show();
+	}
+	
+	
+	
+	private void addSliders(StackPane secondaryLayout){
+
 		
 		Label templateMatch = new Label("Template Match Settings");
 		Label templateWidth = new Label("Template Witdh");
@@ -87,6 +155,8 @@ public class TemplateMatchSliders{
 								mCurrentWidth = ((mCurrentOffsetX + newWitdh/2.0) > 1.0)?1.0 :newWitdh;  
 								mCurrentWidth = ((mCurrentOffsetX - newWitdh/2.0) < 0.0)?0.0 :newWitdh;
 								activeTempate.setBoxWitdh(mCurrentWidth);
+								if(activeTempate.hasBeenCalibrated())
+									mSaveTemplateButton.setDisable(false);
 							}
 					}
 				});
@@ -108,6 +178,8 @@ public class TemplateMatchSliders{
 								mCurrentHeight = ((mCurrentOffsetY + newHeight/2.0) > 1.0)?1.0 :newHeight;  
 								mCurrentHeight = ((mCurrentOffsetY - newHeight/2.0) < 0.0)?0.0 :newHeight;
 								activeTempate.setBoxHeight(mCurrentHeight);
+								if(activeTempate.hasBeenCalibrated())
+									mSaveTemplateButton.setDisable(false);
 							}
 					}
 				});
@@ -129,6 +201,8 @@ public class TemplateMatchSliders{
 								mCurrentOffsetX = (( newOffsetX + mCurrentWidth/2.0) > 1.0)?1.0 :newOffsetX;  
 								mCurrentOffsetX = ((newOffsetX - mCurrentWidth/2.0) < 0.0)?0.0 :newOffsetX;
 								activeTempate.setBoxOffsetX(mCurrentOffsetX);
+								if(activeTempate.hasBeenCalibrated())
+									mSaveTemplateButton.setDisable(false);
 							}
 					}
 				});
@@ -150,90 +224,44 @@ public class TemplateMatchSliders{
 								mCurrentOffsetY = ((newOffsetY + mCurrentHeight/2.0) > 1.0)?1.0 :newOffsetY;  
 								mCurrentOffsetY = ((newOffsetY - mCurrentHeight/2.0) < 0.0)?0.0 :newOffsetY;
 								activeTempate.setBoxOffsetY(mCurrentOffsetY);
+								if(activeTempate.hasBeenCalibrated())
+									mSaveTemplateButton.setDisable(false);
 							}
 					}
 				});
 
 
-		StackPane secondaryLayout = new StackPane();
+	
 		secondaryLayout.setAlignment(Pos.TOP_CENTER);
 		secondaryLayout.getChildren().add(templateMatch);
 
 		//Positioning
 		int textStart =10;	
-		templateWidth.setTranslateY(textStart+10);
+		templateWidth.setTranslateY(FirstItemOffset+10);
 		secondaryLayout.getChildren().add(templateWidth);
-		sliderWidth.setTranslateY(textStart+30);
+		sliderWidth.setTranslateY(FirstItemOffset+30);
 		sliderWidth.setMaxWidth(180);
 		secondaryLayout.getChildren().add(sliderWidth);
 
-		templateHeight.setTranslateY(textStart+60);
+		templateHeight.setTranslateY(FirstItemOffset+60);
 		secondaryLayout.getChildren().add(templateHeight);
-		sliderHeight.setTranslateY(textStart+90);
+		sliderHeight.setTranslateY(FirstItemOffset+90);
 		sliderHeight.setMaxWidth(180);
 		secondaryLayout.getChildren().add(sliderHeight);
 
-		offsetXLabel.setTranslateY(textStart+120);
+		offsetXLabel.setTranslateY(FirstItemOffset+120);
 		secondaryLayout.getChildren().add(offsetXLabel);
-		sliderOffsetX.setTranslateY(textStart+150);
+		sliderOffsetX.setTranslateY(FirstItemOffset+150);
 		sliderOffsetX.setMaxWidth(180);
 		secondaryLayout.getChildren().add(sliderOffsetX);
 
-		offsetYLabel.setTranslateY(textStart+160);
+		offsetYLabel.setTranslateY(FirstItemOffset+160);
 		secondaryLayout.getChildren().add(offsetYLabel);
-		sliderOffsetY.setTranslateY(textStart+190);
+		sliderOffsetY.setTranslateY(FirstItemOffset+190);
 		sliderOffsetY.setMaxWidth(180);
 		secondaryLayout.getChildren().add(sliderOffsetY);
-
-
-		Button fileSelectButton = new Button("Select Template Image"); 
-		fileSelectButton.setTranslateY(textStart+240);
-		secondaryLayout.getChildren().add(fileSelectButton);
-		fileSelectButton.setOnMouseClicked(new EventHandler<Event>() {
-
-			@Override
-			public void handle(Event arg0) {
-				FileChooser fileChooser = new FileChooser();
-				fileChooser.getExtensionFilters().addAll(
-						new ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif","*.pdf")
-						);
-				File selectedFile = fileChooser.showOpenDialog(secondStage);
-
-				if(selectedFile != null){	
-					Mat templateImage = Highgui.imread(selectedFile.getPath());
-					activeTempate = new FormTemplate();
-					activeTempate.setId(mIdCounter++);
-					activeTempate.setTemplateImage(templateImage);
-					mainBus.setCalibFormTemplate(activeTempate);
-				}
-			}
-		});
-		Button saveTemplateButton = new Button("Save Template"); 
-		saveTemplateButton.setTranslateY(textStart+270);
-		secondaryLayout.getChildren().add(saveTemplateButton);
-		fileSelectButton.setOnMouseClicked(new EventHandler<Event>() {
-
-			@Override
-			public void handle(Event arg0) {
-				if(activeTempate != null){
-					mTemplateList.add(activeTempate);
-					resetActiveTemplate();
-				}
-			}
-			
-		});
 		
-		
-		secondScene = new Scene(secondaryLayout, 200, 350);
-
-		secondStage.setTitle("Template Match Calibration");
-		secondStage.setScene(secondScene);
-
-		//Set position of second window, related to primary window.
-		secondStage.setX(primaryStage.getX() - 250);
-		secondStage.setY(primaryStage.getY() - 100);
-
-		secondStage.show();
 	}
+	
 
 }

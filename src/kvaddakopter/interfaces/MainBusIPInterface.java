@@ -7,20 +7,22 @@ import javafx.scene.image.Image;
 import kvaddakopter.image_processing.data_types.*;
 import kvaddakopter.maps.GPSCoordinate;
 public interface MainBusIPInterface {
-	public static final int COLOR_DETECTION_MODE			= 0;
-	public static final int TEMPLATE_MATCHING_MODE 			= 1;
-	public static final int BACKGROUND_SUBTRACION_MODE 		= 2;
-	public static final int BLUR_DETECTION_MODE 			= 3;
-	public static final int COLOR_CALIBRATION_MODE 			= 4;
-	public static final int TRACKING_MODE		 			= 5;
-	public static final int TEMPLATE_CALIBRATION_MODE		= 6;
+	
+	public static final int MODE_COLOR_DETECTION			= 0;
+	public static final int MODE_TEMPLATE_MATCHING 			= 1;
+	public static final int MODE_BACKGROUND_SUBTRACION 		= 2;
+	public static final int MODE_BLUR_DETECTION 			= 3;
+	public static final int MODE_COLOR_CALIBRATION 			= 4;
+	public static final int MODE_TRACKING		 			= 5;
+	public static final int MODE_TEMPLATE_CALIBRATION		= 6;
 
-	public static final int DEFAULT_IMAGE				= 0;
-	public static final int TARGET_IMAGE 				= 2;
-	public static final int CUT_OUT_IMAGE 				= 3;
-	public static final int SURPRISE_IMAGE 				= 4;
-	public static final int TEMPLATE_MATCHING_IMAGE		= 5;
-	public static final int TEMPLATE_CALIBRATE_IMAGE	= 6;
+	public static final int IMAGE_DEFAULT				= 0;
+	public static final int IMAGE_TARGET 				= 2;
+	public static final int IMAGE_CUT_OUT 				= 3;
+	public static final int IMAGE_SURPRISE 				= 4;
+	public static final int IMAGE_TEMPLATE_MATCHING		= 5;
+	public static final int IMAGE_TEMPLATE_CALIBRATE	= 6;
+	public static final int IMAGE_COLOR_CALIBRRATE		= 7;
 
 	//Interface variables
 	
@@ -29,9 +31,13 @@ public interface MainBusIPInterface {
 	ArrayList<TargetObject> mTargetList = new ArrayList<TargetObject>();
 	ArrayList<ColorTemplate> mColorTemplates = new ArrayList<ColorTemplate>();
 	
+	FormTemplate mIPCalibFormTemplate[] = new FormTemplate[1];
+	ColorTemplate mIPCalibTemplate[] = new ColorTemplate[1];
+	Image mIPImageToShow[] = new Image[1];
+	
 	//Modes
 	int[] mIPActiveModes = new int[10];
-
+	int[] mIPImageMode =new int[]{IMAGE_DEFAULT};
 	
 	//Intiation
 	public void initIPVariables();

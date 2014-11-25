@@ -98,13 +98,10 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 	
 	
 	
-	//Control modules
-	
+	//Control modules	
 	public double[] getSensorVector() {		
 		return NavData;
 	}
-
-
 	public void setControlSignalobject(
 			kvaddakopter.control_module.signals.ControlSignal csignal) {
 		//Controlsignal[Landing/Start Roll Pitch Gaz Yaw ]		
@@ -129,9 +126,9 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		//System.out.println("imageprocessing initiated");
 		
 		//Setting up a Matlab Proxy Server
-		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
+		/*MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
 		mainbus.setMatlabProxyConnection(matlabproxy);
-		matlabproxy.startMatlab("quiet");
+		matlabproxy.startMatlab("quiet"); */
 		
 		//Thread t3 = new Thread(imageProcessing);
 		//t3.setPriority(1);
@@ -186,9 +183,7 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		
 		
 		//
-		// START MODULE
-	    
-	
+		// START MODULE	    	
 	    Sensorfusionmodule sensmodule = new Sensorfusionmodule(new Mainbus());
 		Thread t7 = new Thread(sensmodule);
 		t7.setDaemon(true);
@@ -269,23 +264,23 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 	//Communication
 
 	public synchronized float[] getControlSignal(){
-		ControlSignalAll[seq][0] = (double)ControlSignal[0];
+	/*	ControlSignalAll[seq][0] = (double)ControlSignal[0];
 		ControlSignalAll[seq][1] = (double)ControlSignal[1];
 		ControlSignalAll[seq][2] = (double)ControlSignal[2];
 		ControlSignalAll[seq][3] = (double)ControlSignal[3];
 		ControlSignalAll[seq][4] = (double)ControlSignal[4];
-
+ 	*/
 		seq_signal = seq_signal + 1;
 		return ControlSignal;
 	}
 	
 	public synchronized void setNavData(double[] nd){
-		NavDataOverAll[seq][1] = nd[1];
+	/*	NavDataOverAll[seq][1] = nd[1];
 		NavDataOverAll[seq][2] = nd[2];
 		NavDataOverAll[seq][3] = nd[3];
 		NavDataOverAll[seq][4] = nd[4];
 		NavDataOverAll[seq][5] = nd[5];
-
+	*/
 		seq = seq + 1;
 		NavData = nd;
 	}
