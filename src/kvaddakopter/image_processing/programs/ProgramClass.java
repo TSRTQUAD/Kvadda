@@ -39,7 +39,7 @@ public abstract class ProgramClass implements Runnable,DecoderListener,KeyBoardL
 	private static VideoImage mScreen = null;
 	
 	//Sleep time / FPS
-	private long mSleepTime = 20;
+	protected long mSleepTime = 20;
 	
 	//private volatile Container container;
 	protected MainBusIPInterface mMainbus;

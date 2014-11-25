@@ -12,15 +12,22 @@ import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.data_types.FormTemplate;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
-import kvaddakopter.image_processing.data_types.Template;
 import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
 import kvaddakopter.interfaces.MainBusIPInterface;
 
 import org.opencv.core.Mat;
-import org.opencv.highgui.Highgui;
 
-
+/**
+ * Main class of the Image Processing
+ * Initiates detection methods, tracking, decoder
+ * 
+ * Checks colorTemplates, FormTamplates on mainbus
+ * Checks detection modes, image modes on mainbus
+ * 
+ * runs main loop: depending on image processing settings on mainbus
+ *	
+ */
 public class ImageProcessingMainProgram extends ProgramClass{
 
 	private ColorDetection mColorDetection;
@@ -28,12 +35,6 @@ public class ImageProcessingMainProgram extends ProgramClass{
 	private BackgroundSubtraction mBackgroundSubtraction;
 	private BlurDetection mBlurDetection;
 	private Tracking mTracker;
-
-	//Debug Warning
-	boolean userHasBeenWarned = false;
-
-	//Sleep time / FPS
-	private long mSleepTime = 20;
 
 	int count = 0;
 
@@ -43,6 +44,10 @@ public class ImageProcessingMainProgram extends ProgramClass{
 
 	@Override
 	public void init() {
+		
+		//Sleep time / FPS
+		mSleepTime = 20;
+		
 		//Create and initialize decoder. And select source.
 		mDecoder = new FFMpegDecoder();
 
