@@ -20,7 +20,7 @@ public class ControlSignal{
 	}
 	
 	public void print(){
-		System.out.format("yawrate: %.2f%n", yawrate);
+		System.out.format("yawrate: %.4f%n", yawrate);
 		System.out.format("Heightvelocity: %.1f%n", heightvelocity);
 		System.out.format("Forwardvelocity: %.2f%n", forwardvelocity);
 		System.out.format("Lateralvelocity: %.2f%n", lateralvelocity);

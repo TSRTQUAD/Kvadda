@@ -193,7 +193,9 @@ public class Communication implements Runnable{
 			        sequence_1 = sequence;     
 			       // send_pcmd(1,0, 0, 0, 0);   
 
-//					System.out.println("  CS[1]:  " + ControlSignal[1] + "CS[2]   " + ControlSignal[2] + "CS[3]  " + ControlSignal[3] + "CS[4]  " + ControlSignal[4]);
+
+					//System.out.println("  CS[1]:  " + ControlSignal[1] + "CS[2]   " + ControlSignal[2] + "CS[3]  " + ControlSignal[3] + "CS[4]  " + ControlSignal[4]);
+
 				    send_pcmd(1, ControlSignal[1], ControlSignal[2], ControlSignal[3], ControlSignal[4]);   	 
 			        
 

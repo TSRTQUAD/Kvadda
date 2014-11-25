@@ -87,6 +87,7 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 	public boolean selfCheck = false;
 	float speed = (float)0.1;
     boolean shift = false;
+    boolean runcontroller = false;
     boolean space_bar = false; //true = Takeoff, false = Landing
 	public boolean EmerStop = false;
 	double[] NavData = new double[6];
@@ -99,54 +100,58 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 	
 	
 	//Control modules	
-	public double[] getSensorVector() {		
-		return NavData;
+	public synchronized double[] getSensorVector() {				
+		return this.NavData;
 	}
+	
+	
 	public void setControlSignalobject(
-			kvaddakopter.control_module.signals.ControlSignal csignal) {
+		kvaddakopter.control_module.signals.ControlSignal csignal) {		
+		if (true == this.runcontroller){
 		//Controlsignal[Landing/Start Roll Pitch Gaz Yaw ]		
 		//ControlSignal[0] = csignal.getStart();
-		//ControlSignal[1] = (float) csignal.getLateralvelocity();
-		//ControlSignal[2] = (float) -csignal.getForwardvelocity();
+		ControlSignal[1] = (float) csignal.getLateralvelocity();
+		ControlSignal[2] = (float) -csignal.getForwardvelocity();
 		//ControlSignal[3] = (float)  csignal.getHeightvelocity();
-		//ControlSignal[4] = (float)  csignal.getYawrate();	
+		ControlSignal[4] = (float)  -csignal.getYawrate();
+		}
 	}
 	
 
 	
-	
+
 	public static void main(String[] args) {
-		
+
 		//M�ste laddas i b�rjan av programmet... F�rslagsvis h�r.
-	// 	System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		
+		// 	System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+
 		Mainbus mainbus = new Mainbus();
 		System.out.println("created mainbus");
 		//ImageProcessingMainProgram imageProcessing = new ImageProcessingMainProgram(1,mainbus);
 		//System.out.println("imageprocessing initiated");
-		
+
 		//Setting up a Matlab Proxy Server
 		/*MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
 		mainbus.setMatlabProxyConnection(matlabproxy);
 		matlabproxy.startMatlab("quiet"); */
-		
+
 		//Thread t3 = new Thread(imageProcessing);
 		//t3.setPriority(1);
 		//t3.start(); 
-		
+
 		MyRunnable myRunnable = new MyRunnable(1,mainbus);
 		MyRunnable2 myRunnable2 = new MyRunnable2(2,mainbus);
 		AssignmentPlanerRunnable assignmentplanerrunnable = new AssignmentPlanerRunnable(3,mainbus);
 
-		
+
 
 		Thread t = new Thread(myRunnable);
 		t.setPriority(1);
 		t.start();
-		
-		Thread t4 = new Thread(assignmentplanerrunnable);
+
+		/*Thread t4 = new Thread(assignmentplanerrunnable);
 		t4.setPriority(1);
-		t4.start();
+		t4.start();*/
 
 		//Communication
 		try{
@@ -156,46 +161,44 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 			t7.setDaemon(true);
 			t7.setPriority(1);
 			t7.start();
-		    System.out.println("Communication-link initiated");
-		
-		    
-		    NavData navdatatest = new NavData(4,mainbus,"NavData", communicationtest);	
+			System.out.println("Communication-link initiated");
+
+
+			NavData navdatatest = new NavData(4,mainbus,"NavData", communicationtest);	
 			Thread t5 = new Thread(navdatatest);
 			t5.setDaemon(true);
 			t5.setPriority(1);
 			t5.start();
-		    System.out.println("NavData-link initiated");
+			System.out.println("NavData-link initiated");
 
 
-		    
-		        
+
+
 		} catch (Exception ex1){
-			
-		    Security security = new Security(5,mainbus);
+
+			Security security = new Security(5,mainbus);
 			Thread t6 = new Thread(security);
 			t6.setDaemon(true);
 			t6.setPriority(1);
 			t6.start();
-		    System.out.println("Security-link initiated");
-		    
+			System.out.println("Security-link initiated");
+
 			ex1.printStackTrace();	
 		}
-		
-		
+
+
 		//
 		// START MODULE	    	
-	    Sensorfusionmodule sensmodule = new Sensorfusionmodule(new Mainbus());
-		Thread t7 = new Thread(sensmodule);
-		t7.setDaemon(true);
-		t7.setPriority(1);
-		t7.start();
-		
-		
+		Sensorfusionmodule sensmodule = new Sensorfusionmodule(mainbus);
+		Thread t8 = new Thread(sensmodule);
+		t8.setDaemon(true);
+		t8.setPriority(1);
+		t8.start();
 		while(true){
-//			System.out.println("Mainbus running");
+			//			System.out.println("Mainbus running");
 		}
 	}
-       
+
 	
 	public Mainbus(){		
 		addKeyListener(this); 
@@ -282,7 +285,7 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		NavDataOverAll[seq][5] = nd[5];
 	*/
 		seq = seq + 1;
-		NavData = nd;
+		this.NavData = nd;
 	}
 	
 	
@@ -332,6 +335,13 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
         //System.out.println("Key: " + keyCode + " (" + KeyEvent.getKeyText(keyCode) + ")");
     	
     	switch (keyCode) {
+    		case KeyEvent.VK_C:
+    			if (false == this.runcontroller){
+    			this.runcontroller = true;
+    			}
+    			else if (true == this.runcontroller){
+    				this.runcontroller = false;
+    			}
      	    case KeyEvent.VK_1:
      	    	speed = (float)0.1;
     	    	break;

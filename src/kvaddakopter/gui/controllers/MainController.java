@@ -127,14 +127,14 @@ public class MainController implements Initializable {
 	 */
 	public void createGoogleMapViewOnTab(int tabNr){
 		
-		if(0 == tabNr && this.tabPlaneraController.mapView  == null){
+		if(0 == tabNr){
 				this.tabPlaneraController.mapView = new GoogleMapView();
                 setAnchorZero(this.tabPlaneraController.mapView);
                 this.tabPlaneraController.mapContainer.getChildren().add(this.tabPlaneraController.mapView);
                 this.tabPlaneraController.planningMap = new PlanningMap(this.tabPlaneraController.mapView, this.tabPlaneraController);
 
 		}
-		else if(1 == tabNr && this.tabUtforController.mapViewUtfor  == null){
+		else if(1 == tabNr){
 			
 				// ADD GoogleMap To new View
                 this.tabUtforController.mapViewUtfor = new GoogleMapView();
