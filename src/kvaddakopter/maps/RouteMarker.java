@@ -39,7 +39,6 @@ public class RouteMarker {
     public static Marker create(double latitude, double longitude, MapMarkerEnum iconType, String title) {
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(new LatLong(latitude, longitude));
-        
         if (title != null) markerOptions.title(title);
 
         markerOptions.icon(RouteMarker.figureOutIconPath(iconType));

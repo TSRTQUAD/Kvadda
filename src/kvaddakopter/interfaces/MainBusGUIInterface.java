@@ -1,15 +1,24 @@
 package kvaddakopter.interfaces;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import javafx.scene.image.Image;
 import kvaddakopter.assignment_planer.MissionObject;
-import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.maps.GPSCoordinate;
 
 public interface MainBusGUIInterface {
 	
+	
+	/**
+	 * Sets a state for the program so all modules knows that is should start
+	 * @param isStarted
+	 */
+	public void setIsStarted(boolean isStarted);
+	
+	/**
+	 * Checks if the Quad is started
+	 */
+	public boolean isStarted();
 	
 	/**
 	 * Current speed as a double 

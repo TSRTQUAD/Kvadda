@@ -49,6 +49,11 @@ public class TabUtforController extends BaseController implements Initializable 
     @FXML
     private Label lblBattery;
     @FXML
+    private Label lblGPS;
+    @FXML
+    private Label lblWIFI;
+    
+    @FXML
     private Button btnStartMission;
     @FXML
     private Button btnAbortMission;
@@ -72,7 +77,6 @@ public class TabUtforController extends BaseController implements Initializable 
     private MissionStorage missionStorage = new MissionStorage();
 
     
-    private boolean shouldStart = false;
     private long timeLeft = 0;
  
     /**
@@ -93,14 +97,12 @@ public class TabUtforController extends BaseController implements Initializable 
 
     @FXML
     private void startMission(){
-    	this.shouldStart = true;
     	this.timeLeft = (long) this.currentSelectedMissionObject.getMissionTime()[0][0];
-    	this.missionMap.drawResultingTrajectory(this.currentSelectedMissionObject.getTrajectoryFullSize());
     }
     
     @FXML
     private void abortMission(){
-    	this.shouldStart = false;
+    	this.getParent().getMainBus().setEmergencyStop(true);
     }
     
     @FXML
@@ -113,12 +115,11 @@ public class TabUtforController extends BaseController implements Initializable 
     	this.getParent().getMainBus().toggleController();
     }
 
-	
-	public boolean shouldStart(){
-		return this.shouldStart;
-	}
-	
-	
+    
+    /**
+     * Update the clock that shows the time left.
+     * @param passedTime
+     */
 	public void updateTimeLeft(long passedTime){
 		 this.timeLeft -= (long) passedTime/1000;
 		long newTime = this.timeLeft;
@@ -158,6 +159,8 @@ public class TabUtforController extends BaseController implements Initializable 
 		this.lblTimeLeft.setText("");
 		this.lblSpeed.setText("");
 		this.lblBattery.setText("");
+		this.lblGPS.setText("");
+		this.lblWIFI.setText("");
 		
 		
 		this.cmbListOfMissions.setItems( FXCollections.observableArrayList(
@@ -198,22 +201,26 @@ public class TabUtforController extends BaseController implements Initializable 
 //    	this.missionMap.drawTarget(gps.getLatitude(), gps.getLongitude());
 //    }
 
-	public void updateGPSStatus() {
-		// TODO Auto-generated method stub
+	public void updateGPSStatus(boolean isOk) {
+		String status = (isOk) ? "GPS: OK!" : "GPS: NOT OK!";
+		this.lblGPS.setText(status);
 	}
 
-	public void updateWIFIStatus() {
-		// TODO Auto-generated method stub
+	public void updateWIFIStatus(boolean isOk) {
+		String status = (isOk) ? "WIFI: OK!" : "WIFI: NOT OK!";
+		this.lblWIFI.setText(status);
 	}
- 
+	
 	public void updateSpeed(float newSpeed){
 		this.lblSpeed.setText(String.format("%.1f m/s", newSpeed));
 	}
 
 	 
 	public void updateBattery(float newBattery){
-		this.lblBattery.setText(String.format("%.1f %", newBattery));
+		this.lblBattery.setText(String.format("%.1f p", newBattery));
 	}
+	
+	
     
 }
 

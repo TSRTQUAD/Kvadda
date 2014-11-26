@@ -12,7 +12,6 @@ import java.util.HashMap;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
-import kvaddakopter.assignment_planer.MatFileHandler;
 import kvaddakopter.assignment_planer.MatlabProxyConnection;
 import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.communication.Communication;
@@ -53,7 +52,10 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 	//Image processing storage
 	private boolean mIsIPRunning;
 	private ArrayList<TargetObject> mTargetList;
-
+	
+	
+	//GENERAL
+	private boolean isStarted = false;
 	
 	//Assignment planer storage
 	private MatlabProxyConnection matlabproxy;
@@ -152,6 +154,7 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 //			ex1.printStackTrace();	
 //		}
 		
+		
 		//GUI MODULE
 		GUIModule guiModule = new GUIModule(mainbus);
 		Thread t10 = new Thread(guiModule);
@@ -195,7 +198,6 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
             }		
           });
 		
-
 	}
 	
 	/*
@@ -239,7 +241,7 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 		//System.out.println("Pos 1:   " + ControlSignal[1] + "Pos 2:   " + ControlSignal[2]);
 		return ControlSignal;
 	}
-
+	
 
 	@Override
 	public synchronized void setQuadData(QuadData quadData){
@@ -436,12 +438,12 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 
 	@Override
 	public boolean wifiFixOk() {
-		return true;
+		return (int) quadData.getLinkQuality() == 1;
 	}
 
 	@Override
 	public boolean gpsFixOk() {
-		return true;
+		return quadData.getNGPSSatelites() >= 3;
 	}
 
 	@Override
@@ -606,5 +608,18 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 	@Override
 	public synchronized float getBattery(){
 		return batteryLevel;
+	}
+
+
+	@Override
+	public void setIsStarted(boolean isStarted) {
+		this.isStarted = isStarted;
+		
+	}
+	
+	@Override
+	public boolean isStarted() {
+		return this.isStarted;
+		
 	}
 }
