@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 import kvaddakopter.assignment_planer.Area;
 import kvaddakopter.assignment_planer.MissionType;
+import kvaddakopter.gui.components.GPSMarkerNormal;
 import kvaddakopter.gui.components.GpsToAreaTransformer;
 import kvaddakopter.gui.components.factories.MapShapeFactory;
 import kvaddakopter.gui.components.shapes.GPSCircle;
@@ -35,7 +36,7 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 	
 	private ArrayList<MapShapeInterface> navigationMapShapes;
 	private ArrayList<MapShapeInterface> forbiddenShapes;
-	
+	private GPSMarkerNormal quadStartPosition;
 	
 	private int currentActiveMissionAreaCounter = 0;
 	private int currentActiveForbiddenAreaCounter = 0;
@@ -203,6 +204,14 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 				.get(this.currentActiveForbiddenAreaCounter)
 				.addCoordinate(clickedCoordinate);	
 			}
+			if(this.owningController.addQuadStartPositionMode()){
+
+				if( this.quadStartPosition != null){
+					this.quadStartPosition.clearFromMap(map);
+				}
+				this.quadStartPosition = new GPSMarkerNormal(clickedCoordinate);
+				this.quadStartPosition.attachToMap(map);
+			}
 			
 		});
 	}
@@ -241,6 +250,18 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 		//Draw the trajectory
 		this.map.addMapShape(this.generatedPath);
 		
+	}
+
+	public void clearQuadStartPosition() {
+		if(quadStartPosition != null){
+			quadStartPosition.clearFromMap(this.map);
+		}
+		
+	}
+
+	public double[][] getStartCoordinate() {
+		
+		return new double[][]{{this.quadStartPosition.getLatitude(), this.quadStartPosition.getLongitude()}};
 	}
 	
 

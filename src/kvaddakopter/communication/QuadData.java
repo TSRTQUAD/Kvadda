@@ -6,8 +6,8 @@ public class QuadData{
 	   private float mPitch, mYaw, mRoll;
 	   private float mVx, mVy, mVz;
 	   private double mGPS_Lat, mGPS_Long;
-	   private long mGPS_nSatelites;
-	   private float mLinkQuality;
+	   private long mGPS_nSatelites = 0;
+	   private float mLinkQuality = 0.0f;
 	   
 	   /**
 	    * Copy constructor, copies member variables of quadData
