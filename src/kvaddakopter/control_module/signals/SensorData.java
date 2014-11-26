@@ -1,5 +1,7 @@
 package kvaddakopter.control_module.signals;
 
+import kvaddakopter.communication.QuadData;
+
 public class SensorData {
 	private double Longitud;
 	private double Latitud;
@@ -19,13 +21,15 @@ public class SensorData {
 	private double Latitudold;
 	
 	
-	public void setnewsensordata(double[] sensorvector){
-		this.Latitud = sensorvector[0];
-		this.Longitud = sensorvector[1];
-		this.xdot = sensorvector[2];
-		this.ydot = sensorvector[3];
-		this.height = sensorvector[4];
-		this.yaw = Math.PI/180*sensorvector[5];
+	public void setnewsensordata(QuadData quadData){
+		synchronized(quadData){
+			this.Latitud = quadData.getGPSLat();
+			this.Longitud = quadData.getGPSLong();
+			this.xdot = quadData.getVx();
+			this.ydot = quadData.getVy();
+			this.height = quadData.getAltitude();
+			this.yaw = quadData.getYaw(); //Is in degrees
+		}
 	}
 
 	

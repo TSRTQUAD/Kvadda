@@ -170,6 +170,14 @@ public class TabUtforController extends BaseController implements Initializable 
     	GPSCoordinate gps = this.getParent().getMainBus().getCurrentQuadPosition();
     	this.missionMap.drawQuad(gps.getLatitude(), gps.getLongitude());
     }
+    
+    /**
+     * Draw the Target to the map.
+     */
+    public void drawTargetMarker(){
+    	GPSCoordinate gps = this.getParent().getMainBus().getCurrentQuadPosition();
+    	this.missionMap.drawTarget(gps.getLatitude(), gps.getLongitude());
+    }
 
 	public void updateGPSStatus() {
 		// TODO Auto-generated method stub
