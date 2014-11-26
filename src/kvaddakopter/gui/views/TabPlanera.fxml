@@ -15,14 +15,14 @@
                <children>
                   <VBox alignment="TOP_CENTER" prefHeight="605.0" prefWidth="343.0" AnchorPane.bottomAnchor="93.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Label text="Skapa nytt uppdrag">
+                        <Label text="Create new mission">
                            <font>
                               <Font name="Lato Regular" size="20.0" />
                            </font>
                         </Label>
                         <HBox alignment="CENTER">
                            <children>
-                              <Label prefHeight="25.0" prefWidth="170.0" text="Namn ">
+                              <Label prefHeight="25.0" prefWidth="170.0" text="Name">
                                  <font>
                                     <Font name="Lato Regular" size="14.0" />
                                  </font>
@@ -39,7 +39,7 @@
                         </HBox>
                         <HBox alignment="CENTER">
                            <children>
-                              <Label prefHeight="25.0" prefWidth="170.0" text="Uppdragstyp">
+                              <Label prefHeight="25.0" prefWidth="170.0" text="Type">
                                  <font>
                                     <Font name="Lato Regular" size="14.0" />
                                  </font>
@@ -52,7 +52,7 @@
                         </HBox>
                         <HBox alignment="CENTER">
                            <children>
-                              <Label prefHeight="25.0" prefWidth="170.0" text="Uppdragshöjd">
+                              <Label prefHeight="25.0" prefWidth="170.0" text="Altitude">
                                  <font>
                                     <Font name="Lato Regular" size="14.0" />
                                  </font>
@@ -64,64 +64,12 @@
                            </VBox.margin>
                         </HBox>
                         <HBox alignment="CENTER">
-                           <children>
-                              <Label prefHeight="25.0" prefWidth="170.0" text="Målform">
-                                 <font>
-                                    <Font name="Lato Regular" size="14.0" />
-                                 </font>
-                              </Label>
-                              <ComboBox fx:id="listTargetTemplate" prefWidth="250.0" />
-                           </children>
-                           <VBox.margin>
-                              <Insets left="20.0" right="20.0" top="100.0" />
-                           </VBox.margin>
-                        </HBox>
-                        <HBox alignment="CENTER">
-                           <children>
-                              <Label prefHeight="25.0" prefWidth="170.0" text="Färgdetektion">
-                                 <font>
-                                    <Font name="Lato Regular" size="14.0" />
-                                 </font>
-                              </Label>
-                              <ComboBox fx:id="listTargetColor" prefWidth="250.0" />
-                           </children>
-                           <VBox.margin>
-                              <Insets left="20.0" right="20.0" top="20.0" />
-                           </VBox.margin>
-                        </HBox>
-                        <HBox alignment="CENTER_LEFT">
-                           <children>
-                              <Label prefHeight="25.0" prefWidth="158.0" text="Deskriptorer">
-                                 <font>
-                                    <Font name="Lato Regular" size="14.0" />
-                                 </font>
-                              </Label>
-                              <HBox alignment="CENTER" prefWidth="235.0">
-                                 <children>
-                                    <RadioButton fx:id="radioDescriptor1" mnemonicParsing="false" prefHeight="18.0" prefWidth="80.0" selected="true" text="MIMO">
-                                       <toggleGroup>
-                                          <ToggleGroup fx:id="descriporRadioGroup" />
-                                       </toggleGroup>
-                                    </RadioButton>
-                                    <RadioButton fx:id="radioDescriptor2" mnemonicParsing="false" text="SISO" toggleGroup="$descriporRadioGroup">
-                                       <HBox.margin>
-                                          <Insets left="20.0" />
-                                       </HBox.margin>
-                                    </RadioButton>
-                                 </children>
-                              </HBox>
-                           </children>
-                           <VBox.margin>
-                              <Insets left="20.0" right="20.0" top="20.0" />
-                           </VBox.margin>
-                        </HBox>
-                        <HBox alignment="CENTER">
                            <VBox.margin>
                               <Insets left="20.0" right="20.0" top="20.0" />
                            </VBox.margin>
                            <children>
-                              <Button fx:id="btnStartMissionCoordinates" mnemonicParsing="false" onAction="#btnStartMissionCoordinates" prefWidth="200.0" text="Nytt avsökningsområde" />
-                              <Button alignment="CENTER" mnemonicParsing="false" onAction="#btnClickedClearNagivationCoordinates" prefHeight="26.0" prefWidth="70.0" styleClass="btn-danger" stylesheets="@../../application.css" text="Rensa">
+                              <Button fx:id="btnStartMissionCoordinates" mnemonicParsing="false" onAction="#btnStartMissionCoordinates" prefWidth="200.0" text="New search area" />
+                              <Button alignment="CENTER" mnemonicParsing="false" onAction="#btnClickedClearNagivationCoordinates" prefHeight="26.0" prefWidth="70.0" styleClass="btn-danger" stylesheets="@../../application.css" text="Clear">
                                  <HBox.margin>
                                     <Insets left="30.0" />
                                  </HBox.margin>
@@ -130,8 +78,8 @@
                         </HBox>
                         <HBox alignment="CENTER">
                            <children>
-                              <Button fx:id="btnStartMarkForbiddenAreas" mnemonicParsing="false" onAction="#btnStartMarkForbiddenAreas" prefWidth="200.0" text="Nytt förbjudet område" />
-                              <Button alignment="CENTER" mnemonicParsing="false" onAction="#btnClickedClearForbiddenAreasCoodinates" prefHeight="26.0" prefWidth="70.0" styleClass="btn-danger" stylesheets="@../../application.css" text="Rensa">
+                              <Button fx:id="btnStartMarkForbiddenAreas" mnemonicParsing="false" onAction="#btnStartMarkForbiddenAreas" prefWidth="200.0" text="New forbidden area" />
+                              <Button alignment="CENTER" mnemonicParsing="false" onAction="#btnClickedClearForbiddenAreasCoodinates" prefHeight="26.0" prefWidth="70.0" styleClass="btn-danger" stylesheets="@../../application.css" text="Clear">
                                  <HBox.margin>
                                     <Insets left="30.0" />
                                  </HBox.margin>
@@ -143,12 +91,12 @@
                         </HBox>
                         <HBox alignment="CENTER">
                            <children>
-                              <Label prefHeight="25.0" prefWidth="170.0" text="Estimerad sträcka">
+                              <Label prefHeight="25.0" prefWidth="170.0" text="Estimated distance">
                                  <font>
                                     <Font name="Lato Regular" size="14.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="txtEstimatedDistance" editable="false" minHeight="-Infinity" prefHeight="26.0" prefWidth="243.0" styleClass="disabled-textbox" stylesheets="@../../application.css">
+                              <TextField fx:id="txtEstimatedDistance" editable="false" minHeight="-Infinity" prefHeight="26.0" prefWidth="200.0" styleClass="disabled-textbox" stylesheets="@../../application.css">
                                  <padding>
                                     <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                                  </padding>
@@ -160,12 +108,12 @@
                         </HBox>
                         <HBox alignment="CENTER">
                            <children>
-                              <Label prefHeight="25.0" prefWidth="170.0" text="Estimerad tid">
+                              <Label prefHeight="25.0" prefWidth="170.0" text="Estimated time">
                                  <font>
                                     <Font name="Lato Regular" size="14.0" />
                                  </font>
                               </Label>
-                              <TextField fx:id="txtEstimatedTime" editable="false" minHeight="-Infinity" prefHeight="26.0" prefWidth="243.0" styleClass="disabled-textbox" stylesheets="@../../application.css">
+                              <TextField fx:id="txtEstimatedTime" editable="false" minHeight="-Infinity" prefHeight="26.0" prefWidth="200.0" styleClass="disabled-textbox" stylesheets="@../../application.css">
                                  <padding>
                                     <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                                  </padding>
@@ -184,16 +132,16 @@
                      <children>
                         <HBox alignment="CENTER" prefHeight="26.0" prefWidth="401.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                            <children>
-                              <Button fx:id="btnGenerateTrajectory" alignment="CENTER" mnemonicParsing="false" onAction="#btnGenerateTrajectory" prefHeight="26.0" prefWidth="198.0" text="Generera trajektoria">
+                              <Button fx:id="btnGenerateTrajectory" alignment="CENTER" mnemonicParsing="false" onAction="#btnGenerateTrajectory" prefHeight="26.0" prefWidth="198.0" text="Generate trajectory">
                                  <HBox.margin>
                                     <Insets bottom="10.0" />
                                  </HBox.margin>
                               </Button>
                            </children>
                         </HBox>
-                        <HBox  alignment="CENTER" prefHeight="0.0" prefWidth="343.0">
+                        <HBox alignment="CENTER" prefHeight="0.0" prefWidth="343.0">
                            <children>
-                              <Button fx:id="btnSaveMission" alignment="CENTER" mnemonicParsing="false" onAction="#btnSaveMission" prefHeight="26.0" prefWidth="198.0" text="Spara uppdrag">
+                              <Button fx:id="btnSaveMission" alignment="CENTER" mnemonicParsing="false" onAction="#btnSaveMission" prefHeight="26.0" prefWidth="198.0" text="Save mission">
                                  <HBox.margin>
                                     <Insets bottom="40.0" />
                                  </HBox.margin>

@@ -1,6 +1,7 @@
 package kvaddakopter.gui.controllers;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -8,12 +9,16 @@ import java.util.ResourceBundle;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -27,12 +32,15 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
+import kvaddakopter.image_processing.data_types.ColorTemplate;
+import kvaddakopter.image_processing.data_types.FormTemplate;
 import kvaddakopter.image_processing.utils.HSVSliders;
 import kvaddakopter.image_processing.utils.TemplateMatchSliders;
 import kvaddakopter.interfaces.MainBusIPInterface;
 
 public class TabDatorseendeController extends BaseController implements Initializable{
 
+	
 	private StackPane root;
 	private ImageView view;
 	public MainBusIPInterface mainbus;
@@ -47,7 +55,7 @@ public class TabDatorseendeController extends BaseController implements Initiali
 	final static int IMAGE_POS_Y = 200;
 	
 	/*Buttons Common */
-	final static int MODES_POS_X=200;
+	final static int MODES_POS_X = 200;
 	final static int BUTTON_X_START = 600;
 	final static int BUTTON_Y_START = 20;
 	final static int BUTTON_GROUP_SEPARATION = 40;
@@ -68,11 +76,20 @@ public class TabDatorseendeController extends BaseController implements Initiali
 	final static int MODE_BUTTON_MIN_WIDTH   = 150;
 
 
-	/*Options Buttons */
+	/* Options Buttons */
 	final static int OPT_BUTTON_X_START = -150;
 	final static int OPT_BUTTON_Y_START = -250;
 	final static int OPT_BUTTON_Y_SPACE = 40;
 	final static int OPT_BUTTON_WIDTH = 200;
+	
+	
+	/* Template lists */
+	final ComboBox availableColorTemplates = new ComboBox();
+	final ComboBox availableFormTemplates = new ComboBox();
+	final static int TEMPLATE_LISTS_X_START = -150;
+	final static int TEMPLATE_LISTS_Y_START = 150;
+	final static int TEMPLATE_LISTS_Y_SPACE = 40;
+	final static int TEMPLATE_LISTS_WIDTH = 200;
 
 	@FXML
 	private AnchorPane ipRoot;
@@ -247,6 +264,7 @@ public class TabDatorseendeController extends BaseController implements Initiali
 		startIPBtn.setText("Start Image Processing Unit");
 		startIPBtn.setTranslateX(OPT_BUTTON_X_START);
 		startIPBtn.setTranslateY(OPT_BUTTON_Y_START);
+		startIPBtn.setMinWidth(OPT_BUTTON_WIDTH);
 		root.getChildren().add(startIPBtn);
 		startIPBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -262,8 +280,9 @@ public class TabDatorseendeController extends BaseController implements Initiali
 		
 		Button stopIPBtn = new Button();
 		stopIPBtn.setText("Stop Image Processing Unit");
-		stopIPBtn.setTranslateX(OPT_BUTTON_X_START+OPT_BUTTON_WIDTH);
+		stopIPBtn.setTranslateX(OPT_BUTTON_X_START + OPT_BUTTON_WIDTH + TEMPLATE_LISTS_Y_SPACE);
 		stopIPBtn.setTranslateY(OPT_BUTTON_Y_START);
+		stopIPBtn.setMinWidth(OPT_BUTTON_WIDTH);
 		root.getChildren().add(stopIPBtn);
 		stopIPBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -277,9 +296,10 @@ public class TabDatorseendeController extends BaseController implements Initiali
 		cCalibBtn.setText("Color Template Settings");
 		cCalibBtn.setTranslateX(OPT_BUTTON_X_START);
 		cCalibBtn.setTranslateY(OPT_BUTTON_Y_START+OPT_BUTTON_Y_SPACE);
+		cCalibBtn.setMinWidth(OPT_BUTTON_WIDTH);
 		root.getChildren().add(cCalibBtn);
 		//Initiating sliderGUI
-		final HSVSliders hsvSliders = new HSVSliders();
+		final HSVSliders hsvSliders = new HSVSliders(this);
 
 		cCalibBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -293,6 +313,7 @@ public class TabDatorseendeController extends BaseController implements Initiali
 		final TemplateMatchSliders templateSliders = new TemplateMatchSliders();
 		imgCalibrateTemplateButton.setTranslateX(OPT_BUTTON_X_START);
 		imgCalibrateTemplateButton.setTranslateY(OPT_BUTTON_Y_START+OPT_BUTTON_Y_SPACE*2);
+		imgCalibrateTemplateButton.setMinWidth(OPT_BUTTON_WIDTH);
 		root.getChildren().add(imgCalibrateTemplateButton);
 		imgCalibrateTemplateButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -300,6 +321,55 @@ public class TabDatorseendeController extends BaseController implements Initiali
 				templateSliders.setTemplateGeomtry(mainbus, null);
 			}
 		});
+		
+
+		// Color and form template lists
+		root.getChildren().add(availableColorTemplates);
+		root.getChildren().add(availableFormTemplates);
+		availableColorTemplates.setTranslateX(TEMPLATE_LISTS_X_START);
+		availableColorTemplates.setTranslateY(TEMPLATE_LISTS_Y_START);
+		availableColorTemplates.setMinWidth(TEMPLATE_LISTS_WIDTH);
+		availableColorTemplates.setVisibleRowCount(10);
+		availableFormTemplates.setTranslateX(TEMPLATE_LISTS_X_START);
+		availableFormTemplates.setTranslateY(TEMPLATE_LISTS_Y_START + TEMPLATE_LISTS_Y_SPACE);
+		availableFormTemplates.setMinWidth(TEMPLATE_LISTS_WIDTH);
+		
+
+		Button toggleColorTemplateActiveButton = new Button();
+		toggleColorTemplateActiveButton.setText("Toggle active");
+		toggleColorTemplateActiveButton.setTranslateX(TEMPLATE_LISTS_X_START + TEMPLATE_LISTS_WIDTH + TEMPLATE_LISTS_Y_SPACE);
+		toggleColorTemplateActiveButton.setTranslateY(TEMPLATE_LISTS_Y_START);
+		toggleColorTemplateActiveButton.setMinWidth(TEMPLATE_LISTS_WIDTH);
+		root.getChildren().add(toggleColorTemplateActiveButton);
+		toggleColorTemplateActiveButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				ColorTemplate currTemplate = (ColorTemplate)availableColorTemplates.getValue();
+				currTemplate.toggleActive();
+				updateColorTemplates();
+				availableColorTemplates.setValue(currTemplate);
+			}
+		});
+
+		Button toggleFormTemplateActiveButton = new Button();
+		toggleFormTemplateActiveButton.setText("Toggle active");
+		toggleFormTemplateActiveButton.setTranslateX(TEMPLATE_LISTS_X_START + TEMPLATE_LISTS_WIDTH + TEMPLATE_LISTS_Y_SPACE);
+		toggleFormTemplateActiveButton.setTranslateY(TEMPLATE_LISTS_Y_START + TEMPLATE_LISTS_Y_SPACE);
+		toggleFormTemplateActiveButton.setMinWidth(TEMPLATE_LISTS_WIDTH);
+		root.getChildren().add(toggleFormTemplateActiveButton);
+		toggleFormTemplateActiveButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				FormTemplate currTemplate = (FormTemplate)availableFormTemplates.getValue();
+				currTemplate.toggleActive();
+				updateFormTemplates();
+				availableFormTemplates.setValue(currTemplate);
+			}
+		});
+		
+		updateColorTemplates();
+		updateFormTemplates();
+		
 		
 		view = new ImageView();
 		view.setTranslateX(IMAGE_POS_X);
@@ -315,9 +385,29 @@ public class TabDatorseendeController extends BaseController implements Initiali
 
 
 	}
+	
+	public void updateColorTemplates(){
+		availableColorTemplates.getItems().clear(); // TODO: Remove and update text instead
+		ArrayList<ColorTemplate> templates = mainbus.getIPColorTemplates();
+		for(ColorTemplate template : templates){
+			if(!availableColorTemplates.getItems().contains(template)){
+				availableColorTemplates.getItems().add(template);
+			}
+		}
+	}
 
-
+	public void updateFormTemplates(){
+		availableFormTemplates.getItems().clear(); // TODO: Remove and update text instead
+		ArrayList<FormTemplate> templates = mainbus.getIPFormTemplates();
+		for(FormTemplate template : templates){
+			if(!availableFormTemplates.getItems().contains(template)){
+				availableFormTemplates.getItems().add(template);
+			}
+		}
+	}	
+	
 	public void updateImage() {
+		if(mainbus == null) return;
 		Image image = mainbus.getIPImageToShow();
 		if(image != null){
 			view.setImage(image);			

@@ -19,19 +19,29 @@
       	<children>
       		<VBox alignment="CENTER" prefHeight="200.0" prefWidth="455.0" style="-fx-background-color: #ccc; -fx-border-color: black;" stylesheets="@../../application.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       			<children>
-      				<HBox alignment="CENTER" prefHeight="23.0" prefWidth="453.0">
-      					<children>
-      						<Label text="Tid kvar:" />
-      						<Label fx:id="lblTimeLeft" text="300 sek">
-      							<HBox.margin>
-      								<Insets left="30.0" />
-      							</HBox.margin>
-      						</Label>
-      					</children>
-      				</HBox>
-      				<Button fx:id="btnAbortMission" mnemonicParsing="false" onAction="#abortMission" prefHeight="42.0" prefWidth="178.0" styleClass="btn-danger" text="Abort" />
-                              <Button fx:id="btnToggleControl" mnemonicParsing="false" onAction="#toggleControl" text="Toggle Control" />
-                              <Button fx:id="btnEmergency" mnemonicParsing="false" onAction="#emergency" text="Emergency" />
+                              <HBox prefHeight="100.0" prefWidth="200.0" spacing="50.0">
+                                 <children>
+                                    <HBox alignment="CENTER" prefHeight="15.0" prefWidth="200.0" spacing="40.0">
+                                       <children>
+                                          <Label text="Speed:" />
+                                          <Label fx:id="lblSpeed" alignment="CENTER" text="2.4 m/s" />
+                                       </children>
+                                    </HBox>
+            				<HBox alignment="CENTER" spacing="40.0">
+            					<children>
+            						<Label text="Time left:" />
+            						<Label fx:id="lblTimeLeft" text="300 s" />
+            					</children>
+            				</HBox>
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+                                 <children>
+                                    <Button fx:id="btnAbortMission" mnemonicParsing="false" onAction="#abortMission" prefWidth="100.0" text="Abort" />
+            				<Button fx:id="btnEmergency" alignment="CENTER" mnemonicParsing="false" onAction="#emergency" prefHeight="42.0" prefWidth="178.0" styleClass="btn-danger" text="Emergency" textAlignment="CENTER" />
+                                    <Button fx:id="btnToggleControl" alignment="CENTER_RIGHT" contentDisplay="CENTER" mnemonicParsing="false" onAction="#toggleControl" prefWidth="100.0" text="Toggle Control" />
+                                 </children>
+                              </HBox>
       			</children>
       		</VBox>
       	</children>
@@ -40,33 +50,33 @@
 <ToolBar layoutX="-2.0" layoutY="-4.0" prefHeight="50.0" prefWidth="1207.0">
 	<items>
 		<ComboBox fx:id="cmbListOfMissions" onAction="#changeSelectedMission" prefWidth="150.0" />
-		<Button fx:id="btnStartMission" mnemonicParsing="false" onAction="#startMission" text="Utför" />
-		<Label text="Uppdragstyp:">
+		<Button fx:id="btnStartMission" mnemonicParsing="false" onAction="#startMission" text="Execute" />
+		<Label text="Mission type:">
 			<padding>
 				<Insets left="100.0" />
 			</padding>
 		</Label>
-		<Label fx:id="lblMissionType" text="Runt koordinat">
+		<Label fx:id="lblMissionType" text="Circle coordinate">
 			<padding>
 				<Insets left="30.0" />
 			</padding>
 		</Label>
-		<Label text="Estimerad tid:">
+		<Label text="Estimated time:">
 			<padding>
 				<Insets left="100.0" />
 			</padding>
 		</Label>
-		<Label fx:id="lblEstimatedTime" text="666 sek">
+		<Label fx:id="lblEstimatedTime" text="666 s">
 			<padding>
 				<Insets left="30.0" />
 			</padding>
 		</Label>
-		<Label text="Estimerad sträcka:">
+		<Label text="Estimated distance:">
 			<padding>
 				<Insets left="100.0" />
 			</padding>
 		</Label>
-		<Label fx:id="lblEstimatedDistance" text="1542 meter">
+		<Label fx:id="lblEstimatedDistance" text="1542 m">
 			<padding>
 				<Insets left="30.0" />
 			</padding>

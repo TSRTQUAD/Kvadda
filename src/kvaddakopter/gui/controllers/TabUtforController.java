@@ -44,9 +44,15 @@ public class TabUtforController extends BaseController implements Initializable 
     @FXML
     private Label lblTimeLeft;
     @FXML
+    private Label lblSpeed;
+    @FXML
     private Button btnStartMission;
     @FXML
     private Button btnAbortMission;
+    @FXML
+    private Button btnToggleControl;
+    @FXML
+    private Button btnEmergency;
     @FXML
     private ComboBox<String> cmbListOfMissions;
     
@@ -94,6 +100,15 @@ public class TabUtforController extends BaseController implements Initializable 
     	this.shouldStart = false;
     }
     
+    @FXML
+    private void emergency(){
+    	this.getParent().getMainBus().setEmergencyStop(true);
+    }
+
+    @FXML
+    private void toggleControl(){
+    	this.getParent().getMainBus().toggleController();
+    }
 
 	
 	public boolean shouldStart(){
@@ -138,8 +153,7 @@ public class TabUtforController extends BaseController implements Initializable 
 		this.lblEstimatedTime.setText("");
 		this.lblEstimatedDistance.setText("");
 		this.lblTimeLeft.setText("");
-		
-		
+		this.lblSpeed.setText("");
 		
 		
 		this.cmbListOfMissions.setItems( FXCollections.observableArrayList(
@@ -188,7 +202,10 @@ public class TabUtforController extends BaseController implements Initializable 
 		
 	}
  
-    
+	public void updateSpeed(float newSpeed){
+		this.lblSpeed.setText(String.format("%.1f", newSpeed));	
+		System.out.println("halla");
+	}
 
     
     
