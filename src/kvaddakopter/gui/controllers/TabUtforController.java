@@ -192,6 +192,13 @@ public class TabUtforController extends BaseController implements Initializable 
     	this.missionMap.drawQuad(gps.getLatitude(), gps.getLongitude());
     }
     
+    /**
+     * Draw targets to the Map
+     */
+    public void drawTargetsOnMap(){
+    	this.missionMap.drawTargetsOnMap(this.getParent().getMainBus().getTargets());
+    }
+    
 //    /**
 //     * TODO Draw the Target to the map.
 //     */  
