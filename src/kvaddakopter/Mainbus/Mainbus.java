@@ -12,10 +12,13 @@ import java.util.HashMap;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
+import kvaddakopter.assignment_planer.AssignmentPlanerRunnable;
 import kvaddakopter.assignment_planer.MatlabProxyConnection;
 import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.communication.Communication;
+import kvaddakopter.communication.NavData;
 import kvaddakopter.communication.QuadData;
+import kvaddakopter.communication.Security;
 import kvaddakopter.control_module.Sensorfusionmodule;
 import kvaddakopter.gui.GUIModule;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
@@ -67,7 +70,6 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 	Communication communicationtest;
 	static float[] ControlSignal = new float[5];
 	private String mode;
-	private boolean StartPermission;
 	public boolean selfCheck = false;
 	float speed = (float)0.1;
 	float batteryLevel = 99f;
@@ -83,6 +85,10 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 	QuadData quadData = new QuadData();
 
 	protected boolean shouldStart = false;
+
+	private boolean gpsFixOk;
+
+	private boolean wifiFixOk;
 	
 	//Control modules	
 	@Override
@@ -114,47 +120,47 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 		Mainbus mainbus = new Mainbus();
 		
 		
-//		//Setting up a Matlab Proxy Server
-//		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
-//		mainbus.setMatlabProxyConnection(matlabproxy);
-//		matlabproxy.startMatlab("quiet");
-//		
-//		AssignmentPlanerRunnable assignmentplanerrunnable = new AssignmentPlanerRunnable(3,mainbus);
-//		Thread t4 = new Thread(assignmentplanerrunnable);
-//		t4.setPriority(1);
-//		t4.start();
-//
-//		//Communication
-//		try{
-//			ControlSignal = new float[] {0, 0, 0, 0, 0};
-//			Communication communicationtest = new Communication(3,mainbus,"Communication");
-//			Thread t7 = new Thread(communicationtest);
-//			t7.setDaemon(true);
-//			t7.setPriority(1);
-//			t7.start();
-//			System.out.println("Communication-link initiated");
-//
-//
-//			NavData navdatatest = new NavData(4,mainbus,"NavData", communicationtest);	
-//			Thread t5 = new Thread(navdatatest);
-//			t5.setDaemon(true);
-//			t5.setPriority(1);
-//			t5.start();
-//			System.out.println("NavData-link initiated");
-//
-//
-//
-//		} catch (Exception ex1){
-//
-//			Security security = new Security(5,mainbus);
-//			Thread t6 = new Thread(security);
-//			t6.setDaemon(true);
-//			t6.setPriority(1);
-//			t6.start();
-//			System.out.println("Security-link initiated");
-//
-//			ex1.printStackTrace();	
-//		}
+		//Setting up a Matlab Proxy Server
+		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
+		mainbus.setMatlabProxyConnection(matlabproxy);
+		matlabproxy.startMatlab("quiet");
+		
+		AssignmentPlanerRunnable assignmentplanerrunnable = new AssignmentPlanerRunnable(3,mainbus);
+		Thread t4 = new Thread(assignmentplanerrunnable);
+		t4.setPriority(1);
+		t4.start();
+
+		//Communication
+		try{
+			ControlSignal = new float[] {0, 0, 0, 0, 0};
+			Communication communicationtest = new Communication(3,mainbus,"Communication");
+			Thread t7 = new Thread(communicationtest);
+			t7.setDaemon(true);
+			t7.setPriority(1);
+			t7.start();
+			System.out.println("Communication-link initiated");
+
+
+			NavData navdatatest = new NavData(4,mainbus,"NavData", communicationtest);	
+			Thread t5 = new Thread(navdatatest);
+			t5.setDaemon(true);
+			t5.setPriority(1);
+			t5.start();
+			System.out.println("NavData-link initiated");
+
+
+
+		} catch (Exception ex1){
+
+			Security security = new Security(5,mainbus);
+			Thread t6 = new Thread(security);
+			t6.setDaemon(true);
+			t6.setPriority(1);
+			t6.start();
+			System.out.println("Security-link initiated");
+
+			ex1.printStackTrace();	
+		}
 		
 		
 		//GUI MODULE
@@ -269,10 +275,6 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 		return mode; 
 	}
 	
-	@Override
-	public synchronized boolean getStartPermission(){
-		return StartPermission;
-	}
 	
 	@Override
 	public synchronized boolean EmergencyStop(){
@@ -440,12 +442,12 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 
 	@Override
 	public boolean wifiFixOk() {
-		return (int) quadData.getLinkQuality() == 1;
+		return this.wifiFixOk;
 	}
 
 	@Override
 	public boolean gpsFixOk() {
-		return quadData.getNGPSSatelites() >= 3;
+		return this.gpsFixOk;
 	}
 
 	@Override
@@ -614,21 +616,41 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 
 
 	@Override
-	public void setIsStarted(boolean isStarted) {
+	public synchronized void setIsStarted(boolean isStarted) {
 		this.isStarted = isStarted;
 		
 	}
 	
 	@Override
-	public boolean isStarted() {
+	public synchronized boolean isStarted() {
 		return this.isStarted;
 		
 	}
 
 
 	@Override
-	public void setShouldStart(boolean b) {
+	public synchronized void setShouldStart(boolean b) {
 		this.shouldStart = b;
+		
+	}
+
+
+	@Override
+	public synchronized boolean shouldStart() {
+		return shouldStart;
+	}
+
+
+	@Override
+	public synchronized void setGpsFixOk(boolean b) {
+		this.gpsFixOk = b;
+		
+	}
+
+
+	@Override
+	public synchronized void setWifiFixOk(boolean b) {
+		this.wifiFixOk = b;
 		
 	}
 }
