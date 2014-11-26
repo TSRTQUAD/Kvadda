@@ -81,6 +81,8 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 	public int seq = 0;
 	public int seq_signal = 0;
 	QuadData quadData = new QuadData();
+
+	protected boolean shouldStart = false;
 	
 	//Control modules	
 	@Override
@@ -620,6 +622,13 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 	@Override
 	public boolean isStarted() {
 		return this.isStarted;
+		
+	}
+
+
+	@Override
+	public void setShouldStart(boolean b) {
+		this.shouldStart = b;
 		
 	}
 }

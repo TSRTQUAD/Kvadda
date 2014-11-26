@@ -98,19 +98,22 @@ public class TabUtforController extends BaseController implements Initializable 
     @FXML
     private void startMission(){
     	this.timeLeft = (long) this.currentSelectedMissionObject.getMissionTime()[0][0];
-    	this.getParent().getMainBus().setIsStarted(true);
+    	this.getParent().getMainBus().setShouldStart(true);
     }
+    
     
     @FXML
     private void abortMission(){
     	this.getParent().getMainBus().setIsStarted(false);
     }
     
+    
     @FXML
     private void emergency(){
     	this.getParent().getMainBus().setEmergencyStop(true);
     }
 
+    
     @FXML
     private void toggleControl(){
     	this.getParent().getMainBus().toggleController();

@@ -8,6 +8,17 @@ import kvaddakopter.maps.GPSCoordinate;
 
 public interface MainBusGUIInterface {
 	
+	/**
+	 * Toggle Manual automatic control
+	 */
+	public void toggleController();
+	
+	
+	/**
+	 * Sets to true when a mission should start
+	 * @param b
+	 */
+	public void setShouldStart(boolean b);
 	
 	/**
 	 * Sets a state for the program so all modules knows that is should start

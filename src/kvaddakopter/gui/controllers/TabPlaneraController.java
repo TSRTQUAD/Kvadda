@@ -52,6 +52,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     
     protected boolean canEnterMissionCoordinates = false;
 	protected boolean canEnterForbiddenAreaCoordinates = false;
+	protected boolean canEnterQuadStartPosition = true;
 	
 	
 	protected MissionStorage storage;
@@ -94,12 +95,21 @@ public class TabPlaneraController extends BaseController implements Initializabl
     }
     
     /**
+     * Clear the set quad position
+     */
+    @FXML
+    private void btnClickedClearQuadStartPosition(){
+    	this.planningMap.clearQuadStartPosition();
+    }
+    
+    /**
      * Triggered when user presses btn "Mark new mission coordinates"
      */
     @FXML
     private void btnStartMissionCoordinates(){
     	this.canEnterMissionCoordinates = true;
     	this.canEnterForbiddenAreaCoordinates = false;	
+    	this.canEnterQuadStartPosition = false;	
     	this.planningMap.createNewMapShape();
     }
     
@@ -110,9 +120,19 @@ public class TabPlaneraController extends BaseController implements Initializabl
     private void btnStartMarkForbiddenAreas(){
     	this.canEnterForbiddenAreaCoordinates = true;
     	this.canEnterMissionCoordinates = false;
+    	this.canEnterQuadStartPosition = false;	
     	this.planningMap.createNewForbiddenArea();
     }
 
+    /**
+     * Triggered when user presses btn "New Quad start postion"
+     */
+    @FXML
+    private void btnStartMarkQuadStartPosition(){
+    	this.canEnterQuadStartPosition = true;	
+    	this.canEnterForbiddenAreaCoordinates = false;
+    	this.canEnterMissionCoordinates = false;
+    } 
     
     @FXML
     private void btnGenerateTrajectory(){
@@ -195,6 +215,15 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	return this.canEnterForbiddenAreaCoordinates;
     }
     
+    /**
+     * Used by map to determine if the user specified that he/she want to add Forbidden Area Coordinates.
+     * @return boolean If we are on this Mode
+     */
+    public boolean addQuadStartPositionMode(){
+    	return this.canEnterQuadStartPosition;
+    }
+
+    
     public MissionType getCurrentSelectedMissionType(){
     	return this.currentSelectedMissionType;
     }
@@ -238,7 +267,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	MissionObject mission = new MissionObject();
     	
     	//Temporary set startcoordinates
-    	mission.setStartCoordinate(new double[][] {{58.406632934898347, 15.619798600673676}});
+    	mission.setStartCoordinate(this.planningMap.getStartCoordinate());
     	
     	//Mission Name
     	mission.setMissionName(this.txtMissionName.getText());
