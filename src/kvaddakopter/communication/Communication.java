@@ -9,6 +9,7 @@ import java.nio.IntBuffer;
 import java.util.StringTokenizer;
 
 import kvaddakopter.Mainbus.*;
+import kvaddakopter.interfaces.MainBusCommInterface;
 
 
 public class Communication implements Runnable{
@@ -34,9 +35,7 @@ public class Communication implements Runnable{
     
    static final int INTERVAL = 100;
   
-	
-   private int mThreadId;
-   private volatile Mainbus mMainbus;
+   private volatile MainBusCommInterface mMainbus;
    float[] ControlSignal = new float[5];
 	
    InetAddress inet_addr;
@@ -51,8 +50,7 @@ public class Communication implements Runnable{
    FloatBuffer fb;
    IntBuffer ib;
    
-   public Communication(int threadid,Mainbus mainbus, String name)  {
-        mThreadId = threadid;
+   public Communication(int threadid,MainBusCommInterface mainbus, String name)  {
         mMainbus = mainbus;
             
         System.out.println("Init Communication");        

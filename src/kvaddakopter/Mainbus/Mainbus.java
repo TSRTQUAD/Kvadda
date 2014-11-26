@@ -11,13 +11,11 @@ import java.util.ArrayList;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
-import kvaddakopter.assignment_planer.AssignmentPlanerRunnable;
 import kvaddakopter.assignment_planer.MatFileHandler;
 import kvaddakopter.assignment_planer.MatlabProxyConnection;
 import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.communication.Communication;
-import kvaddakopter.communication.NavData;
-import kvaddakopter.communication.Security;
+import kvaddakopter.communication.QuadData;
 import kvaddakopter.control_module.Sensorfusionmodule;
 import kvaddakopter.gui.GUIModule;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
@@ -27,6 +25,7 @@ import kvaddakopter.image_processing.programs.ImageProcessingMainProgram;
 import kvaddakopter.interfaces.AssignmentPlanerInterface;
 import kvaddakopter.interfaces.ControlMainBusInterface;
 import kvaddakopter.interfaces.IPAndGUIInterface;
+import kvaddakopter.interfaces.MainBusCommInterface;
 import kvaddakopter.interfaces.MainBusGUIInterface;
 import kvaddakopter.interfaces.MainBusIPInterface;
 import kvaddakopter.maps.GPSCoordinate;
@@ -43,8 +42,14 @@ import kvaddakopter.maps.GPSCoordinate;
  * 3) start thread
  * 
  */
-public class Mainbus extends Frame implements KeyListener,ControlMainBusInterface, AssignmentPlanerInterface, MainBusGUIInterface, MainBusIPInterface, IPAndGUIInterface{
+public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, ControlMainBusInterface, AssignmentPlanerInterface, MainBusGUIInterface, MainBusIPInterface, IPAndGUIInterface{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+
 	//Image processing storage
 	private boolean mIsIPRunning;
 
@@ -66,18 +71,19 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
     boolean runcontroller = false;
     boolean space_bar = false; //true = Takeoff, false = Landing
 	public boolean EmerStop = false;
-	double[] NavData = new double[6];
 	double[][] NavDataOverAll = new double[3000][6];
 	double[][] ControlSignalAll = new double[3000][5];
 	public int seq = 0;
 	public int seq_signal = 0;
+	QuadData quadData = new QuadData();
 	//
 	
 	
 	
 	//Control modules	
-	public synchronized double[] getSensorVector() {				
-		return this.NavData;
+	@Override
+	public synchronized QuadData getQuadData() {				
+		return this.quadData;
 	}
 	
 	
@@ -221,7 +227,7 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 	}
 	
 	//Communication
-
+	@Override
 	public synchronized float[] getControlSignal(){
 	/*	ControlSignalAll[seq][0] = (double)ControlSignal[0];
 		ControlSignalAll[seq][1] = (double)ControlSignal[1];
@@ -233,30 +239,28 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		return ControlSignal;
 	}
 	
-	public synchronized void setNavData(double[] nd){
-	/*	NavDataOverAll[seq][1] = nd[1];
-		NavDataOverAll[seq][2] = nd[2];
-		NavDataOverAll[seq][3] = nd[3];
-		NavDataOverAll[seq][4] = nd[4];
-		NavDataOverAll[seq][5] = nd[5];
-	*/
+	@Override
+	public synchronized void setQuadData(QuadData quadData){
 		seq = seq + 1;
-		this.NavData = nd;
+		this.quadData = quadData;
 	}
 	
-	
+	@Override
 	public synchronized void setSelfCheck(boolean b){
 	    selfCheck = true;
 	}
 	
+	@Override
 	public synchronized String getMode(){
 		return mode; 
 	}
 	
+	@Override
 	public synchronized boolean getStartPermission(){
 		return StartPermission;
 	}
 	
+	@Override
 	public synchronized boolean EmergencyStop(){
 		return EmerStop;
 	}
@@ -264,9 +268,6 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 	public synchronized void setEmergencyStop(boolean newBool){
 		EmerStop = newBool;
 	}
-	
-	
-	///// 
 	
 	public void keyTyped(KeyEvent e) {
         ;
@@ -419,7 +420,7 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 
 	@Override
 	public GPSCoordinate getCurrentQuadPosition() {
-		return new GPSCoordinate(getSensorVector()[0] , getSensorVector()[1]);
+		return new GPSCoordinate(quadData.getGPSLat() , quadData.getGPSLong());
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package kvaddakopter.control_module;
 import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.assignment_planer.ReferenceExtractor;
+import kvaddakopter.communication.QuadData;
 import kvaddakopter.control_module.modules.*;
 import kvaddakopter.control_module.signals.*;
 import kvaddakopter.interfaces.ControlMainBusInterface;
@@ -57,7 +58,7 @@ public class Sensorfusionmodule implements Runnable{
 	protected ControlMainBusInterface mainbus;
 	protected double 				sampletime			= 0.2; //seconds
 	protected double 				time;
-	protected double[] 				sensorvector;
+	protected QuadData				quadData;
 	
 	
 	protected SensorData 			sdata				= new SensorData();
@@ -92,8 +93,8 @@ public class Sensorfusionmodule implements Runnable{
 		
 		//Initialize -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 		System.out.println("Initializing modules ..");
-		this.sensorvector = mainbus.getSensorVector();				//Reads sensor data from mainbus
-		sdata.setnewsensordata(sensorvector);						//Update local sensor object
+		this.quadData = mainbus.getQuadData();				//Reads sensor data from mainbus
+		sdata.setnewsensordata(quadData);						//Update local sensor object
 		//sdata.print();
 		
 		if (0 == controllingmode){
@@ -178,8 +179,8 @@ public class Sensorfusionmodule implements Runnable{
 				counter ++;
 				time = System.currentTimeMillis();		
 				ControlSignal csignal = new ControlSignal();
-				this.sensorvector = mainbus.getSensorVector();				//Reads sensor data from mainbus
-				sdata.setnewsensordata(sensorvector);						//Update local sensor object
+				this.quadData = mainbus.getQuadData();				//Reads sensor data from mainbus
+				sdata.setnewsensordata(quadData);						//Update local sensor object
 				
 
 				if (0 == controllingmode || 1 == controllingmode){

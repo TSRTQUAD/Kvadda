@@ -7,6 +7,7 @@ import com.lynden.gmapsfx.javascript.object.*;
 import java.util.ArrayList;
 
 import kvaddakopter.gui.components.AbstractGPSMarker;
+import kvaddakopter.gui.components.GPSMarkerNormal;
 import kvaddakopter.gui.components.QuadMarker;
 import kvaddakopter.gui.controllers.TabUtforController;
 
@@ -43,6 +44,7 @@ public class MissionMap extends BaseMap implements MapComponentInitializedListen
 	
 	
 	private QuadMarker quadMarker;
+	private GPSMarkerNormal targetMarker; //TODO some other marker
 	
 	
 	/**
@@ -80,6 +82,22 @@ public class MissionMap extends BaseMap implements MapComponentInitializedListen
 		if (this.quadMarker == null){
 			this.quadMarker = new QuadMarker(new LatLong(latitude, longitude));  
 			this.quadMarker.attachToMap(map);
+		}
+		System.out.println("Updated Position");
+		this.quadMarker.updatePosition(new LatLong(latitude, longitude));
+		map.setZoom(map.getZoom() - 1);
+		map.setZoom(map.getZoom() + 1);
+	}
+	
+	/**
+	 * Draw the quad marker on the specified position.
+	 * @param latitude
+	 * @param longitude
+	 */
+	public void drawTarget(double latitude, double longitude) {
+		if (this.targetMarker == null){
+			this.targetMarker = new QuadMarker(new LatLong(latitude, longitude));  
+			this.targetMarker.attachToMap(map);
 		}
 		System.out.println("Updated Position");
 		this.quadMarker.updatePosition(new LatLong(latitude, longitude));
