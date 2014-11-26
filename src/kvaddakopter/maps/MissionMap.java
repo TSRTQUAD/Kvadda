@@ -109,7 +109,7 @@ public class MissionMap extends BaseMap implements MapComponentInitializedListen
 	}
 
 	public void drawTargetsOnMap(HashMap<String, GPSCoordinate> targets) {
-		
+		if( targets.size() == 0) return;
 		if (this.targets == null){
 			this.targets = new TargetMap(this.map);  
 		}

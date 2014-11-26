@@ -100,6 +100,9 @@ public class TabUtforController extends BaseController implements Initializable 
     	System.out.println("Started");
     	System.out.println(this.currentSelectedMissionName);
     	this.getParent().getMainBus().setShouldStart(true);
+    	synchronized (this.getParent().getMainBus()) {
+			this.getParent().getMainBus().notifyAll();
+		}
     }
     
     
@@ -201,7 +204,9 @@ public class TabUtforController extends BaseController implements Initializable 
      * Draw targets to the Map
      */
     public void drawTargetsOnMap(){
-    	this.missionMap.drawTargetsOnMap(this.getParent().getMainBus().getTargets());
+    	if (this.getParent().getMainBus().getTargets() != null){
+                    this.missionMap.drawTargetsOnMap(this.getParent().getMainBus().getTargets());
+    	}
     }
     
 //    /**

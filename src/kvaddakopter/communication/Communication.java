@@ -171,6 +171,7 @@ public class Communication implements Runnable {
 				try {
 					mIsRunning = false;
 					mMainbus.wait();
+					System.out.println("WAIT FOR START");
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -190,7 +191,8 @@ public class Communication implements Runnable {
 
 	public void run() {
 		checkIsRunning();
-
+		
+		
 		try {
 			Thread.sleep(500);
 			send_at_cmd("AT*REF=" + get_seq() + ",290717696"); // Landing
