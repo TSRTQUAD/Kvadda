@@ -272,7 +272,7 @@ public class TabDatorseendeController extends BaseController implements Initiali
 				//mainbus.setColorCalibrationMode(true);
 				mainbus.setIsIPRunning(true);
 				synchronized(mainbus){
-					mainbus.notify();
+					mainbus.notifyAll();
 				}
 				System.out.println("Image Processing started from GUI");
 			}

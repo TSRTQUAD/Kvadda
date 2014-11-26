@@ -637,7 +637,7 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 
 	@Override
 	public synchronized boolean shouldStart() {
-		return shouldStart;
+		return this.shouldStart;
 	}
 
 

@@ -65,7 +65,7 @@ public class AssignmentPlanerRunnable implements Runnable {
 	public void resetCondVar(){
 		mainbus.setAssignmentPlanerOn(false);
 		synchronized(mainbus){
-			mainbus.notify ();
+			mainbus.notifyAll();
 		}
 	}
 

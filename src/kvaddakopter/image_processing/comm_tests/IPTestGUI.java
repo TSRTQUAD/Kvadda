@@ -101,7 +101,7 @@ public class IPTestGUI extends Application implements Runnable{
 				//mMainbus.setColorCalibrationMode(true);
 				mMainbus.setIsIPRunning(true);
 				synchronized(mMainbus){
-					mMainbus.notify();
+					mMainbus.notifyAll();
 				}
 				System.out.println("Image Processing started from GUI");
 			}

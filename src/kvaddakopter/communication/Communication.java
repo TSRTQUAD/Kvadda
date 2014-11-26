@@ -182,7 +182,7 @@ public class Communication implements Runnable {
 			init();
 			synchronized(this){
 				mIsInitiated = true;
-				this.notify();
+				this.notifyAll();
 			}
 
 		}
