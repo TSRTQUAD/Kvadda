@@ -341,7 +341,7 @@ public class TabDatorseendeController extends BaseController implements Initiali
 		toggleColorTemplateActiveButton.setTranslateY(TEMPLATE_LISTS_Y_START);
 		toggleColorTemplateActiveButton.setMinWidth(TEMPLATE_LISTS_WIDTH);
 		root.getChildren().add(toggleColorTemplateActiveButton);
-		/*toggleColorTemplateActiveButton.setOnAction(new EventHandler<ActionEvent>() {
+		toggleColorTemplateActiveButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				ColorTemplate currTemplate = (ColorTemplate)availableColorTemplates.getValue();
@@ -349,7 +349,7 @@ public class TabDatorseendeController extends BaseController implements Initiali
 				updateColorTemplates();
 				availableColorTemplates.setValue(currTemplate);
 			}
-		});*/
+		});
 
 		Button toggleFormTemplateActiveButton = new Button();
 		toggleFormTemplateActiveButton.setText("Toggle active");
@@ -357,7 +357,7 @@ public class TabDatorseendeController extends BaseController implements Initiali
 		toggleFormTemplateActiveButton.setTranslateY(TEMPLATE_LISTS_Y_START + TEMPLATE_LISTS_Y_SPACE);
 		toggleFormTemplateActiveButton.setMinWidth(TEMPLATE_LISTS_WIDTH);
 		root.getChildren().add(toggleFormTemplateActiveButton);
-		/*toggleFormTemplateActiveButton.setOnAction(new EventHandler<ActionEvent>() {
+		toggleFormTemplateActiveButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				FormTemplate currTemplate = (FormTemplate)availableFormTemplates.getValue();
@@ -365,7 +365,7 @@ public class TabDatorseendeController extends BaseController implements Initiali
 				updateFormTemplates();
 				availableFormTemplates.setValue(currTemplate);
 			}
-		});*/
+		});
 		
 		updateColorTemplates();
 		updateFormTemplates();
@@ -387,23 +387,23 @@ public class TabDatorseendeController extends BaseController implements Initiali
 	}
 	
 	public void updateColorTemplates(){
-		/*availableColorTemplates.getItems().clear(); // TODO: Remove and update text instead
+		availableColorTemplates.getItems().clear(); // TODO: Remove and update text instead
 		ArrayList<ColorTemplate> templates = mainbus.getIPColorTemplates();
 		for(ColorTemplate template : templates){
 			if(!availableColorTemplates.getItems().contains(template)){
 				availableColorTemplates.getItems().add(template);
 			}
-		}*/
+		}
 	}
 
 	public void updateFormTemplates(){
-		/*availableFormTemplates.getItems().clear(); // TODO: Remove and update text instead
+		availableFormTemplates.getItems().clear(); // TODO: Remove and update text instead
 		ArrayList<FormTemplate> templates = mainbus.getIPFormTemplates();
 		for(FormTemplate template : templates){
 			if(!availableFormTemplates.getItems().contains(template)){
 				availableFormTemplates.getItems().add(template);
 			}
-		}*/
+		}
 	}	
 	
 	public void updateImage() {
