@@ -79,7 +79,9 @@ public class NavData implements Runnable {
 	 * Processes different header opts and data types
 	 */
 	public void run() {
+		
 		checkIsCommRunning();
+		
 		try {
 			byte[] buf_snd = { 0x01, 0x00, 0x00, 0x00 };
 			DatagramPacket packet_snd = new DatagramPacket(buf_snd,
@@ -110,14 +112,14 @@ public class NavData implements Runnable {
 					boolean[] droneStates = reader.droneStates32();
 					long sequenceNumber = reader.uint32();
 					long visionFlag = reader.uint32();
-					
+					/*
 					if(droneStates[NavReader.COMM_WATCHDOG_PROBLEM])
 						System.err.println("COMM WATCHDOG PROBLEM");
 					if(droneStates[NavReader.COMM_LOST])
 						System.err.println("COMM LOST");
 					if(droneStates[NavReader.FLYING])
 						comm.setIsFlying(true);
-
+					 */
 					// Run until checksum
 					boolean finnished = false;
 					while (!finnished) {
@@ -214,8 +216,7 @@ public class NavData implements Runnable {
 		}
 		
 		if(wifi && gps)
-			mMainbus.setIsStarted(true);
-			
+			mMainbus.setIsStarted(true);			
 	}
 }
 

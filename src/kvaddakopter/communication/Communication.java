@@ -16,6 +16,7 @@ import kvaddakopter.interfaces.MainBusCommInterface;
  * Handles sending UDP-ports and the sending of command to the quad
  *
  */
+
 public class Communication implements Runnable {
 	static final int NAV_PORT = 5554;
 	static final int VIDEO_PORT = 5555;
@@ -184,19 +185,28 @@ public class Communication implements Runnable {
 			synchronized(this){
 				mIsInitiated = true;
 				this.notifyAll();
+
+				while(!mMainbus.isStarted()){
+					System.out.println("Waiting For GPS-FIX & WIFI");						
+					try {
+						Thread.sleep(500);
+						send_at_cmd("AT*REF=" + get_seq() + ",290717696"); // Landing
+					} catch (Exception ex1) {
+						// TODO Auto-generated catch block
+						ex1.printStackTrace();
+					}	
+				}
 			}
 
 		}
 	}
 
 	public void run() {
-		checkIsRunning();
-		
-		
+		checkIsRunning();	
 		try {
-			Thread.sleep(500);
-			send_at_cmd("AT*REF=" + get_seq() + ",290717696"); // Landing
-
+			//Thread.sleep(500);
+			//send_at_cmd("AT*REF=" + get_seq() + ",290717696"); // Landing
+			/*
 			while (ControlSignal[0] == 0) {
 				System.out.println("Not Started Yet");
 				Thread.sleep(500);
@@ -208,6 +218,8 @@ public class Communication implements Runnable {
 				ControlSignal = mMainbus.getControlSignal();
 
 			}
+			*/
+			
 
 			System.out.println("Starting");
 
