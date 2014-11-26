@@ -50,33 +50,33 @@
 <ToolBar layoutX="-2.0" layoutY="-4.0" prefHeight="50.0" prefWidth="1207.0">
 	<items>
 		<ComboBox fx:id="cmbListOfMissions" onAction="#changeSelectedMission" prefWidth="150.0" />
-		<Button fx:id="btnStartMission" mnemonicParsing="false" onAction="#startMission" text="Utför" />
-		<Label text="Uppdragstyp:">
+		<Button fx:id="btnStartMission" mnemonicParsing="false" onAction="#startMission" text="Execute" />
+		<Label text="Mission type:">
 			<padding>
 				<Insets left="100.0" />
 			</padding>
 		</Label>
-		<Label fx:id="lblMissionType" text="Runt koordinat">
+		<Label fx:id="lblMissionType" text="Circle coordinate">
 			<padding>
 				<Insets left="30.0" />
 			</padding>
 		</Label>
-		<Label text="Estimerad tid:">
+		<Label text="Estimated time:">
 			<padding>
 				<Insets left="100.0" />
 			</padding>
 		</Label>
-		<Label fx:id="lblEstimatedTime" text="666 sek">
+		<Label fx:id="lblEstimatedTime" text="666 s">
 			<padding>
 				<Insets left="30.0" />
 			</padding>
 		</Label>
-		<Label text="Estimerad sträcka:">
+		<Label text="Estimated distance:">
 			<padding>
 				<Insets left="100.0" />
 			</padding>
 		</Label>
-		<Label fx:id="lblEstimatedDistance" text="1542 meter">
+		<Label fx:id="lblEstimatedDistance" text="1542 m">
 			<padding>
 				<Insets left="30.0" />
 			</padding>

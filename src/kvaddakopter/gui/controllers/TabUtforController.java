@@ -156,8 +156,6 @@ public class TabUtforController extends BaseController implements Initializable 
 		this.lblSpeed.setText("");
 		
 		
-		
-		
 		this.cmbListOfMissions.setItems( FXCollections.observableArrayList(
 				this.listOfMissions
 				));

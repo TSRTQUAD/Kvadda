@@ -45,16 +45,6 @@ public class TabPlaneraController extends BaseController implements Initializabl
     @FXML
     private ComboBox<MissionHeight> listMissionHeight;
     @FXML
-    private ComboBox<String> listTargetTemplate;
-    @FXML
-    private ComboBox<String> listTargetColor;
-    @FXML
-    private ToggleGroup descriporRadioGroup;
-    @FXML
-    private RadioButton radioDescriptor1;
-    @FXML
-    private RadioButton radioDescriptor2;
-    @FXML
     private TextField txtEstimatedDistance;
     @FXML
     private TextField txtEstimatedTime;
@@ -66,9 +56,6 @@ public class TabPlaneraController extends BaseController implements Initializabl
     
     protected boolean canEnterMissionCoordinates = false;
 	protected boolean canEnterForbiddenAreaCoordinates = false;
-	
-	protected ArrayList<String> targetTemplates = new ArrayList<String>();
-	protected ArrayList<String> colorTemplates = new ArrayList<String>();
 	
 	
 	protected MissionStorage storage;
@@ -159,7 +146,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
 		MissionObject mission = mainbus.getMissionObject();
 		
 		this.txtEstimatedTime.setText(String.format("%s" , SecToMinSec.transform( (long) mission.getMissionTime()[0][0])));
-		this.txtEstimatedDistance.setText(String.format("%s meter", (int)mission.getTrajectoryLength()[0][0]));
+		this.txtEstimatedDistance.setText(String.format("%s m", (int)mission.getTrajectoryLength()[0][0]));
 		this.planningMap.drawResultingTrajectory(mission.getTrajectoryFullSize());
     }
     
@@ -239,32 +226,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     			MissionHeight.TEN_METERS
     			));
     	this.listMissionHeight.getSelectionModel().select(0);
-    	
-    	// Populate template targets
-    	this.targetTemplates.add("Av");
-    	this.targetTemplates.add("Cirkel");
-    	this.targetTemplates.add("Kvadrat");
-    	this.targetTemplates.add("Triangel");
-    	this.listTargetTemplate.setItems(FXCollections.observableArrayList(
-    			this.targetTemplates
-    			));
-    	this.listTargetTemplate.getSelectionModel().select(0);
-
-    	// Populate color targets
-    	this.colorTemplates.add("Av");
-    	this.colorTemplates.add("Röd");
-    	this.colorTemplates.add("Grön");
-    	this.colorTemplates.add("Blå");
-    	this.listTargetColor.setItems(FXCollections.observableArrayList(
-    			this.colorTemplates
-    			));
-    	this.listTargetColor.getSelectionModel().select(0);
-    	
-    	
-    	//Set up descriptors Radios
-    	this.radioDescriptor1.setUserData(0);
-    	this.radioDescriptor2.setUserData(1);
-    	
+    	    	
 	}
     
     
@@ -294,20 +256,6 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	//Mission Radius
     	double[] radiusValue = this.planningMap.getCircleRadius();
     	mission.setRadius(radiusValue);
-    	
-    	//Image template
-    	String selectedTemplate = this.listTargetTemplate.getValue();
-    	int templateId = this.targetTemplates.indexOf(selectedTemplate);
-    	mission.setImageTemplate(templateId);
-    	
-    	//Image color
-    	String selectedColor = this.listTargetColor.getValue();
-    	int colorId = this.colorTemplates.indexOf(selectedColor);
-    	mission.setColorTemplate(colorId);
-    	
-    	//Image Descriptor
-    	int descriptorId = (int) this.descriporRadioGroup.getSelectedToggle().getUserData();
-    	mission.setDescriptor(descriptorId);
     	
     	//GPS AREAS
     	mission.setSearchAreas(this.planningMap.allNavigationCoordinates());
