@@ -46,6 +46,8 @@ public class TabUtforController extends BaseController implements Initializable 
     @FXML
     private Label lblSpeed;
     @FXML
+    private Label lblBattery;
+    @FXML
     private Button btnStartMission;
     @FXML
     private Button btnAbortMission;
@@ -154,6 +156,7 @@ public class TabUtforController extends BaseController implements Initializable 
 		this.lblEstimatedDistance.setText("");
 		this.lblTimeLeft.setText("");
 		this.lblSpeed.setText("");
+		this.lblBattery.setText("");
 		
 		
 		this.cmbListOfMissions.setItems( FXCollections.observableArrayList(
@@ -195,14 +198,12 @@ public class TabUtforController extends BaseController implements Initializable 
 	}
  
 	public void updateSpeed(float newSpeed){
-		this.lblSpeed.setText(String.format("%.1f", newSpeed));	
-		System.out.println("halla");
+		this.lblSpeed.setText(String.format("%.1f m/s", newSpeed));
 	}
 
+	 
+	public void updateBattery(float newBattery){
+		this.lblBattery.setText(String.format("%.1f %", newBattery));
+	}
     
-    
-
-    
-
-
 }

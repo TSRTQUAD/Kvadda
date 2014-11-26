@@ -19,20 +19,26 @@
       	<children>
       		<VBox alignment="CENTER" prefHeight="200.0" prefWidth="455.0" style="-fx-background-color: #ccc; -fx-border-color: black;" stylesheets="@../../application.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       			<children>
-                              <HBox prefHeight="100.0" prefWidth="200.0" spacing="50.0">
+                              <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                                  <children>
-                                    <HBox alignment="CENTER" prefHeight="15.0" prefWidth="200.0" spacing="40.0">
+                                    <HBox alignment="CENTER_LEFT" prefHeight="46.0" prefWidth="140.0">
                                        <children>
-                                          <Label text="Speed:" />
-                                          <Label fx:id="lblSpeed" alignment="CENTER" text="2.4 m/s" />
+                                          <Label prefWidth="70.0" text="Speed:" />
+                                          <Label fx:id="lblSpeed" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefWidth="70.0" text="2.4 m/s" textAlignment="RIGHT" />
                                        </children>
                                     </HBox>
-            				<HBox alignment="CENTER" spacing="40.0">
+            				<HBox alignment="CENTER" prefWidth="140.0">
             					<children>
-            						<Label text="Time left:" />
-            						<Label fx:id="lblTimeLeft" text="300 s" />
+            						<Label prefWidth="70.0" text="Time left:" />
+            						<Label fx:id="lblTimeLeft" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefWidth="70.0" text="300 s" />
             					</children>
             				</HBox>
+                                    <HBox alignment="CENTER" prefWidth="150.0">
+                                       <children>
+                                          <Label prefWidth="70.0" text="Battery:" />
+                                          <Label fx:id="lblBattery" alignment="CENTER_RIGHT" prefWidth="70.0" text="100 %" />
+                                       </children>
+                                    </HBox>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
