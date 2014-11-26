@@ -61,13 +61,13 @@ public class ReferenceData {
 		double deltaLat=lat2-lat1;
 		double deltaLon=lon2-lon1;
 
-		this.Ypos=radius*deltaLon*Math.cos((lat1+lat2)/2)*1000;
-		this.Xpos=radius*deltaLat*1000;
+		this.Xpos=radius*deltaLon*Math.cos((lat1+lat2)/2)*1000;
+		this.Ypos=radius*deltaLat*1000;
 	}
 	
 	public void GPS2XYtest(){
-		this.Ypos=Longitud;
-		this.Xpos=Latitud;
+		this.Xpos=Longitud;
+		this.Ypos=Latitud;
 	}
 	
 	

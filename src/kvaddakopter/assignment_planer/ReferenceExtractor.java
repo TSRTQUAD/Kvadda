@@ -9,10 +9,10 @@ public class ReferenceExtractor {
 	public ReferenceExtractor(int startcount){
 		this.counter = startcount;
 		this.start = 0;
-		this.land = 0;
-		
+		this.land = 0;		
 	}
 
+	
 	// Returndata  = (latitude, longitud, height, yaw, time, forward velocity, mission type, start,land)
 	public double[] update(MissionObject missionobject){
 		
@@ -21,12 +21,12 @@ public class ReferenceExtractor {
 		if (this.counter == missionobject.getHeight().length){
 			this.counter = 0;
 		}
-		
+				
 		if (0 == this.counter ){
 			//System.out.format("Reference first update no. %d%n",this.counter);
 			this.start = 1;
-			double[] returnvalue = new double[]{missionobject.getTrajectory()[this.counter][1],
-												missionobject.getTrajectory()[this.counter][0],
+			double[] returnvalue = new double[]{missionobject.getTrajectory()[this.counter][0],
+												missionobject.getTrajectory()[this.counter][1],
 												missionobject.getHeight()[this.counter],
 												missionobject.getYaw(),
 												missionobject.getWaitingtime(),
@@ -41,8 +41,8 @@ public class ReferenceExtractor {
 		}
 		else if (this.counter == missionobject.getHeight().length){
 			this.land = 1;
-			double[] returnvalue = new double[]{missionobject.getTrajectory()[counter][1],
-												missionobject.getTrajectory()[counter][0],
+			double[] returnvalue = new double[]{missionobject.getTrajectory()[counter][0],
+												missionobject.getTrajectory()[counter][1],
 												missionobject.getHeight()[this.counter],
 												missionobject.getYaw(),
 												missionobject.getWaitingtime(),
@@ -66,8 +66,8 @@ public class ReferenceExtractor {
 		
 		else {		
 			System.out.format("Reference update no. %d%n",this.counter);
-			double[] returnvalue = new double[]{missionobject.getTrajectory()[this.counter][1],
-												missionobject.getTrajectory()[this.counter][0],
+			double[] returnvalue = new double[]{missionobject.getTrajectory()[this.counter][0],
+												missionobject.getTrajectory()[this.counter][1],
 												missionobject.getHeight()[this.counter],
 												missionobject.getYaw(),
 												missionobject.getWaitingtime(),
