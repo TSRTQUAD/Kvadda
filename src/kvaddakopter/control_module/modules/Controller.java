@@ -16,16 +16,18 @@ import kvaddakopter.control_module.signals.*;
 
 public class Controller{		
 	protected double  errorheight,errorlateralvel, errorforwardvel, errorheading, Ts;
-	protected double KVelForward, KVelForward2, KVelHeight, KVelLateral, KYaw, Tintegral, integral;
+	protected double KVelForward, KVelForward2, KVelHeight, KVelLateral,KVelLateral2, KYaw, KYaw2, Tintegral, integral;
 
 
 	public Controller(double sampletime){	
 		KVelHeight = 1.5; 
-		KVelForward = 0.05;
-		KVelForward2 = 0.05;
-		KVelLateral = 0.05;
+		KVelForward = 0.04;
+		KVelForward2 = 0.1;
+		KVelLateral = 0.04;
+		KVelLateral2 = 0.05;
 		KYaw = 1.5;
-		Tintegral = 0.01;
+		KYaw2 = 0.5;
+		Tintegral = 0.05;
 		Ts = sampletime;
 		errorheight = 0;
 		errorlateralvel = 0;
@@ -55,7 +57,7 @@ public class Controller{
 		
 		
 		//Control signals
-		csignal.setForwardvelocity	(	-KVelForward*(RDataVel.get(0) - rsdata.getForVel() )		);
+		csignal.setForwardvelocity	(	KVelForward*(RDataVel.get(0) - rsdata.getForVel() )		);
 		csignal.setLateralvelocity	(	KVelLateral*(RDataVel.get(1) - rsdata.getLatVel() )		);	
 		csignal.setHeightvelocity	( 	KVelHeight*(rrdata.getHeight() - rsdata.getHeight())	);	
 		csignal.setYawrate			(	-KYaw*(rrdata.getYaw() - rsdata.getYaw())				);
@@ -81,11 +83,11 @@ public class Controller{
 		 //Constant speed controlling
 			ControlSignal csignal = new ControlSignal();
 			 
-			 csignal.setForwardvelocity		(	-(this.integral + (KVelForward2+ Ts*Tintegral/2)*
+			 csignal.setForwardvelocity		(	(this.integral + (KVelForward2+ Ts*Tintegral/2)*
 					 							(rrdata.getForVel() - rsdata.getForVel())	+
 					 							(Ts*Tintegral/2 - KVelForward2)*this.errorforwardvel)				);
-			 csignal.setLateralvelocity		(								0										);
-			 csignal.setYawrate 			(	-KYaw*(rrdata.getYaw() - rsdata.getYaw())							);
+			 csignal.setLateralvelocity		(	KVelLateral2*(0 - rsdata.getLatVel())								);
+			 csignal.setYawrate 			(	-KYaw2*(rrdata.getYaw() - rsdata.getYaw())							);
 			 csignal.setHeightvelocity		(	KVelHeight*(rrdata.getHeight() - rsdata.getHeight())				);
 			 
 			 //Errors 

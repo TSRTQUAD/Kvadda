@@ -160,9 +160,9 @@ public class ReferenceData {
 	
 	public void update(RefinedSensorData rsdata, MissionObject missionobject){
 		//mission = FALSE		
-		if (Math.abs(rsdata.getHeight()-Height)<1 && 
-			Math.abs(rsdata.getXpos()-Xpos)<0.3   && 
-			Math.abs(rsdata.getYpos()-Ypos)<0.3   &&
+		if ( 
+			Math.abs(rsdata.getXpos()-Xpos)<1.5   && 
+			Math.abs(rsdata.getYpos()-Ypos)<1.5   &&
 			mission==0										){
 			
 			if (!running){
@@ -176,6 +176,41 @@ public class ReferenceData {
 			System.out.println("-.-.-.-.-.-.-.-.-.-.-.-"); //update ref 
 			System.out.println("Updated referencedata mission = 0"); //update ref 	
 			System.out.println("-.-.-.-.-.-.-.-.-.-.-.-"); //update ref 
+			
+							
+				if (Ypos == rsdata.getYpos()){
+						if (Xpos > rsdata.getXpos()){
+							this.Yaw = -Math.PI/2;
+						}
+						else{
+							this.Yaw = Math.PI/2;
+						}							
+				}		
+				else if (Xpos == rsdata.getXpos()){
+					if (Ypos > rsdata.getYpos()){
+						this.Yaw = 0;
+					}
+					else{
+						this.Yaw = - Math.PI;
+					}
+						
+				}
+				else if (  Xpos > rsdata.getXpos()  && Ypos > rsdata.getYpos() ){ 				
+					this.Yaw = Math.atan( (rsdata.getXpos() - Xpos)  /  (Ypos - rsdata.getYpos()) ); 			
+				}
+				else if (  Xpos < rsdata.getXpos()  && Ypos > rsdata.getYpos() ){ 				
+					this.Yaw = Math.atan( (rsdata.getXpos() - Xpos) /   (Ypos - rsdata.getYpos()) ); 			
+				}
+				else if (  Xpos < rsdata.getXpos()  && Ypos < rsdata.getYpos() ){ 				
+					this.Yaw = Math.PI - Math.atan( (rsdata.getXpos() - Xpos) /   (rsdata.getYpos() - Ypos) ); 			
+				}
+				else if (  Xpos > rsdata.getXpos()  && Ypos < rsdata.getYpos() ){ 				
+					this.Yaw = - (Math.PI - Math.atan( (Xpos - rsdata.getXpos()) /   (rsdata.getYpos() - Ypos) )); 			
+				}
+				
+				
+			
+			
 			}
 		}	
 		// mission = TRUE

@@ -8,4 +8,5 @@ public interface ControlMainBusInterface {
 	public QuadData getQuadData();
 	public MissionObject getMissionObject();
 	public void setControlSignalobject(ControlSignal csignal);
+	public boolean isStarted();
 }

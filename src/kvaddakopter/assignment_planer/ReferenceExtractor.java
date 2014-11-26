@@ -16,8 +16,6 @@ public class ReferenceExtractor {
 	// Returndata  = (latitude, longitud, height, yaw, time, forward velocity, mission type, start,land)
 	public double[] update(MissionObject missionobject){
 		
-		System.out.println(this.counter);
-		
 		if (this.counter == missionobject.getHeight().length){
 			this.counter = 0;
 		}
@@ -25,11 +23,11 @@ public class ReferenceExtractor {
 		if (0 == this.counter ){
 			//System.out.format("Reference first update no. %d%n",this.counter);
 			this.start = 1;
-			double[] returnvalue = new double[]{missionobject.getTrajectory()[this.counter][0],
-												missionobject.getTrajectory()[this.counter][1],
+			double[] returnvalue = new double[]{missionobject.getTrajectory()[0][0],
+												missionobject.getTrajectory()[0][1],
 												missionobject.getHeight()[this.counter],
 												missionobject.getYaw(),
-												missionobject.getWaitingtime(),
+												3000,
 												missionobject.getReferenceVelocity()[this.counter][0]
 															 ,0,this.start,this.land};
 			
@@ -41,11 +39,11 @@ public class ReferenceExtractor {
 		}
 		else if (this.counter == missionobject.getHeight().length){
 			this.land = 1;
-			double[] returnvalue = new double[]{missionobject.getTrajectory()[counter][0],
-												missionobject.getTrajectory()[counter][1],
-												missionobject.getHeight()[this.counter],
+			double[] returnvalue = new double[]{missionobject.getTrajectory()[0][0],
+												missionobject.getTrajectory()[0][1],
+												missionobject.getHeight()[0],
 												missionobject.getYaw(),
-												missionobject.getWaitingtime(),
+												5000,
 												missionobject.getReferenceVelocity()[this.counter][0]
 															 ,0,start,land};
 			land = 0;
@@ -65,14 +63,14 @@ public class ReferenceExtractor {
 		
 		
 		else {		
-			System.out.format("Reference update no. %d%n",this.counter);
+			//System.out.format("Reference update no. %d%n",this.counter);
 			double[] returnvalue = new double[]{missionobject.getTrajectory()[this.counter][0],
 												missionobject.getTrajectory()[this.counter][1],
 												missionobject.getHeight()[this.counter],
 												missionobject.getYaw(),
 												missionobject.getWaitingtime(),
 												missionobject.getReferenceVelocity()[this.counter][0]
-															 ,1,start,land};
+															 ,0,start,land};
 			
 			this.counter = this.counter + 1;			
 			return returnvalue;	

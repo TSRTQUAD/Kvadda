@@ -69,14 +69,26 @@ public class Sensorfusionmodule implements Runnable{
 	protected ReferenceData 		rrdata				= new ReferenceData();   
 	protected ReferenceExtractor	referenceextractor	= new ReferenceExtractor(0);
 	protected int					counter				= 0;
-	protected int					controllingmode		= 0; // 0 for autonomous 
-	protected boolean				debugMode			= true; // Toggle System out prints 		
+	protected int					controllingmode		= 0; 		// 0 for autonomous 
+	protected boolean				debugMode			= false;	// Toggle System out prints 		
 	public Sensorfusionmodule(ControlMainBusInterface mainbus) {
 		this.mainbus = mainbus;
 	}
 	
-	public void run(){
 	
+	
+	private void checkIsRunning(){
+		while(!mainbus.isStarted()){
+			synchronized(mainbus){
+				mainbus.wait();				
+			}
+		}
+	}
+	
+	
+	public void run(){	
+		checkIsRunning();
+		/*
 		try {
 			if(debugMode){
 				System.out.println("Waiting for quadcopter...");
@@ -84,54 +96,67 @@ public class Sensorfusionmodule implements Runnable{
 				System.out.println(controlsignal.getStart());
 				System.out.println("");
 			}
-			Thread.sleep((long) 5000);
+			Thread.sleep((long) 4000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+		*/
 		//Initialize -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 		
 		//MissionObject -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+		/*
 		missionobject.setTrajectory(new double[][]
-				{{58.395166,15.574459},
-				{58.395097,15.574507},
-				{58.395010,15.574574},
-				{58.395099,15.574622},
-				{58.395073,15.574633},
-				{58.395055,15.574598},
-				{58.395052,15.574544},
-				{58.395049,15.574491},
+				{{58.395113,15.574487},
+				{58.395163,15.574632},
+				{58.395151,15.574801},
+				{58.395076,15.574833},
+				{58.395032,15.574701},
+				{58.395045,15.57454}
 				});
 		
-		missionobject.setHeight(new double[]{2,2,2,2,2,2,2,2});
+		missionobject.setHeight(new double[]{2,2,2,2,2,2});
 		missionobject.setYaw(0.0);
-		missionobject.setWaitingtime(5000.0);
+		missionobject.setWaitingtime(100.0);
 		missionobject.setReferenceVelocity(new double[][]
 				{{1,0},
 				{1,0},
 				{1,0},
 				{1,0},
 				{1,0},
-				{1,0},
-				{1,0},
-				{1,0},
+				{1,0}
 				});
-		
-		
+		*/
 		//Initialize -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+		
 		if(debugMode) System.out.println("Initializing modules ..");
 		this.quadData = mainbus.getQuadData();				//Reads sensor data from mainbus
 		sdata.setnewsensordata(quadData);						//Update local sensor object
 		//sdata.print();
 		
 		if (0 == controllingmode){
-		//this.missionobject = mainbus.getMissionObject();			//Reads mission object from mainbus	
+		this.missionobject = mainbus.getMissionObject();			//Reads mission object from mainbus	
+		
+						//Start Quad-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-		
+						ControlSignal csignal = new ControlSignal();	
+						csignal.setStart(1);
+						mainbus.setControlSignalobject(csignal);
+						try {
+							if(debugMode){
+								System.out.println("Waiting for quadcopter...");
+								System.out.println("Quad is starting .. startsignal =  ");
+								System.out.println(controlsignal.getStart());
+								System.out.println("");
+							}
+							Thread.sleep((long) 2000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+								
 		sdata.setinitial();											// Fix local coordinate system XY
 		sdata.GPS2XY();												// Transformation GPS to XY coordinates
 		sdata.xydot2XYdot();
 		rrdata.initialize(sdata.getLatitud(),sdata.getLongitud());	// Fix local coordinate system XY
-		rrdata.updateref(referenceextractor.update(missionobject));	// update ref @ Autonomous flight mode
-		
+		rrdata.updateref(referenceextractor.update(missionobject));	// update ref @ Autonomous flight mode		
 		}															
 
 		else if (1 == controllingmode){
@@ -170,23 +195,7 @@ public class Sensorfusionmodule implements Runnable{
 			System.out.println("");
 		}
 		
-		//Start Quad-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-		
-		if (0 == controllingmode){
-		if(rrdata.getStart() == 1){			
-			controlsignal.setStart(1);			
-			try {
-				if(debugMode){
-					System.out.println("Waiting for quadcopter...");
-					System.out.println("Quad is starting .. startsignal =  ");
-					System.out.println(controlsignal.getStart());
-					System.out.println("");
-				}
-				Thread.sleep((long) 1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-}
+
 		//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
 		try {
@@ -280,11 +289,13 @@ public class Sensorfusionmodule implements Runnable{
 					csignal = controller.GetControlSignalMission1(rsdata, rrdata);
 					if(debugMode) System.out.println("Controller Mission = 1, controlsignal:");
 					//csignal.print();
+					csignal = controller.saturation(csignal,1,0.4,0.1,0.3,0.02);
 				}
 				else if(rrdata.getMission()==0 || rrdata.getMission()==2){
 					csignal = controller.GetControlSignalMission0(rsdata, rrdata);
 					if(debugMode) System.out.println("Controller Mission = 0, controlsignal:");
 					//csignal.print();
+					csignal = controller.saturation(csignal,0.25,0.25,0.1,1.5,0.02);
 				}
 				
 				if( rrdata.getLand() == 1){									//Initiate landing?
@@ -295,7 +306,7 @@ public class Sensorfusionmodule implements Runnable{
 						e.printStackTrace();								//
 					}					
 				}
-				csignal = controller.saturation(csignal,0.5,0.4,0.1,1.5,0.02);
+				
 				//csignal = controller.saturation(csignal,0.7,0.6,0.1,1.5,0.02);		// Saturate control-signal
 				mainbus.setControlSignalobject(csignal);					// Update main-bus control-signal
 				if(debugMode) csignal.print();
