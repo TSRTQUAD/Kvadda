@@ -89,22 +89,6 @@ public class MissionMap extends BaseMap implements MapComponentInitializedListen
 		map.setZoom(map.getZoom() + 1);
 	}
 	
-	/**
-	 * Draw the quad marker on the specified position.
-	 * @param latitude
-	 * @param longitude
-	 */
-	public void drawTarget(double latitude, double longitude) {
-		if (this.targetMarker == null){
-			this.targetMarker = new QuadMarker(new LatLong(latitude, longitude));  
-			this.targetMarker.attachToMap(map);
-		}
-		System.out.println("Updated Position");
-		this.quadMarker.updatePosition(new LatLong(latitude, longitude));
-		map.setZoom(map.getZoom() - 1);
-		map.setZoom(map.getZoom() + 1);
-	}
-	
 	
 	/**
 	 * Where should we start the mapView. The world is yours!

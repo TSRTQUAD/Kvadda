@@ -85,7 +85,6 @@ public class ImageProcessingMainProgram extends ProgramClass{
 
 		//Create Trackers
 		//mTracker = new Tracking();
-
 	}
 
 	public void update(){
@@ -113,7 +112,8 @@ public class ImageProcessingMainProgram extends ProgramClass{
 		}else{
 			if(modes[MainBusIPInterface.MODE_BLUR_DETECTION] == 1){
 				mBlurDetection.runMethod(imageObject);
-				//TODO some way to present the blur data
+				if(imageObject.getBlurLevels().h > BlurDetection.MAX_H_BLUR || imageObject.getBlurLevels().v > BlurDetection.MAX_V_BLUR)
+					return;
 			}
 
 			if(modes[MainBusIPInterface.MODE_COLOR_DETECTION] == 1){

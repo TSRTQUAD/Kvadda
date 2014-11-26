@@ -28,7 +28,10 @@ public class QuadData{
 		   mLinkQuality = quadData.getLinkQuality();
 	   }
 
-	public synchronized float getBatteryLevel(){
+	   	public QuadData() {
+		}
+
+		public synchronized float getBatteryLevel(){
 		   return mBatteryLevel;
 	   }
 	   

@@ -7,6 +7,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
@@ -77,9 +78,6 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 	public int seq = 0;
 	public int seq_signal = 0;
 	QuadData quadData = new QuadData();
-	//
-	
-	
 	
 	//Control modules	
 	@Override
@@ -434,19 +432,22 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 		return true;
 	}
 
+	@Override
+	public synchronized HashMap<String,GPSCoordinate> getTargets() {
+		HashMap<String,GPSCoordinate> hashMap = new HashMap<String,GPSCoordinate>();
+		Integer id = 0;
+		for(TargetObject target : mTargetList){
+			hashMap.put(id.toString(), target.getGPSCoordinate());
+			id++;
+		}
+		return hashMap;
+	}
 
 
 	//Image processing-------------------------------------
 	
 	@Override
 	public synchronized void initIPVariables() {
-	
-		//activateIPMode(COLOR_DETECTION_MODE);
-		//activateIPMode(TEMPLATE_CALIBRATION_MODE);
-		//setIPImageMode(TEMPLATE_CALIBRATE_IMAGE);
-		//activateIPMode(TRACKING_MODE);
-		//setIPImageMode(DEFAULT_IMAGE);
-		
 		mColorTemplates.add(new ColorTemplate("Pink square", 120, 200, 50, 90, 180, 245, ColorTemplate.FORM_SQUARE));	
 		mColorTemplates.add(new ColorTemplate("Yellow square", 30, 120, 50, 120, 130, 255, ColorTemplate.FORM_SQUARE));
 		
@@ -558,11 +559,6 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 	public synchronized void addIPColorTemplate(ColorTemplate template) {
 		mColorTemplates.add(template);
 		
-	}
-
-	@Override
-	public synchronized ArrayList<TargetObject> getIPTargetList() {
-		return mTargetList;
 	}
 
 	@Override

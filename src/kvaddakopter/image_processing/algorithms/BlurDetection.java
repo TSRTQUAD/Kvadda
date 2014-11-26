@@ -22,6 +22,9 @@ public class BlurDetection{
 	private static final int DEFAULT_SQUARE_SIZE = 21;
 	private static final int X_DIRECTION = 0;
 	private static final int Y_DIRECTION = 1;
+	public static final float MAX_V_BLUR = 0.8f;
+	public static final float MAX_H_BLUR = 0.8f;
+	
 	private Mat mGradXImage;
 	private Mat mGradYImage;
 	

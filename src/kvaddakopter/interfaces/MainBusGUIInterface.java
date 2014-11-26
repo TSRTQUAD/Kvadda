@@ -1,6 +1,7 @@
 package kvaddakopter.interfaces;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javafx.scene.image.Image;
 import kvaddakopter.assignment_planer.MissionObject;
@@ -89,6 +90,6 @@ public interface MainBusGUIInterface {
 	 * Get list of targets detected by image processing
 	 * @return targetList
 	 */
-	public ArrayList<TargetObject> getIPTargetList();
+	public HashMap<String,GPSCoordinate> getTargets();
 	
 }

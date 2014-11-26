@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import javafx.scene.image.Image;
+import kvaddakopter.communication.QuadData;
 import kvaddakopter.image_processing.data_types.*;
 import kvaddakopter.maps.GPSCoordinate;
 public interface MainBusIPInterface {
@@ -88,4 +89,7 @@ public interface MainBusIPInterface {
 	//Color Calibration
 	public void setIPCalibTemplate(ColorTemplate cTemplate);
 	public ColorTemplate getIPCalibTemplate(); 
+	
+	//
+	public QuadData getQuadData();
 }

@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
@@ -188,13 +189,14 @@ public class TabUtforController extends BaseController implements Initializable 
     	this.missionMap.drawQuad(gps.getLatitude(), gps.getLongitude());
     }
     
-    /**
-     * Draw the Target to the map.
-     */
-    public void drawTargetMarker(){
-    	GPSCoordinate gps = this.getParent().getMainBus().getCurrentQuadPosition();
-    	this.missionMap.drawTarget(gps.getLatitude(), gps.getLongitude());
-    }
+//    /**
+//     * TODO Draw the Target to the map.
+//     */  
+//    public void drawTargetMarker(){
+//		HashMap<String,GPSCoordinate> targetMap = this.getParent().getMainBus().getTargets();
+//    	GPSCoordinate gps = this.getParent().getMainBus().getCurrentQuadPosition();
+//    	this.missionMap.drawTarget(gps.getLatitude(), gps.getLongitude());
+//    }
 
 	public void updateGPSStatus() {
 		// TODO Auto-generated method stub
@@ -202,7 +204,6 @@ public class TabUtforController extends BaseController implements Initializable 
 
 	public void updateWIFIStatus() {
 		// TODO Auto-generated method stub
-		
 	}
  
 	public void updateSpeed(float newSpeed){
@@ -215,3 +216,4 @@ public class TabUtforController extends BaseController implements Initializable 
 	}
     
 }
+
