@@ -25,7 +25,7 @@ public class MatlabProxyConnection {
 	public void startMatlab(String option) {
 		System.out.println("Setting up the Matlab proxy");
 		String workingDir = System.getProperty("user.dir");
-		File file = new File(workingDir,"src/kvaddakopter/assignment_planer/Matlab");
+		File file = new File(workingDir,"/src/kvaddakopter/assignment_planer/Matlab");
 		
 		//Create a proxy, which will be used to control MATLAB
 		if (option.equals("quiet")) {
