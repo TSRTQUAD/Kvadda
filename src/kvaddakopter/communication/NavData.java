@@ -8,48 +8,40 @@ import java.util.StringTokenizer;
 
 import kvaddakopter.interfaces.MainBusCommInterface;
 
+/**
+ * NavData class handles the receiving of data sent from the quad over UDP
+ *
+ */
 public class NavData implements Runnable {
 
 	private volatile MainBusCommInterface mMainbus;
 
-	DatagramSocket socket_nav;
-	InetAddress inet_addr;
-	NavData navdatatest;
+	private DatagramSocket socket_nav;
+	private InetAddress inet_addr;
 
-	Communication communicationtest;
+	private Communication comm;
+	
+	private boolean mIsInitiated = false;
 
 	// Container class for sensor data
 	QuadData mQuadData = new QuadData();
 
-	// double[] NavData = new double[6];
 	public NavData(
 			int threadid,
 			MainBusCommInterface mainbus,
 			String name,
-			Communication communicationtest){
+			Communication comm){
 		
 		mMainbus = mainbus;
-		this.communicationtest = communicationtest;
-		InetAddress inet_addr;
-		String ip = "192.168.1.1";
-
-		StringTokenizer st = new StringTokenizer(ip, ".");
-
-		byte[] ip_bytes = new byte[4];
-		if (st.countTokens() == 4) {
-			for (int i = 0; i < 4; i++) {
-				ip_bytes[i] = (byte) Integer.parseInt(st.nextToken());
-			}
-		} else {
-			System.out.println("Incorrect IP address format: " + ip);
-			System.exit(-1);
-		}
-
+		this.comm = comm;
+	}
+	
+	/**
+	 * Initializes the UDP socket
+	 */
+	public void init(){
 		try {
-
-			inet_addr = InetAddress.getByAddress(ip_bytes);
-
-			this.inet_addr = inet_addr;
+			this.inet_addr = comm.getInetAddr();
 			socket_nav = new DatagramSocket(Communication.NAV_PORT);
 			socket_nav.setSoTimeout(3000);
 		} catch (Exception ex1) {
@@ -57,10 +49,36 @@ public class NavData implements Runnable {
 		}
 
 		System.out.println("Init NavData");
-
 	}
-
+	
+	/**
+	 * Checks if the communication unit is started
+	 */
+	public void checkIsCommRunning(){
+		while(!comm.isRunning()){
+			synchronized(comm){
+				try {
+					comm.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}				
+			}
+		}
+		if(!mIsInitiated){
+			mIsInitiated = true;
+			init();
+		}
+	}
+	
+	/**
+	 * Sends what information to get with AT.CONFIG messages
+	 * and receives messages with {@link socket_nav.receive(packet_rcv)}
+	 * 
+	 * Received data is read in order with {@link NavReader class}
+	 * Processes different header opts and data types
+	 */
 	public void run() {
+		checkIsCommRunning();
 		try {
 			byte[] buf_snd = { 0x01, 0x00, 0x00, 0x00 };
 			DatagramPacket packet_snd = new DatagramPacket(buf_snd,
@@ -70,16 +88,12 @@ public class NavData implements Runnable {
 			System.out.println("Sent trigger flag to UDP port "
 					+ Communication.NAV_PORT);
 
-			communicationtest.send_at_cmd("AT*CONFIG="
-					+ communicationtest.get_seq()
+			comm.send_at_cmd("AT*CONFIG="
+					+ comm.get_seq()
 					+ ",\"general:navdata_demo\",\"FALSE\"");
-			communicationtest.send_at_cmd("AT*CONFIG="
-					+ communicationtest.get_seq() + ",777060865");
-
-			// communicationtest.send_at_cmd("AT*CONFIG=" +
-			// communicationtest.get_seq() +
-			// ",\"enable_navdata_gps\",\"TRUE\"");
-
+			comm.send_at_cmd("AT*CONFIG="
+					+ comm.get_seq() + ",777060865");
+			
 			byte[] buf_rcv = new byte[10240];
 			DatagramPacket packet_rcv = new DatagramPacket(buf_rcv,
 					buf_rcv.length);
@@ -87,49 +101,21 @@ public class NavData implements Runnable {
 			while (true) {
 				try {
 					socket_nav.receive(packet_rcv);
-					// System.out.println("NavData Received: " +
-					// packet_rcv.getLength() + " bytes");
-					/*
-					 * 
-					 * 
-					 * BatteryLevel = communicationtest.get_int(buf_rcv,
-					 * Communication.NAVDATA_BATTERY); //
-					 * System.out.println(BatteryLevel);
-					 * 
-					 * Altitude = communicationtest.get_int(buf_rcv,
-					 * Communication.NAVDATA_ALTITUDE);
-					 * System.out.println(Altitude);
-					 * 
-					 * 
-					 * 
-					 * Pitch =
-					 * Float.intBitsToFloat(communicationtest.get_int(buf_rcv,
-					 * Communication.NAVDATA_PITCH))/1000; Roll =
-					 * Float.intBitsToFloat(communicationtest.get_int(buf_rcv,
-					 * Communication.NAVDATA_ROLL))/1000; Yaw =
-					 * Float.intBitsToFloat(communicationtest.get_int(buf_rcv,
-					 * Communication.NAVDATA_YAW))/1000; //
-					 * System.out.println("Pitch;   " + Pitch + "   Roll:    " +
-					 * Roll + "  Yaw:   " + Yaw);
-					 * 
-					 * // System.out.println("---------------------"); Vx =
-					 * Float.intBitsToFloat(communicationtest.get_int(buf_rcv,
-					 * Communication.NAVDATA_VX))/1000; Vy =
-					 * Float.intBitsToFloat(communicationtest.get_int(buf_rcv,
-					 * Communication.NAVDATA_VY))/1000; Vz =
-					 * Float.intBitsToFloat(communicationtest.get_int(buf_rcv,
-					 * Communication.NAVDATA_VZ))/1000;
-					 */
 
 					NavReader reader = new NavReader(packet_rcv.getData());
 
 					// Get header information
 					long header = reader.uint32();
-					long droneState = reader.uint32(); // Should be some sort of
-														// mask to see what
-														// state the drone is in
+					boolean[] droneStates = reader.droneStates32();
 					long sequenceNumber = reader.uint32();
 					long visionFlag = reader.uint32();
+					
+					if(droneStates[NavReader.COMM_WATCHDOG_PROBLEM])
+						System.err.println("COMM WATCHDOG PROBLEM");
+					if(droneStates[NavReader.COMM_LOST])
+						System.err.println("COMM LOST");
+					if(droneStates[NavReader.FLYING])
+						comm.setIsFlying(true);
 
 					// Run until checksum
 					boolean finnished = false;
@@ -138,7 +124,6 @@ public class NavData implements Runnable {
 						int length = reader.uint16();
 
 						// System.out.println("OptionId: " + optionId);
-						// System.out.println("Length: " + length);
 
 						byte[] content;
 						// length includes 4 byte header
@@ -147,17 +132,14 @@ public class NavData implements Runnable {
 
 						switch (optionId) {
 						case NavReader.DEMO:
-							// System.out.println("GOT DEMO MESSAGE!");
 							int flyState = contentReader.uint16();
 							int controlState = contentReader.uint16();
 
 							mQuadData.setBatteryLevel(contentReader.uint32());
-							mQuadData
-									.setPitch(contentReader.float32() / 1000);
+							mQuadData.setPitch(contentReader.float32() / 1000);
 							mQuadData.setRoll(contentReader.float32() / 1000);
 							mQuadData.setYaw(contentReader.float32() / 1000);
-							mQuadData.setAltitude((float) (contentReader
-									.int32()) / 1000);
+							mQuadData.setAltitude((float)(contentReader.int32()) / 1000);
 							mQuadData.setVx(contentReader.float32() / 1000);
 							mQuadData.setVy(contentReader.float32() / 1000);
 							mQuadData.setVz(contentReader.float32());
@@ -166,13 +148,11 @@ public class NavData implements Runnable {
 							break;
 
 						case NavReader.WIFI:
-							// System.out.println("GOT WIFI MESSAGE!");
 							mQuadData.setLinkQuality(1 - contentReader
 									.float32());
 							break;
 
 						case NavReader.GPS:
-							// System.out.println("GOT GPS MESSAGE!");
 							mQuadData.setGPSLat(contentReader.double64());
 							mQuadData.setGPSLong(contentReader.double64());
 							mQuadData.setNGPSSatelites(contentReader
@@ -204,6 +184,8 @@ public class NavData implements Runnable {
 					}
 
 					mMainbus.setQuadData(mQuadData);
+					
+					checkStartConditions();
 
 					// System.out.println("Vx:    " + Vx + "  Vy:    " + Vy +
 					// "   GPS_Long     :" + GPS_Long);
@@ -213,11 +195,62 @@ public class NavData implements Runnable {
 				} catch (Exception ex1) {
 					ex1.printStackTrace();
 				}
-
 			}
-
 		} catch (Exception ex2) {
 			ex2.printStackTrace();
 		}
 	}
+	
+	public void checkStartConditions(){
+		boolean wifi = false,gps=false;
+		if(mQuadData.getNGPSSatelites() > 2){
+			mMainbus.setGpsFixOk(true);
+			wifi = true;
+		}
+		if(mQuadData.getLinkQuality() > 0.8){
+			mMainbus.setWifiFixOk(true);
+			gps=true;
+		}
+		
+		if(wifi && gps)
+			mMainbus.setIsStarted(true);
+			
+	}
 }
+
+
+//old stuff
+
+// System.out.println("NavData Received: " +
+// packet_rcv.getLength() + " bytes");
+/*
+ * 
+ * 
+ * BatteryLevel = comm.get_int(buf_rcv,
+ * Communication.NAVDATA_BATTERY); //
+ * System.out.println(BatteryLevel);
+ * 
+ * Altitude = comm.get_int(buf_rcv,
+ * Communication.NAVDATA_ALTITUDE);
+ * System.out.println(Altitude);
+ * 
+ * 
+ * 
+ * Pitch =
+ * Float.intBitsToFloat(comm.get_int(buf_rcv,
+ * Communication.NAVDATA_PITCH))/1000; Roll =
+ * Float.intBitsToFloat(comm.get_int(buf_rcv,
+ * Communication.NAVDATA_ROLL))/1000; Yaw =
+ * Float.intBitsToFloat(comm.get_int(buf_rcv,
+ * Communication.NAVDATA_YAW))/1000; //
+ * System.out.println("Pitch;   " + Pitch + "   Roll:    " +
+ * Roll + "  Yaw:   " + Yaw);
+ * 
+ * // System.out.println("---------------------"); Vx =
+ * Float.intBitsToFloat(comm.get_int(buf_rcv,
+ * Communication.NAVDATA_VX))/1000; Vy =
+ * Float.intBitsToFloat(comm.get_int(buf_rcv,
+ * Communication.NAVDATA_VY))/1000; Vz =
+ * Float.intBitsToFloat(comm.get_int(buf_rcv,
+ * Communication.NAVDATA_VZ))/1000;
+ */
