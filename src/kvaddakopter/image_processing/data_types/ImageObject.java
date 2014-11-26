@@ -2,10 +2,7 @@ package kvaddakopter.image_processing.data_types;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import kvaddakopter.communication.QuadData;
 import kvaddakopter.image_processing.utils.MatchesHelpFunctions;
-
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDMatch;
@@ -26,9 +23,6 @@ public class ImageObject {
 
 	// Descriptors
 	private Mat mDescriptors;
-
-	//Quaddata
-	QuadData mQuadData;
 
 	private BlurLevels mBlurLevels;
 
@@ -140,8 +134,6 @@ public class ImageObject {
 		if(!internalImageObject.hasDescriptors())
 			System.err.println("ImageObject: Descriptors has not been computed returning null");
 						
-			
-
 		//If we dont have any keypoint return an empty MatOfDMatch
 		if(internalImageObject.numberOfKeyPoints() <= 0 ||
 				externalImageObject.numberOfKeyPoints() <= 0)
@@ -235,15 +227,6 @@ public class ImageObject {
 			mKeyPoints.release();
 		if(mDescriptors != null)
 			mDescriptors.release();
-	}
-	
-	/**
-	 * Adds data from when the image was taken
-	 * @param currentQuadData
-	 */
-	public void setQuadData(QuadData currentQuadData) {
-		mQuadData = currentQuadData;
-
 	}
 
 }

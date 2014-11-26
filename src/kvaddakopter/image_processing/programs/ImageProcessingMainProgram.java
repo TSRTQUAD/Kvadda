@@ -100,7 +100,6 @@ public class ImageProcessingMainProgram extends ProgramClass{
 
 		Mat image = getNextFrame();
 		ImageObject imageObject = new ImageObject(image);
-		imageObject.setQuadData(currentQuadData);
 
 		ArrayList<TargetObject> targetObjects = new ArrayList<TargetObject>();
 
@@ -131,7 +130,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 			}
 			if(modes[MainBusIPInterface.MODE_TRACKING] == 1){
 				if(targetObjects.size() > 0){
-					mTracker.update(targetObjects);
+					mTracker.update(targetObjects,quadData);
 					Mat currentImage = imageObject.getImage();
 					trackingImage = mTracker.getImage(
 							currentImage.width(),
