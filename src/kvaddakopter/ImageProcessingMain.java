@@ -4,10 +4,10 @@ import java.util.Scanner;
 import kvaddakopter.image_processing.algorithms.ColorDetection;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.programs.CameraCalibration;
-import kvaddakopter.image_processing.programs.TestBackgroundSubtraction;
-import kvaddakopter.image_processing.programs.TestBlurDetection;
-import kvaddakopter.image_processing.programs.TestColorDetection;
-import kvaddakopter.image_processing.programs.TestTemplateMatching;
+import kvaddakopter.image_processing.test_programs.TestBackgroundSubtraction;
+import kvaddakopter.image_processing.test_programs.TestBlurDetection;
+import kvaddakopter.image_processing.test_programs.TestColorDetection;
+import kvaddakopter.image_processing.test_programs.TestTemplateMatching;
 import kvaddakopter.interfaces.MainBusIPInterface;
 
 import org.opencv.core.Core;

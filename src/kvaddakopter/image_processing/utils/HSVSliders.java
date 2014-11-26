@@ -9,8 +9,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import kvaddakopter.gui.controllers.TabDatorseendeController;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.interfaces.MainBusIPInterface;
 
@@ -19,6 +22,7 @@ import kvaddakopter.interfaces.MainBusIPInterface;
  * Implements functionality to modify and add custom made color templates
  */
 public class HSVSliders{
+	TabDatorseendeController parent;
 		static final int MIN_HUE = 0;
 		static final int MAX_HUE = 179;
 		
@@ -33,7 +37,8 @@ public class HSVSliders{
 	/**
 	 * Constructs the stage
 	 */
-	public HSVSliders(){
+	public HSVSliders(TabDatorseendeController newParent){
+		parent = newParent;
 		secondStage = new Stage();
 	}
 		
@@ -162,12 +167,18 @@ public class HSVSliders{
 					}
 					});
 		
+		TextField templateDescription = new TextField ();
+		templateDescription.setText("Description");
+		
+		
 		Button addTemplateBtn = new Button();
 		addTemplateBtn.setText("Add template");
 		addTemplateBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				template.setDescription(templateDescription.getText());
 				mainbus.addIPColorTemplate(new ColorTemplate(template));
+				parent.updateColorTemplates();
 			}
 		});
 		
@@ -221,10 +232,13 @@ public class HSVSliders{
         sliderValHigh.setMaxWidth(180);
         secondaryLayout.getChildren().add(sliderValHigh);
         
-        addTemplateBtn.setTranslateY(300);
+        templateDescription.setTranslateY(300);
+		secondaryLayout.getChildren().add(templateDescription);
+        
+        addTemplateBtn.setTranslateY(330);
 		secondaryLayout.getChildren().add(addTemplateBtn);
         
-        closeBtn.setTranslateY(330);
+        closeBtn.setTranslateY(360);
 		secondaryLayout.getChildren().add(closeBtn);
         
          
@@ -234,8 +248,11 @@ public class HSVSliders{
         secondStage.setScene(secondScene);
          
         //Set position of second window, related to primary window.
-        secondStage.setX(primaryStage.getX() + 550);
-        secondStage.setY(primaryStage.getY());
+        if(primaryStage != null){
+            secondStage.setX(primaryStage.getX() + 550);
+            secondStage.setY(primaryStage.getY());
+        }
+
 
         secondStage.show();
 	}

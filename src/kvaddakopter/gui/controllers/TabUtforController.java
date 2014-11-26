@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
@@ -44,9 +45,17 @@ public class TabUtforController extends BaseController implements Initializable 
     @FXML
     private Label lblTimeLeft;
     @FXML
+    private Label lblSpeed;
+    @FXML
+    private Label lblBattery;
+    @FXML
     private Button btnStartMission;
     @FXML
     private Button btnAbortMission;
+    @FXML
+    private Button btnToggleControl;
+    @FXML
+    private Button btnEmergency;
     @FXML
     private ComboBox<String> cmbListOfMissions;
     
@@ -75,7 +84,11 @@ public class TabUtforController extends BaseController implements Initializable 
     private void changeSelectedMission() throws FileNotFoundException, IOException{
     	this.currentSelectedMissionName = this.cmbListOfMissions.getSelectionModel().getSelectedItem();
     	this.currentSelectedMissionObject = this.missionStorage.loadMission(this.currentSelectedMissionName);
+    	
     	this.drawMission();
+    	this.lblMissionType.setText(this.currentSelectedMissionObject.getMissionType().toString());
+    	this.lblEstimatedDistance.setText(String.valueOf((int) this.currentSelectedMissionObject.getTrajectoryLength()[0][0])+ " m");
+    	this.lblEstimatedTime.setText(SecToMinSec.transform((long) this.currentSelectedMissionObject.getMissionTime()[0][0]));
     }
 
     @FXML
@@ -90,6 +103,15 @@ public class TabUtforController extends BaseController implements Initializable 
     	this.shouldStart = false;
     }
     
+    @FXML
+    private void emergency(){
+    	this.getParent().getMainBus().setEmergencyStop(true);
+    }
+
+    @FXML
+    private void toggleControl(){
+    	this.getParent().getMainBus().toggleController();
+    }
 
 	
 	public boolean shouldStart(){
@@ -134,8 +156,8 @@ public class TabUtforController extends BaseController implements Initializable 
 		this.lblEstimatedTime.setText("");
 		this.lblEstimatedDistance.setText("");
 		this.lblTimeLeft.setText("");
-		
-		
+		this.lblSpeed.setText("");
+		this.lblBattery.setText("");
 		
 		
 		this.cmbListOfMissions.setItems( FXCollections.observableArrayList(
@@ -166,13 +188,32 @@ public class TabUtforController extends BaseController implements Initializable 
     	GPSCoordinate gps = this.getParent().getMainBus().getCurrentQuadPosition();
     	this.missionMap.drawQuad(gps.getLatitude(), gps.getLongitude());
     }
+    
+//    /**
+//     * TODO Draw the Target to the map.
+//     */  
+//    public void drawTargetMarker(){
+//		HashMap<String,GPSCoordinate> targetMap = this.getParent().getMainBus().getTargets();
+//    	GPSCoordinate gps = this.getParent().getMainBus().getCurrentQuadPosition();
+//    	this.missionMap.drawTarget(gps.getLatitude(), gps.getLongitude());
+//    }
+
+	public void updateGPSStatus() {
+		// TODO Auto-generated method stub
+	}
+
+	public void updateWIFIStatus() {
+		// TODO Auto-generated method stub
+	}
  
-    
+	public void updateSpeed(float newSpeed){
+		this.lblSpeed.setText(String.format("%.1f m/s", newSpeed));
+	}
 
+	 
+	public void updateBattery(float newBattery){
+		this.lblBattery.setText(String.format("%.1f %", newBattery));
+	}
     
-    
-
-    
-
-
 }
+

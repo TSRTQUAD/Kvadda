@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import kvaddakopter.gui.controllers.MainController;
+import kvaddakopter.interfaces.IPAndGUIInterface;
 import kvaddakopter.interfaces.MainBusGUIInterface;
 
 public class GUIModule extends Application implements Runnable{
@@ -29,7 +30,7 @@ public class GUIModule extends Application implements Runnable{
 	private String applicationTitle = "KvaddaKopter -  Uppdrags planerare";
 	
 	
-	static MainBusGUIInterface mainBus;
+	static IPAndGUIInterface mainBus;
 	
 	/**
 	 * Runs once when the application is started.
@@ -40,7 +41,7 @@ public class GUIModule extends Application implements Runnable{
 		super();
 	}
 	
-	public GUIModule(MainBusGUIInterface mainBus1) {
+	public GUIModule(IPAndGUIInterface mainBus1) {
 		mainBus = mainBus1;
 	}
 	

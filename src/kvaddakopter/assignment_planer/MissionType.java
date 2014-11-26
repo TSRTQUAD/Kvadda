@@ -3,9 +3,9 @@ package kvaddakopter.assignment_planer;
 
 public enum MissionType {
 	NULL_MISSION(0, ""),
-	AROUND_COORDINATE(1, "Runt Koordinat"),
-	ALONG_TRAJECTORY(2, "Längs bana"),
-	AREA_COVERAGE(3,"Inom område");
+	AROUND_COORDINATE(1, "Circle coordinate"),
+	ALONG_TRAJECTORY(2, "Along trajectory"),
+	AREA_COVERAGE(3,"Area coverage");
 	
     private final int value;
     private final String name;

@@ -1,4 +1,4 @@
-package kvaddakopter.image_processing.programs;
+package kvaddakopter.image_processing.test_programs;
 
 import java.awt.image.BufferedImage;
 
@@ -7,6 +7,7 @@ import kvaddakopter.image_processing.algorithms.BackgroundSubtraction;
 import kvaddakopter.image_processing.comm_tests.IPMockMainBus;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.decoder.FFMpegDecoder;
+import kvaddakopter.image_processing.programs.ProgramClass;
 import kvaddakopter.image_processing.utils.ImageConversion;
 import kvaddakopter.image_processing.utils.KeyBoardHandler;
 

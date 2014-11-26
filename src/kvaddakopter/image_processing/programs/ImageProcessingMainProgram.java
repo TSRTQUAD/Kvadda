@@ -3,6 +3,7 @@ package kvaddakopter.image_processing.programs;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import kvaddakopter.communication.QuadData;
 import kvaddakopter.image_processing.algorithms.BackgroundSubtraction;
 import kvaddakopter.image_processing.algorithms.BlurDetection;
 import kvaddakopter.image_processing.algorithms.ColorDetection;
@@ -12,15 +13,22 @@ import kvaddakopter.image_processing.data_types.ColorTemplate;
 import kvaddakopter.image_processing.data_types.FormTemplate;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
-import kvaddakopter.image_processing.data_types.Template;
 import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
 import kvaddakopter.interfaces.MainBusIPInterface;
 
 import org.opencv.core.Mat;
-import org.opencv.highgui.Highgui;
 
-
+/**
+ * Main class of the Image Processing
+ * Initiates detection methods, tracking, decoder
+ * 
+ * Checks colorTemplates, FormTamplates on mainbus
+ * Checks detection modes, image modes on mainbus
+ * 
+ * runs main loop: depending on image processing settings on mainbus
+ *	
+ */
 public class ImageProcessingMainProgram extends ProgramClass{
 
 	private ColorDetection mColorDetection;
@@ -29,33 +37,35 @@ public class ImageProcessingMainProgram extends ProgramClass{
 	private BlurDetection mBlurDetection;
 	private Tracking mTracker;
 
-	//Debug Warning
-	boolean userHasBeenWarned = false;
-
-	//Sleep time / FPS
-	private long mSleepTime = 20;
-
 	int count = 0;
-
+	
+	private boolean mStandAloneTest = false;
+	
 	public ImageProcessingMainProgram(int threadid, MainBusIPInterface mainbus)  {
 		super(threadid,mainbus);
 	}
 
 	@Override
 	public void init() {
+		
+		//Sleep time / FPS
+		mSleepTime = 20;
+		
 		//Create and initialize decoder. And select source.
 		mDecoder = new FFMpegDecoder();
 
 		//mDecoder.initialize("tcp://192.168.1.1:5555"/*FFMpegDecoder.STREAM_ADDR_BIPBOP*/);
 		mDecoder.initialize(FFMpegDecoder.STREAM_ADDR_BIPBOP);
+		//mDecoder.initialize("mvi2.mp4");
 		// Listen to decoder events
 		mDecoder.setDecoderListener(this);
 
 		//Start stream on a separate thread
 		mDecoder.startStream();
 
-		//Open window 
-		openVideoWindow();
+		//Open window
+		if(mStandAloneTest)
+			openVideoWindow();
 
 		//Create and add background subtraction method and add it to the list of active methods
 		//mBackgroundSubtraction = new BackgroundSubtraction();
@@ -75,11 +85,12 @@ public class ImageProcessingMainProgram extends ProgramClass{
 
 		//Create Trackers
 		//mTracker = new Tracking();
-
 	}
 
 	public void update(){
 		//Images to show
+		checkIsRunning();
+		QuadData currentQuadData = new QuadData(mMainbus.getQuadData());
 		BufferedImage out = null;
 		Mat colorDetectionImage = null;
 		Mat colorCalibrationImage = null;
@@ -91,8 +102,6 @@ public class ImageProcessingMainProgram extends ProgramClass{
 
 		ArrayList<TargetObject> targetObjects = new ArrayList<TargetObject>();
 
-		//GPSCoordinate gpsCoordinate = mMainbus.getGPSCoordinate(); 
-
 		int[] modes = mMainbus.getIPActiveModes(); 
 
 		if(modes[MainBusIPInterface.MODE_COLOR_CALIBRATION] == 1){
@@ -103,7 +112,8 @@ public class ImageProcessingMainProgram extends ProgramClass{
 		}else{
 			if(modes[MainBusIPInterface.MODE_BLUR_DETECTION] == 1){
 				mBlurDetection.runMethod(imageObject);
-				//TODO some way to present the blur data
+				if(imageObject.getBlurLevels().h > BlurDetection.MAX_H_BLUR || imageObject.getBlurLevels().v > BlurDetection.MAX_V_BLUR)
+					return;
 			}
 
 			if(modes[MainBusIPInterface.MODE_COLOR_DETECTION] == 1){
@@ -120,7 +130,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 			}
 			if(modes[MainBusIPInterface.MODE_TRACKING] == 1){
 				if(targetObjects.size() > 0){
-					mTracker.update(targetObjects);
+					mTracker.update(targetObjects,quadData);
 					Mat currentImage = imageObject.getImage();
 					trackingImage = mTracker.getImage(
 							currentImage.width(),
@@ -170,9 +180,11 @@ public class ImageProcessingMainProgram extends ProgramClass{
 				out = ImageConversion.mat2Img(colorCalibrationImage);
 			break;
 		}
+		
 		if(out != null){
 			mMainbus.setIPImageToShow(out);
-			updateJavaWindow(out);
+			if(mStandAloneTest)
+				updateJavaWindow(out);
 		}
 	}	
 

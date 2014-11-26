@@ -18,8 +18,6 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
-import ch.qos.logback.classic.filter.ThresholdFilter;
-
 /**
  * ColorDetection class
  * Implements functionality to identify objects from  color
@@ -40,12 +38,19 @@ public class ColorDetection  extends DetectionClass{
 	
 	//Adaptive coloring
 	private boolean mUsingColorAdaption = true;
-
+	
+	/**
+	 * Standard constructor
+	 * Initiates this object and initiates list of color templates
+	 */
 	public ColorDetection(){
 		super();
 		colorTemplates = new ArrayList<ColorTemplate>();
 	}
-
+	
+	/**
+	 * Check if the method is active or not
+	 */
 	@Override
 	public boolean isMethodActive(Mainbus mainbus) {
 		//return mainbus.isColorDetectionOn();
@@ -131,7 +136,6 @@ public class ColorDetection  extends DetectionClass{
 			
 			//Draw target HSV values
 			for(TargetObject target:newTargets){
-				//System.out.println((int)target.getPosition().get(0,0)[0]);
 				drawTargetHSVValues(cutoutImage, targetHSVChannels, (int)target.getPosition().get(0,0), (int)target.getPosition().get(1,0));
 			}
 			

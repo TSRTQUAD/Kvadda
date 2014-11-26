@@ -3,7 +3,6 @@ package kvaddakopter.image_processing.algorithms;
 import java.util.ArrayList;
 import java.util.List;
 
-import kvaddakopter.ImageProcessingMain;
 import kvaddakopter.Mainbus.Mainbus;
 import kvaddakopter.image_processing.data_types.ImageObject;
 import kvaddakopter.image_processing.data_types.TargetObject;
@@ -36,7 +35,7 @@ import org.opencv.imgproc.Imgproc;
 public class DetectionClass {
 	Mat mIntermeditateResult;
 
-	protected ArrayList<TargetObject> runMethod(ImageObject imageObject){
+	public ArrayList<TargetObject> runMethod(ImageObject imageObject){
 		return null;
 	};
 	

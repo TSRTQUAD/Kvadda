@@ -7,6 +7,7 @@ import com.lynden.gmapsfx.javascript.object.*;
 import java.util.ArrayList;
 
 import kvaddakopter.gui.components.AbstractGPSMarker;
+import kvaddakopter.gui.components.GPSMarkerNormal;
 import kvaddakopter.gui.components.QuadMarker;
 import kvaddakopter.gui.controllers.TabUtforController;
 
@@ -43,6 +44,7 @@ public class MissionMap extends BaseMap implements MapComponentInitializedListen
 	
 	
 	private QuadMarker quadMarker;
+	private GPSMarkerNormal targetMarker; //TODO some other marker
 	
 	
 	/**

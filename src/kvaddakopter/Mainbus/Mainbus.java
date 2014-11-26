@@ -1,7 +1,5 @@
 package kvaddakopter.Mainbus;
 
-import kvaddakopter.communication.*;
-
 import java.awt.Frame;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -9,30 +7,30 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashMap;
 
-// import org.opencv.core.Core;
-
-
-
-
-
-
-
-
-import kvaddakopter.ImageProcessingMain;
-import kvaddakopter.assignment_planer.AssignmentPlanerRunnable;
+import javafx.scene.image.Image;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import kvaddakopter.assignment_planer.MatFileHandler;
 import kvaddakopter.assignment_planer.MatlabProxyConnection;
 import kvaddakopter.assignment_planer.MissionObject;
-import kvaddakopter.control_module.Mockmainbus;
+import kvaddakopter.communication.Communication;
+import kvaddakopter.communication.QuadData;
 import kvaddakopter.control_module.Sensorfusionmodule;
-import kvaddakopter.control_module.signals.ControlSignal;
-import kvaddakopter.control_module.signals.SensorData;
+import kvaddakopter.gui.GUIModule;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
+import kvaddakopter.image_processing.data_types.FormTemplate;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.image_processing.programs.ImageProcessingMainProgram;
 import kvaddakopter.interfaces.AssignmentPlanerInterface;
 import kvaddakopter.interfaces.ControlMainBusInterface;
+import kvaddakopter.interfaces.IPAndGUIInterface;
+import kvaddakopter.interfaces.MainBusCommInterface;
+import kvaddakopter.interfaces.MainBusGUIInterface;
+import kvaddakopter.interfaces.MainBusIPInterface;
+import kvaddakopter.maps.GPSCoordinate;
+// import org.opencv.core.Core;
 
 
 /**
@@ -44,34 +42,18 @@ import kvaddakopter.interfaces.ControlMainBusInterface;
  * 2) Create thread with your runnable
  * 3) start thread
  * 
- * Ex)
- * MyRunnable myRunnable = new MyRunnable(other variables,mainbus);
- *       
- * Thread t = new Thread(myRunnable);
- * t.setPriority(1); //Sets priority (how much sheduled time the thread gets)
- * t.start(); 
- * 
- * -----------------------------------
- * If unsure about synchronization read the following:
- * http://www.javaworld.com/article/2074318/java-concurrency/java-101--understanding-java-threads--part-2--thread-synchronization.html
- * 
  */
-public class Mainbus extends Frame implements KeyListener,ControlMainBusInterface, AssignmentPlanerInterface{
-	//Examples
-	private int var;
-	public boolean condVar = false;
+public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, ControlMainBusInterface, AssignmentPlanerInterface, MainBusGUIInterface, MainBusIPInterface, IPAndGUIInterface{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
-	
-	
-	//Programs
-	MyRunnable myRunnable;
-	MyRunnable2 myRunnable2;
-	AssignmentPlanerRunnable assignmentplanerrunnable;
-	
-	ImageProcessingMainProgram imageProcessing;
-	
 	//Image processing storage
-	//TODO
+	private boolean mIsIPRunning;
+	private ArrayList<TargetObject> mTargetList;
+
 	
 	//Assignment planer storage
 	private MatlabProxyConnection matlabproxy;
@@ -86,22 +68,22 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 	private boolean StartPermission;
 	public boolean selfCheck = false;
 	float speed = (float)0.1;
+	float batteryLevel = 99f;
     boolean shift = false;
     boolean runcontroller = false;
     boolean space_bar = false; //true = Takeoff, false = Landing
 	public boolean EmerStop = false;
-	double[] NavData = new double[6];
-	double[][] NavDataOverAll = new double[500000][6];
-	double[][] ControlSignalAll = new double[500000][5];
+
+	double[][] NavDataOverAll = new double[3000][6];
+	double[][] ControlSignalAll = new double[3000][5];
 	public int seq = 0;
 	public int seq_signal = 0;
-	//
-	
-	
+	QuadData quadData = new QuadData();
 	
 	//Control modules	
-	public synchronized double[] getSensorVector() {				
-		return this.NavData;
+	@Override
+	public synchronized QuadData getQuadData() {				
+		return this.quadData;
 	}
 	
 	
@@ -126,76 +108,79 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		// 	System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
 		Mainbus mainbus = new Mainbus();
-		System.out.println("created mainbus");
-		//ImageProcessingMainProgram imageProcessing = new ImageProcessingMainProgram(1,mainbus);
-		//System.out.println("imageprocessing initiated");
-
-		//Setting up a Matlab Proxy Server
-		/*MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
-		mainbus.setMatlabProxyConnection(matlabproxy);
-		matlabproxy.startMatlab("quiet"); */
-
-		//Thread t3 = new Thread(imageProcessing);
-		//t3.setPriority(1);
-		//t3.start(); 
-
-		MyRunnable myRunnable = new MyRunnable(1,mainbus);
-		MyRunnable2 myRunnable2 = new MyRunnable2(2,mainbus);
-		AssignmentPlanerRunnable assignmentplanerrunnable = new AssignmentPlanerRunnable(3,mainbus);
-
-
-
-		Thread t = new Thread(myRunnable);
-		t.setPriority(1);
-		t.start();
-
-		/*Thread t4 = new Thread(assignmentplanerrunnable);
-		t4.setPriority(1);
-		t4.start();*/
-
-		//Communication
-		try{
-			ControlSignal = new float[] {0, 0, 0, 0, 0};
-			Communication communicationtest = new Communication(3,mainbus,"Communication");
-			Thread t7 = new Thread(communicationtest);
-			t7.setDaemon(true);
-			t7.setPriority(1);
-			t7.start();
-			System.out.println("Communication-link initiated");
-
-
-			NavData navdatatest = new NavData(4,mainbus,"NavData", communicationtest);	
-			Thread t5 = new Thread(navdatatest);
-			t5.setDaemon(true);
-			t5.setPriority(1);
-			t5.start();
-			System.out.println("NavData-link initiated");
-
-
-
-
-		} catch (Exception ex1){
-
-			Security security = new Security(5,mainbus);
-			Thread t6 = new Thread(security);
-			t6.setDaemon(true);
-			t6.setPriority(1);
-			t6.start();
-			System.out.println("Security-link initiated");
-
-			ex1.printStackTrace();	
-		}
-
-
-		//
-		// START MODULE	    	
+		
+		
+//		//Setting up a Matlab Proxy Server
+//		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
+//		mainbus.setMatlabProxyConnection(matlabproxy);
+//		matlabproxy.startMatlab("quiet");
+//		
+//		AssignmentPlanerRunnable assignmentplanerrunnable = new AssignmentPlanerRunnable(3,mainbus);
+//		Thread t4 = new Thread(assignmentplanerrunnable);
+//		t4.setPriority(1);
+//		t4.start();
+//
+//		//Communication
+//		try{
+//			ControlSignal = new float[] {0, 0, 0, 0, 0};
+//			Communication communicationtest = new Communication(3,mainbus,"Communication");
+//			Thread t7 = new Thread(communicationtest);
+//			t7.setDaemon(true);
+//			t7.setPriority(1);
+//			t7.start();
+//			System.out.println("Communication-link initiated");
+//
+//
+//			NavData navdatatest = new NavData(4,mainbus,"NavData", communicationtest);	
+//			Thread t5 = new Thread(navdatatest);
+//			t5.setDaemon(true);
+//			t5.setPriority(1);
+//			t5.start();
+//			System.out.println("NavData-link initiated");
+//
+//
+//
+//		} catch (Exception ex1){
+//
+//			Security security = new Security(5,mainbus);
+//			Thread t6 = new Thread(security);
+//			t6.setDaemon(true);
+//			t6.setPriority(1);
+//			t6.start();
+//			System.out.println("Security-link initiated");
+//
+//			ex1.printStackTrace();	
+//		}
+		
+		//GUI MODULE
+		GUIModule guiModule = new GUIModule(mainbus);
+		Thread t10 = new Thread(guiModule);
+		t10.setDaemon(true);
+		t10.setPriority(5);
+		t10.start();
+		
+		// Control module MODULE	    	
 		Sensorfusionmodule sensmodule = new Sensorfusionmodule(mainbus);
 		Thread t8 = new Thread(sensmodule);
 		t8.setDaemon(true);
 		t8.setPriority(1);
 		t8.start();
+		
+		// Image processing MODULE
+		ImageProcessingMainProgram imageProcessing = new ImageProcessingMainProgram(1,mainbus);
+		mainbus.initIPVariables();
+		Thread t9 = new Thread(imageProcessing);
+		t9.setDaemon(true);
+		t9.setPriority(1);
+		t9.start();
+		
 		while(true){
 			//			System.out.println("Mainbus running");
+			try {
+				Thread.sleep(60000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -212,29 +197,6 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		
 
 	}
-	
-	
-	
-	public synchronized void setVar(int i){
-		var = i;
-	}
-	
-	public synchronized int getVar(){
-		return var;
-	}
-	
-	public synchronized boolean getCondVar(){
-		return condVar;
-	}
-	
-	public synchronized void setCondVar(boolean b){
-		condVar = true;
-	}
-	
-	/*
-	 * Get/set functions for image processing
-	 */
-	//TODO image processing bus functionallity (being implemented in IPMockMainbus)
 	
 	/*
 	 * Get/set functions for Mission Planing
@@ -265,7 +227,7 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 	}
 	
 	//Communication
-
+	@Override
 	public synchronized float[] getControlSignal(){
 		ControlSignalAll[seq][0] = (double)ControlSignal[0];
 		ControlSignalAll[seq][1] = (double)ControlSignal[1];
@@ -277,39 +239,45 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
 		//System.out.println("Pos 1:   " + ControlSignal[1] + "Pos 2:   " + ControlSignal[2]);
 		return ControlSignal;
 	}
-	
-	public synchronized void setNavData(double[] nd){
+
+
+	@Override
+	public synchronized void setQuadData(QuadData quadData){
+		/*
 		NavDataOverAll[seq][0] = nd[0];
 		NavDataOverAll[seq][1] = nd[1];
 		NavDataOverAll[seq][2] = nd[2];
 		NavDataOverAll[seq][3] = nd[3];
 		NavDataOverAll[seq][4] = nd[4];
 		NavDataOverAll[seq][5] = nd[5];
-	
+		*/		
 		seq = seq + 1;
-		this.NavData = nd;
+		this.quadData = quadData;
 	}
 	
-	
+	@Override
 	public synchronized void setSelfCheck(boolean b){
 	    selfCheck = true;
 	}
 	
+	@Override
 	public synchronized String getMode(){
 		return mode; 
 	}
 	
+	@Override
 	public synchronized boolean getStartPermission(){
 		return StartPermission;
 	}
 	
+	@Override
 	public synchronized boolean EmergencyStop(){
-	return EmerStop;
-//	return true;
+		return EmerStop;
 	}
 	
-	
-	///// 
+	public synchronized void setEmergencyStop(boolean newBool){
+		EmerStop = newBool;
+	}
 	
 	public void keyTyped(KeyEvent e) {
         ;
@@ -339,7 +307,7 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
     	switch (keyCode) {
     		case KeyEvent.VK_C:
     			if (false == this.runcontroller){
-    			this.runcontroller = true;
+    				this.runcontroller = true;
     			}
     			else if (true == this.runcontroller){
     				this.runcontroller = false;
@@ -354,7 +322,7 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
     	        shift = true;
     	    	break;
     	    case KeyEvent.VK_E:
-    	    	EmerStop = true;;
+    	    	EmerStop = true;
     	    	break;
     	    case KeyEvent.VK_UP:
     	    	if (shift) {
@@ -455,9 +423,188 @@ public class Mainbus extends Frame implements KeyListener,ControlMainBusInterfac
     }
 
 
+	@Override
+	public double getCurrentSpeed() {
+		return 1.23;
+	}
 
-	//
 
+	@Override
+	public GPSCoordinate getCurrentQuadPosition() {
+		return new GPSCoordinate(quadData.getGPSLat() , quadData.getGPSLong());
+	}
+
+	@Override
+	public boolean wifiFixOk() {
+		return true;
+	}
+
+	@Override
+	public boolean gpsFixOk() {
+		return true;
+	}
+
+	@Override
+	public synchronized HashMap<String,GPSCoordinate> getTargets() {
+		HashMap<String,GPSCoordinate> hashMap = new HashMap<String,GPSCoordinate>();
+		Integer id = 0;
+		for(TargetObject target : mTargetList){
+			hashMap.put(id.toString(), target.getGPSCoordinate());
+			id++;
+		}
+		return hashMap;
+	}
+
+
+	//Image processing-------------------------------------
+	
+	@Override
+	public synchronized void initIPVariables() {
+		mColorTemplates.add(new ColorTemplate("Pink square", 120, 200, 50, 90, 180, 245, ColorTemplate.FORM_SQUARE));	
+		mColorTemplates.add(new ColorTemplate("Yellow square", 30, 120, 50, 120, 130, 255, ColorTemplate.FORM_SQUARE));
+		
+		mIPCalibTemplate[0] = new ColorTemplate();
+		mIPImageToShow[0] = null;
+		
+		mIsIPRunning = false;
+	}
 
 	
+	@Override
+	public synchronized int[] getIPActiveModes() {
+		return mIPActiveModes;
+	}
+
+@Override
+	public synchronized void setIPActiveModes(int[] modes) {
+		//mIPActiveModes = modes;
+	}
+
+	@Override
+	public synchronized void deactivateIPMode(int i) {
+		mIPActiveModes[i] = 0;
+	}
+	
+	@Override
+	public synchronized void activateIPMode(int i) {
+		mIPActiveModes[i] = 1;
+	}
+
+	@Override
+	public synchronized boolean getIsIPRunning() {
+		return mIsIPRunning;
+	}
+
+	@Override
+	public synchronized void setIsIPRunning(boolean b) {
+		mIsIPRunning = b;
+	}
+
+	@Override
+	public synchronized int getIPImageMode() {
+		return mIPImageMode[0];
+	}
+
+	@Override
+	public synchronized void setIPImageMode(int imageMode) {
+		mIPImageMode[0] =imageMode;
+	}
+
+	@Override
+	public synchronized ArrayList<ColorTemplate> getIPColorTemplates() {
+		return mColorTemplates;
+	}
+
+	@Override
+	public synchronized void setIPColorTemplates(ArrayList<ColorTemplate> colorTemplates) {
+		//mColorTemplates = colorTemplates;
+		
+	}
+
+	@Override
+	public synchronized ArrayList<FormTemplate> getIPFormTemplates() {
+		return mFormTemplates;
+	}
+
+	@Override
+	public synchronized void addIPFormTemplate(FormTemplate template) {
+		mFormTemplates.add(template);
+	}
+
+	@Override
+	public synchronized void setIPGPSCoordinate(GPSCoordinate coord) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public synchronized void setIPTargetList(ArrayList<TargetObject> listOfTargets) {
+		mTargetList = listOfTargets;
+	}
+
+	@Override
+	public synchronized void setIPImageToShow(BufferedImage image) {
+		WritableImage wr = null;
+        if (image != null) {
+            wr = new WritableImage(image.getWidth(), image.getHeight());
+            PixelWriter pw = wr.getPixelWriter();
+            for (int x = 0; x < image.getWidth(); x++) {
+                for (int y = 0; y < image.getHeight(); y++) {
+                    pw.setArgb(x, y, image.getRGB(x, y));
+                }
+            }
+        }
+        mIPImageToShow[0] = wr;
+	}
+	
+	@Override
+	public synchronized Image getIPImageToShow() {
+		return mIPImageToShow[0];
+	}
+
+	@Override
+	public synchronized void setIPCalibTemplate(ColorTemplate cTemplate) {
+		mIPCalibTemplate[0] = cTemplate;	
+	}
+
+	@Override
+	public synchronized void addIPColorTemplate(ColorTemplate template) {
+		mColorTemplates.add(template);
+		
+	}
+
+	@Override
+	public synchronized ColorTemplate getIPCalibTemplate() {
+		return mIPCalibTemplate[0];
+	}
+
+	@Override
+	public synchronized FormTemplate getCalibFormTemplate() {
+		return mIPCalibFormTemplate[0];
+	}
+
+	@Override
+	public synchronized void setCalibFormTemplate(FormTemplate template) {
+		mIPCalibFormTemplate[0] = template;
+	}
+
+	@Override
+	public synchronized Image getImage() {
+		return mIPImageToShow[0];
+	}
+	
+	@Override
+	public synchronized void toggleController(){
+		this.runcontroller = !this.runcontroller;
+	}
+	
+	@Override
+	public synchronized float getSpeed(){
+		return speed;
+	}
+	
+	@Override
+	public synchronized float getBattery(){
+		return batteryLevel;
+	}
 }

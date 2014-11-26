@@ -13,6 +13,7 @@ import kvaddakopter.image_processing.utils.KeyBoardHandler;
 import kvaddakopter.image_processing.utils.KeyBoardListener;
 import kvaddakopter.interfaces.MainBusIPInterface;
 
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 
 import com.xuggle.xuggler.demos.VideoImage;
@@ -39,7 +40,7 @@ public abstract class ProgramClass implements Runnable,DecoderListener,KeyBoardL
 	private static VideoImage mScreen = null;
 	
 	//Sleep time / FPS
-	private long mSleepTime = 20;
+	protected long mSleepTime = 20;
 	
 	//private volatile Container container;
 	protected MainBusIPInterface mMainbus;
@@ -55,6 +56,10 @@ public abstract class ProgramClass implements Runnable,DecoderListener,KeyBoardL
 	public ProgramClass(int threadid, MainBusIPInterface mainbus) {
 		mMainbus = mainbus;
 	    mThreadId = threadid;
+	    
+	  //Has to be run to be working
+	  System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+	  		
 	    //init(); Put in run()
 	}
 

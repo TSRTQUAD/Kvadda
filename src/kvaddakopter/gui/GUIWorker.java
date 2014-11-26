@@ -45,15 +45,30 @@ public class GUIWorker implements Runnable{
    						public void run() {
    							mainController.tabUtforController.drawQuadMarker();
    							mainController.tabUtforController.updateTimeLeft(sampleTime);
+   							mainController.tabUtforController.updateSpeed(mainBuss.getSpeed());
+   							mainController.tabUtforController.updateBattery(mainBuss.getBattery());
    						}
    					 });
                 	}
+                	//CHECK LINKSTATUS
+   					 Platform.runLater(new Runnable() {
+   						@Override
+   						public void run() {
+   							mainController.tabUtforController.updateGPSStatus();
+   							mainController.tabUtforController.updateWIFIStatus();
+   						}
+   					 });
+   					 //Update gui image
+   					 Platform.runLater(new Runnable() {
+   						@Override
+   						public void run() {
+   							mainController.tabDatorseendeController.updateImage();
+   						}
+   					 });
                 	
                 }
-                
                 Thread.sleep(clock.stopAndGetSleepTime(1000));
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

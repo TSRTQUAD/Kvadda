@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import javafx.scene.image.Image;
+import kvaddakopter.communication.QuadData;
 import kvaddakopter.image_processing.data_types.*;
 import kvaddakopter.maps.GPSCoordinate;
 public interface MainBusIPInterface {
@@ -33,11 +34,12 @@ public interface MainBusIPInterface {
 	
 	FormTemplate mIPCalibFormTemplate[] = new FormTemplate[1];
 	ColorTemplate mIPCalibTemplate[] = new ColorTemplate[1];
-	Image mIPImageToShow[] = new Image[1];
 	
 	//Modes
 	int[] mIPActiveModes = new int[10];
 	int[] mIPImageMode =new int[]{IMAGE_DEFAULT};
+	
+	Image mIPImageToShow[] = new Image[1];
 	
 	//Intiation
 	public void initIPVariables();
@@ -50,42 +52,44 @@ public interface MainBusIPInterface {
 	 * @return
 	 */
 	public int[] getIPActiveModes();
-	public void setIPActiveModes(int[] modes); //TODO in GUI interface
-	public void activateIPMode(int i); //TODO in GUI interface
-	public void deactivateIPMode(int i); //TODO in GUI interface
+	public void setIPActiveModes(int[] modes);
+	public void activateIPMode(int i);
+	public void deactivateIPMode(int i);
 	//public boolean getIsIPModeActive(int i); //Not needed really but might be handier than to fetch all modes
 	public boolean getIsIPRunning();
-	public void setIsIPRunning(boolean b); //TODO in GUI interface
+	public void setIsIPRunning(boolean b);
 	
 	//Image flags
 	public int getIPImageMode();
-	public void setIPImageMode(int imageMode);//TODO in GUI interface
+	public void setIPImageMode(int imageMode);
 	
 	//Templates
 	//Color
 	public ArrayList<ColorTemplate> getIPColorTemplates();
-	public void setIPColorTemplates(ArrayList<ColorTemplate> colorTemplates); //TODO in GUI interface
-	public void addIPColorTemplate(ColorTemplate template); //TODO in GUI interface
+	public void setIPColorTemplates(ArrayList<ColorTemplate> colorTemplates);
+	public void addIPColorTemplate(ColorTemplate template);
 	
 	//Form
 	public ArrayList<FormTemplate> getIPFormTemplates();
-	public void addIPFormTemplate(FormTemplate template); //TODO in GUI interface
+	public void addIPFormTemplate(FormTemplate template);
 	public FormTemplate getCalibFormTemplate();
 	public void setCalibFormTemplate(FormTemplate template);
 	
 	//GPS
-	public void setIPGPSCoordinate(GPSCoordinate coord); //TODO somewhere
-	public GPSCoordinate getGPSCoordinate();
+	public void setIPGPSCoordinate(GPSCoordinate coord);
+	public GPSCoordinate getCurrentQuadPosition();
 	
 	//Targets
 	public void setIPTargetList(ArrayList<TargetObject> listOfTargets);
-	public ArrayList<TargetObject> getIPTargetList(); //TODO in GUI interface
 	
 	//Image object
 	public void setIPImageToShow(BufferedImage image);
-	public Image getIPImageToShow(); //TODO in GUI interface
+	public Image getIPImageToShow();
 	
 	//Color Calibration
-	public void setIPCalibTemplate(ColorTemplate cTemplate); //TODO in GUI interface
+	public void setIPCalibTemplate(ColorTemplate cTemplate);
 	public ColorTemplate getIPCalibTemplate(); 
+	
+	//
+	public QuadData getQuadData();
 }

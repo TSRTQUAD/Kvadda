@@ -14,11 +14,7 @@ public class RedGPSPolygon extends GPSPolygon{
 		super(map);
 	}
 
-	/**
-	 * Returns the shape Options
-	 * @param mvc
-	 * @return
-	 */
+	@Override
 	protected PolygonOptions getOptions(MVCArray mvc){
 		return new PolygonOptions()
 			.paths(mvc)
@@ -28,6 +24,8 @@ public class RedGPSPolygon extends GPSPolygon{
 			.fillColor("red")
 			.fillOpacity(0.3);
 	}
+	
+	
 	@Override
 	protected AbstractGPSMarker usedMarkerType(LatLong clickedCoordinate){
 		return new GPSMarkerForbidden(clickedCoordinate);

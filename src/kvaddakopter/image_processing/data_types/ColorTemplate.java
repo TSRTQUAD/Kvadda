@@ -57,7 +57,7 @@ public class ColorTemplate {
 	/**
 	 * Constructor from threshold values
 	 * @param description_
-	 * @param hueLow_
+	 * @param hueLow_ 
 	 * @param hueHigh_
 	 * @param saturationLow_
 	 * @param saturationHigh_
@@ -126,6 +126,14 @@ public class ColorTemplate {
 	public String getDescription(){
 		return description;
 	}
+
+	/**
+	 * Set template decription
+	 * @param descr new description
+	 */
+	public void setDescription(String descr){
+		description = descr;
+	}
 	
 	/**
 	 * Activates the template
@@ -141,6 +149,13 @@ public class ColorTemplate {
 	 */
 	public void deactivate(){
 		isActive = false;
+	}
+	
+	/**
+	 * Toggle activation of the template
+	 */
+	public void toggleActive(){
+		isActive = !isActive;
 	}
 	
 	/**
@@ -288,6 +303,15 @@ public class ColorTemplate {
 	public int getValHigh() {
 		return valueHigh;	
 	}
+		
 	
-	
+	/**
+	 * Renderer for ComboBox
+	 */
+	public String toString() {
+		if(isActive){
+			return "[x] " + description;
+		}
+		return "[-] " + description;
+	}
 }

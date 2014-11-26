@@ -13,7 +13,7 @@ import kvaddakopter.image_processing.data_types.ImageObject;
 
 /**
  * Class which has the purpose of containing and calculating the 
- * bluriness of an image
+ * bluriness level of an image
  *
  */
 public class BlurDetection{
@@ -22,6 +22,9 @@ public class BlurDetection{
 	private static final int DEFAULT_SQUARE_SIZE = 21;
 	private static final int X_DIRECTION = 0;
 	private static final int Y_DIRECTION = 1;
+	public static final float MAX_V_BLUR = 0.8f;
+	public static final float MAX_H_BLUR = 0.8f;
+	
 	private Mat mGradXImage;
 	private Mat mGradYImage;
 	
@@ -29,7 +32,7 @@ public class BlurDetection{
 	private float mHBlurLevel; //between 0:1
 	
 	/**
-	 * Constructor
+	 * Standard constructor
 	 */
 	public BlurDetection(){
 		mVBlurLevel = 0;
@@ -94,7 +97,7 @@ public class BlurDetection{
 	 * @param src image mat to find local maximas in
 	 * @param squareSize The number of pixels to be processed in each step
 	 * @param direction BlurDetection.X_DIRECTION or BlurDetection.Y_DIRECTION
-	 * @return
+	 * @return Vector<Float> local maximas of image
 	 */
 	private Vector<Float> localMaximas(Mat src,int squareSize,int direction, int threshold){
 		Vector<Float> listOfLocMax = new Vector<Float>();

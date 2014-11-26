@@ -11,6 +11,8 @@ public class FormTemplate {
 	double mBoxHeight = 0.5;
 	double mBoxOffsetX = 0.5;
 	double mBoxOffsetY = 0.5;
+	String description;
+	private boolean isActive;
 		
 	
 	public void setBoxWitdh(double newWitdh){
@@ -73,5 +75,55 @@ public class FormTemplate {
 	
 	public int getId() {
 		return mId;
+	}
+	
+	public String getDescription(){
+		return description;
+	}
+	
+	public void setDescription(String descr){
+		description = descr;
+	}
+
+	
+	/**
+	 * Renderer for ComboBox
+	 */
+	public String toString() {
+		if(isActive){
+			return "[x] " + description;
+		}
+		return "[-] " + description;
+	}
+	
+	/**
+	 * Activates the template
+	 * Set active flag to true
+	 */
+	public void activate(){
+		isActive = true;
+	}
+	
+	/**
+	 * Deactivates the template
+	 * Set the active flag to false
+	 */
+	public void deactivate(){
+		isActive = false;
+	}
+	
+	/**
+	 * Toggle activation of the template
+	 */
+	public void toggleActive(){
+		isActive = !isActive;
+	}
+	
+	/**
+	 * Check if template is active or not
+	 * @return boolean isActive flag
+	 */
+	public boolean isActive(){
+		return isActive;
 	}
 }
