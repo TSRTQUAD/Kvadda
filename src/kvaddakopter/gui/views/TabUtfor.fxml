@@ -23,19 +23,28 @@
                                  <children>
                                     <HBox alignment="CENTER_LEFT" prefHeight="46.0" prefWidth="140.0">
                                        <children>
-                                          <Label prefWidth="70.0" text="Speed:" />
+                                          <Label prefWidth="70.0" text="Speed:">
+                                             <padding>
+                                                <Insets left="10.0" />
+                                             </padding></Label>
                                           <Label fx:id="lblSpeed" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefWidth="70.0" text="2.4 m/s" textAlignment="RIGHT" />
                                        </children>
                                     </HBox>
             				<HBox alignment="CENTER" prefWidth="140.0">
             					<children>
-            						<Label prefWidth="70.0" text="Time left:" />
+            						<Label prefWidth="70.0" text="Time left:">
+                                             <padding>
+                                                <Insets left="10.0" />
+                                             </padding></Label>
             						<Label fx:id="lblTimeLeft" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefWidth="70.0" text="300 s" />
             					</children>
             				</HBox>
                                     <HBox alignment="CENTER" prefWidth="150.0">
                                        <children>
-                                          <Label prefWidth="70.0" text="Battery:" />
+                                          <Label prefWidth="70.0" text="Battery:">
+                                             <padding>
+                                                <Insets left="10.0" />
+                                             </padding></Label>
                                           <Label fx:id="lblBattery" alignment="CENTER_RIGHT" prefWidth="70.0" text="100 %" />
                                        </children>
                                     </HBox>

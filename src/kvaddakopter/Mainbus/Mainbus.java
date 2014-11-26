@@ -67,6 +67,7 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 	private boolean StartPermission;
 	public boolean selfCheck = false;
 	float speed = (float)0.1;
+	float batteryLevel = 99f;
     boolean shift = false;
     boolean runcontroller = false;
     boolean space_bar = false; //true = Takeoff, false = Landing
@@ -598,5 +599,10 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 	@Override
 	public synchronized float getSpeed(){
 		return speed;
+	}
+	
+	@Override
+	public synchronized float getBattery(){
+		return batteryLevel;
 	}
 }
