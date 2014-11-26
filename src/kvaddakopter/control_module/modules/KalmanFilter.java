@@ -37,6 +37,11 @@ public class KalmanFilter {
 		
 		
 		// Update x according to new GPS observations. 
+		/**
+		 * Updates kalmanfilter with a new GPS measurement
+		 * @param GPS - observation
+		 * @return New states 
+		 */
 		public double[] gpsmeasurementupdate(double observation){	
 		    // Transform observation to matrix
 	        this.z1 = new SimpleMatrix(1,1,true,observation);
@@ -64,7 +69,12 @@ public class KalmanFilter {
 		
 		
 		
-		// Update x according to new velocity observations. 
+		 
+		/**
+		 * Update states according to new velocity measurement
+		 * @param velobservation Velocity measurement
+		 * @return New States
+		 */
 		public double[] velmeasurementupdate(double velobservation){	
 		    // Transform observation to matrix
 	        this.z2 = new SimpleMatrix(1,1,true,velobservation);
@@ -92,7 +102,10 @@ public class KalmanFilter {
 
 		
 		
-		// Update x by time.	
+		/**
+		 * Update states according to timeupdate.	
+		 * @return New states
+		 */
 		public double[] timeupdate(){
 			// x = F x 
 			this.x = F.mult(x);
@@ -105,7 +118,9 @@ public class KalmanFilter {
 		
 		
 		
-		
+		/**
+		 * Prints all Matrixes used in Kalman.
+		 */
 		public void print(){
 		    // Construct all matrices 	
 			F.print(); 

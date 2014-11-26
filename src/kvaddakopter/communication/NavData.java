@@ -191,6 +191,7 @@ public class NavData implements Runnable {
 				    		}
 				    	}
 //			    	}
+				    	System.out.println("Degree:   " + 180/Math.PI*Yaw + "Rad:    " + Yaw);
 				    	double[] NavData = new double[6];
 				    	NavData[0] = GPS_Lat;
 				       	NavData[1] = GPS_Long;
@@ -202,7 +203,7 @@ public class NavData implements Runnable {
 				        mMainbus.setNavData(NavData);
 				       	
 
-				        	// System.out.println("Vx:    " + Vx + "  Vy:    " + Vy +  "   GPS_Long     :" + GPS_Long);
+				         //System.out.println("Vx:    " + Vx + "  Vy:    " + Vy +  "   GPS_Long     :" + GPS_Long);
 
 
 				} catch(SocketTimeoutException ex3) {

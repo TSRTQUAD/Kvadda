@@ -20,10 +20,10 @@ public class Controller{
 
 
 	public Controller(double sampletime){	
-		KVelHeight = 0.1; 
+		KVelHeight = 1.5; 
 		KVelForward = 0.05;
-		KVelLateral = 0.1;
-		KYaw = 0.2;
+		KVelLateral = 0.05;
+		KYaw = 0.02;
 		Tintegral = 0.01;
 		Ts = sampletime;
 		errorheight = 0;
@@ -34,7 +34,12 @@ public class Controller{
 	}
 		
 	
-	
+		/**
+		 * Function that calculates controlsignal given mission = 0 @ Reference data
+		 * @param Refinedsensordata object
+		 * @param Referencedata object
+		 * @return Controlsignal
+		 */
 		public ControlSignal GetControlSignalMission0(RefinedSensorData rsdata, ReferenceData rrdata){
 		
 		ControlSignal csignal = new ControlSignal();
@@ -49,7 +54,7 @@ public class Controller{
 		
 		
 		//Control signals
-		csignal.setForwardvelocity	(	KVelForward*(RDataVel.get(0) - rsdata.getForVel() )		);
+		csignal.setForwardvelocity	(	-KVelForward*(RDataVel.get(0) - rsdata.getForVel() )		);
 		csignal.setLateralvelocity	(	KVelLateral*(RDataVel.get(1) - rsdata.getLatVel() )		);	
 		csignal.setHeightvelocity	( 	KVelHeight*(rrdata.getHeight() - rsdata.getHeight())	);	
 		csignal.setYawrate			(	KYaw*(rrdata.getYaw() - rsdata.getYaw())				);
@@ -64,7 +69,13 @@ public class Controller{
 		}
 
 		
-		
+		/**
+		 * Function that calculates controlsignal given mission = 1 @ Reference data
+		 * This controller uses the velocity referenece in Referencedata object.
+		 * @param rsdata  RefinedSensorData object containing estimated states and sensordata.
+		 * @param rrdata ReferenceData object containing reference signal
+		 * @return Controlsignal
+		 */
 		 public ControlSignal GetControlSignalMission1(RefinedSensorData rsdata, ReferenceData rrdata){ 
 		 //Constant speed controlling
 			ControlSignal csignal = new ControlSignal();
@@ -85,8 +96,19 @@ public class Controller{
 		 }
 		 
 
-	public ControlSignal saturation(ControlSignal csignal,double forvel,double latvel,double heightvel,double yawdot){
-		double refforvel,reflatvel,refheightvel; //,refyawdot;
+		 /**
+		  * Saturates controlsignal given saturation parameters (forvel, latvel, heightvel and yawdot).
+		  * Also introduces a dead-zone for yawdot around yawdeadzone
+		  * @param controlsignal
+		  * @param forvel
+		  * @param latvel
+		  * @param heightvel
+		  * @param yawdot
+		  * @param yawdeadzone
+		  * @return
+		  */
+	public ControlSignal saturation(ControlSignal csignal,double forvel,double latvel,double heightvel,double yawdot,double yawdeadzone){
+		double refforvel,reflatvel,refheightvel,refyawdot;
 		
 		
 		if (Math.abs(csignal.getForwardvelocity()) > forvel){
@@ -101,28 +123,46 @@ public class Controller{
 			refheightvel = (csignal.getHeightvelocity() > heightvel) ? heightvel : - heightvel;
 			csignal.setHeightvelocity(refheightvel);
 		}
-		
+		if (Math.abs(csignal.getYawrate()  ) < yawdeadzone){
+			csignal.setYawrate(0);
+		}
+		if (Math.abs(csignal.getYawrate()  ) > yawdot){
+			refyawdot = (csignal.getYawrate() > yawdot) ? yawdot : - yawdot;
+			csignal.setYawrate(refyawdot);
+		}
 		//TODO  yawdot
 
 		return csignal;		
 	}
 		 
 
-	// Getters
-	public double geterrorheigt() {
+	/**
+	 * Get error height
+	 * @return
+	 */
+	public double geterrorheight() {
 		return errorheight;
 	}
 
-
+	/**
+	 * Geterror for lateral velocity
+	 * @return
+	 */
 	public double geterrorlateralvel() {
 		return errorlateralvel;
 	}
 
-
+	/**
+	 * Get error for forward velocity
+	 * @return
+	 */
 	public double geterrorforwardvel() {
 		return errorforwardvel;
 	}
-
+	/**
+	 * Get error for heading (yaw)
+	 * @return
+	 */
 	public double geterrorheading() {
 		return errorheading;
 	}

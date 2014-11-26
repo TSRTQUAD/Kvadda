@@ -30,7 +30,7 @@ public class ReferenceData {
 	public int mission;
 	public int start;
 	public int land;
-	private int counter = 0;
+	private int counter = 1;
 	public double[] latestreference;
 	
 	public double Xpos;
@@ -118,19 +118,20 @@ public class ReferenceData {
 		this.land = 0;	
 	}
 	
-	public void wiggle(){
-		this.Latitud = initiallat;
-		this.Longitud = initiallon + 0.000012*Math.pow(-1, counter);
-		this.Height = 1;
-		this.Yaw = 0;
-		this.time = 1000;
+	
+	
+	public void square(){
+		System.out.println("Arrived att referenceupdate" + counter);
+		this.Latitud = this.initiallat; // ((counter % 4) == 1 || (counter % 4) == 0) ? initiallat: initiallat + 0.000009*5;
+		this.Longitud = this.initiallon; //((counter % 4) == 1 || (counter % 4) == 2) ? initiallon: initiallon + 0.0000132*5;
+		this.Height = 2;
+		this.Yaw = ( (counter % 2) == 0) ? Math.PI / 2 : 0;
+		this.time = 10000;
 		this.ForVel = 1;
 		this.mission = 0;
 		this.start = 1;
-		this.land = 0;	
-		
-		this.counter = this.counter + 1;
-		
+		this.land = 0;			
+		this.counter = this.counter + 1;		
 	}
 	
 	
@@ -268,21 +269,26 @@ public class ReferenceData {
 		}			
 	}
 	
-	public void updatewiggle(RefinedSensorData rsdata){
+	public void updatesquare(RefinedSensorData rsdata){
 		//mission = TEST		
 		if (Math.abs(rsdata.getHeight()-Height)<2 && 
 			Math.abs(rsdata.getXpos()-Xpos)<1	&& 
 			Math.abs(rsdata.getYpos()-Ypos)<1   &&
 			mission==0										)
 		
-		{			
+		{	
+			System.out.println("-.-.-.-.-.-.-.-.-.-.-.-"); 		//update ref 
+			System.out.println(""); 	//update ref 	
+			System.out.println("-.-.-.-.-.-.-.-.-.-.-.-"); 		//update ref 
+			
 			if (!running){ 
 				this.lStartTime= System.currentTimeMillis();
 				this.running = true;
-			}			
+			}
+			
 			if (running && ((double)Math.abs(System.currentTimeMillis() - lStartTime)) > time){
 			this.running = false;
-			this.wiggle();	//Indoor flight
+			this.square();	//Indoor flight
 			System.out.println("-.-.-.-.-.-.-.-.-.-.-.-"); 		//update ref 
 			System.out.println("Updated referencedata TEST"); 	//update ref 	
 			System.out.println("-.-.-.-.-.-.-.-.-.-.-.-"); 		//update ref 

@@ -58,15 +58,11 @@ public class Sensorfusionmodule implements Runnable{
 	protected double 				sampletime			= 0.2; //seconds
 	protected double 				time;
 	protected double[] 				sensorvector;
-	
-	
 	protected SensorData 			sdata				= new SensorData();
 	protected ControlSignal 		controlsignal		= new ControlSignal();
 	protected MissionObject 		missionobject		= new MissionObject(); 
-	
-	
-	protected KalmanFilter			skalmanx 			= new KalmanFilter(sampletime,1,0.1,1,0,0);
-	protected KalmanFilter			skalmany	 		= new KalmanFilter(sampletime,1,0.1,1,0,0);
+	protected KalmanFilter			skalmanx 			= new KalmanFilter(sampletime,1,0.01,1,0,0);
+	protected KalmanFilter			skalmany	 		= new KalmanFilter(sampletime,1,0.01,1,0,0);
 	protected RefinedSensorData 	rsdata  			= new RefinedSensorData();
 	protected Controller			controller			= new Controller(sampletime);
 	protected ReferenceData 		rrdata				= new ReferenceData();   
@@ -226,7 +222,8 @@ public class Sensorfusionmodule implements Runnable{
 				rrdata.update(rsdata, missionobject);						//Update reference data
 				}
 				if (1 == controllingmode){
-				//rrdata.updatewiggle(rsdata);								//Reference is init+-(0.000012 longitud)
+				rrdata.updatesquare(rsdata);								//Reference is a 3m square)
+				rrdata.GPS2XY();
 				}
 				else if (2 == controllingmode){
 				rrdata.updatetest(rsdata);									//Reference is init+-(2m)
@@ -234,6 +231,7 @@ public class Sensorfusionmodule implements Runnable{
 				System.out.print("Reference signal:");
 				rrdata.print();
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
+				
 				
 								
 				//Control-signal -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
@@ -257,7 +255,7 @@ public class Sensorfusionmodule implements Runnable{
 					}					
 				}
 
-				csignal = controller.saturation(csignal,0.1,0.1,0.1,1);		// Saturate control-signal
+				csignal = controller.saturation(csignal,0.7,0.6,0.1,0.2,0.02);		// Saturate control-signal
 				mainbus.setControlSignalobject(csignal);					// Update main-bus control-signal
 				csignal.print();
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	

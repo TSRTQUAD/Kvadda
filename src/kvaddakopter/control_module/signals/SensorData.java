@@ -18,18 +18,24 @@ public class SensorData {
 	private double Longitudold;
 	private double Latitudold;
 	
-	
+		/**
+		 * Set sensordata object from sensordata in vector format
+		 * {Latitud,Longitud,xdot,ydot,height,yaw}
+		 * @param sensorvector
+		 */
 	public void setnewsensordata(double[] sensorvector){
 		this.Latitud = sensorvector[0];
 		this.Longitud = sensorvector[1];
 		this.xdot = sensorvector[2];
 		this.ydot = sensorvector[3];
 		this.height = sensorvector[4];
-		this.yaw = Math.PI/180*sensorvector[5];
+		this.yaw = sensorvector[5];
 	}
 
 	
-	// Fixes the local coordinate system XY to intitiallat, initiallon
+	/**
+	 * Fixes the local coordinate system XY to intitiallat, initiallon
+	 */
 	public void setinitial(){
 		this.initiallon = Longitud;
 		this.initiallat  = Latitud;
@@ -38,9 +44,11 @@ public class SensorData {
 	}
 
 	
-	/* Transforms GPS coordinates Latitude and Longitude into local 
-	 *  coordinate system XY which has origo at (initiallat,initialat)
-	   and Y axis pointing north. */ 
+	/**
+	 *  Transforms GPS coordinates Latitude and Longitude into local 
+	   coordinate system XY which has origo at (initiallat,initiallon)
+	   and Y axis pointing north. 
+	   */ 
 	public void GPS2XY(){
 
 		double lat1=initiallat*Math.PI/180;
@@ -52,23 +60,26 @@ public class SensorData {
 		double deltaLat=lat2-lat1;
 		double deltaLon=lon2-lon1;
 
-		this.Y=radius*deltaLon*Math.cos((lat1+lat2)/2)*1000;
-		this.X=radius*deltaLat*1000;
+		this.X=radius*deltaLon*Math.cos((lat1+lat2)/2)*1000;
+		this.Y=radius*deltaLat*1000;
 	}
 	
 	
 	
-	/* Transforms local coordinate system XY into coordinate system 
+	/** Transforms local coordinate system XY into coordinate system 
 	 * xy on platform. y pointing forward (Pitch axis) and x pointing sideways (Roll axis)
+	 * @param 
 	 */
+	/*
 	public double[]  XY2xy(double A, double B){
 		double a = Math.cos(yaw)*A + Math.sin(yaw)*B;
 		double b = -Math.sin(yaw)*A + Math.cos(yaw)*B;
 		double[] array = new double[]{a,b};
 		return array;
 	}
+	*/
 	
-	
+	/*
 	// Transforms xy to local coordinate system XY
 	public double[] xy2XY(double a,double b){
 		double A =  Math.cos(yaw)*a - Math.sin(yaw)*b;
@@ -76,13 +87,20 @@ public class SensorData {
 		double[] array = new double[]{A,B};
 		return array;
 	}
-
+	 */
 	
+	
+	/**
+	 * Transforms quadcopters local velocities (xdot,ydot) to fixed coordinate system XY velocities
+	 */
 	public void xydot2XYdot(){
 		Xdot =  Math.cos(yaw)*xdot - Math.sin(yaw)*ydot;
 		Ydot =  Math.sin(yaw)*xdot + Math.cos(yaw)*ydot;
 	}
 	
+	/**
+	 * Transforms fixed coordinate system XY velocities to local velocities (xdot,ydot)
+	 */
 	public void XYdot2xydot(){
 		xdot =    Math.cos(yaw)*Xdot + Math.sin(yaw)*Ydot;
 		ydot =  - Math.sin(yaw)*Xdot + Math.cos(yaw)*Ydot;
@@ -91,12 +109,19 @@ public class SensorData {
 	
 	
 	
-	// setGPSposition (Latitud longitud)
+	/**
+	 *  sets GPS-position from array {Latitud,longitud}
+	 * @param GPS
+	 */
 	public void setGPSposition(double[] GPS) {
 		this.Latitud = GPS[0];
 		this.Longitud = GPS[1];
 	}
 	
+	/**
+	 * Calculates if there is a new GPS measurement
+	 * @return true/false
+	 */
 	public boolean isGPSnew() {
 		if(	this.Longitud == this.Longitudold && this.Latitud == this.Latitudold)		 
 		return false;
@@ -107,18 +132,21 @@ public class SensorData {
 		}
 	}
 	
-
-	public void print(){
-		
+	/**
+	 * Prints all sensordata
+	 */
+	public void print(){	
 		System.out.format("Latitud: %.8f , Longitud %.8f%n", Latitud, Longitud);
 		System.out.format("X: %.4f , Y %.4f%n", X, Y);
 		System.out.format("Xdot: %.4f , Ydot %.4f%n", Xdot, Ydot);
 		System.out.format("xdot: %.4f , ydot %.4f%n", xdot, ydot);
 		System.out.format("Height: %.4f%n", height);
-		System.out.format("Yaw: %.4f%n  %n %n", yaw*180/Math.PI);
+		System.out.format("Yaw: %.4f%n  %n %n",yaw);
 	}
 	
-	
+		/**
+		 * Print at which GPS positions coordinate system XY is fixed at.
+		 */
 	public void printinitials(){
 	System.out.format("Init.Latitud: %.8f , Init.Longitud %.8f%n", initiallat, initiallon);
 	}
@@ -127,8 +155,6 @@ public class SensorData {
 	public double getLongitud() {
 		return Longitud;
 	}
-
-
 
 
 	public void setLongitud(double longitud) {

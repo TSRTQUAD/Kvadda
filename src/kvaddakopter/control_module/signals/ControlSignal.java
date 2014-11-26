@@ -19,6 +19,10 @@ public class ControlSignal{
 		start = 0;
 	}
 	
+	
+	/**
+	 * Print all control-signals
+	 */
 	public void print(){
 		System.out.format("yawrate: %.4f%n", yawrate);
 		System.out.format("Heightvelocity: %.1f%n", heightvelocity);
