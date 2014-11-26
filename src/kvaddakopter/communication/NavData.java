@@ -63,6 +63,7 @@ public class NavData implements Runnable {
 					e.printStackTrace();
 				}				
 			}
+		System.out.println("Stopped waiting!");
 		}
 		if(!mIsInitiated){
 			mIsInitiated = true;
