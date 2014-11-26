@@ -5,10 +5,12 @@ import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.object.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import kvaddakopter.gui.components.AbstractGPSMarker;
 import kvaddakopter.gui.components.GPSMarkerNormal;
 import kvaddakopter.gui.components.QuadMarker;
+import kvaddakopter.gui.components.shapes.TargetMap;
 import kvaddakopter.gui.controllers.TabUtforController;
 
 
@@ -36,6 +38,17 @@ public class MissionMap extends BaseMap implements MapComponentInitializedListen
 	private ArrayList<AbstractGPSMarker> forbiddenAreasCoordinates = new ArrayList<AbstractGPSMarker>();
 	
 	
+	/**
+	 * Target container
+	 */
+	private TargetMap targets;
+	
+	
+	/**
+	 * The quad Marker
+	 */
+	private QuadMarker quadMarker;
+	
 	
 	/**
 	 * Is map initialized Initialized
@@ -43,8 +56,6 @@ public class MissionMap extends BaseMap implements MapComponentInitializedListen
 	boolean isMapInitialized = false;
 	
 	
-	private QuadMarker quadMarker;
-	private GPSMarkerNormal targetMarker; //TODO some other marker
 	
 	
 	/**
@@ -83,7 +94,6 @@ public class MissionMap extends BaseMap implements MapComponentInitializedListen
 			this.quadMarker = new QuadMarker(new LatLong(latitude, longitude));  
 			this.quadMarker.attachToMap(map);
 		}
-		System.out.println("Updated Position");
 		this.quadMarker.updatePosition(new LatLong(latitude, longitude));
 		map.setZoom(map.getZoom() - 1);
 		map.setZoom(map.getZoom() + 1);
@@ -96,6 +106,17 @@ public class MissionMap extends BaseMap implements MapComponentInitializedListen
 	 */
 	protected LatLong startCoordinate(){
 		return new LatLong(58.406659, 15.620358);
+	}
+
+	public void drawTargetsOnMap(HashMap<String, GPSCoordinate> targets) {
+		
+		if (this.targets == null){
+			this.targets = new TargetMap(this.map);  
+		}
+		this.targets.addListOfTargets(targets);
+		map.setZoom(map.getZoom() - 1);
+		map.setZoom(map.getZoom() + 1);
+		
 	}
 	
 

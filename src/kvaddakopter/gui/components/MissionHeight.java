@@ -2,6 +2,7 @@ package kvaddakopter.gui.components;
 
 public enum MissionHeight {
 	ONE_METER("1 m", 1), 
+	THREE_METERS("2 m",2),
 	FIVE_METERS("5 m", 5), 
 	TEN_METERS("10 m", 10);
 

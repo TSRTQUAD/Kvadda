@@ -24,6 +24,7 @@ public class RouteMarker {
         markerPaths.put(MapMarkerEnum.NAVIGATION_NORMAL, "waypoint_marker.png");
         markerPaths.put(MapMarkerEnum.FORBIDDEN_AREAS, "waypoint_marker_forbidden.png");
         markerPaths.put(MapMarkerEnum.QUAD_MARKER, "quad_marker.png");
+        markerPaths.put(MapMarkerEnum.TARGET_MARKER, "target-marker.png");
     }
 
 
@@ -39,7 +40,6 @@ public class RouteMarker {
     public static Marker create(double latitude, double longitude, MapMarkerEnum iconType, String title) {
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(new LatLong(latitude, longitude));
-        
         if (title != null) markerOptions.title(title);
 
         markerOptions.icon(RouteMarker.figureOutIconPath(iconType));

@@ -48,25 +48,33 @@ public class MainController implements Initializable {
 	@FXML
 	public TabUtforController tabUtforController;
 	
-	
+	/**
+	 * View that contains GUI for  computer vision
+	 */
 	@FXML
 	public AnchorPane tabDatorseende;
 	
+	
+	/**
+	 * Controller representing the tab for compuser vision.
+	 */
 	@FXML 
 	public TabDatorseendeController tabDatorseendeController;
 	
 	
-	
+	/**
+	 * A reference to the overall Tab object
+	 */
 	@FXML
 	public TabPane mainTabPane;
 	
+	
+	
 	/**
-	 * GUI events
+	 * When the Execute mission tab is selected this runs once
 	 */
 	@FXML
-	private void runMissionTabSelected(){
-		
-	}
+	private void runMissionTabSelected(){ }
 
 	private void setAnchorZero(GoogleMapView node) {
 		AnchorPane.setTopAnchor(node, 0.0);
@@ -79,13 +87,11 @@ public class MainController implements Initializable {
 	
 
 	/**
-	 * MainBus
+	 * A reference to the program common mainBus. 
 	 */
 	protected IPAndGUIInterface mainBus;
 	
-	/**
-	 * Runs When GUI is initialized.
-	 */
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 			this.tabUtforController.setParent(this);
@@ -102,7 +108,7 @@ public class MainController implements Initializable {
 		}); 
 		
 		
-		
+		// Starts the GUI-worker which hanldes all connections with the other program.
 		Thread t1 = new Thread(new GUIWorker(this));
 		t1.setDaemon(true);
 		t1.start();
@@ -111,7 +117,9 @@ public class MainController implements Initializable {
 	}
 	
 	
-	
+	/**
+	 * Refreshes the list of available missions in the dropdown
+	 */
 	protected void updateAvailableMission() {
 		this.tabUtforController.updateMissionList();
 		

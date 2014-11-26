@@ -6,11 +6,11 @@ import java.nio.ByteOrder;
  * NavReader class implements functionality to read ordered data from a byte array
  * via a ByteBuffer.
  * 
- * Read functions: byte8, uint16, uint32, int16, int32, float32, double64, getSubArray
+ * Read functions: byte8, uint16, uint32, int16, int32, float32, double64, getSubArray, droneState32
  * Utility: getRemainingSize
  */
 public class NavReader {
-	
+	//OPTION IDs
 	public static final int DEMO 				= 0;
 	public static final int TIME 				= 1;
 	public static final int RAW_MEASURES 		= 2;
@@ -40,6 +40,42 @@ public class NavReader {
 	public static final int WIFI		 		= 26;
 	public static final int GPS 				= 27;
 	public static final int CHECKSUM	 		= 65535;
+	
+	
+	//DRONE STATES
+	public static final int
+			FLYING			= 0,
+			VIDEO_ENABLED	= 1,
+			VISION_ENABLED	= 2,
+			CONTROL_ENABLED = 3,
+			ALTITUDE_CONTROL_ALGORITHM = 4, 
+			START_BUTON_STATE =5, 
+			CONTROL_COMMAND_ACK =6,
+			CAMERA_READY =7,
+			TRAVELING_ENABLED =8,
+			USB_READY  =9,
+			NAV_DATA_DEMO = 10,
+			NAVDATA_BOOTSTRAP = 11,
+			MOTOR_PROBLEM = 12,
+			COMM_LOST=  13,
+			SOFTWWARE_FAULT=      14,
+			LOW_BATTERY=         15,
+			USER_EMERGENCY_LANDING = 16, 
+			TIMER_ELAPSED=       17,
+			MAGNETO_CALIBRATION = 18,
+			ANGLEs_OUT_OF_RANGE=   19,
+			TOO_MUCH_WIND=        20,
+			ULTRASONIC_SENSOR_DEF=      21,
+			CUTOUT_DETECTED=     22,
+			PIC_VERSION_NUMBER_OK= 23,
+			AT_CODEC_THREAD_ON=    24,
+			NAVDATA_THREAD_ON=    25,
+			VIDEO_THREAD_ON=      26,
+			ACQUISITION_THREAD_ON=27,
+			CONTROL_  =       28,
+			ADC_WATCH_DOG_DELAY=   29,
+			COMM_WATCHDOG_PROBLEM= 30,
+			EMERGENCY_LANDING=   31;
 	
 	//Buffer containing the data array
 	private ByteBuffer mBuf;
@@ -224,6 +260,21 @@ public class NavReader {
 	 */
 	public int getRemainingSize(){
 		return mBuf.remaining();
+	}
+	
+	/**
+	 * Get the 32 states of the quad in a boolean array
+	 * See static declarations {@link NavReader} for state names
+	 * @return boolean array of states
+	 */
+	public boolean[] droneStates32(){
+		long value = this.uint32();
+		boolean[] res = new boolean[32];
+		for(int i = 0;i < 32; i++){
+			res[i] = (value & (1 << i)) != 0;
+		}
+		return res;
+
 	}
 }
 

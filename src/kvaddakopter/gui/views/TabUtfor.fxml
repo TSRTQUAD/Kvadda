@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.scene.media.*?>
 <?import javafx.geometry.*?>
 <?import java.lang.*?>
@@ -17,48 +18,75 @@
                   <AnchorPane fx:id="mapContainer" prefHeight="700.0" prefWidth="1200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       <AnchorPane layoutX="373.0" layoutY="593.0" prefHeight="93.0" prefWidth="455.0">
       	<children>
-      		<VBox alignment="CENTER" prefHeight="200.0" prefWidth="455.0" style="-fx-background-color: #ccc; -fx-border-color: black;" stylesheets="@../../application.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-      			<children>
-                              <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0">
-                                 <children>
-                                    <HBox alignment="CENTER_LEFT" prefHeight="46.0" prefWidth="140.0">
+                        <HBox prefHeight="96.0" prefWidth="628.0">
+                           <children>
+            		<VBox alignment="CENTER" prefHeight="200.0" prefWidth="455.0" style="-fx-background-color: #ccc; -fx-border-color: black;" stylesheets="@../../application.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            			<children>
+                                    <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                                        <children>
-                                          <Label prefWidth="70.0" text="Speed:">
-                                             <padding>
-                                                <Insets left="10.0" />
-                                             </padding></Label>
-                                          <Label fx:id="lblSpeed" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefWidth="70.0" text="2.4 m/s" textAlignment="RIGHT" />
+                                          <HBox alignment="CENTER_LEFT" prefHeight="46.0" prefWidth="140.0">
+                                             <children>
+                                                <Label prefWidth="70.0" text="Speed:">
+                                                   <padding>
+                                                      <Insets left="10.0" />
+                                                   </padding>
+                                                </Label>
+                                                <Label fx:id="lblSpeed" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefWidth="70.0" text="2.4 m/s" textAlignment="RIGHT" />
+                                             </children>
+                                          </HBox>
+                  				<HBox alignment="CENTER" prefWidth="140.0">
+                  					<children>
+                  						<Label prefWidth="70.0" text="Time left:">
+                                                   <padding>
+                                                      <Insets left="10.0" />
+                                                   </padding>
+                                                </Label>
+                  						<Label fx:id="lblTimeLeft" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefWidth="70.0" text="300 s" />
+                  					</children>
+                  				</HBox>
+                                          <HBox alignment="CENTER" prefWidth="150.0">
+                                             <children>
+                                                <Label prefWidth="70.0" text="Battery:">
+                                                   <padding>
+                                                      <Insets left="10.0" />
+                                                   </padding>
+                                                </Label>
+                                                <Label fx:id="lblBattery" alignment="CENTER_RIGHT" prefWidth="70.0" text="100 %" />
+                                             </children>
+                                          </HBox>
                                        </children>
                                     </HBox>
-            				<HBox alignment="CENTER" prefWidth="140.0">
-            					<children>
-            						<Label prefWidth="70.0" text="Time left:">
-                                             <padding>
-                                                <Insets left="10.0" />
-                                             </padding></Label>
-            						<Label fx:id="lblTimeLeft" alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefWidth="70.0" text="300 s" />
-            					</children>
-            				</HBox>
-                                    <HBox alignment="CENTER" prefWidth="150.0">
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
                                        <children>
-                                          <Label prefWidth="70.0" text="Battery:">
-                                             <padding>
-                                                <Insets left="10.0" />
-                                             </padding></Label>
-                                          <Label fx:id="lblBattery" alignment="CENTER_RIGHT" prefWidth="70.0" text="100 %" />
+                                          <Button fx:id="btnAbortMission" mnemonicParsing="false" onAction="#abortMission" prefWidth="100.0" text="Abort" />
+                  				<Button fx:id="btnEmergency" alignment="CENTER" mnemonicParsing="false" onAction="#emergency" prefHeight="42.0" prefWidth="178.0" styleClass="btn-danger" text="Emergency" textAlignment="CENTER" />
+                                          <Button fx:id="btnToggleControl" alignment="CENTER_RIGHT" contentDisplay="CENTER" mnemonicParsing="false" onAction="#toggleControl" prefHeight="26.0" prefWidth="94.0" text="Toggle Auto" />
                                        </children>
                                     </HBox>
-                                 </children>
-                              </HBox>
-                              <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+            			</children>
+            		</VBox>
+                              <VBox alignment="CENTER_LEFT" prefHeight="96.0" prefWidth="178.0" style="-fx-background-color: #ccc; -fx-border-color: black;" stylesheets="@../../application.css">
                                  <children>
-                                    <Button fx:id="btnAbortMission" mnemonicParsing="false" onAction="#abortMission" prefWidth="100.0" text="Abort" />
-            				<Button fx:id="btnEmergency" alignment="CENTER" mnemonicParsing="false" onAction="#emergency" prefHeight="42.0" prefWidth="178.0" styleClass="btn-danger" text="Emergency" textAlignment="CENTER" />
-                                    <Button fx:id="btnToggleControl" alignment="CENTER_RIGHT" contentDisplay="CENTER" mnemonicParsing="false" onAction="#toggleControl" prefWidth="100.0" text="Toggle Control" />
+                                    <Label fx:id="lblGPS" alignment="TOP_LEFT" text="GPS NOT OK!">
+                                       <font>
+                                          <Font size="21.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets left="20.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="lblWIFI" alignment="TOP_LEFT" text="WIFI NOT OK!">
+                                       <font>
+                                          <Font size="21.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets left="20.0" top="10.0" />
+                                       </VBox.margin>
+                                    </Label>
                                  </children>
-                              </HBox>
-      			</children>
-      		</VBox>
+                              </VBox>
+                           </children>
+                        </HBox>
       	</children>
       </AnchorPane>
                </children></AnchorPane>

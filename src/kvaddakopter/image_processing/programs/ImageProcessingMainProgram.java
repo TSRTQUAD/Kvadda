@@ -130,7 +130,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 			}
 			if(modes[MainBusIPInterface.MODE_TRACKING] == 1){
 				if(targetObjects.size() > 0){
-					mTracker.update(targetObjects,quadData);
+					mTracker.update(targetObjects,currentQuadData);
 					Mat currentImage = imageObject.getImage();
 					trackingImage = mTracker.getImage(
 							currentImage.width(),

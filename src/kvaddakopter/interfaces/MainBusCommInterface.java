@@ -7,6 +7,10 @@ public interface MainBusCommInterface {
 	public float[] getControlSignal();
 	public boolean EmergencyStop();
 	public void setSelfCheck(boolean b);
-	public boolean getStartPermission();
+	//public boolean getStartPermission();
+	public boolean shouldStart();
+	public boolean setIsStarted(boolean b);
 	String getMode();
+	public void setGpsFixOk(boolean b);
+	public void setWifiFixOk(boolean b);
 }
