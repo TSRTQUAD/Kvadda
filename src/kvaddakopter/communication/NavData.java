@@ -55,7 +55,7 @@ public class NavData implements Runnable {
 	 * Checks if the communication unit is started
 	 */
 	public void checkIsCommRunning(){
-		while(!comm.isRunning()){
+		while(!comm.isRunning() || !comm.isInitiated()){
 			synchronized(comm){
 				try {
 					comm.wait();
