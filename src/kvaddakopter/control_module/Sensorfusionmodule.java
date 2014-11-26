@@ -74,6 +74,7 @@ public class Sensorfusionmodule implements Runnable{
 	protected ReferenceExtractor	referenceextractor	= new ReferenceExtractor(0);
 	protected int					counter				= 0;
 	protected int					controllingmode		= 2; // 0 for autonomous 
+	protected boolean				debugMode			= true; // Toggle System out prints 
 		
 	public Sensorfusionmodule(ControlMainBusInterface mainbus) {
 		this.mainbus = mainbus;
@@ -82,17 +83,19 @@ public class Sensorfusionmodule implements Runnable{
 	public void run(){
 	
 		try {
-			System.out.println("Waiting for quadcopter...");
-			System.out.println("Quad is starting .. startsignal =  ");
-			System.out.println(controlsignal.getStart());
-			System.out.println("");
+			if(debugMode){
+				System.out.println("Waiting for quadcopter...");
+				System.out.println("Quad is starting .. startsignal =  ");
+				System.out.println(controlsignal.getStart());
+				System.out.println("");
+			}
 			Thread.sleep((long) 5000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		
 		//Initialize -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-		System.out.println("Initializing modules ..");
+		if(debugMode) System.out.println("Initializing modules ..");
 		this.quadData = mainbus.getQuadData();				//Reads sensor data from mainbus
 		sdata.setnewsensordata(quadData);						//Update local sensor object
 		//sdata.print();
@@ -123,7 +126,7 @@ public class Sensorfusionmodule implements Runnable{
 			rrdata.initialize(sdata.getLatitud(),sdata.getLongitud());	// Fix local coordinate system XY
 			rrdata.updateindoor(referenceextractor.updatetest());		// Indoor flight mode GPS has to be [0,0]
 		}													
-		rrdata.print();
+		if(debugMode) rrdata.print();
 		//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 		
 		//SENSORFUSION  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
@@ -137,19 +140,23 @@ public class Sensorfusionmodule implements Runnable{
 		//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 		
 		
-		//rsdata.print();		
-		System.out.println("Initializing completed");
-		System.out.println("");
+		//rsdata.print();
+		if(debugMode){
+			System.out.println("Initializing completed");
+			System.out.println("");
+		}
 		
 		//Start Quad-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-		
 		if (0 == controllingmode){
 		if(rrdata.getStart() == 1){			
 			controlsignal.setStart(1);			
 			try {
-				System.out.println("Waiting for quadcopter...");
-				System.out.println("Quad is starting .. startsignal =  ");
-				System.out.println(controlsignal.getStart());
-				System.out.println("");
+				if(debugMode){
+					System.out.println("Waiting for quadcopter...");
+					System.out.println("Quad is starting .. startsignal =  ");
+					System.out.println(controlsignal.getStart());
+					System.out.println("");
+				}
 				Thread.sleep((long) 1000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -159,7 +166,7 @@ public class Sensorfusionmodule implements Runnable{
 		//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
 		try {
-			System.out.println("Sleep");
+			if(debugMode) System.out.println("Sleep");
 			Thread.sleep((long) 10000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -172,7 +179,7 @@ public class Sensorfusionmodule implements Runnable{
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-				System.out.println("Controllerloop initialized");
+				if(debugMode) System.out.println("Controllerloop initialized");
 				while(true)
 				{					
 				//For every sample  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
@@ -193,9 +200,10 @@ public class Sensorfusionmodule implements Runnable{
 				sdata.xydot2XYdot();										//Transformation
 				}
 				
-				
-				System.out.format("Sensordata at sample %d%n",counter);
-				sdata.print();
+				if(debugMode){
+					System.out.format("Sensordata at sample %d%n",counter);
+					sdata.print();
+				}
 													
 
 				
@@ -216,8 +224,10 @@ public class Sensorfusionmodule implements Runnable{
 						rsdata.XYdot2Vel();												//Transform Xdot,Ydot to velocities								
 						}
 						// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_				
-				System.out.format("States at sample %d%n",counter);
-				rsdata.print();
+				if(debugMode){
+					System.out.format("States at sample %d%n",counter);
+					rsdata.print();
+				}
 				// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				
 				
@@ -232,20 +242,22 @@ public class Sensorfusionmodule implements Runnable{
 				else if (2 == controllingmode){
 				rrdata.updatetest(rsdata);									//Reference is init+-(2m)
 				}	
-				System.out.print("Reference signal:");
-				rrdata.print();
+				if(debugMode){
+					System.out.print("Reference signal:");
+					rrdata.print();
+				}
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 				
 								
 				//Control-signal -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 				if(rrdata.getMission()==1){
 					csignal = controller.GetControlSignalMission1(rsdata, rrdata);
-					System.out.println("Controller Mission = 1, controlsignal:");
+					if(debugMode) System.out.println("Controller Mission = 1, controlsignal:");
 					//csignal.print();
 				}
 				else if(rrdata.getMission()==0 || rrdata.getMission()==2){
 					csignal = controller.GetControlSignalMission0(rsdata, rrdata);
-					System.out.println("Controller Mission = 0, controlsignal:");
+					if(debugMode) System.out.println("Controller Mission = 0, controlsignal:");
 					//csignal.print();
 				}
 				
@@ -260,7 +272,7 @@ public class Sensorfusionmodule implements Runnable{
 
 				csignal = controller.saturation(csignal,0.1,0.1,0.1,1);		// Saturate control-signal
 				mainbus.setControlSignalobject(csignal);					// Update main-bus control-signal
-				csignal.print();
+				if(debugMode) csignal.print();
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 				
 				
@@ -269,9 +281,11 @@ public class Sensorfusionmodule implements Runnable{
 				//Sample-time -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 				time = sampletime*1000 - (System.currentTimeMillis()-time);				
 //				System.out.format("Samplingsintervall: %.2f%n",time); 
-				System.out.println("-------------------------------");
-				System.out.println("");
-				System.out.println("");
+				if(debugMode){
+					System.out.println("-------------------------------");
+					System.out.println("");
+					System.out.println("");
+				}
 				if(time>0){
 				
 				try {
