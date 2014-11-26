@@ -222,10 +222,11 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	
     	this.listMissionHeight.setItems( FXCollections.observableArrayList(
     			MissionHeight.ONE_METER,
+    			MissionHeight.THREE_METERS,
     			MissionHeight.FIVE_METERS,
     			MissionHeight.TEN_METERS
     			));
-    	this.listMissionHeight.getSelectionModel().select(0);
+    	this.listMissionHeight.getSelectionModel().select(1);
     	    	
 	}
     
