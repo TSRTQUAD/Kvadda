@@ -2,6 +2,8 @@ package kvaddakopter.image_processing.data_types;
 
 import java.util.ArrayList;
 
+import kvaddakopter.maps.GPSCoordinate;
+
 import org.ejml.simple.SimpleMatrix;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
@@ -11,12 +13,15 @@ import org.opencv.core.Rect;
  * It also contains an Identifier object. The state and covariance are represented as 
  * matrices usable in a Kalman filter. 
  * <p>
+ * The filter currentyl works on 2D image positions. 
+ * <p>
  * The state is defined as the matrix [x_position y_position x_velocity y_velocity] transposed.
  */
 public class TargetObject {
 	private SimpleMatrix x; // State [x1, x2, dot(x1), dot(x2)]'
 	private SimpleMatrix P; // Covariance for the states
 	private Identifier identifier; // Holds identification information about the target
+	private GPSCoordinate geoPosition; // Estimated Geo position for target
 
 	/**
 	 * The constructor for TargetObject assumes zero velocity and creates the state and
@@ -163,5 +168,21 @@ public class TargetObject {
 	 */
 	public Identifier getIdentifier() {
 		return identifier;
+	}
+	
+	/**
+	 * Returns estimated GPS coordinate.
+	 * @return geo position
+	 */
+	public GPSCoordinate getGPSCoordinate(){
+		return geoPosition;
+	}
+	
+	/**
+	 * Sets estimated GPS coordinate.
+	 * @param newCoordinate
+	 */
+	public void setGPSCoordinate(GPSCoordinate newCoordinate){
+		geoPosition = newCoordinate;
 	}
 }

@@ -7,8 +7,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import kvaddakopter.communication.QuadData;
 import kvaddakopter.image_processing.data_types.Identifier;
 import kvaddakopter.image_processing.data_types.TargetObject;
+import kvaddakopter.maps.GPSCoordinate;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.ejml.simple.SimpleMatrix;
@@ -17,6 +19,8 @@ import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+
+import com.lynden.gmapsfx.service.geocoding.GeocodingService;
 
 public class Tracking {	
 	HashMap<Integer, TargetObject> mInternalTargets;
@@ -58,7 +62,7 @@ public class Tracking {
 	 * @see TargetObject
 	 * @see #measurementUpdate
 	 */
-	public void update(ArrayList<TargetObject> targetObjects){
+	public void update(ArrayList<TargetObject> targetObjects, QuadData qData){
 		// Elapsed time since last update  
 		double elapsedTime = ((double)(System.currentTimeMillis() - lastTime)) / 1000;
 		lastTime = System.currentTimeMillis();
@@ -87,7 +91,12 @@ public class Tracking {
 			// Perform measurement update on target
 			measurementUpdate(mInternalTargets.get(matchedIDs[i]), z, R);
 			
+			
 			// TODO Add optinal trajectories again for debugging purposes
+		}
+		
+		if(qData != null){
+			estimateGeo(qData);
 		}
 		
 		// Remove old internal targets with too high covariance
@@ -305,6 +314,36 @@ public class Tracking {
 				0, a2, 0, a3);
 		res.scale(sigmaSquared);
 		return res;
+	}
+	
+	
+	/**
+	 * A temporary function for estimating the targets geo coordinates by estimating angles in
+	 * the image and projecting the target to the ground.
+	 * @param qData
+	 */
+	private void estimateGeo(QuadData qData){
+		for(int key : mInternalTargets.keySet()) {
+			TargetObject target = mInternalTargets.get(key);
+			double fullYAngle = 90; // Field of view in vertical
+			double fullYPixels = 360; // half the vertical pixel width
+			double yAngle = Math.atan(((target.getPosition().get(1,0) - fullYPixels) / fullYPixels) * Math.tan(Math.toRadians(fullYAngle / 2)));
+			double yDist = qData.getAltitude() * Math.tan(Math.toRadians(qData.getPitch()) + yAngle);
+
+			double fullXAngle = 120; // Field of view in horizontal
+			double fullXPixels = 480; // Half the horizontal pixel width
+			double xAngle = Math.atan(((target.getPosition().get(0,0) - fullXPixels) / fullXPixels) * Math.tan(Math.toRadians(fullXAngle / 2)));
+			double xDist = qData.getAltitude() * Math.tan(Math.toRadians(-qData.getRoll()) + xAngle);
+			
+			
+			double latDist = -xDist*Math.cos(Math.toRadians(qData.getYaw())) + yDist*Math.sin(Math.toRadians(qData.getYaw()));
+			double lonDist = xDist*Math.sin(Math.toRadians(qData.getYaw())) + yDist*Math.cos(Math.toRadians(qData.getYaw()));
+			
+			double linearizedLat = 0.0000091796; // Degrees per meter
+			double linearizedLon = 0.000017198; // Degrees per meter
+			
+			target.setGPSCoordinate(new GPSCoordinate(qData.getGPSLat() + latDist * linearizedLat, qData.getGPSLong() + lonDist * linearizedLon));
+		}
 	}
 	
 	/**
