@@ -49,9 +49,9 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 	 */
 	private static final long serialVersionUID = 1L;
 
-
 	//Image processing storage
 	private boolean mIsIPRunning;
+	private ArrayList<TargetObject> mTargetList;
 
 	
 	//Assignment planer storage
@@ -525,14 +525,8 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 	}
 
 	@Override
-	public synchronized GPSCoordinate getGPSCoordinate() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public synchronized void setIPTargetList(ArrayList<TargetObject> listOfTargets) {
-		//mTargetList = listOfTargets;
+		mTargetList = listOfTargets;
 	}
 
 	@Override

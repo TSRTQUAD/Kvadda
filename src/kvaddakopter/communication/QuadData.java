@@ -9,7 +9,26 @@ public class QuadData{
 	   private long mGPS_nSatelites;
 	   private float mLinkQuality;
 	   
-	   public synchronized float getBatteryLevel(){
+	   /**
+	    * Copy constructor, copies member variables of quadData
+	    * @param quadData another QUadData object
+	    */
+	   public QuadData(QuadData quadData) {
+		   mBatteryLevel = quadData.getBatteryLevel();
+		   mAltitude = quadData.getAltitude();
+		   mPitch = quadData.getPitch();
+		   mYaw = quadData.getYaw();
+		   mRoll = quadData.getRoll();
+		   mVx = quadData.getVx();
+		   mVy = quadData.getVy();
+		   mVz = quadData.getVz();
+		   mGPS_Lat = quadData.getGPSLat();
+		   mGPS_Long = quadData.getGPSLong();
+		   mGPS_nSatelites = quadData.getNGPSSatelites();
+		   mLinkQuality = quadData.getLinkQuality();
+	   }
+
+	public synchronized float getBatteryLevel(){
 		   return mBatteryLevel;
 	   }
 	   

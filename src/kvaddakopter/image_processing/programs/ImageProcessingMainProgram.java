@@ -3,6 +3,7 @@ package kvaddakopter.image_processing.programs;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import kvaddakopter.communication.QuadData;
 import kvaddakopter.image_processing.algorithms.BackgroundSubtraction;
 import kvaddakopter.image_processing.algorithms.BlurDetection;
 import kvaddakopter.image_processing.algorithms.ColorDetection;
@@ -90,6 +91,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 	public void update(){
 		//Images to show
 		checkIsRunning();
+		QuadData currentQuadData = new QuadData(mMainbus.getQuadData());
 		BufferedImage out = null;
 		Mat colorDetectionImage = null;
 		Mat colorCalibrationImage = null;
@@ -98,10 +100,9 @@ public class ImageProcessingMainProgram extends ProgramClass{
 
 		Mat image = getNextFrame();
 		ImageObject imageObject = new ImageObject(image);
+		imageObject.setQuadData(currentQuadData);
 
 		ArrayList<TargetObject> targetObjects = new ArrayList<TargetObject>();
-
-		//GPSCoordinate gpsCoordinate = mMainbus.getGPSCoordinate(); 
 
 		int[] modes = mMainbus.getIPActiveModes(); 
 

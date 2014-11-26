@@ -76,11 +76,10 @@ public interface MainBusIPInterface {
 	
 	//GPS
 	public void setIPGPSCoordinate(GPSCoordinate coord);
-	public GPSCoordinate getGPSCoordinate();
+	public GPSCoordinate getCurrentQuadPosition();
 	
 	//Targets
 	public void setIPTargetList(ArrayList<TargetObject> listOfTargets);
-	public ArrayList<TargetObject> getIPTargetList();
 	
 	//Image object
 	public void setIPImageToShow(BufferedImage image);
