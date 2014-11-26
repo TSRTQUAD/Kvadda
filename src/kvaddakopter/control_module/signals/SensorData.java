@@ -32,7 +32,7 @@ public class SensorData {
 			this.xdot = quadData.getVx();
 			this.ydot = quadData.getVy();
 			this.height = quadData.getAltitude();
-			this.yaw = quadData.getYaw(); //Is in degrees
+			this.yaw = -Math.PI/180*quadData.getYaw(); //Is in degrees
 		}
 
 	}
@@ -146,7 +146,7 @@ public class SensorData {
 		System.out.format("Xdot: %.4f , Ydot %.4f%n", Xdot, Ydot);
 		System.out.format("xdot: %.4f , ydot %.4f%n", xdot, ydot);
 		System.out.format("Height: %.4f%n", height);
-		System.out.format("Yaw: %.4f%n  %n %n",yaw);
+		System.out.format("Yaw: %.4f%n  %n %n",180/Math.PI*yaw);
 	}
 	
 		/**

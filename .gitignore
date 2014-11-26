@@ -1,6 +1,7 @@
 /bin/
 /cam_undistorted.png
 .metadata
+.settings/
 *.txt
 *.mat
 *.mp4

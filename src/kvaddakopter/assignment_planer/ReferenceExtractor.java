@@ -18,12 +18,15 @@ public class ReferenceExtractor {
 		
 		System.out.println(this.counter);
 		
+		if (this.counter == missionobject.getHeight().length){
+			this.counter = 0;
+		}
 		
 		if (0 == this.counter ){
 			//System.out.format("Reference first update no. %d%n",this.counter);
 			this.start = 1;
-			double[] returnvalue = new double[]{missionobject.getTrajectory()[this.counter][0],
-												missionobject.getTrajectory()[this.counter][1],
+			double[] returnvalue = new double[]{missionobject.getTrajectory()[this.counter][1],
+												missionobject.getTrajectory()[this.counter][0],
 												missionobject.getHeight()[this.counter],
 												missionobject.getYaw(),
 												missionobject.getWaitingtime(),
@@ -38,8 +41,8 @@ public class ReferenceExtractor {
 		}
 		else if (this.counter == missionobject.getHeight().length){
 			this.land = 1;
-			double[] returnvalue = new double[]{missionobject.getTrajectory()[counter][0],
-												missionobject.getTrajectory()[counter][1],
+			double[] returnvalue = new double[]{missionobject.getTrajectory()[counter][1],
+												missionobject.getTrajectory()[counter][0],
 												missionobject.getHeight()[this.counter],
 												missionobject.getYaw(),
 												missionobject.getWaitingtime(),
@@ -63,8 +66,8 @@ public class ReferenceExtractor {
 		
 		else {		
 			System.out.format("Reference update no. %d%n",this.counter);
-			double[] returnvalue = new double[]{missionobject.getTrajectory()[this.counter][0],
-												missionobject.getTrajectory()[this.counter][1],
+			double[] returnvalue = new double[]{missionobject.getTrajectory()[this.counter][1],
+												missionobject.getTrajectory()[this.counter][0],
 												missionobject.getHeight()[this.counter],
 												missionobject.getYaw(),
 												missionobject.getWaitingtime(),
@@ -80,12 +83,13 @@ public class ReferenceExtractor {
 	
 public double[] updatetest(){			
 			//System.out.format("Reference first update no. %d%n",this.counter);
-	this.counter = this.counter + 1; 		
+	this.counter = this.counter + 1;
+	 double angle = ((this.counter % 2) == 0) ? Math.PI : 0;
 	double[] returnvalue = new double[]{		0,														// GPS lat
-												0+ 2*Math.pow(-1, counter),			 					// GPS long
+												0 + 2*Math.pow(-1, counter),			 				// GPS long
 												1,														// Height
-												0,														// Yaw
-												1000,														// Time at coordinate
+												0,													// Yaw
+												1000,													// Time at coordinate
 												0,														// null
 												0,														// Mission type
 												this.start,												// Set start/land

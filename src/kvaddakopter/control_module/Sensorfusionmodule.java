@@ -69,9 +69,8 @@ public class Sensorfusionmodule implements Runnable{
 	protected ReferenceData 		rrdata				= new ReferenceData();   
 	protected ReferenceExtractor	referenceextractor	= new ReferenceExtractor(0);
 	protected int					counter				= 0;
-	protected int					controllingmode		= 2; // 0 for autonomous 
-	protected boolean				debugMode			= true; // Toggle System out prints 
-		
+	protected int					controllingmode		= 0; // 0 for autonomous 
+	protected boolean				debugMode			= true; // Toggle System out prints 		
 	public Sensorfusionmodule(ControlMainBusInterface mainbus) {
 		this.mainbus = mainbus;
 	}
@@ -91,13 +90,42 @@ public class Sensorfusionmodule implements Runnable{
 		}
 		
 		//Initialize -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+		
+		//MissionObject -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+		missionobject.setTrajectory(new double[][]
+				{{58.395366,15.574459},
+				{58.395297,15.574507},
+				{58.395310,15.574574},
+				{58.395299,15.574622},
+				{58.395273,15.574633},
+				{58.395255,15.574598},
+				{58.395252,15.574544},
+				{58.395249,15.574491},
+				});
+		
+		missionobject.setHeight(new double[]{2,2,2,2,2,2,2,2});
+		missionobject.setYaw(0.0);
+		missionobject.setWaitingtime(5000.0);
+		missionobject.setReferenceVelocity(new double[][]
+				{{1,0},
+				{1,0},
+				{1,0},
+				{1,0},
+				{1,0},
+				{1,0},
+				{1,0},
+				{1,0},
+				});
+		
+		
+		//Initialize -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 		if(debugMode) System.out.println("Initializing modules ..");
 		this.quadData = mainbus.getQuadData();				//Reads sensor data from mainbus
 		sdata.setnewsensordata(quadData);						//Update local sensor object
 		//sdata.print();
 		
 		if (0 == controllingmode){
-		this.missionobject = mainbus.getMissionObject();			//Reads mission object from mainbus	
+		//this.missionobject = mainbus.getMissionObject();			//Reads mission object from mainbus	
 		sdata.setinitial();											// Fix local coordinate system XY
 		sdata.GPS2XY();												// Transformation GPS to XY coordinates
 		sdata.xydot2XYdot();
@@ -267,8 +295,8 @@ public class Sensorfusionmodule implements Runnable{
 						e.printStackTrace();								//
 					}					
 				}
-
-				csignal = controller.saturation(csignal,0.7,0.6,0.1,0.2,0.02);		// Saturate control-signal
+				csignal = controller.saturation(csignal,0.5,0.4,0.1,1.5,0.02);
+				//csignal = controller.saturation(csignal,0.7,0.6,0.1,1.5,0.02);		// Saturate control-signal
 				mainbus.setControlSignalobject(csignal);					// Update main-bus control-signal
 				if(debugMode) csignal.print();
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	

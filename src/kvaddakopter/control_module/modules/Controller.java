@@ -16,14 +16,15 @@ import kvaddakopter.control_module.signals.*;
 
 public class Controller{		
 	protected double  errorheight,errorlateralvel, errorforwardvel, errorheading, Ts;
-	protected double KVelForward, KVelHeight, KVelLateral, KYaw, Tintegral, integral;
+	protected double KVelForward, KVelForward2, KVelHeight, KVelLateral, KYaw, Tintegral, integral;
 
 
 	public Controller(double sampletime){	
 		KVelHeight = 1.5; 
 		KVelForward = 0.05;
+		KVelForward2 = 0.05;
 		KVelLateral = 0.05;
-		KYaw = 0.02;
+		KYaw = 1.5;
 		Tintegral = 0.01;
 		Ts = sampletime;
 		errorheight = 0;
@@ -47,8 +48,8 @@ public class Controller{
 		//Coordinate system calculation
 		SimpleMatrix errorpos = new SimpleMatrix(2,1,true,rrdata.getYpos() - rsdata.getYpos(),
 														  rrdata.getXpos() - rsdata.getXpos());	
-		SimpleMatrix pos2vel = new SimpleMatrix(2,2,true,Math.cos(rsdata.getYaw()), Math.sin(rsdata.getYaw()),
-														-Math.sin(rsdata.getYaw()), Math.cos(rsdata.getYaw()));					 
+		SimpleMatrix pos2vel = new SimpleMatrix(2,2,true,Math.cos(rsdata.getYaw()), -Math.sin(rsdata.getYaw()),
+														 Math.sin(rsdata.getYaw()), Math.cos(rsdata.getYaw()));					 
 		SimpleMatrix RDataVel = pos2vel.mult(errorpos);
 		
 		
@@ -57,7 +58,7 @@ public class Controller{
 		csignal.setForwardvelocity	(	-KVelForward*(RDataVel.get(0) - rsdata.getForVel() )		);
 		csignal.setLateralvelocity	(	KVelLateral*(RDataVel.get(1) - rsdata.getLatVel() )		);	
 		csignal.setHeightvelocity	( 	KVelHeight*(rrdata.getHeight() - rsdata.getHeight())	);	
-		csignal.setYawrate			(	KYaw*(rrdata.getYaw() - rsdata.getYaw())				);
+		csignal.setYawrate			(	-KYaw*(rrdata.getYaw() - rsdata.getYaw())				);
 
 		 
 		
@@ -80,11 +81,11 @@ public class Controller{
 		 //Constant speed controlling
 			ControlSignal csignal = new ControlSignal();
 			 
-			 csignal.setForwardvelocity		(	this.integral + (KVelForward+ Ts*Tintegral/2)*
+			 csignal.setForwardvelocity		(	-(this.integral + (KVelForward2+ Ts*Tintegral/2)*
 					 							(rrdata.getForVel() - rsdata.getForVel())	+
-					 							(Ts*Tintegral/2 - KVelForward)*this.errorforwardvel						);
-			 
-			 csignal.setYawrate 			(	KYaw*(rrdata.getYaw() - rsdata.getYaw())							);
+					 							(Ts*Tintegral/2 - KVelForward2)*this.errorforwardvel)				);
+			 csignal.setLateralvelocity		(								0										);
+			 csignal.setYawrate 			(	-KYaw*(rrdata.getYaw() - rsdata.getYaw())							);
 			 csignal.setHeightvelocity		(	KVelHeight*(rrdata.getHeight() - rsdata.getHeight())				);
 			 
 			 //Errors 
