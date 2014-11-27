@@ -253,6 +253,14 @@ public class Mainbus implements MainBusCommInterface, ControlMainBusInterface, A
 		ManualControlBool = mcb;
 	}
 	
+	public synchronized boolean getRunController(){
+		return this.runcontroller;
+	}
+	
+	public synchronized void setRunController(boolean runctrl){
+		this.runcontroller = runctrl;
+	}
+	
 	public synchronized float[] getControlSignal(){
 		/*ControlSignalAll[seq][0] = (double)ControlSignal[0];
 		ControlSignalAll[seq][1] = (double)ControlSignal[1];
