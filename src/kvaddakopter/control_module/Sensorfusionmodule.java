@@ -77,6 +77,7 @@ public class Sensorfusionmodule implements Runnable{
 	
 	
 	
+	
 	private void checkIsRunning(){
 		while(!mainbus.isStarted()){
 			synchronized(mainbus){
@@ -84,6 +85,7 @@ public class Sensorfusionmodule implements Runnable{
 			}
 		}
 	}
+	
 	
 	
 	public void run(){	
@@ -129,10 +131,10 @@ public class Sensorfusionmodule implements Runnable{
 		//Initialize -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 		
 		if(debugMode) System.out.println("Initializing modules ..");
-		this.quadData = mainbus.getQuadData();				//Reads sensor data from mainbus
-		sdata.setnewsensordata(quadData);						//Update local sensor object
+					//Update local sensor object
 		//sdata.print();
-		
+		this.quadData = mainbus.getQuadData();				//Reads sensor data from mainbus
+		sdata.setnewsensordata(quadData);	
 		if (0 == controllingmode){
 		this.missionobject = mainbus.getMissionObject();			//Reads mission object from mainbus	
 		
@@ -151,7 +153,7 @@ public class Sensorfusionmodule implements Runnable{
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-								
+					
 		sdata.setinitial();											// Fix local coordinate system XY
 		sdata.GPS2XY();												// Transformation GPS to XY coordinates
 		sdata.xydot2XYdot();
@@ -195,19 +197,11 @@ public class Sensorfusionmodule implements Runnable{
 			System.out.println("");
 		}
 		
-
-		//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-
-		try {
-			if(debugMode) System.out.println("Sleep");
-			Thread.sleep((long) 10000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		if (0 == controllingmode){
+			mainbus.setruncontroller(true);
 		}
 		
-		
-
-				
+				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-				
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
@@ -301,11 +295,12 @@ public class Sensorfusionmodule implements Runnable{
 				if( rrdata.getLand() == 1){									//Initiate landing?
 					csignal.setStart(0);									//
 					try {													//
-						Thread.sleep((long) 10);							//
+						Thread.sleep((long) 10000);							//
 					} catch (InterruptedException e) {						//
 						e.printStackTrace();								//
 					}					
 				}
+				
 				
 				//csignal = controller.saturation(csignal,0.7,0.6,0.1,1.5,0.02);		// Saturate control-signal
 				mainbus.setControlSignalobject(csignal);					// Update main-bus control-signal
