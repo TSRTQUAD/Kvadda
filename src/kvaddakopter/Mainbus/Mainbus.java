@@ -12,10 +12,14 @@ import java.util.HashMap;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
+import kvaddakopter.assignment_planer.AssignmentPlanerRunnable;
 import kvaddakopter.assignment_planer.MatlabProxyConnection;
 import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.communication.Communication;
+import kvaddakopter.communication.ManualControl;
+import kvaddakopter.communication.NavData;
 import kvaddakopter.communication.QuadData;
+import kvaddakopter.communication.Security;
 import kvaddakopter.control_module.Sensorfusionmodule;
 import kvaddakopter.gui.GUIModule;
 import kvaddakopter.image_processing.data_types.ColorTemplate;
@@ -28,7 +32,9 @@ import kvaddakopter.interfaces.IPAndGUIInterface;
 import kvaddakopter.interfaces.MainBusCommInterface;
 import kvaddakopter.interfaces.MainBusGUIInterface;
 import kvaddakopter.interfaces.MainBusIPInterface;
+import kvaddakopter.interfaces.ManualControlInterface;
 import kvaddakopter.maps.GPSCoordinate;
+
 // import org.opencv.core.Core;
 
 
@@ -42,7 +48,7 @@ import kvaddakopter.maps.GPSCoordinate;
  * 3) start thread
  * 
  */
-public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, ControlMainBusInterface, AssignmentPlanerInterface, MainBusGUIInterface, MainBusIPInterface, IPAndGUIInterface{
+public class Mainbus implements MainBusCommInterface, ControlMainBusInterface, AssignmentPlanerInterface, MainBusGUIInterface, MainBusIPInterface, IPAndGUIInterface, ManualControlInterface {
 	
 	/**
 	 * 
@@ -67,22 +73,22 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 	Communication communicationtest;
 	static float[] ControlSignal = new float[5];
 	private String mode;
-	private boolean StartPermission;
 	public boolean selfCheck = false;
-	float speed = (float)0.1;
 	float batteryLevel = 99f;
-    boolean shift = false;
     boolean runcontroller = false;
-    boolean space_bar = false; //true = Takeoff, false = Landing
+	
 	public boolean EmerStop = false;
-
 	double[][] NavDataOverAll = new double[3000][6];
 	double[][] ControlSignalAll = new double[3000][5];
 	public int seq = 0;
 	public int seq_signal = 0;
+	float speed;
 	QuadData quadData = new QuadData();
-
+	protected boolean ManualControlBool;
+	
 	protected boolean shouldStart = false;
+	private boolean gpsFixOk;
+	private boolean wifiFixOk;
 	
 	//Control modules	
 	@Override
@@ -92,7 +98,9 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 	
 	
 	public void setControlSignalobject(
+			
 		kvaddakopter.control_module.signals.ControlSignal csignal) {		
+		
 		if (true == this.runcontroller){
 		//Controlsignal[Landing/Start Roll Pitch Gaz Yaw ]		
 		//ControlSignal[0] = csignal.getStart();
@@ -101,9 +109,8 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 		//ControlSignal[3] = (float)  	csignal.getHeightvelocity();
 		ControlSignal[4] = (float)  	csignal.getYawrate();
 		}
+		
 	}
-	
-
 	
 
 	public static void main(String[] args) {
@@ -113,48 +120,58 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 
 		Mainbus mainbus = new Mainbus();
 		
+		//Setting up a Matlab Proxy Server
+		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
+		mainbus.setMatlabProxyConnection(matlabproxy);
+		matlabproxy.startMatlab("quiet");
 		
-//		//Setting up a Matlab Proxy Server
-//		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
-//		mainbus.setMatlabProxyConnection(matlabproxy);
-//		matlabproxy.startMatlab("quiet");
-//		
-//		AssignmentPlanerRunnable assignmentplanerrunnable = new AssignmentPlanerRunnable(3,mainbus);
-//		Thread t4 = new Thread(assignmentplanerrunnable);
-//		t4.setPriority(1);
-//		t4.start();
-//
-//		//Communication
-//		try{
-//			ControlSignal = new float[] {0, 0, 0, 0, 0};
-//			Communication communicationtest = new Communication(3,mainbus,"Communication");
-//			Thread t7 = new Thread(communicationtest);
-//			t7.setDaemon(true);
-//			t7.setPriority(1);
-//			t7.start();
-//			System.out.println("Communication-link initiated");
-//
-//
-//			NavData navdatatest = new NavData(4,mainbus,"NavData", communicationtest);	
-//			Thread t5 = new Thread(navdatatest);
-//			t5.setDaemon(true);
-//			t5.setPriority(1);
-//			t5.start();
-//			System.out.println("NavData-link initiated");
-//
-//
-//
-//		} catch (Exception ex1){
-//
-//			Security security = new Security(5,mainbus);
-//			Thread t6 = new Thread(security);
-//			t6.setDaemon(true);
-//			t6.setPriority(1);
-//			t6.start();
-//			System.out.println("Security-link initiated");
-//
-//			ex1.printStackTrace();	
-//		}
+		AssignmentPlanerRunnable assignmentplanerrunnable = new AssignmentPlanerRunnable(3,mainbus);
+		Thread t4 = new Thread(assignmentplanerrunnable);
+		t4.setPriority(1);
+		t4.start();
+
+		//Communication
+		try{
+			ControlSignal = new float[] {0, 0, 0, 0, 0};
+			Communication communicationtest = new Communication(3,mainbus,"Communication");
+			Thread t7 = new Thread(communicationtest);
+			t7.setDaemon(true);
+			t7.setPriority(1);
+			t7.start();
+			System.out.println("Communication-link initiated");
+
+
+			NavData navdatatest = new NavData(4,mainbus,"NavData", communicationtest);	
+			Thread t5 = new Thread(navdatatest);
+			t5.setDaemon(true);
+			t5.setPriority(1);
+			t5.start();
+			System.out.println("NavData-link initiated");
+			
+			
+			
+			// Shall be moved. 
+			ManualControl keybindings = new ManualControl(11,mainbus);	
+			Thread t11 = new Thread(navdatatest);
+			t11.setDaemon(true);
+			t11.setPriority(1);
+			t11.start();
+			System.out.println("Manual Control initiated");
+
+			
+			
+			
+		} catch (Exception ex1){
+
+			Security security = new Security(5,mainbus);
+			Thread t6 = new Thread(security);
+			t6.setDaemon(true);
+			t6.setPriority(1);
+			t6.start();
+			System.out.println("Security-link initiated");
+
+			ex1.printStackTrace();	
+		}
 		
 		
 		//GUI MODULE
@@ -179,8 +196,9 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 		t9.setPriority(1);
 		t9.start();
 		
+
 		while(true){
-			//			System.out.println("Mainbus running");
+			//System.out.println("Mainbus running");
 			try {
 				Thread.sleep(60000);
 			} catch (InterruptedException e) {
@@ -190,21 +208,15 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 	}
 
 	
-	public Mainbus(){		
-		addKeyListener(this); 
-        setSize(320, 160);
-        setVisible(true);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                System.exit(0);	
-            }		
-          });
-		
+	public Mainbus(){				
 	}
+
 	
 	/*
 	 * Get/set functions for Mission Planing
 	 */
+	
+	
 	public synchronized void setMissionObject(MissionObject MO){
 		missionobject = MO;
 	}
@@ -230,21 +242,41 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 		return this.matlabproxy;
 	}
 	
+	
 	//Communication
 	@Override
+	public synchronized boolean getManualControl(){
+		return ManualControlBool;
+	}
+	
+	public synchronized void setManualControl(boolean mcb){
+		ManualControlBool = mcb;
+	}
+	
+	public synchronized boolean getRunController(){
+		return this.runcontroller;
+	}
+	
+	public synchronized void setRunController(boolean runctrl){
+		this.runcontroller = runctrl;
+	}
+	
 	public synchronized float[] getControlSignal(){
-		ControlSignalAll[seq][0] = (double)ControlSignal[0];
+		/*ControlSignalAll[seq][0] = (double)ControlSignal[0];
 		ControlSignalAll[seq][1] = (double)ControlSignal[1];
 		ControlSignalAll[seq][2] = (double)ControlSignal[2];
 		ControlSignalAll[seq][3] = (double)ControlSignal[3];
 		ControlSignalAll[seq][4] = (double)ControlSignal[4];
- 	
+ 	*/
 		seq_signal = seq_signal + 1;
 		//System.out.println("Pos 1:   " + ControlSignal[1] + "Pos 2:   " + ControlSignal[2]);
 		return ControlSignal;
 	}
 	
-
+	public synchronized void setControlSignal(float[] controlsignal){
+		ControlSignal = controlsignal;
+	}
+	
 	@Override
 	public synchronized void setQuadData(QuadData quadData){
 		/*
@@ -269,12 +301,11 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 		return mode; 
 	}
 	
-	@Override
-	public synchronized boolean getStartPermission(){
-		return StartPermission;
-	}
 	
 	@Override
+	
+	
+	
 	public synchronized boolean EmergencyStop(){
 		return EmerStop;
 	}
@@ -282,150 +313,6 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 	public synchronized void setEmergencyStop(boolean newBool){
 		EmerStop = newBool;
 	}
-	
-	public void keyTyped(KeyEvent e) {
-        ;
-    }
-    
-    public void keyPressed(KeyEvent e) {
-        int keyCode = e.getKeyCode();
-
-        try {
-        control(keyCode);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-    
-    public void keyReleased(KeyEvent e) {
-        int keyCode = e.getKeyCode();
-        //if (keyCode >= KeyEvent.VK_1 && keyCode <= KeyEvent.VK_9) speed = (float)0.1; //Reset speed
-        if (keyCode == KeyEvent.VK_SHIFT) shift = false;
-    }
-
-	
-    //Control AR.Drone via AT commands per key code
-    public void control(int keyCode) throws Exception {
-        //System.out.println("Key: " + keyCode + " (" + KeyEvent.getKeyText(keyCode) + ")");
-    	
-    	switch (keyCode) {
-    		case KeyEvent.VK_C:
-    			if (false == this.runcontroller){
-    				this.runcontroller = true;
-    			}
-    			else if (true == this.runcontroller){
-    				this.runcontroller = false;
-    			}
-     	    case KeyEvent.VK_1:
-     	    	speed = (float)0.1;
-    	    	break;
-    	    case KeyEvent.VK_2:
-    	    	speed = (float)0.2;
-    	    	break; 
-    	    case KeyEvent.VK_SHIFT:
-    	        shift = true;
-    	    	break;
-    	    case KeyEvent.VK_E:
-    	    	EmerStop = true;
-    	    	break;
-    	    case KeyEvent.VK_UP:
-    	    	if (shift) {
-    	    		
-    		    System.out.println("Go Up (gaz+)");   
-    		   // communicationtest.send_pcmd(1, 0, 0, speed, 0);
-    	      // Controlsignal[Landing/Start Roll Pitch Gaz Yaw ] 
-    	    		ControlSignal[4] =ControlSignal[4] + speed;
-	    		
-    	    	} else {
-    	    	    System.out.println("Go Forward (pitch+)");   	    	   
-     	    	  //  communicationtest.send_pcmd(1, 0, 0, 0, 0);
-    	    	    ControlSignal[2] = ControlSignal[2] -  speed;
-    	    	}
-    	    	break;
-    	    	
-    	    case KeyEvent.VK_DOWN:
-    	    	
-    	    	if (shift) {
-    	    	    System.out.println("Go Down (gaz-)");
-    	    	    // communicationtest.send_pcmd(1, 0, 0, -speed, 0);
-    	    	    ControlSignal[4] =ControlSignal[4] -speed;
-    	    	} else {
-    	    	    System.out.println("Go Backward (pitch-)");
-    	    	    // communicationtest.send_pcmd(1, -speed, 0, 0, 0);
-    	    	    ControlSignal[2] = ControlSignal[2] +speed;
-    	    	}
-       	    	break;
-       	    	
-    	    case KeyEvent.VK_LEFT:
-    	        
-    	    	if (shift) {
-    	            System.out.println("Rotate Left (yaw-)");
-    	            // communicationtest.send_pcmd(1, 0, 0, 0, -speed);
-    	            ControlSignal[3]  =  ControlSignal[3] -speed;
-    	            
-    	    	} else {
-    	    		System.out.println("Go Left (roll-)");
-    	    		// communicationtest.send_pcmd(1, 0, -speed, 0, 0);
-    	    	    ControlSignal[1]  = ControlSignal[1] -speed;
-    	    	}
-    	    	
-   	    	break;
-    	    case KeyEvent.VK_RIGHT:
-    		if (shift) {
-    			
-    		    System.out.println("Rotate Right (yaw+)");
-    		    // communicationtest.send_pcmd(1, 0, 0, 0, speed);
-    		    ControlSignal[3] = ControlSignal[3] + speed;
-    		    
-    		    
-		} else {
-		    System.out.println("Go Right (roll+)");
-		//    communicationtest.send_pcmd(1, 0, speed, 0, 0);
-		    	ControlSignal[1] = ControlSignal[1] + speed;
-		}
-    	    	break;
-    	    case KeyEvent.VK_SPACE:
-    	    	space_bar = !space_bar;
-
-    	    	
-    	    	
-    	    	
-   	    if (space_bar && (ControlSignal[0]) == 0) {
-    	    	 System.out.println("Takeoff");
-
-   	    		 ControlSignal[0] = 1;
-
-
-   	    } else if (space_bar && ControlSignal[0] == 1 ) {
-   	    	System.out.println("Landing");
-	   	    //	new MatFileHandler().createMatFileFromFlightData("FlightData", NavDataOverAll);
-	   	    //	new MatFileHandler().createMatFileFromFlightData("ControlData", ControlSignalAll);
-   	    	ControlSignal[0] = 0;
-    	}
-
-    	    	break;   	    	
-    	    	
-    	    	
-    	    case KeyEvent.VK_CONTROL:
-    	    	System.out.println("Hovering");
-    	    	
-    	    	// communicationtest.send_pcmd(1, 0, 0, 0, 0);
-    	    	
-    	    			   for(int i = 1; i < 5; i = i+1) {
-    	    				   ControlSignal[i] = 0;
-    	    			      }
-    	    			   
-		speed = (float)0.1; //Reset speed
-    	    	break;
-    	    	
-    	    	
-    	    default:
-    	    	break;
-    	}
-    	
-    	if (keyCode >= KeyEvent.VK_1 && keyCode <= KeyEvent.VK_9) System.out.println("Speed: " + speed);
-    }
-
 
 	@Override
 	public double getCurrentSpeed() {
@@ -440,12 +327,12 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 
 	@Override
 	public boolean wifiFixOk() {
-		return (int) quadData.getLinkQuality() == 1;
+		return this.wifiFixOk;
 	}
 
 	@Override
 	public boolean gpsFixOk() {
-		return quadData.getNGPSSatelites() >= 3;
+		return this.gpsFixOk;
 	}
 
 	@Override
@@ -598,13 +485,18 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 	}
 	
 	@Override
+	
 	public synchronized void toggleController(){
 		this.runcontroller = !this.runcontroller;
 	}
 	
+	
 	@Override
 	public synchronized float getSpeed(){
 		return speed;
+	}
+	public synchronized void setSpeed(float spd){
+		speed = spd;
 	}
 	
 	@Override
@@ -614,21 +506,41 @@ public class Mainbus extends Frame implements KeyListener,MainBusCommInterface, 
 
 
 	@Override
-	public void setIsStarted(boolean isStarted) {
+	public synchronized void setIsStarted(boolean isStarted) {
 		this.isStarted = isStarted;
 		
 	}
 	
 	@Override
-	public boolean isStarted() {
+	public synchronized boolean isStarted() {
 		return this.isStarted;
 		
 	}
 
 
 	@Override
-	public void setShouldStart(boolean b) {
+	public synchronized void setShouldStart(boolean b) {
 		this.shouldStart = b;
+		
+	}
+
+
+	@Override
+	public synchronized boolean shouldStart() {
+		return this.shouldStart;
+	}
+
+
+	@Override
+	public synchronized void setGpsFixOk(boolean b) {
+		this.gpsFixOk = b;
+		
+	}
+
+
+	@Override
+	public synchronized void setWifiFixOk(boolean b) {
+		this.wifiFixOk = b;
 		
 	}
 }

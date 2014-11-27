@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
@@ -98,7 +97,12 @@ public class TabUtforController extends BaseController implements Initializable 
     @FXML
     private void startMission(){
     	this.timeLeft = (long) this.currentSelectedMissionObject.getMissionTime()[0][0];
+    	System.out.println("Started");
+    	System.out.println(this.currentSelectedMissionName);
     	this.getParent().getMainBus().setShouldStart(true);
+    	synchronized (this.getParent().getMainBus()) {
+			this.getParent().getMainBus().notifyAll();
+		}
     }
     
     
@@ -200,7 +204,9 @@ public class TabUtforController extends BaseController implements Initializable 
      * Draw targets to the Map
      */
     public void drawTargetsOnMap(){
-    	this.missionMap.drawTargetsOnMap(this.getParent().getMainBus().getTargets());
+    	if (this.getParent().getMainBus().getTargets() != null){
+                    this.missionMap.drawTargetsOnMap(this.getParent().getMainBus().getTargets());
+    	}
     }
     
 //    /**

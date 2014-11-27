@@ -81,7 +81,11 @@ public class Sensorfusionmodule implements Runnable{
 	private void checkIsRunning(){
 		while(!mainbus.isStarted()){
 			synchronized(mainbus){
-				mainbus.wait();				
+				try {
+					mainbus.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}				
 			}
 		}
 	}

@@ -145,7 +145,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	//Start AssignmentPlaner
     	mainbus.setAssignmentPlanerOn(true);
 		synchronized(mainbus){
-			mainbus.notify ();
+			mainbus.notifyAll ();
 		}
     	
     	//Check for results from AssignmentPlaner
