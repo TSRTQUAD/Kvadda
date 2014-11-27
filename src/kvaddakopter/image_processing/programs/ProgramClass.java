@@ -51,7 +51,7 @@ public abstract class ProgramClass implements Runnable,DecoderListener,KeyBoardL
     
 	
 	// KeyBoard handler
-	KeyBoardHandler mKeyBoardHandler = null;
+	protected KeyBoardHandler mKeyBoardHandler = null;
 
 	public ProgramClass(int threadid, MainBusIPInterface mainbus) {
 		mMainbus = mainbus;

@@ -5,14 +5,14 @@ import org.opencv.core.Mat;
 public class FormTemplate {
 	
 	ImageObject mImageObject;
-	boolean isCalibrated = false;
 	int mId =-1;
 	double mBoxWidth = 0.5;
 	double mBoxHeight = 0.5;
 	double mBoxOffsetX = 0.5;
 	double mBoxOffsetY = 0.5;
 	String description;
-	private boolean isActive;
+	Mat mBoxPoints = null;
+	private boolean isActive = true;
 		
 	
 	public void setBoxWitdh(double newWitdh){
@@ -27,14 +27,6 @@ public class FormTemplate {
 	
 	public void setBoxOffsetY(double newOffsetY){
 		mBoxOffsetY= newOffsetY;
-	}
-	
-	public void setCalibrated(boolean b){
-		isCalibrated = b;
-	}
-	
-	public boolean hasBeenCalibrated(){
-		return isCalibrated;
 	}
 	
 	public double getBoxWitdh(){
@@ -125,5 +117,12 @@ public class FormTemplate {
 	 */
 	public boolean isActive(){
 		return isActive;
+	}
+	public void setBoxPoints(Mat boxPoints) {
+		mBoxPoints = boxPoints;
+		
+	}
+	public Mat getBoxPoints() {
+		return mBoxPoints;
 	}
 }
