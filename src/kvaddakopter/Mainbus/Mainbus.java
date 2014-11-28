@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import matlabcontrol.MatlabInvocationException;
+
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
@@ -116,7 +116,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	public static void main(String[] args) {
 
 		//M�ste laddas i b�rjan av programmet... F�rslagsvis h�r.
-		// 	System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+		//     System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
 		Mainbus mainbus = new Mainbus();
 		
