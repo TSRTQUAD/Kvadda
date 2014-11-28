@@ -20,7 +20,7 @@ public class NavData implements Runnable {
 	private InetAddress inet_addr;
 
 	private Communication comm;
-	
+	private boolean NavDataTimeOut = false;
 	private boolean mIsInitiated = false;
 
 	// Container class for sensor data
@@ -87,7 +87,9 @@ public class NavData implements Runnable {
 		checkIsCommRunning();
 		try {
 			
+			
 			Thread.sleep(1000);
+			
 			byte[] buf_snd = { 0x01, 0x00, 0x00, 0x00 };
 			DatagramPacket packet_snd = new DatagramPacket(buf_snd,
 					buf_snd.length, this.inet_addr, Communication.NAV_PORT);
@@ -106,7 +108,7 @@ public class NavData implements Runnable {
 			DatagramPacket packet_rcv = new DatagramPacket(buf_rcv,
 					buf_rcv.length);
 
-			while (true) {
+			while (!NavDataTimeOut) {
 				try {
 					socket_nav.receive(packet_rcv);
 
@@ -191,13 +193,15 @@ public class NavData implements Runnable {
 						}
 					}
 					// System.out.println(mQuadData.getNGPSSatelites());
-					
+				//	System.out.println(mQuadData.getBatteryLevel());
 					mMainbus.setQuadData(mQuadData);				
 					checkStartConditions();
 				
 
 				} catch (SocketTimeoutException ex3) {
 					System.out.println("socket_nav.receive(): Timeout");
+					NavDataTimeOut = true;
+					mIsInitiated = false;
 				} catch (Exception ex1) {
 					ex1.printStackTrace();
 				}
@@ -206,6 +210,8 @@ public class NavData implements Runnable {
 			ex2.printStackTrace();
 		}
 	}
+	
+	
 	
 	public void checkStartConditions(){
 		boolean wifi = false,gps=false;
@@ -221,7 +227,8 @@ public class NavData implements Runnable {
 		if(wifi && gps)
 			mMainbus.setIsStarted(true);
 			
-	}
+	}	
+	
 }
 
 

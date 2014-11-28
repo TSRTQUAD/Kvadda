@@ -87,7 +87,6 @@ public class Communication implements Runnable {
 		try {
 
 			inet_addr = InetAddress.getByAddress(ip_bytes);
-
 			AT_socket = new DatagramSocket(Communication.AT_PORT);
 			AT_socket.setSoTimeout(3000);
 
