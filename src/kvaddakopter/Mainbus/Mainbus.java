@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
@@ -48,7 +49,7 @@ import kvaddakopter.maps.GPSCoordinate;
  * 3) start thread
  * 
  */
-public class Mainbus implements MainBusCommInterface, ControlMainBusInterface, AssignmentPlanerInterface, MainBusGUIInterface, MainBusIPInterface, IPAndGUIInterface, ManualControlInterface {
+public class Mainbus extends Frame implements ManualControlInterface, MainBusCommInterface, ControlMainBusInterface, AssignmentPlanerInterface, MainBusGUIInterface, MainBusIPInterface, IPAndGUIInterface{
 	
 	/**
 	 * 
@@ -74,20 +75,23 @@ public class Mainbus implements MainBusCommInterface, ControlMainBusInterface, A
 	static float[] ControlSignal = new float[5];
 	private String mode;
 	public boolean selfCheck = false;
+	float speed = (float)0.1;
 	float batteryLevel = 99f;
+    boolean shift = false;
     boolean runcontroller = false;
-	
+    boolean space_bar = false; //true = Takeoff, false = Landing
 	public boolean EmerStop = false;
+	public boolean manualcontrolbool;
 	double[][] NavDataOverAll = new double[3000][6];
 	double[][] ControlSignalAll = new double[3000][5];
 	public int seq = 0;
 	public int seq_signal = 0;
-	float speed;
 	QuadData quadData = new QuadData();
-	protected boolean ManualControlBool;
-	
+
 	protected boolean shouldStart = false;
+
 	private boolean gpsFixOk;
+
 	private boolean wifiFixOk;
 	
 	//Control modules	
@@ -98,9 +102,7 @@ public class Mainbus implements MainBusCommInterface, ControlMainBusInterface, A
 	
 	
 	public void setControlSignalobject(
-			
 		kvaddakopter.control_module.signals.ControlSignal csignal) {		
-		
 		if (true == this.runcontroller){
 		//Controlsignal[Landing/Start Roll Pitch Gaz Yaw ]		
 		//ControlSignal[0] = csignal.getStart();
@@ -109,16 +111,15 @@ public class Mainbus implements MainBusCommInterface, ControlMainBusInterface, A
 		//ControlSignal[3] = (float)  	csignal.getHeightvelocity();
 		ControlSignal[4] = (float)  	csignal.getYawrate();
 		}
-		
 	}
 	
-
 	public static void main(String[] args) {
 
 		//M�ste laddas i b�rjan av programmet... F�rslagsvis h�r.
-		// 	System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+		//     System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
 		Mainbus mainbus = new Mainbus();
+		
 		
 		//Setting up a Matlab Proxy Server
 		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
@@ -131,6 +132,8 @@ public class Mainbus implements MainBusCommInterface, ControlMainBusInterface, A
 		t4.start();
 
 		//Communication
+		
+		
 		try{
 			ControlSignal = new float[] {0, 0, 0, 0, 0};
 			Communication communicationtest = new Communication(3,mainbus,"Communication");
@@ -147,20 +150,15 @@ public class Mainbus implements MainBusCommInterface, ControlMainBusInterface, A
 			t5.setPriority(1);
 			t5.start();
 			System.out.println("NavData-link initiated");
+		
 			
-			
-			
-			// Shall be moved. 
-			ManualControl keybindings = new ManualControl(11,mainbus);	
-			Thread t11 = new Thread(navdatatest);
-			t11.setDaemon(true);
-			t11.setPriority(1);
-			t11.start();
+			ManualControl manualcontrol = new ManualControl(5,mainbus);
+			Thread t2 = new Thread(manualcontrol);
+			t2.setDaemon(true);
+			t2.setPriority(1);
+			t2.start();
 			System.out.println("Manual Control initiated");
 
-			
-			
-			
 		} catch (Exception ex1){
 
 			Security security = new Security(5,mainbus);
@@ -172,7 +170,6 @@ public class Mainbus implements MainBusCommInterface, ControlMainBusInterface, A
 
 			ex1.printStackTrace();	
 		}
-		
 		
 		//GUI MODULE
 		GUIModule guiModule = new GUIModule(mainbus);
@@ -196,9 +193,8 @@ public class Mainbus implements MainBusCommInterface, ControlMainBusInterface, A
 		t9.setPriority(1);
 		t9.start();
 		
-
 		while(true){
-			//System.out.println("Mainbus running");
+			//			System.out.println("Mainbus running");
 			try {
 				Thread.sleep(60000);
 			} catch (InterruptedException e) {
@@ -208,15 +204,12 @@ public class Mainbus implements MainBusCommInterface, ControlMainBusInterface, A
 	}
 
 	
-	public Mainbus(){				
+	public Mainbus(){		
 	}
-
 	
 	/*
 	 * Get/set functions for Mission Planing
 	 */
-	
-	
 	public synchronized void setMissionObject(MissionObject MO){
 		missionobject = MO;
 	}
@@ -242,41 +235,21 @@ public class Mainbus implements MainBusCommInterface, ControlMainBusInterface, A
 		return this.matlabproxy;
 	}
 	
-	
 	//Communication
 	@Override
-	public synchronized boolean getManualControl(){
-		return ManualControlBool;
-	}
-	
-	public synchronized void setManualControl(boolean mcb){
-		ManualControlBool = mcb;
-	}
-	
-	public synchronized boolean getRunController(){
-		return this.runcontroller;
-	}
-	
-	public synchronized void setRunController(boolean runctrl){
-		this.runcontroller = runctrl;
-	}
-	
 	public synchronized float[] getControlSignal(){
-		/*ControlSignalAll[seq][0] = (double)ControlSignal[0];
+		ControlSignalAll[seq][0] = (double)ControlSignal[0];
 		ControlSignalAll[seq][1] = (double)ControlSignal[1];
 		ControlSignalAll[seq][2] = (double)ControlSignal[2];
 		ControlSignalAll[seq][3] = (double)ControlSignal[3];
 		ControlSignalAll[seq][4] = (double)ControlSignal[4];
- 	*/
+ 	
 		seq_signal = seq_signal + 1;
 		//System.out.println("Pos 1:   " + ControlSignal[1] + "Pos 2:   " + ControlSignal[2]);
 		return ControlSignal;
 	}
 	
-	public synchronized void setControlSignal(float[] controlsignal){
-		ControlSignal = controlsignal;
-	}
-	
+
 	@Override
 	public synchronized void setQuadData(QuadData quadData){
 		/*
@@ -303,9 +276,6 @@ public class Mainbus implements MainBusCommInterface, ControlMainBusInterface, A
 	
 	
 	@Override
-	
-	
-	
 	public synchronized boolean EmergencyStop(){
 		return EmerStop;
 	}
@@ -313,7 +283,7 @@ public class Mainbus implements MainBusCommInterface, ControlMainBusInterface, A
 	public synchronized void setEmergencyStop(boolean newBool){
 		EmerStop = newBool;
 	}
-
+	
 	@Override
 	public double getCurrentSpeed() {
 		return 1.23;
@@ -485,18 +455,13 @@ public class Mainbus implements MainBusCommInterface, ControlMainBusInterface, A
 	}
 	
 	@Override
-	
 	public synchronized void toggleController(){
 		this.runcontroller = !this.runcontroller;
 	}
 	
-	
 	@Override
 	public synchronized float getSpeed(){
 		return speed;
-	}
-	public synchronized void setSpeed(float spd){
-		speed = spd;
 	}
 	
 	@Override
@@ -543,4 +508,47 @@ public class Mainbus implements MainBusCommInterface, ControlMainBusInterface, A
 		this.wifiFixOk = b;
 		
 	}
+
+
+
+	@Override
+	public synchronized void setSpeed(float spd) {
+		speed = spd;		
+	}
+
+	@Override
+	public synchronized boolean getManualControl() {
+		return manualcontrolbool = true;
+	}
+
+	@Override
+	public synchronized void setManualControl(boolean mcb) {
+		manualcontrolbool = mcb;
+	}
+
+	@Override
+	public synchronized void setControlSignal(float[] controlsignal) {
+		ControlSignal = controlsignal;	
+	}
+
+
+	@Override
+	public synchronized boolean getRunController() {
+	return this.runcontroller;
+	}
+
+	@Override
+	public void setRunController(boolean runctrl) {
+		// TODO Auto-generated method stub
+		this.runcontroller = runctrl;	
+	}
+
+	// Varför klagar den på båda? - Interfaces säger endast 1?
+
+	@Override
+	public void setruncontroller(boolean b) {
+		// TODO Auto-generated method stub
+		this.runcontroller = b;
+	}
+
 }

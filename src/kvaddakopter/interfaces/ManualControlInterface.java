@@ -8,5 +8,4 @@ public interface ManualControlInterface {
 	public void setControlSignal(float[] controlsignal);
 	public boolean getRunController();	
 	public void setRunController(boolean runctrl);
-	
 }

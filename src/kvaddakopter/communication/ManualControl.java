@@ -21,7 +21,7 @@ public class ManualControl extends Frame implements KeyListener, Runnable{
 	public ManualControl(int threadid, ManualControlInterface mainbus) {	
 		mMainbus = mainbus;		
 		
-		addKeyListener(this); 
+		addKeyListener(this);
         setSize(320, 160);
         setVisible(true);
         addWindowListener(new WindowAdapter() {

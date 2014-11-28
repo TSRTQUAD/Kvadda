@@ -30,7 +30,11 @@ fprintf(fileID,'%s\n','EOF');
 fclose(fileID);
 
 % Solve the TSP-problem
-system('./LKH problem.par')
+if isunix
+    system('./LKH problem.par')
+else
+    system('lkh.exe problem.par')
+end
 
 % Open the resultfile and specify the trajectory
 fileID = fopen('result.tour');
