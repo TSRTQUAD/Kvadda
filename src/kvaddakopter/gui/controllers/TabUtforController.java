@@ -234,7 +234,11 @@ public class TabUtforController extends BaseController implements Initializable 
 
 	 
 	public void updateBattery(float newBattery){
-		this.lblBattery.setText(String.format("%.1f p", newBattery));
+		if(newBattery < 15){
+			this.lblBattery.setText(String.format("WRN! %.1f %", newBattery));
+		} else {
+			this.lblBattery.setText(String.format("%.1f %", newBattery));
+		}
 	}
 	
 	
