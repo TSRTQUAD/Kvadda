@@ -19,13 +19,13 @@ dmatcross = dmat;
 allboundaries = [object.area object.forbiddenarea];
 boundarylines = [];
 for ii = 1:length(allboundaries);
-    for kk = 2:length(allboundaries{ii})
+    for kk = 2:size(allboundaries{ii},1)
         boundarylines = [boundarylines;[allboundaries{ii}(kk-1,1)...
             allboundaries{ii}(kk-1,2) allboundaries{ii}(kk,1)...
             allboundaries{ii}(kk,2)]];
     end
 end
-nrofboundarylines = length(boundarylines);
+nrofboundarylines = size(boundarylines,1);
 
 % The additive penalty for crossing a boundry is ~ 100 times the lowest
 % distance. This will be applied for nodpairs with a distance below the

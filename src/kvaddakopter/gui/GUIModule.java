@@ -27,7 +27,7 @@ public class GUIModule extends Application implements Runnable{
 	/**
 	 * Application title
 	 */
-	private String applicationTitle = "KvaddaKopter -  Uppdrags planerare";
+	private String applicationTitle = "KvaddaKopter -  Mission planner";
 	
 	
 	static IPAndGUIInterface mainBus;
