@@ -125,12 +125,6 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
 		mainbus.setMatlabProxyConnection(matlabproxy);
 		matlabproxy.startMatlab("quiet");
-		try {
-			matlabproxy.getMatlabProxy().eval("cd D:/Program/Git/Kvadda/src/kvaddakopter/assignment_planer/Matlab");
-		} catch (MatlabInvocationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 		
 		AssignmentPlanerRunnable assignmentplanerrunnable = new AssignmentPlanerRunnable(3,mainbus);
 		Thread t4 = new Thread(assignmentplanerrunnable);
