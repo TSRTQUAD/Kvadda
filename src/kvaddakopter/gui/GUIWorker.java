@@ -56,13 +56,11 @@ public class GUIWorker implements Runnable{
 
 				}
 				
-				
 				//Update gui image
 				Platform.runLater(new Runnable() {
 					@Override
 					public void run() {
 						mainController.tabDatorseendeController.updateImage();
-						System.out.println("GUI-worker: Update image");
 					}
 				});
 				
@@ -73,6 +71,7 @@ public class GUIWorker implements Runnable{
 						mainController.tabUtforController.updateBattery(mainBuss.getBattery());
 						mainController.tabUtforController.updateGPSStatus(mainBuss.gpsFixOk());
 						mainController.tabUtforController.updateWIFIStatus(mainBuss.wifiFixOk());
+						mainController.tabUtforController.updateButtons();
 					}
 				});
 				

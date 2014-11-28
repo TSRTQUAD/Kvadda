@@ -53,6 +53,8 @@ public class TabUtforController extends BaseController implements Initializable 
     private Label lblWIFI;
     
     @FXML
+    private Button btnArm;
+    @FXML
     private Button btnStartMission;
     @FXML
     private Button btnAbortMission;
@@ -96,6 +98,11 @@ public class TabUtforController extends BaseController implements Initializable 
 
     @FXML
     private void startMission(){
+    	this.getParent().getMainBus().setIsStarted(true);
+    }
+    
+    @FXML
+    private void arm(){
     	this.timeLeft = (long) this.currentSelectedMissionObject.getMissionTime()[0][0];
     	System.out.println("Started");
     	System.out.println(this.currentSelectedMissionName);
@@ -104,7 +111,6 @@ public class TabUtforController extends BaseController implements Initializable 
 			this.getParent().getMainBus().notifyAll();
 		}
     }
-    
     
     @FXML
     private void abortMission(){
@@ -129,7 +135,7 @@ public class TabUtforController extends BaseController implements Initializable 
      * @param passedTime
      */
 	public void updateTimeLeft(long passedTime){
-		 this.timeLeft -= (long) passedTime/1000;
+		this.timeLeft -= (long) passedTime/1000;
 		long newTime = this.timeLeft;
 		
 		this.lblTimeLeft.setText( SecToMinSec.transform( Math.max(0, newTime)));
@@ -208,15 +214,6 @@ public class TabUtforController extends BaseController implements Initializable 
                     this.missionMap.drawTargetsOnMap(this.getParent().getMainBus().getTargets());
     	}
     }
-    
-//    /**
-//     * TODO Draw the Target to the map.
-//     */  
-//    public void drawTargetMarker(){
-//		HashMap<String,GPSCoordinate> targetMap = this.getParent().getMainBus().getTargets();
-//    	GPSCoordinate gps = this.getParent().getMainBus().getCurrentQuadPosition();
-//    	this.missionMap.drawTarget(gps.getLatitude(), gps.getLongitude());
-//    }
 
 	public void updateGPSStatus(boolean isOk) {
 		String status = (isOk) ? "GPS: OK!" : "GPS: NOT OK!";
@@ -238,6 +235,16 @@ public class TabUtforController extends BaseController implements Initializable 
 			this.lblBattery.setText(String.format("WRN! %.1f %%", newBattery));
 		} else {
 			this.lblBattery.setText(String.format("%.1f %%", newBattery));
+		}
+	}
+	
+	public void updateButtons(){
+		if(this.getParent().getMainBus() == null) return;
+		else if(this.getParent().getMainBus().getIsArmed()){
+			btnStartMission.setDisable(false);
+		}
+		else{
+			btnStartMission.setDisable(true);
 		}
 	}
 	

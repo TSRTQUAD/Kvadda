@@ -120,10 +120,8 @@ public class NavData implements Runnable {
 					long sequenceNumber = reader.uint32();
 					long visionFlag = reader.uint32();
 					
-					if(droneStates[NavReader.COMM_WATCHDOG_PROBLEM])
-					//	System.err.println("COMM WATCHDOG PROBLEM");
 					if(droneStates[NavReader.COMM_LOST])
-					//	System.err.println("COMM LOST");
+						//System.err.println("COMM LOST");
 					if(droneStates[NavReader.FLYING])
 						comm.setIsFlying(true);
 
@@ -165,8 +163,7 @@ public class NavData implements Runnable {
 						case NavReader.GPS:
 							mQuadData.setGPSLat(contentReader.double64());
 							mQuadData.setGPSLong(contentReader.double64());
-							mQuadData.setNGPSSatelites(contentReader
-									.uint32(164));
+							mQuadData.setNGPSSatelites(contentReader.uint32(164));
 							break;
 						// Checksum used to determine if message received
 						// properly
@@ -188,7 +185,7 @@ public class NavData implements Runnable {
 
 							// checksum is the last option
 							finnished = true;
-							// TODO sleep here and wait a bit (refreshtime)
+							//Thread.sleep(50); //TODO REFRESH TIME
 							break;
 						}
 					}
@@ -225,7 +222,7 @@ public class NavData implements Runnable {
 		}
 		
 		if(wifi && gps)
-			mMainbus.setIsStarted(true);
+			mMainbus.setIsArmed(true);
 			
 	}	
 	
