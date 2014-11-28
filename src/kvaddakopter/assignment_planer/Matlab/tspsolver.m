@@ -33,7 +33,7 @@ fclose(fileID);
 if isunix
     system('./LKH problem.par')
 else
-    system('lkh.exe problem.par')
+    system('lkh.exe problem.par <nul')
 end
 
 % Open the resultfile and specify the trajectory

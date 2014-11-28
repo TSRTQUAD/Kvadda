@@ -9,8 +9,6 @@ import java.util.ResourceBundle;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -18,7 +16,6 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -51,8 +48,8 @@ public class TabDatorseendeController extends BaseController implements Initiali
 	final Background GreenBackground  = new Background(new BackgroundFill(Color.LIGHTGREEN,new CornerRadii(4.5),new Insets(1.0)));
 
 	/*Image pos*/
-	final static int IMAGE_POS_X = -400;
-	final static int IMAGE_POS_Y = 200;
+	final static int IMAGE_POS_X = -0;
+	final static int IMAGE_POS_Y = 0;
 	
 	/*Buttons Common */
 	final static int MODES_POS_X = 200;
@@ -414,7 +411,8 @@ public class TabDatorseendeController extends BaseController implements Initiali
 		if(mainbus == null) return;
 		Image image = mainbus.getIPImageToShow();
 		if(image != null){
-			view.setImage(image);			
+			view.setImage(image);
+			System.out.println("Image redraw");
 		}
 
 		
