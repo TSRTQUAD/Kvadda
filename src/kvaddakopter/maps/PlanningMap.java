@@ -15,6 +15,7 @@ import kvaddakopter.assignment_planer.Area;
 import kvaddakopter.assignment_planer.MissionType;
 import kvaddakopter.gui.components.GPSMarkerNormal;
 import kvaddakopter.gui.components.GpsToAreaTransformer;
+import kvaddakopter.gui.components.StartMarker;
 import kvaddakopter.gui.components.factories.MapShapeFactory;
 import kvaddakopter.gui.components.shapes.GPSCircle;
 import kvaddakopter.gui.components.shapes.MapShapeInterface;
@@ -36,7 +37,7 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 	
 	private ArrayList<MapShapeInterface> navigationMapShapes;
 	private ArrayList<MapShapeInterface> forbiddenShapes;
-	private GPSMarkerNormal quadStartPosition;
+	private StartMarker quadStartPosition;
 	
 	private int currentActiveMissionAreaCounter = 0;
 	private int currentActiveForbiddenAreaCounter = 0;
@@ -209,8 +210,11 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 				if( this.quadStartPosition != null){
 					this.quadStartPosition.clearFromMap(map);
 				}
-				this.quadStartPosition = new GPSMarkerNormal(clickedCoordinate);
+				this.quadStartPosition = new StartMarker(clickedCoordinate);
 				this.quadStartPosition.attachToMap(map);
+
+				map.setZoom(map.getZoom() - 1);
+				map.setZoom(map.getZoom() + 1);
 			}
 			
 		});
