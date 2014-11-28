@@ -202,7 +202,7 @@ public class Sensorfusionmodule implements Runnable{
 		}
 		
 		if (0 == controllingmode){
-			mainbus.setruncontroller(true);
+			mainbus.setRunController(true);
 		}
 		
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-				

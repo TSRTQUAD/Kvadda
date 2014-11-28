@@ -543,12 +543,5 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 		this.runcontroller = runctrl;	
 	}
 
-	// Varför klagar den på båda? - Interfaces säger endast 1?
-
-	@Override
-	public void setruncontroller(boolean b) {
-		// TODO Auto-generated method stub
-		this.runcontroller = b;
-	}
 
 }
