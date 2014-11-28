@@ -1,8 +1,15 @@
 package kvaddakopter.assignment_planer;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
+import sun.misc.IOUtils;
 import matlabcontrol.MatlabConnectionException;
+import matlabcontrol.MatlabInvocationException;
 import matlabcontrol.MatlabProxy;
 import matlabcontrol.MatlabProxyFactory;
 import matlabcontrol.MatlabProxyFactoryOptions;
@@ -24,8 +31,6 @@ public class MatlabProxyConnection {
 	 */
 	public void startMatlab(String option) {
 		System.out.println("Setting up the Matlab proxy");
-		String workingDir = System.getProperty("user.dir");
-		File file = new File(workingDir,"/src/kvaddakopter/assignment_planer/Matlab");
 		
 		//Create a proxy, which will be used to control MATLAB
 		if (option.equals("quiet")) {
@@ -34,7 +39,6 @@ public class MatlabProxyConnection {
 			System.out.println("Setting up a quiet Matlab session ...");
 			Builder buildoptions = new MatlabProxyFactoryOptions.Builder();
 			buildoptions.setHidden(true);
-			buildoptions.setMatlabStartingDirectory(file);
 			MatlabProxyFactoryOptions options = buildoptions.build();
 
 			MatlabProxyFactory factory = new MatlabProxyFactory(options);
@@ -51,7 +55,6 @@ public class MatlabProxyConnection {
 			System.out.println("Connecting to running session of Matlab ...");
 			Builder buildoptions = new MatlabProxyFactoryOptions.Builder();
 			buildoptions.setUsePreviouslyControlledSession(true);
-			buildoptions.setMatlabStartingDirectory(file);
 			MatlabProxyFactoryOptions options = buildoptions.build();
 
 			MatlabProxyFactory factory = new MatlabProxyFactory(options);
@@ -64,7 +67,6 @@ public class MatlabProxyConnection {
 		}
 		else {
 			Builder buildoptions = new MatlabProxyFactoryOptions.Builder();
-			buildoptions.setMatlabStartingDirectory(file);
 			MatlabProxyFactoryOptions options = buildoptions.build();
 			
 			MatlabProxyFactory factory = new MatlabProxyFactory(options);
@@ -74,6 +76,15 @@ public class MatlabProxyConnection {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+		
+		//Go to the correct directory
+		try {
+			proxy.eval("cd('" + System.getProperty("user.dir") + 
+					"/src/kvaddakopter/assignment_planer/Matlab')");
+		} catch (MatlabInvocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 	}
