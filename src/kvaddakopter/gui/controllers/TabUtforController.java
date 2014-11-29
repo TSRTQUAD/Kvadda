@@ -241,11 +241,12 @@ public class TabUtforController extends BaseController implements Initializable 
 		this.lblWIFI.setText(status);
 	}
 	
-	public void updateSpeed(float newSpeed){
-		this.lblSpeed.setText(String.format("%.1f m/s", newSpeed));
+	public void updateSpeed(){
+		if (this.getParent().getMainBus() != null){
+                this.lblSpeed.setText(String.format("%.1f m/s", this.getParent().getMainBus().getCurrentSpeed()));
+		}
 	}
 
-	 
 	public void updateBattery(float newBattery){
 		if(newBattery < 15){
 			this.lblBattery.setText(String.format("WRN! %.1f %%", newBattery));

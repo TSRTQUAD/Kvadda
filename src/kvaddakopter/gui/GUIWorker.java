@@ -1,9 +1,6 @@
 package kvaddakopter.gui;
 
-import java.util.Date;
-
 import javafx.application.Platform;
-import kvaddakopter.Mainbus.Mainbus;
 import kvaddakopter.gui.controllers.MainController;
 import kvaddakopter.interfaces.MainBusGUIInterface;
 import kvaddakopter.utils.Clock;
@@ -50,7 +47,7 @@ public class GUIWorker implements Runnable{
 							mainController.tabUtforController.drawQuadMarker();
 							mainController.tabUtforController.drawTargetsOnMap();
 							mainController.tabUtforController.updateTimeLeft(sampleTime);
-							mainController.tabUtforController.updateSpeed(mainBuss.getSpeed());
+							mainController.tabUtforController.updateSpeed();
 							mainController.tabUtforController.updateMovie();
 						}
 					});
