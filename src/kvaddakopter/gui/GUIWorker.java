@@ -54,6 +54,9 @@ public class GUIWorker implements Runnable{
 
 				}
 				
+				
+				
+				
 				//Update gui image
 				Platform.runLater(new Runnable() {
 					@Override

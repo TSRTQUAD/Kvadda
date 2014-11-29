@@ -142,10 +142,13 @@ public class TabUtforController extends BaseController implements Initializable 
      * @param currentImage
      */
     public void updateMovie(){
-    	if(this.getParent().getMainBus() != null){
-    		Image currentImage = this.getParent().getMainBus().getImage();
-    		this.imgMovie.setImage(currentImage);
-    	}
+    	
+    	if(this.getParent().getMainBus() != null) return;
+		Image image = this.getParent().getMainBus().getIPImageToShow();
+		if(image != null){
+			this.imgMovie.setImage(image);
+		}
+    	
     }
     
     
