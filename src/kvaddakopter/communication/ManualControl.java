@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
 import kvaddakopter.interfaces.ManualControlInterface;
 
 public class ManualControl extends Frame implements KeyListener, Runnable{
@@ -13,7 +14,7 @@ public class ManualControl extends Frame implements KeyListener, Runnable{
 	private volatile ManualControlInterface mMainbus;
 	float speed = (float)0.1;
 	public boolean EmerStop = false;
-	static float[] ControlSignal = new float[5];
+	static float[] ControlSignal = {1f,0,0,0,0};
     boolean shift = false;
     boolean space_bar = false; //true = Takeoff, false = Landing
     
@@ -184,11 +185,22 @@ public class ManualControl extends Frame implements KeyListener, Runnable{
     	if (keyCode >= KeyEvent.VK_1 && keyCode <= KeyEvent.VK_9) System.out.println("Speed: " + speed);
     }
 
-
+    public void checkIsRunning(){
+    	while((mMainbus.getRunController())){
+			synchronized(mMainbus){
+				try {
+					mMainbus.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+    	}
+    }
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
+		// TODO Auto-generated method stu
+		checkIsRunning();
 		try {
 			
 			Thread.sleep(50);

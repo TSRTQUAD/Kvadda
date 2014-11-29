@@ -69,7 +69,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	
 	//Communication
 	//Communication communicationtest;
-	static float[] ControlSignal = new float[5];
+	static float[] ControlSignal = {1f,0,0,0,0};
 	private String mode;
 	public boolean selfCheck = false;
 	float speed = (float)-1;
@@ -100,11 +100,11 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 		kvaddakopter.control_module.signals.ControlSignal csignal) {		
 		if (true == this.runcontroller){
 		//Controlsignal[Landing/Start Roll Pitch Gaz Yaw ]		
-		ControlSignal[0] = 0; //csignal.getStart();
-		ControlSignal[1] = (float) 	csignal.getLateralvelocity();
-		ControlSignal[2] = (float) 	csignal.getForwardvelocity();
-		ControlSignal[3] = (float)  	csignal.getHeightvelocity();
-		ControlSignal[4] = (float)  	csignal.getYawrate();
+		//ControlSignal[0] = csignal.getStart();
+		//ControlSignal[1] = (float) 	csignal.getLateralvelocity();
+		//ControlSignal[2] = (float) 	csignal.getForwardvelocity();
+		//ControlSignal[3] = (float)  	csignal.getHeightvelocity();
+		//ControlSignal[4] = (float)  	csignal.getYawrate();
 		}
 	}
 	
@@ -115,7 +115,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 
 		Mainbus mainbus = new Mainbus();
 		
-		
+		/*
 		//Setting up a Matlab Proxy Server
 		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
 		mainbus.setMatlabProxyConnection(matlabproxy);
@@ -125,12 +125,11 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 		Thread t4 = new Thread(assignmentplanerrunnable);
 		t4.setPriority(1);
 		t4.start();
-
+*/
 		//Communication
 		
 		
 		try{
-			ControlSignal = new float[] {0, 0, 0, 0, 0};
 			Communication communication = new Communication(3,mainbus,"Communication");
 			Thread t7 = new Thread(communication);
 			t7.setDaemon(true);
@@ -521,7 +520,8 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 
 	@Override
 	public synchronized void setControlSignal(float[] controlsignal) {
-		ControlSignal = controlsignal;	
+		ControlSignal = controlsignal;
+		System.out.println("Position 1:   " + ControlSignal[0]);
 	}
 
 

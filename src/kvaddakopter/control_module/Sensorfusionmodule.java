@@ -77,12 +77,12 @@ public class Sensorfusionmodule implements Runnable{
 	protected ReferenceExtractor	referenceextractor	= new ReferenceExtractor(0);
 	protected int					counter				= 0;
 	protected int					controllingmode		= 0; 					// 0 for autonomous 
-	protected boolean				debugMode			= true;					// Toggle System out prints 		
+	protected boolean				debugMode			= false;					// Toggle System out prints 		
 	protected int					whichkalman			= 1; // 1 for 2xY 0 for 1xY
 	protected double[][]			states				= new double[(int) (1/sampletime*seconds)][4];
 	protected MatFileHandler		saver				= new MatFileHandler();
 	protected boolean				initialbool 		= true;
-	
+	protected boolean				threadrunning		= true;
 	public Sensorfusionmodule(ControlMainBusInterface mainbus) {
 		this.mainbus = mainbus;
 			
@@ -119,6 +119,7 @@ public class Sensorfusionmodule implements Runnable{
 	
 	public void run(){	
 		checkIsArmed();
+		
 		/*
 		try {
 			if(debugMode){
@@ -212,6 +213,8 @@ public class Sensorfusionmodule implements Runnable{
 		this.quadData = mainbus.getQuadData();								//Reads sensor data from mainbus
 		sdata.setnewsensordata(quadData);
 		if (sdata.isGPSnew()){
+		System.out.println(this.quadData.getGPSLat());
+		System.out.println(this.quadData.getGPSLong());
 		Initiallatitud = Initiallatitud + this.quadData.getGPSLat();
 		Initiallongitud = Initiallongitud + this.quadData.getGPSLong();
 		localcounter = localcounter + 1;
@@ -336,7 +339,7 @@ public class Sensorfusionmodule implements Runnable{
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				if(debugMode) System.out.println("Controllerloop initialized");
-				while(true)
+				while(threadrunning)
 				{					
 				//For every sample  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				counter ++;
@@ -345,7 +348,7 @@ public class Sensorfusionmodule implements Runnable{
 				this.quadData = mainbus.getQuadData();						//Reads sensor data from mainbus
 				sdata.setnewsensordata(quadData);							//Update local sensor object
 				
-
+				
 				if (0 == controllingmode || 1 == controllingmode){
 				sdata.GPS2XY();												//Transformation
 				sdata.xydot2XYdot();										//Transformation
@@ -376,6 +379,8 @@ public class Sensorfusionmodule implements Runnable{
 				//For every new GPS measurement-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				if(sdata.isGPSnew() )
 				{	
+					
+
 				rsdata.setXstates(skalmanx.gpsmeasurementupdate(sdata.getX()));	// Measurement update in kalmanfilter
 				rsdata.setYstates(skalmany.gpsmeasurementupdate(sdata.getY()));	// Measurement update in kalmanfilter
 				rsdata.XYdot2Vel();												//Transform Xdot,Ydot to velocities								
@@ -445,9 +450,13 @@ public class Sensorfusionmodule implements Runnable{
 				}
 				
 				if( rrdata.getLand() == 1){									//Initiate landing?
-					csignal.setStart(0);									//
+					ControlSignal csignal1 = new ControlSignal();
+					csignal.setStart(0);
+					mainbus.setControlSignalobject(csignal1);
+									//
 					try {													//
-						Thread.sleep((long) 10);							//
+						Thread.sleep((long) 10000);							//
+						this.threadrunning = false;
 					} catch (InterruptedException e) {						//
 						e.printStackTrace();								//
 					}					
@@ -457,7 +466,7 @@ public class Sensorfusionmodule implements Runnable{
 				mainbus.setControlSignalobject(csignal);						// Update main-bus control-signal
 				if(debugMode) csignal.print();
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
-				
+			/*	
 				//Save data-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				if (counter <= 20*seconds){
 				states[counter-1][0] = rsdata.getXpos();
@@ -469,6 +478,7 @@ public class Sensorfusionmodule implements Runnable{
 					try {
 						
 						ControlSignal csignal1 = new ControlSignal();
+						csignal.setStart(1);
 						mainbus.setControlSignalobject(csignal1);
 						saver.createMatFileFromFlightData("States", states);
 					} catch (IOException e) {
@@ -477,7 +487,7 @@ public class Sensorfusionmodule implements Runnable{
 					}
 				}
 				}
-				
+				*/
 				
 				
 				//Sample-time -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	

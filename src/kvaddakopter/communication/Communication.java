@@ -163,7 +163,7 @@ public class Communication implements Runnable {
 			}
 		}
 		mIsRunning = true;
-		if(!mIsInitiated){
+		if(!mIsInitiated && !mIsFlying){
 			System.out.println("Comm unit being initiated");
 			init();
 			synchronized(this){
