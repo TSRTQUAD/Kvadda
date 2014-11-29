@@ -30,7 +30,7 @@ public class HSVSliders{
 		static final int MAX_SAT = 255;
 		
 		static final int MIN_VAL = 0;
-		static final int MAX_VAL = 400;
+		static final int MAX_VAL = 255;
 		
 		Scene secondScene;
 		Stage secondStage;
@@ -240,9 +240,8 @@ public class HSVSliders{
         
         closeBtn.setTranslateY(360);
 		secondaryLayout.getChildren().add(closeBtn);
-        
          
-        secondScene = new Scene(secondaryLayout, 200, 370);
+        secondScene = new Scene(secondaryLayout, 200, 400);
 
         secondStage.setTitle("HSVCalibration");
         secondStage.setScene(secondScene);

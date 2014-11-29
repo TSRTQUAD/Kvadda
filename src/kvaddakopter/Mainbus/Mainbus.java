@@ -53,7 +53,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 
 	//Image processing storage
 	private boolean mIsIPRunning;
-	private ArrayList<TargetObject> mTargetList;
+	private ArrayList<TargetObject> mTargetList = new ArrayList<TargetObject>();
 	
 	
 	//GENERAL
@@ -72,8 +72,8 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	static float[] ControlSignal = new float[5];
 	private String mode;
 	public boolean selfCheck = false;
-	float speed = (float)0.1;
-	float batteryLevel = 99f;
+	float speed = (float)-1;
+	float batteryLevel = -1f;
     boolean shift = false;
     boolean runcontroller = false;
     boolean space_bar = false; //true = Takeoff, false = Landing
@@ -100,7 +100,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 		kvaddakopter.control_module.signals.ControlSignal csignal) {		
 		if (true == this.runcontroller){
 		//Controlsignal[Landing/Start Roll Pitch Gaz Yaw ]		
-		ControlSignal[0] = csignal.getStart();
+		ControlSignal[0] = 0; //csignal.getStart();
 		ControlSignal[1] = (float) 	csignal.getLateralvelocity();
 		ControlSignal[2] = (float) 	csignal.getForwardvelocity();
 		ControlSignal[3] = (float)  	csignal.getHeightvelocity();
@@ -302,16 +302,13 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	}
 
 	@Override
-	public synchronized HashMap<String,GPSCoordinate> getTargets() {
-		HashMap<String,GPSCoordinate> hashMap = new HashMap<String,GPSCoordinate>();
-		Integer id = 0;
+	public synchronized HashMap<String, GPSCoordinate> getTargets() {
+		HashMap<String, GPSCoordinate> hashMap = new HashMap<String, GPSCoordinate>();
 		for(TargetObject target : mTargetList){
-			hashMap.put(id.toString(), target.getGPSCoordinate());
-			id++;
+			hashMap.put(Integer.toString(target.getID()), target.getGPSCoordinate());
 		}
 		return hashMap;
 	}
-
 
 	//Image processing-------------------------------------
 	

@@ -20,10 +20,8 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 
-import com.lynden.gmapsfx.service.geocoding.GeocodingService;
-
 public class Tracking {	
-	HashMap<Integer, TargetObject> mInternalTargets;
+	ArrayList<TargetObject> mInternalTargets;
 	int highestKey = -1;
 	
 	SimpleMatrix H; // Measurments from state matrix
@@ -49,8 +47,12 @@ public class Tracking {
 				0, 1, 0, 0);
 		
 		// Initialize target list
-		mInternalTargets = new HashMap<Integer, TargetObject>();
+		mInternalTargets = new ArrayList<TargetObject>();
 		lastTime = System.currentTimeMillis();
+		
+		// Debug
+		mInternalTargets.add(new TargetObject(new SimpleMatrix(2, 1, true, 0, 0), 50, null));
+		mInternalTargets.get(0).setGPSCoordinate(new GPSCoordinate(58.40708, 15.62126));
 	}
 	
 
@@ -82,14 +84,16 @@ public class Tracking {
 		for(int i = 0; i < matchedIDs.length; i++){
 			if(matchedIDs[i] == -1){
 				// Create new target
-				mInternalTargets.put(++highestKey, targetObjects.get(i));
+				TargetObject newTarget = targetObjects.get(i);
+				newTarget.setID(++highestKey);
+				mInternalTargets.add(newTarget);
 				continue;
 			}
 			// Extract position measurment and noise from measurments
 			SimpleMatrix z = H.mult(targetObjects.get(i).getState());
 			SimpleMatrix R = (H.mult(targetObjects.get(i).getCovariance())).mult(H.transpose());
 			// Perform measurement update on target
-			measurementUpdate(mInternalTargets.get(matchedIDs[i]), z, R);
+			measurementUpdate(TargetObject.getTargetByID(mInternalTargets, matchedIDs[i]), z, R);
 			
 			
 			// TODO Add optinal trajectories again for debugging purposes
@@ -101,22 +105,22 @@ public class Tracking {
 		
 		// Remove old internal targets with too high covariance
 		// If ||P|| > threshold we remove the target from tracked targets
-		Iterator<Map.Entry<Integer, TargetObject>> iter = mInternalTargets.entrySet().iterator();
+		Iterator<TargetObject> iter = mInternalTargets.iterator();
 		while(iter.hasNext()){
-		    Map.Entry<Integer, TargetObject> entry = iter.next();
-			if(entry.getValue().getCovariance().normF() > 1000){
+		    TargetObject target = iter.next();
+			if(target.getCovariance().normF() > 1000){
 				iter.remove();
+				System.out.println("Tracking: Removing target");
 		    }
-		}		
+		}
 	}
 
 	/**
 	 * Performs the Kalman filter time update aka. prediction step on all tracked targets.
 	 */
-	private void timeUpdate(){ // TODO: Variable time updates
-		for(Entry<Integer, TargetObject> entry: mInternalTargets.entrySet()){
+	private void timeUpdate(){
+		for(TargetObject target : mInternalTargets){
 			// Get state and covariance
-			TargetObject target = entry.getValue();
 			SimpleMatrix x = target.getState();
 			SimpleMatrix P = target.getCovariance();
 			
@@ -200,16 +204,14 @@ public class Tracking {
 		
 		
 		// For each entry in the matching table, set matching value as a combination of methods Identigier.compare and compareDistance.
-		ArrayList<Integer> keyArray = new ArrayList<Integer>(mInternalTargets.keySet());
-		for(int keyI = 0; keyI < numInternalTargets; keyI++){
-			if(debugPrintMatches) System.out.format("|%2d|", keyArray.get(keyI));
+		for(TargetObject internalTarget : mInternalTargets){
+			if(debugPrintMatches) System.out.format("|%2d|", internalTarget.getID());
 			for(TargetObject target : targetObjects){
-				TargetObject internalTarget = mInternalTargets.get(keyArray.get(keyI));
 				
-				matchTable[keyI][targetObjects.indexOf(target)] = 
+				matchTable[internalTarget.getID()][targetObjects.indexOf(target)] = 
 						(Identifier.compare(internalTarget.getIdentifier(), target.getIdentifier().setmeanHSVValuesCertainty(1)) + 
 						compareDistance(internalTarget, target)) / 2;
-				if(debugPrintMatches) System.out.format("%.2f|", matchTable[keyI][targetObjects.indexOf(target)]);
+				if(debugPrintMatches) System.out.format("%.2f|", matchTable[internalTarget.getID()][targetObjects.indexOf(target)]);
 			}
 			if(debugPrintMatches) System.out.println();
 		}
@@ -227,7 +229,7 @@ public class Tracking {
 			for(int keyI = 0; keyI < numInternalTargets; keyI++){
 				if(matchTable[keyI][i] > bestMatchVal){
 					bestMatchVal = matchTable[keyI][i];
-					bestMatchId = keyArray.get(keyI);
+					bestMatchId = mInternalTargets.get(keyI).getID();
 				}
 			}
 			if(bestMatchVal > matchThreshold){
@@ -323,15 +325,14 @@ public class Tracking {
 	 * @param qData
 	 */
 	private void estimateGeo(QuadData qData){
-		for(int key : mInternalTargets.keySet()) {
-			TargetObject target = mInternalTargets.get(key);
+		for(TargetObject target : mInternalTargets) {
 			double fullYAngle = 90; // Field of view in vertical
-			double fullYPixels = 360; // half the vertical pixel width
-			double yAngle = Math.atan(((target.getPosition().get(1,0) - fullYPixels) / fullYPixels) * Math.tan(Math.toRadians(fullYAngle / 2)));
+			double fullYPixels = 360; // half the image pixel height
+			double yAngle = Math.atan(((fullYPixels - target.getPosition().get(1,0)) / fullYPixels) * Math.tan(Math.toRadians(fullYAngle / 2)));
 			double yDist = qData.getAltitude() * Math.tan(Math.toRadians(qData.getPitch()) + yAngle);
 
 			double fullXAngle = 120; // Field of view in horizontal
-			double fullXPixels = 480; // Half the horizontal pixel width
+			double fullXPixels = 480; // Half the image pixel width
 			double xAngle = Math.atan(((target.getPosition().get(0,0) - fullXPixels) / fullXPixels) * Math.tan(Math.toRadians(fullXAngle / 2)));
 			double xDist = qData.getAltitude() * Math.tan(Math.toRadians(-qData.getRoll()) + xAngle);
 			
@@ -355,9 +356,7 @@ public class Tracking {
 	public Mat getImage(int w_, int h_, Mat res){
 		// TODO: Remove w_ and h_ in method call
 		if(mInternalTargets.size() > 0){
-			for(int key : mInternalTargets.keySet()) {
-			    TargetObject target = mInternalTargets.get(key);
-			    
+			for(TargetObject target : mInternalTargets) {
 			    SimpleMatrix pos = target.getPosition();
 				SimpleMatrix cov = target.getCovariance();
 				
@@ -366,7 +365,7 @@ public class Tracking {
 				Core.ellipse(res, new Point(pos.get(0, 0), pos.get(1, 0)), new Size(new double[]{cov.get(0, 0), cov.get(1, 1)}), 0.0, 0.0, 360.0, new Scalar(255, 255, 255));
 
 				// Draw ID information
-				String txtString = String.format("ID:%d", key);
+				String txtString = String.format("ID:%d", target.getID());
 			    Core.putText(res, txtString, new Point(pos.get(0, 0) - 12, pos.get(1, 0) + 22) , Core.FONT_HERSHEY_SIMPLEX, .4, new Scalar(255, 255, 255), 1, 8, false);
 			}
 		}
@@ -374,4 +373,11 @@ public class Tracking {
 		return res;
 	}
 	
+	/**
+	 * Returns hash map with tracked targets
+	 * @return tracked targets
+	 */
+	public ArrayList<TargetObject> getTargets(){
+		return mInternalTargets;
+	}
 }

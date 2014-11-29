@@ -26,7 +26,7 @@ import org.opencv.imgproc.Imgproc;
 public class ColorDetection  extends DetectionClass{
 	
 	// Minimum object size
-	static final int MINIMUM_OBJECT_SIZE = 500;
+	static final int MINIMUM_OBJECT_SIZE = 50;
 	static final int MAXIMUM_OBJECT_SIZE = 15000; //Not used yet
 
 	//Morphology 
@@ -86,6 +86,8 @@ public class ColorDetection  extends DetectionClass{
 			return targetObjects;
 		else{
 		for(ColorTemplate colorTemplate : colorTemplates){
+			if(!colorTemplate.isActive())
+				continue;
 			//number of targets found from this template
 			int numberOfTargetsFound = 0;
 			// Threshold with inRange
@@ -128,8 +130,6 @@ public class ColorDetection  extends DetectionClass{
 			//Calculate mean HSV channel values with 10 as value threshhold 
 			ArrayList<Long> targetHSVChannels = calculateMeanHSVValues(cutoutImage, 10);
 			
-
-			
 			//Convert boundingboxes to targetObjects, draw boundingboxes in resultImage
 			ArrayList<TargetObject> newTargets = convertToTargets(boundingBoxes, targetHSVChannels, resultImage);
 			targetObjects.addAll(newTargets);
@@ -142,7 +142,7 @@ public class ColorDetection  extends DetectionClass{
 			//Adapt color template towards HSV-channels of detected target
 			//If no target is found the template is adapted towards original bounds
 			if(isUsingColorAdaption() && numberOfTargetsFound > 0){
-				colorTemplate.adapt(targetHSVChannels, 100, 100, 100);
+				colorTemplate.adapt(targetHSVChannels);
 			}
 			else if (isUsingColorAdaption()){
 				colorTemplate.adaptToOriginalBounds();

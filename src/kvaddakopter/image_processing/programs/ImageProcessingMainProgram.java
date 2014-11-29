@@ -54,8 +54,8 @@ public class ImageProcessingMainProgram extends ProgramClass{
 		//Create and initialize decoder. And select source.
 		mDecoder = new FFMpegDecoder();
 
-		//mDecoder.initialize("tcp://192.168.1.1:5555"/*FFMpegDecoder.STREAM_ADDR_BIPBOP*/);
-		mDecoder.initialize(FFMpegDecoder.STREAM_ADDR_BIPBOP);
+		mDecoder.initialize("tcp://192.168.1.1:5555"/*FFMpegDecoder.STREAM_ADDR_BIPBOP*/);
+		//mDecoder.initialize(FFMpegDecoder.STREAM_ADDR_BIPBOP);
 		//mDecoder.initialize("mvi2.mp4");
 		// Listen to decoder events
 		mDecoder.setDecoderListener(this);
@@ -84,10 +84,10 @@ public class ImageProcessingMainProgram extends ProgramClass{
 		mBlurDetection = new BlurDetection();
 
 		//Create Trackers
-		//mTracker = new Tracking();
+		mTracker = new Tracking();
 	}
 
-	public void update(){
+	public void update(){		
 		//Images to show
 		checkIsRunning();
 		QuadData currentQuadData = new QuadData(mMainbus.getQuadData());
@@ -146,7 +146,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 				}
 			}
 
-			mMainbus.setIPTargetList(targetObjects);
+			mMainbus.setIPTargetList(mTracker.getTargets());
 
 
 		}
