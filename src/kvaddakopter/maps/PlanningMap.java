@@ -182,7 +182,7 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 	 * @return
 	 */
 	protected LatLong startCoordinate(){
-		return new LatLong(58.406659, 15.620358);
+		return new LatLong(58.395128,15.575096);
 	}
 	
 

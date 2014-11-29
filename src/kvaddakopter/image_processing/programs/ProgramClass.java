@@ -59,8 +59,6 @@ public abstract class ProgramClass implements Runnable,DecoderListener,KeyBoardL
 	    
 	  //Has to be run to be working
 	  System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-	  		
-	    //init(); Put in run()
 	}
 
 	/** 
@@ -144,7 +142,6 @@ public abstract class ProgramClass implements Runnable,DecoderListener,KeyBoardL
 		
 		while(!mMainbus.getIsIPRunning()){
 			synchronized(mMainbus){
-				System.out.println("!!!");
 				try {
 					mMainbus.wait();
 				} catch (InterruptedException e) {
@@ -224,5 +221,4 @@ public abstract class ProgramClass implements Runnable,DecoderListener,KeyBoardL
 	
 	@Override
 	public void onKeyBoardInput(String inputString) {};
-
 }
