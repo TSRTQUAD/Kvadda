@@ -2,6 +2,7 @@ package kvaddakopter.interfaces;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javafx.scene.image.Image;
 import kvaddakopter.communication.QuadData;
@@ -37,9 +38,8 @@ public interface MainBusIPInterface {
 	
 	//Modes
 	int[] mIPActiveModes = new int[10];
-	int[] mIPImageMode =new int[]{IMAGE_DEFAULT};
+	int[] mIPImageMode = new int[]{IMAGE_DEFAULT};
 	
-	Image mIPImageToShow[] = new Image[1];
 	
 	//Intiation
 	public void initIPVariables();
@@ -80,7 +80,7 @@ public interface MainBusIPInterface {
 	public GPSCoordinate getCurrentQuadPosition();
 	
 	//Targets
-	public void setIPTargetList(ArrayList<TargetObject> listOfTargets);
+	public void setIPTargetList(ArrayList<TargetObject> targets);
 	
 	//Image object
 	public void setIPImageToShow(BufferedImage image);
