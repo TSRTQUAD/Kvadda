@@ -1,6 +1,7 @@
 package kvaddakopter.image_processing.data_types;
 
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfKeyPoint;
 
 public class FormTemplate {
 	
@@ -52,6 +53,13 @@ public class FormTemplate {
 	}
 	public double[] getBoxCenter() {
 		return new double[]{mBoxOffsetX,mBoxOffsetY};
+	}
+	
+	public float getPercentMatches(float matches){
+		MatOfKeyPoint keyPoints = mImageObject.getKeyPoints();
+		float numKeyPoints = keyPoints.width()*keyPoints.height();
+		
+		return matches/numKeyPoints;
 	}
 	
 	

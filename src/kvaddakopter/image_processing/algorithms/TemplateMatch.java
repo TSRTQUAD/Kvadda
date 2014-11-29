@@ -83,8 +83,8 @@ public class TemplateMatch  extends DetectionClass{
 						//   Detected object in list //
 						ArrayList<Long> matchesList = new ArrayList<Long>();
 						long numMatches = matches.width()*matches.height();
-						float noiseLevel = 120.5f;
-						targetObjects.add(new TargetObject(boxCorners,noiseLevel,template.getId(),numMatches));
+						float noiseLevel = 60.5f;
+						targetObjects.add(new TargetObject(boxCorners,noiseLevel,template.getId(),template.getPercentMatches(numMatches)));
 
 						/* For the output image */					
 						for (int i = 0; i < 4; i++) {
