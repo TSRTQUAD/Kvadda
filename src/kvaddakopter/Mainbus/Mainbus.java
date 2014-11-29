@@ -54,6 +54,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	//Image processing storage
 	private boolean mIsIPRunning;
 	private ArrayList<TargetObject> mTargetList = new ArrayList<TargetObject>();
+	Image mIPImageToShow[] = new Image[1];
 	
 	
 	//GENERAL
@@ -72,7 +73,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	static float[] ControlSignal = new float[5];
 	private String mode;
 	public boolean selfCheck = false;
-	float speed = (float)-1;
+	float speed = -1f;
 	float batteryLevel = -1f;
     boolean shift = false;
     boolean runcontroller = false;
@@ -83,7 +84,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	double[][] ControlSignalAll = new double[3000][5];
 	public int seq = 0;
 	public int seq_signal = 0;
-	QuadData quadData = new QuadData();
+	QuadData quadData;// = new QuadData();
 
 	private boolean gpsFixOk;
 
@@ -282,7 +283,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	
 	@Override
 	public double getCurrentSpeed() {
-		return 1.23;
+		return speed;
 	}
 
 
