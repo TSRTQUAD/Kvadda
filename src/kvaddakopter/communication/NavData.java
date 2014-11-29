@@ -7,6 +7,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.StringTokenizer;
 
+import kvaddakopter.Mainbus.Mainbus;
 import kvaddakopter.interfaces.MainBusCommInterface;
 
 /**
@@ -204,7 +205,10 @@ public class NavData implements Runnable {
 					
 
 					} catch (SocketTimeoutException ex3) {
-						System.out.println("socket_nav.receive(): Timeout");
+						System.err.println("socket_nav.receive(): Timeout");
+						
+						if(!comm.getIsFlying())
+							mMainbus.setShouldStart(false);
 						NavDataTimeOut = true;
 						comm.reset();
 						mIsInitiated = false;
