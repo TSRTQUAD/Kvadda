@@ -70,7 +70,7 @@ public class TargetObject {
 	 * @param targetNumMatches	Number of matches in each templade.
 	 */
 	public TargetObject(ArrayList<Point> rectCorners, float noise_level,
-			ArrayList<Long> targetNumMatches) {
+			int templateId, float percentageMatches) {
 		// Create the state matrix with given position measurements
 		float meanX = 0;
 		float meanY = 0;
@@ -86,7 +86,7 @@ public class TargetObject {
 		P = SimpleMatrix.diag(1, 1, 3, 3);
 		P = P.scale(noise_level);
 
-		identifier = new Identifier(targetNumMatches);
+		identifier = new Identifier(templateId, percentageMatches);
 	}
 
 	/**
