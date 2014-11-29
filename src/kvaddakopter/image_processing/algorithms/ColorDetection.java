@@ -26,7 +26,7 @@ import org.opencv.imgproc.Imgproc;
 public class ColorDetection  extends DetectionClass{
 	
 	// Minimum object size
-	static final int MINIMUM_OBJECT_SIZE = 500;
+	static final int MINIMUM_OBJECT_SIZE = 50;
 	static final int MAXIMUM_OBJECT_SIZE = 15000; //Not used yet
 
 	//Morphology 
@@ -86,6 +86,8 @@ public class ColorDetection  extends DetectionClass{
 			return targetObjects;
 		else{
 		for(ColorTemplate colorTemplate : colorTemplates){
+			if(!colorTemplate.isActive())
+				continue;
 			//number of targets found from this template
 			int numberOfTargetsFound = 0;
 			// Threshold with inRange
