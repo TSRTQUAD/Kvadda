@@ -3,7 +3,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import kvaddakopter.Mainbus.Mainbus;
 import kvaddakopter.image_processing.algorithms.DetectionClass;
 import kvaddakopter.image_processing.algorithms.Tracking;
 import kvaddakopter.image_processing.decoder.DecoderListener;

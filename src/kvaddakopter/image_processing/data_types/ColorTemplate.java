@@ -189,6 +189,19 @@ public class ColorTemplate {
 	}
 	
 	/**
+	 * Adapt to new HSV values with same window size
+	 * @param objectHSVChannels HSV values to adapt to
+	 */
+	public void adapt(ArrayList<Long> objectHSVChannels){
+		if(hueLow>hueHigh)
+			hueHigh += 180;
+		int hueWindow = hueHigh-hueLow;
+		int satWindow = saturationHigh-saturationLow;
+		int valWindow = valueHigh-valueLow;
+		this.adapt(objectHSVChannels, hueWindow, satWindow, valWindow);
+	}
+	
+	/**
 	 * Adapt color template towards original bounds
 	 * Implements low pass filtering towards original bounds
 	 * Use this to adapt if no targets are found
