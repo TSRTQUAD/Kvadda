@@ -17,14 +17,15 @@ public class SensorData {
 	private double initiallat;
 	private double radius = 6371;
 	
-	private double Longitudold;
-	private double Latitudold;
+	private double Longitudold = 0;
+	private double Latitudold = 0;
 	
 		/**
 		 * Set sensordata object from sensordata in vector format
 		 * {Latitud,Longitud,xdot,ydot,height,yaw}
 		 * @param sensorvector
 		 */
+	
 	public void setnewsensordata(QuadData quadData){
 		synchronized(quadData){
 			this.Latitud = quadData.getGPSLat();
