@@ -69,7 +69,7 @@ public class NavData implements Runnable {
 					e.printStackTrace();
 				}				
 			}
-		System.out.println("Stopped waiting!");
+		System.out.println("NavData: Stopped waiting!");
 		}
 			
 		if(!mIsInitiated){
@@ -231,48 +231,13 @@ public class NavData implements Runnable {
 		if(wifi && gps){
 			
 		}
-			mMainbus.setIsArmed(true);
-			synchronized(mMainbus){
-				mMainbus.notifyAll();
-			}
-			
+			if(!mMainbus.getIsArmed()){
+				mMainbus.setIsArmed(true);
+				synchronized(mMainbus){
+					mMainbus.notifyAll();
+					System.out.println("Communication: Armed, notifyall!");
+				}				
+			}	
 	}	
 	
 }
-
-
-//old stuff
-
-// System.out.println("NavData Received: " +
-// packet_rcv.getLength() + " bytes");
-/*
- * 
- * 
- * BatteryLevel = comm.get_int(buf_rcv,
- * Communication.NAVDATA_BATTERY); //
- * System.out.println(BatteryLevel);
- * 
- * Altitude = comm.get_int(buf_rcv,
- * Communication.NAVDATA_ALTITUDE);
- * System.out.println(Altitude);
- * 
- * 
- * 
- * Pitch =
- * Float.intBitsToFloat(comm.get_int(buf_rcv,
- * Communication.NAVDATA_PITCH))/1000; Roll =
- * Float.intBitsToFloat(comm.get_int(buf_rcv,
- * Communication.NAVDATA_ROLL))/1000; Yaw =
- * Float.intBitsToFloat(comm.get_int(buf_rcv,
- * Communication.NAVDATA_YAW))/1000; //
- * System.out.println("Pitch;   " + Pitch + "   Roll:    " +
- * Roll + "  Yaw:   " + Yaw);
- * 
- * // System.out.println("---------------------"); Vx =
- * Float.intBitsToFloat(comm.get_int(buf_rcv,
- * Communication.NAVDATA_VX))/1000; Vy =
- * Float.intBitsToFloat(comm.get_int(buf_rcv,
- * Communication.NAVDATA_VY))/1000; Vz =
- * Float.intBitsToFloat(comm.get_int(buf_rcv,
- * Communication.NAVDATA_VZ))/1000;
- */

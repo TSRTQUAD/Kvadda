@@ -21,4 +21,5 @@ public interface MainBusCommInterface {
 	 * @param b
 	 */
 	public void setShouldStart(boolean b);
+	public boolean getIsArmed();
 }

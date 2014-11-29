@@ -182,17 +182,6 @@ public class HSVSliders{
 			}
 		});
 		
-//		Button colorAdaptBtn = new Button();
-//		colorAdaptBtn.setText("Finnished");
-//		colorAdaptBtn.setOnAction(new EventHandler<ActionEvent>() {
-//			@Override
-//			public void handle(ActionEvent event) {
-//				synchronized(template){
-//					template.setAdaption(!template.isAdaptionActive);
-//				}
-//			}
-//		});
-		
 		Button closeBtn = new Button();
 		closeBtn.setText("Finnished");
 		closeBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -251,9 +240,8 @@ public class HSVSliders{
         
         closeBtn.setTranslateY(360);
 		secondaryLayout.getChildren().add(closeBtn);
-        
          
-        secondScene = new Scene(secondaryLayout, 200, 370);
+        secondScene = new Scene(secondaryLayout, 200, 400);
 
         secondStage.setTitle("HSVCalibration");
         secondStage.setScene(secondScene);
