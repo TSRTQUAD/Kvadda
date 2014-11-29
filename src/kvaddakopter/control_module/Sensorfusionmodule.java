@@ -93,20 +93,20 @@ public class Sensorfusionmodule implements Runnable{
 	
 	public void run(){	
 		checkIsRunning();
+		/*
 		try {
 			if(debugMode){
 				System.out.println("Waiting for quadcopter...");
-				System.out.println("Quad is starting .. startsignal =  ");
-				System.out.println(controlsignal.getStart());
-				System.out.println("");
 			}
 			Thread.sleep((long) 1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
+		*/
 		//Initialize -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-		
+		
 		//MissionObject -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-		
+		/*
 		missionobject.setTrajectory(new double[][]
 				{{58.395132,15.574524},
 				{58.395184,15.574648},
@@ -167,7 +167,7 @@ public class Sensorfusionmodule implements Runnable{
 				{0.7,0},
 				{0.7,0}
 				});
-		
+		*/
 		//Initialize -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 		
 		if(debugMode){
@@ -178,7 +178,7 @@ public class Sensorfusionmodule implements Runnable{
 		//sdata.print();
 		
 		if (0 == controllingmode){
-		//this.missionobject = mainbus.getMissionObject();					//Reads mission object from mainbus	
+		this.missionobject = mainbus.getMissionObject();					//Reads mission object from mainbus	
 		
 						//Start Quad-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-		
 						ControlSignal csignal = new ControlSignal();	

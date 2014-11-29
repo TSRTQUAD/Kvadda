@@ -101,9 +101,9 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 		if (true == this.runcontroller){
 		//Controlsignal[Landing/Start Roll Pitch Gaz Yaw ]		
 		//ControlSignal[0] = csignal.getStart();
-		//ControlSignal[1] = (float) 	csignal.getLateralvelocity();
-		//ControlSignal[2] = (float) 	csignal.getForwardvelocity();
-		//ControlSignal[3] = (float)  	csignal.getHeightvelocity();
+		ControlSignal[1] = (float) 	csignal.getLateralvelocity();
+		ControlSignal[2] = (float) 	csignal.getForwardvelocity();
+		ControlSignal[3] = (float)  	csignal.getHeightvelocity();
 		ControlSignal[4] = (float)  	csignal.getYawrate();
 		}
 	}
@@ -318,7 +318,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	public synchronized void initIPVariables() {
 		mColorTemplates.add(new ColorTemplate("Pink square", 120, 200, 50, 90, 180, 245, ColorTemplate.FORM_SQUARE));	
 		mColorTemplates.add(new ColorTemplate("Yellow square", 30, 120, 50, 120, 130, 255, ColorTemplate.FORM_SQUARE));
-		
+		mTargetList = new ArrayList<TargetObject>();
 		mIPCalibTemplate[0] = new ColorTemplate();
 		mIPImageToShow[0] = null;
 		
@@ -549,6 +549,11 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	public void setIsArmed(boolean b) {
 		mIsArmed = true;
 		
+	}
+	
+	public boolean getStartPermission() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 
