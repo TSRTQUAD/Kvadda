@@ -61,6 +61,7 @@ public class Sensorfusionmodule implements Runnable{
 	protected ControlMainBusInterface mainbus;
 	protected double 				sampletime			= 0.05; //seconds
 	protected double 				time;
+	protected double 				seconds				= 30;
 	protected QuadData				quadData;
 	protected SensorData 			sdata				= new SensorData();
 	protected ControlSignal 		controlsignal		= new ControlSignal();
@@ -78,9 +79,9 @@ public class Sensorfusionmodule implements Runnable{
 	protected int					controllingmode		= 0; 					// 0 for autonomous 
 	protected boolean				debugMode			= true;					// Toggle System out prints 		
 	protected int					whichkalman			= 1; // 1 for 2xY 0 for 1xY
-	protected double[][]			states;
+	protected double[][]			states				= new double[(int) (1/sampletime*seconds)][4];
 	protected MatFileHandler		saver				= new MatFileHandler();
-	
+	protected boolean				initialbool 		= true;
 	
 	public Sensorfusionmodule(ControlMainBusInterface mainbus) {
 		this.mainbus = mainbus;
@@ -118,7 +119,7 @@ public class Sensorfusionmodule implements Runnable{
 		//Initialize -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-		
 		
 		//MissionObject -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-		
-		/*
+		
 		missionobject.setTrajectory(new double[][]
 				{{58.395132,15.574524},
 				{58.395184,15.574648},
@@ -148,7 +149,7 @@ public class Sensorfusionmodule implements Runnable{
 				{58.39511,15.574573}
 				});
 		
-		missionobject.setHeight(new double[]{4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4});
+		missionobject.setHeight(new double[]{4});
 		missionobject.setYaw(0.0);
 		missionobject.setWaitingtime(0.0);
 		missionobject.setReferenceVelocity(new double[][]
@@ -179,18 +180,56 @@ public class Sensorfusionmodule implements Runnable{
 				{0.7,0},
 				{0.7,0}
 				});
-		*/
+	
 		//Initialize -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 		
 		if(debugMode){
 		System.out.println("Initializing modules ..");
 		}
-		this.quadData = mainbus.getQuadData();								//Reads sensor data from mainbus
-		sdata.setnewsensordata(quadData);									//Update local sensor object
-		//sdata.print();
+		
+		
+				
+		
+		
 		
 		if (0 == controllingmode){
-		this.missionobject = mainbus.getMissionObject();					//Reads mission object from mainbus	
+		
+		
+		//Average initials -_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_-
+		double Initiallatitud = 0;
+		double Initiallongitud = 0;
+		int localcounter = 0;
+		
+		while(initialbool) {					
+		this.quadData = mainbus.getQuadData();								//Reads sensor data from mainbus
+		sdata.setnewsensordata(quadData);
+		if (sdata.isGPSnew()){
+		Initiallatitud = Initiallatitud + this.quadData.getGPSLat();
+		Initiallongitud = Initiallongitud + this.quadData.getGPSLong();
+		localcounter = localcounter + 1;
+		if (6 == localcounter) initialbool = false;
+		}
+		try {
+			Thread.sleep((long) 200);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		}
+		
+		Initiallatitud = Initiallatitud/(localcounter-1);
+		Initiallongitud = Initiallongitud/(localcounter-1);
+		sdata.setGPSposition(new double[]{Initiallatitud,Initiallongitud});
+		
+		sdata.setinitial();													// Fix local coordinate system XY
+		sdata.GPS2XY();														// Transformation GPS to XY coordinates
+
+		//-_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_-
+
+		
+		rrdata.initialize(sdata.getLatitud(),sdata.getLongitud());			// Fix local coordinate system XY
+		this.missionobject = mainbus.getMissionObject();					//Reads mission object from mainbus			
+		rrdata.updateref(referenceextractor.update(missionobject));			// update ref @ Autonomous flight mode		
+
 		
 						//Start Quad-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-		
 						ControlSignal csignal = new ControlSignal();	
@@ -207,12 +246,12 @@ public class Sensorfusionmodule implements Runnable{
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-								
-		sdata.setinitial();													// Fix local coordinate system XY
-		sdata.GPS2XY();														// Transformation GPS to XY coordinates
+						//-_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_-
+						
+		this.quadData = mainbus.getQuadData();								//Reads sensor data from mainbus
+		sdata.setnewsensordata(quadData);							
 		sdata.xydot2XYdot();
-		rrdata.initialize(sdata.getLatitud(),sdata.getLongitud());			// Fix local coordinate system XY
-		rrdata.updateref(referenceextractor.update(missionobject));			// update ref @ Autonomous flight mode		
+
 		}															
 
 		else if (1 == controllingmode){
@@ -411,17 +450,20 @@ public class Sensorfusionmodule implements Runnable{
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 				
 				//Save data-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+				if (counter <= 20*seconds){
+				states[counter-1][0] = rsdata.getXpos();
+				states[counter-1][1] = rsdata.getYpos();
+				states[counter-1][2] = rrdata.getXpos();
+				states[counter-1][3] = rrdata.getYpos();
 				
-				states[counter][0] = rsdata.getXpos();
-				states[counter][1] = rsdata.getYpos();
-				
-				if (counter == 20*30){
+				if (counter == 20*seconds){
 					try {
 						saver.createMatFileFromFlightData("States", states);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+				}
 				}
 				
 				
