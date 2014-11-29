@@ -148,6 +148,7 @@ public class TabUtforController extends BaseController implements Initializable 
 		Image image = this.getParent().getMainBus().getIPImageToShow();
 		if(image != null){
 			this.imgMovie.setImage(image);
+			this.imgMovie.toFront();
 		}
     	
     }
