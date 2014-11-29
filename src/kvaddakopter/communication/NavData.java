@@ -228,8 +228,13 @@ public class NavData implements Runnable {
 			wifi=true;
 		}
 		
-		if(wifi && gps)
+		if(wifi && gps){
+			
+		}
 			mMainbus.setIsArmed(true);
+			synchronized(mMainbus){
+				mMainbus.notifyAll();
+			}
 			
 	}	
 	

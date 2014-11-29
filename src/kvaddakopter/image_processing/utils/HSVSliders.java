@@ -30,7 +30,7 @@ public class HSVSliders{
 		static final int MAX_SAT = 255;
 		
 		static final int MIN_VAL = 0;
-		static final int MAX_VAL = 400;
+		static final int MAX_VAL = 255;
 		
 		Scene secondScene;
 		Stage secondStage;
@@ -181,6 +181,17 @@ public class HSVSliders{
 				parent.updateColorTemplates();
 			}
 		});
+		
+//		Button colorAdaptBtn = new Button();
+//		colorAdaptBtn.setText("Finnished");
+//		colorAdaptBtn.setOnAction(new EventHandler<ActionEvent>() {
+//			@Override
+//			public void handle(ActionEvent event) {
+//				synchronized(template){
+//					template.setAdaption(!template.isAdaptionActive);
+//				}
+//			}
+//		});
 		
 		Button closeBtn = new Button();
 		closeBtn.setText("Finnished");
