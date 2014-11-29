@@ -1,4 +1,7 @@
 package kvaddakopter.control_module;
+import java.io.IOException;
+
+import kvaddakopter.assignment_planer.MatFileHandler;
 import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.assignment_planer.ReferenceExtractor;
 import kvaddakopter.communication.QuadData;
@@ -64,6 +67,9 @@ public class Sensorfusionmodule implements Runnable{
 	protected MissionObject 		missionobject		= new MissionObject(); 
 	protected KalmanFilter			skalmanx 			= new KalmanFilter(sampletime,1,0.01,1,0,0);
 	protected KalmanFilter			skalmany	 		= new KalmanFilter(sampletime,1,0.01,1,0,0);
+	protected Kalmanfilter_endast_gps			skalmanxx 			= new Kalmanfilter_endast_gps(sampletime,1,0.01,0,0);
+	protected Kalmanfilter_endast_gps			skalmanyy	 		= new Kalmanfilter_endast_gps(sampletime,1,0.01,0,0);
+	
 	protected RefinedSensorData 	rsdata  			= new RefinedSensorData();
 	protected Controller			controller			= new Controller(sampletime);
 	protected ReferenceData 		rrdata				= new ReferenceData();   
@@ -71,8 +77,14 @@ public class Sensorfusionmodule implements Runnable{
 	protected int					counter				= 0;
 	protected int					controllingmode		= 0; 					// 0 for autonomous 
 	protected boolean				debugMode			= true;					// Toggle System out prints 		
+	protected int					whichkalman			= 1; // 1 for 2xY 0 for 1xY
+	protected double[][]			states;
+	protected MatFileHandler		saver				= new MatFileHandler();
+	
+	
 	public Sensorfusionmodule(ControlMainBusInterface mainbus) {
 		this.mainbus = mainbus;
+			
 	}
 	
 	
@@ -222,6 +234,7 @@ public class Sensorfusionmodule implements Runnable{
 		if(debugMode) rrdata.print();
 		//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 		
+		if (1 ==  whichkalman){
 		//SENSORFUSION  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 		rsdata.setXstates(skalmanx.timeupdate()); 							//Kalman filter in X direction
 		rsdata.setYstates(skalmany.timeupdate()); 							//Kalman filter in Y direction
@@ -231,6 +244,18 @@ public class Sensorfusionmodule implements Runnable{
 		rsdata.setHeight(sdata.getHeight());								// Set Height
 		rsdata.XYdot2Vel();													//Transform Xdot,Ydot to velocities
 		//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+		}
+		
+		
+		if (0 ==  whichkalman){
+		//SENSORFUSION  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+		rsdata.setXstates(skalmanxx.timeupdate(sdata.getXdot())); 							//Kalman filter in X direction
+		rsdata.setYstates(skalmanyy.timeupdate(sdata.getYdot())); 							//Kalman filter in Y direction
+		rsdata.setYaw(sdata.getYaw());										// Set Yaw
+		rsdata.setHeight(sdata.getHeight());								// Set Height
+		rsdata.XYdot2Vel();													//Transform Xdot,Ydot to velocities
+		//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+		}
 		
 		
 		//rsdata.print();
@@ -292,22 +317,45 @@ public class Sensorfusionmodule implements Runnable{
 				
 				//SENSORFUSION  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				//Update states from Kalman filter
+				if (1 ==  whichkalman){
 				rsdata.setXstates(skalmanx.timeupdate()); 					//Kalman filter in X direction
 				rsdata.setYstates(skalmany.timeupdate()); 					//Kalman filter in Y direction
 				rsdata.setXstates(skalmanx.velmeasurementupdate(sdata.getXdot())); //Kalman filter in X direction
 				rsdata.setYstates(skalmany.velmeasurementupdate(sdata.getYdot())); //Kalman filter in Y direction
 				rsdata.XYdot2Vel();											 //Transform Xdot,Ydot to velocities
-				rsdata.s2rs(sdata);	
+				rsdata.s2rs(sdata);
+				
+				//For every new GPS measurement-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+				if(sdata.isGPSnew() )
+				{	
+				rsdata.setXstates(skalmanx.gpsmeasurementupdate(sdata.getX()));	// Measurement update in kalmanfilter
+				rsdata.setYstates(skalmany.gpsmeasurementupdate(sdata.getY()));	// Measurement update in kalmanfilter
+				rsdata.XYdot2Vel();												//Transform Xdot,Ydot to velocities								
+				}
+				// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_				
+				}
+				
+				if (0 ==  whichkalman){
+					//SENSORFUSION  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+					rsdata.setXstates(skalmanxx.timeupdate(sdata.getXdot())); 							//Kalman filter in X direction
+					rsdata.setYstates(skalmanyy.timeupdate(sdata.getYdot())); 							//Kalman filter in Y direction
+					rsdata.setYaw(sdata.getYaw());														// Set Yaw
+					rsdata.setHeight(sdata.getHeight());												// Set Height
+					rsdata.XYdot2Vel();																	//Transform Xdot,Ydot to velocities
+					rsdata.s2rs(sdata);
+					//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+				
+
 						//For every new GPS measurement-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 						if(sdata.isGPSnew() )
 						{	
-						System.out.println("New GPS measurement");
-						rsdata.setXstates(skalmanx.gpsmeasurementupdate(sdata.getX()));	// Measurement update in kalmanfilter
-						rsdata.setYstates(skalmany.gpsmeasurementupdate(sdata.getY()));	// Measurement update in kalmanfilter
-						rsdata.XYdot2Vel();												//Transform Xdot,Ydot to velocities								
+						rsdata.setXstates(skalmanxx.gpsmeasurementupdate(sdata.getX()));	// Measurement update in kalmanfilter
+						rsdata.setYstates(skalmanyy.gpsmeasurementupdate(sdata.getY()));	// Measurement update in kalmanfilter
+						rsdata.XYdot2Vel();													//Transform Xdot,Ydot to velocities								
 						}
 						// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_				
-				if(debugMode){
+				}						
+						if(debugMode){
 					System.out.format("States at sample %d%n",counter);
 					rsdata.print();
 				}
@@ -362,6 +410,19 @@ public class Sensorfusionmodule implements Runnable{
 				if(debugMode) csignal.print();
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 				
+				//Save data-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+				
+				states[counter][0] = rsdata.getXpos();
+				states[counter][1] = rsdata.getYpos();
+				
+				if (counter == 20*30){
+					try {
+						saver.createMatFileFromFlightData("States", states);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 				
 				
 				

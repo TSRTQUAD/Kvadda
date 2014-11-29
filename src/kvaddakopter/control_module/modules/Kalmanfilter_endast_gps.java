@@ -13,27 +13,41 @@ public class Kalmanfilter_endast_gps {
 	public Kalmanfilter_endast_gps(double sampletime,double lambdaxdot,double lambday,
 						double initialx, double initialxdot){		
 	    // Construct all matrices
-		F = new SimpleMatrix(2,2,true, ((double) 1), (sampletime), ((double) 0),((double) 0)); 
-		Gu = new SimpleMatrix(2,1,true,((double)0),((double)1));
-		Gv = new SimpleMatrix(2,1,true,Math.pow(sampletime, 2)/2,sampletime);
+		F = new SimpleMatrix(2,2,true,		1.0,	(sampletime),	0.0,
+											0.0,	0.0,			1.0,
+											0.0,	0.0,			1.0); 
+		
+		Gu = new SimpleMatrix(2,1,true,	0.0,
+										1.0,
+										0.0);
+		
+		Gv = new SimpleMatrix(2,1,true,	Math.pow(sampletime, 2)/2,
+										sampletime,
+										1);
+		
 		Q = new SimpleMatrix(1,1,true,lambdaxdot);
 		R = new SimpleMatrix(1,1,true,lambday);
-		H = new SimpleMatrix(1,2,true,((double)1),((double)0));
-		P = new SimpleMatrix(2,2,true,1,0,0,1);       ///// Initial states!!
-		HP = new SimpleMatrix(1,2);
-		K = new SimpleMatrix(2,2);
+		H = new SimpleMatrix(1,2,true,	1.0,
+										0.0,
+										0,0);
+		
+		P = new SimpleMatrix(2,2,true,	1,0,0,
+										0,1,0,
+										0,0,1);       ///// Initial states!!
+		HP = new SimpleMatrix(1,3);
+		K = new SimpleMatrix(3,3);
 		S = new SimpleMatrix(1,1);
 		error = new SimpleMatrix(1,1);
 		z1 = new SimpleMatrix(1,1);
 		z2 = new SimpleMatrix(1,1);
-		x = new SimpleMatrix(2,1,true,initialx,initialxdot);
+		x = new SimpleMatrix(2,1,true,initialx,initialxdot,0);
 	}
 	
 	
 	
 	
 	// Update x according to new observations. 
-	public double[] measurementupdate(double observation){	
+	public double[] gpsmeasurementupdate(double observation){	
 	    // Transform observation to matrix
         this.z1 = new SimpleMatrix(1,1,true,observation);
 		//z1.print();
@@ -55,8 +69,6 @@ public class Kalmanfilter_endast_gps {
         //x.print();
         // P = (I-kH)P = P - KHP
         P = P.minus(K.mult(HP));
-        
- 
         states = new double[]{x.get(0),x.get(1)};
         return states;
 	    }
