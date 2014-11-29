@@ -240,6 +240,7 @@ public class Sensorfusionmodule implements Runnable{
 		}
 		
 
+
 		//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 
 //		try {
@@ -248,6 +249,11 @@ public class Sensorfusionmodule implements Runnable{
 //		} catch (InterruptedException e) {
 //			e.printStackTrace();
 //		}
+
+		if (0 == controllingmode){
+			mainbus.setRunController(true);
+		}
+
 		
 		
 

@@ -54,18 +54,15 @@ public class GUIWorker implements Runnable{
 						}
 					});
 
-
-				
-					//Update gui image
-					Platform.runLater(new Runnable() {
-						@Override
-						public void run() {
-							mainController.tabDatorseendeController.updateImage();
-						}
-					});
-
-
 				}
+				
+				//Update gui image
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						mainController.tabDatorseendeController.updateImage();
+					}
+				});
 				
 				//CHECK LINKSTATUS
 				Platform.runLater(new Runnable() {
@@ -74,11 +71,9 @@ public class GUIWorker implements Runnable{
 						mainController.tabUtforController.updateBattery(mainBuss.getBattery());
 						mainController.tabUtforController.updateGPSStatus(mainBuss.gpsFixOk());
 						mainController.tabUtforController.updateWIFIStatus(mainBuss.wifiFixOk());
+						mainController.tabUtforController.updateButtons();
 					}
 				});
-
-				
-				
 				
 				Thread.sleep(clock.stopAndGetSleepTime(1000));
 			} catch (InterruptedException e) {

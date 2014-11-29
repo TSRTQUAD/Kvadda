@@ -9,4 +9,6 @@ public interface ControlMainBusInterface {
 	public MissionObject getMissionObject();
 	public void setControlSignalobject(ControlSignal csignal);
 	public boolean isStarted();
+	public void setRunController(boolean runctrl);
+
 }

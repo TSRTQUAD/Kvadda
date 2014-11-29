@@ -14,5 +14,6 @@ public interface MainBusCommInterface {
 	String getMode();
 	public void setGpsFixOk(boolean b);
 	public void setWifiFixOk(boolean b);
-	public  boolean isStarted();
+	public boolean isStarted();
+	public void setIsArmed(boolean b);
 }
