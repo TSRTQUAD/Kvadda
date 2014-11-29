@@ -17,6 +17,7 @@ public class Identifier {
 		meanHSVValuesCertainty = 0.7f;
 		templateMatches = new float[Template.getTemplates().size()];
 		
+		if(targetHSVChannels == null) return;
 		for(int i = 0; i < 3; i++){
 			meanHSVValues[i] = (float)targetHSVChannels.get(i);
 		}
