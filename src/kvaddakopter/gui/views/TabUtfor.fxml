@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.media.*?>
 <?import javafx.geometry.*?>
@@ -89,6 +90,7 @@
                         </HBox>
       	</children>
       </AnchorPane>
+                  <ImageView fx:id="imgMovie" fitHeight="200.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" />
                </children></AnchorPane>
 <ToolBar layoutX="-2.0" layoutY="-4.0" prefHeight="50.0" prefWidth="1207.0">
 	<items>

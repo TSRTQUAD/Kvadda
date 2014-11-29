@@ -51,6 +51,7 @@ public class GUIWorker implements Runnable{
 							mainController.tabUtforController.drawTargetsOnMap();
 							mainController.tabUtforController.updateTimeLeft(sampleTime);
 							mainController.tabUtforController.updateSpeed(mainBuss.getSpeed());
+							mainController.tabUtforController.updateMovie();
 						}
 					});
 
