@@ -126,4 +126,6 @@ public abstract class AbstractMapShape {
 		this.unDraw();
 		this.markers.clear();
 	}
+	
+	abstract public boolean isValid();
 }

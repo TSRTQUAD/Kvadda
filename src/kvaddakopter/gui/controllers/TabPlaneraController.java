@@ -25,7 +25,6 @@ import kvaddakopter.utils.SecToMinSec;
 
 public class TabPlaneraController extends BaseController implements Initializable {
 
-
 	/**
 	 * UI ELEMENTS
 	 */
@@ -52,7 +51,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     
     protected boolean canEnterMissionCoordinates = false;
 	protected boolean canEnterForbiddenAreaCoordinates = false;
-	protected boolean canEnterQuadStartPosition = true;
+	protected boolean canEnterQuadStartPosition = false;
 	
 	
 	protected MissionStorage storage;
@@ -198,7 +197,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
         this.populateListsAndDefaults();
     }
     
-    
+
     /**
      * Used by map to determine if the user specified that he/she want to add Mission Coordinates.
      * @return boolean If we are in this Mode
