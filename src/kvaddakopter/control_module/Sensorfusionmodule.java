@@ -76,8 +76,8 @@ public class Sensorfusionmodule implements Runnable{
 	protected ReferenceData 		rrdata				= new ReferenceData();   
 	protected ReferenceExtractor	referenceextractor	= new ReferenceExtractor(0);
 	protected int					counter				= 0;
-	protected int					controllingmode		= 0; 					// 0 for autonomous 
-	protected boolean				debugMode			= false;					// Toggle System out prints 		
+	protected int					controllingmode		= 2; 					// 0 for autonomous 
+	protected boolean				debugMode			= true;					// Toggle System out prints 		
 	protected int					whichkalman			= 1; // 1 for 2xY 0 for 1xY
 	protected double[][]			states				= new double[(int) (1/sampletime*seconds)][4];
 	protected MatFileHandler		saver				= new MatFileHandler();
@@ -325,12 +325,12 @@ public class Sensorfusionmodule implements Runnable{
 //		} catch (InterruptedException e) {
 //			e.printStackTrace();
 //		}
-
+/*
 		if (0 == controllingmode){
 			mainbus.setRunController(true);
 		}
 
-		
+*/		
 		
 
 				
@@ -340,7 +340,8 @@ public class Sensorfusionmodule implements Runnable{
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				if(debugMode) System.out.println("Controllerloop initialized");
 				while(threadrunning)
-				{					
+				{
+					
 				//For every sample  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				counter ++;
 				time = System.currentTimeMillis();		

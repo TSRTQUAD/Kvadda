@@ -135,8 +135,7 @@ public class NavData implements Runnable {
 					}
 
 					NavReader reader = new NavReader(packet_rcv.getData());
-					this.counter = this.counter + 1;
-					System.out.println(counter);
+
 					// Get header information
 					long header = reader.uint32();
 					boolean[] droneStates = reader.droneStates32();
