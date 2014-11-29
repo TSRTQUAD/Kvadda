@@ -27,21 +27,21 @@ public class TemplateMatch  extends DetectionClass{
 	ArrayList<FormTemplate> mTemplates;
 
 	public TemplateMatch() {
-		
+
 	}
-	
+
 	public void setTemplates(ArrayList<FormTemplate> templates){
 		mTemplates = templates;
 	}
-/**
- *  - Compute features in the incoming image <br>
- *  - Match with template object <br>
- *  - Compute homography <br>
- *  - Determine/Compute ROI in the incoming image 
- *  - Store detected target object into list
- *  @param imageObject ALSFNJLGHJNGH
- *  @return List of targets
- */
+	/**
+	 *  - Compute features in the incoming image <br>
+	 *  - Match with template object <br>
+	 *  - Compute homography <br>
+	 *  - Determine/Compute ROI in the incoming image 
+	 *  - Store detected target object into list
+	 *  @param imageObject ALSFNJLGHJNGH
+	 *  @return List of targets
+	 */
 	@Override
 	public ArrayList<TargetObject> runMethod(ImageObject imageObject) {
 
@@ -49,52 +49,52 @@ public class TemplateMatch  extends DetectionClass{
 
 		/*Copy input image to the result image */
 		mIntermeditateResult = imageObject.getImage().clone();
-		
+
 		//Compute KP and descriptors for incoming image
 		imageObject.computeKeyPoints(FeatureDetector.SIFT);
 		imageObject.computeDescriptors(DescriptorExtractor.SIFT);
 
 		for(FormTemplate template: mTemplates){
-			int minumumRequiredMatches = 4;
-			MatOfDMatch matches = template.getImageObject().findMatches(imageObject, minumumRequiredMatches);
-			if(matches != null){
+			if(template.isActive()){
+				int minumumRequiredMatches = 4;
+				MatOfDMatch matches = template.getImageObject().findMatches(imageObject, minumumRequiredMatches);
+				if(matches != null){
 
-				// Save copy of key points
-				MatOfKeyPoint keyPointsTemplate = new MatOfKeyPoint();
-				MatOfKeyPoint keyPointsVideo = new MatOfKeyPoint();
-				Mat homo = MatchesHelpFunctions.findHomography_EXT(matches, template.getImageObject().getKeyPoints(), imageObject.getKeyPoints(),keyPointsTemplate,keyPointsVideo);
+					// Save copy of key points
+					MatOfKeyPoint keyPointsTemplate = new MatOfKeyPoint();
+					MatOfKeyPoint keyPointsVideo = new MatOfKeyPoint();
+					Mat homo = MatchesHelpFunctions.findHomography_EXT(matches, template.getImageObject().getKeyPoints(), imageObject.getKeyPoints(),keyPointsTemplate,keyPointsVideo);
 
-				if(homo != null){
-					/* Transform box points */
-					Mat transformBoxPoints = new Mat();
-					Core.perspectiveTransform(template.getBoxPoints(), transformBoxPoints,homo);
-					
-					/*Convert box points from Mat to points */
-					int rows = transformBoxPoints.rows();
-					int cols = transformBoxPoints.cols();
-					ArrayList<Point> boxCorners = new ArrayList<Point>();
-					for(int i = 0; i <rows; i++){
-						for(int j = 0; j < cols; i++){
-							boxCorners.add(new Point(transformBoxPoints.get(i,j)));
+					if(homo != null){
+						/* Transform box points */
+						Mat transformBoxPoints = new Mat();
+						Core.perspectiveTransform(template.getBoxPoints(), transformBoxPoints,homo);
+
+						//    Convert box points from Mat to points //
+						int rows = transformBoxPoints.rows();
+						int cols = transformBoxPoints.cols();
+						ArrayList<Point> boxCorners = new ArrayList<Point>();
+						for(int i = 0; i <rows; i++){
+							for(int j = 0; j < cols; j++){
+								boxCorners.add(new Point(transformBoxPoints.get(i,j)));
+							}
 						}
-					}
-					
-					/* Detected object in list */
-					ArrayList<Long> matchesList = new ArrayList<Long>();
-					long numMatches = matches.width()*matches.height();
-					matchesList.add(numMatches);
-					targetObjects.add(new TargetObject(boxCorners,0.5f,matchesList));
-					
-					/* For the output image */
-					
-					for (int i = 0; i < 4; i++) {
-						Point start = new Point(transformBoxPoints.get(i, 0));
-						Point end = new Point(transformBoxPoints.get((i+1) % 4, 0));
-						
-						Core.line(mIntermeditateResult, start, end, new Scalar(255,0,0,255), 3);
-					}
 
-					mIntermeditateResult = new Mat();
+						//   Detected object in list //
+						ArrayList<Long> matchesList = new ArrayList<Long>();
+						long numMatches = matches.width()*matches.height();
+						float noiseLevel = 120.5f;
+						targetObjects.add(new TargetObject(boxCorners,noiseLevel,template.getId(),numMatches));
+
+						/* For the output image */					
+						for (int i = 0; i < 4; i++) {
+							Point start = new Point(transformBoxPoints.get(i, 0));
+							Point end = new Point(transformBoxPoints.get((i+1) % 4, 0));
+
+							Core.line(mIntermeditateResult, start, end, new Scalar(255,0,0,255), 3);
+						}
+
+						/*mIntermeditateResult = new Mat();
 					Features2d.drawMatches(
 							template.getImageObject().getImage(),
 							keyPointsTemplate,  
@@ -102,9 +102,9 @@ public class TemplateMatch  extends DetectionClass{
 							keyPointsVideo, 
 							matches,
 							mIntermeditateResult
-							);
+							);*/
+					}
 				}
-
 			}
 		}
 
@@ -112,7 +112,7 @@ public class TemplateMatch  extends DetectionClass{
 		return targetObjects;
 	}
 
-	
+
 	/**
 	 * Can be used when calibrating template object. Computing features in the template image. The features <br>
 	 * will reside within the specified region of interest, described by the template box data.
@@ -125,26 +125,26 @@ public class TemplateMatch  extends DetectionClass{
 	static private Mat calibrateCurrentImage(FormTemplate template){
 		Mat image = template.getImageObject().getImage().clone();
 		KeyPoint[] kpArray = template.getImageObject().getKeyPoints().toArray();
-		
-		
+
+
 		int numKeyPoints = kpArray.length;
 		double imageWidth = image.cols();
 		double imageHeight = image.rows();
 
 		double x[] = new double[numKeyPoints];
 		double y[] = new double[numKeyPoints];
-		
+
 		double[] boxCenter = template.getScaledBoxCenter(imageWidth, imageHeight);
 		double[] boxSize   = template.getScaledBoxSize(imageWidth, imageHeight);
-		
+
 		boxSize[0] /=2.0;
 		boxSize[1] /=2.0;
-		
+
 		for (int i = 0; i < numKeyPoints; i++) {
 			x[i] = kpArray[i].pt.x;
 			y[i] = kpArray[i].pt.y;
 		}
-		
+
 		int[] indicesTemp = new int[numKeyPoints];
 		int ptr = 0;
 		for (int i = 0; i < numKeyPoints; i++) {
@@ -157,17 +157,17 @@ public class TemplateMatch  extends DetectionClass{
 		int indices[] = new int[ptr];
 		System.arraycopy(indicesTemp, 0, indices, 0, ptr);
 		KeyPoint[] kpArrayRefined = new KeyPoint[indices.length];
-		
+
 		for (int i = 0; i < kpArrayRefined.length; i++) {
 			kpArrayRefined[i] = kpArray[indices[i]]; 
 		}
-		
+
 		template.getImageObject().getKeyPoints().fromArray(kpArrayRefined);
 
 		Mat boxPoints = getBoxPoints(boxCenter,boxSize,image);
 		template.setBoxPoints(boxPoints);
 		Features2d.drawKeypoints(image, template.getImageObject().getKeyPoints(), image);
-		
+
 		return image;
 
 	}
@@ -181,7 +181,7 @@ public class TemplateMatch  extends DetectionClass{
 	 * @param discardDistanceX
 	 * @param discardDistanceY
 	 */
-	 static private Mat getBoxPoints(double[] mean,double [] var,Mat image){
+	static private Mat getBoxPoints(double[] mean,double [] var,Mat image){
 		double xMean = mean[0];
 		double yMean = mean[1];
 		double xVar = var[0];
@@ -200,7 +200,7 @@ public class TemplateMatch  extends DetectionClass{
 		if(yMean + yVar < imageHeight) endCoord[1]= yMean + yVar;
 		Point end = new Point(endCoord);
 		Core.rectangle(image, start, end, new Scalar(255, 0, 0, 255), 3);
-		
+
 		double p0[] = new double[]{xMean - xVar,yMean - yVar};
 		double p1[] = new double[]{xMean + xVar,yMean - yVar};
 		double p2[] = new double[]{xMean + xVar,yMean + yVar};
@@ -215,13 +215,13 @@ public class TemplateMatch  extends DetectionClass{
 	}
 
 
-/**
- * Calibrate active template.
- * This function should be called from the GUI template slider class
- * 
- * @param formTemplate
- * @return
- */
+	/**
+	 * Calibrate active template.
+	 * This function should be called from the GUI template slider class
+	 * 
+	 * @param formTemplate
+	 * @return
+	 */
 	static public Mat calibrateTemplate(FormTemplate formTemplate) {
 		Mat result = null;
 		if(formTemplate != null){
