@@ -10,5 +10,6 @@ public interface ControlMainBusInterface {
 	public void setControlSignalobject(ControlSignal csignal);
 	public boolean isStarted();
 	public void setRunController(boolean runctrl);
+	public boolean getIsArmed();
 
 }

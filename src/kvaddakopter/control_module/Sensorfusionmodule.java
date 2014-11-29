@@ -102,10 +102,23 @@ public class Sensorfusionmodule implements Runnable{
 		}
 	}
 	
+	private void checkIsArmed(){
+		while(!mainbus.getIsArmed()){
+			synchronized(mainbus){
+				try {
+					mainbus.wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}				
+			}
+		}
+	}
+	
 
 	
 	public void run(){	
-		checkIsRunning();
+		checkIsArmed();
 		/*
 		try {
 			if(debugMode){
@@ -186,12 +199,7 @@ public class Sensorfusionmodule implements Runnable{
 		if(debugMode){
 		System.out.println("Initializing modules ..");
 		}
-		
-		
 				
-		
-		
-		
 		if (0 == controllingmode){
 		
 		
@@ -207,7 +215,8 @@ public class Sensorfusionmodule implements Runnable{
 		Initiallatitud = Initiallatitud + this.quadData.getGPSLat();
 		Initiallongitud = Initiallongitud + this.quadData.getGPSLong();
 		localcounter = localcounter + 1;
-		if (6 == localcounter) initialbool = false;
+		System.out.println(localcounter);
+		if (5 == localcounter) initialbool = false;
 		}
 		try {
 			Thread.sleep((long) 200);
@@ -216,10 +225,9 @@ public class Sensorfusionmodule implements Runnable{
 		}
 		}
 		
-		Initiallatitud = Initiallatitud/(localcounter-1);
-		Initiallongitud = Initiallongitud/(localcounter-1);
+		Initiallatitud = Initiallatitud/(localcounter);
+		Initiallongitud = Initiallongitud/(localcounter);
 		sdata.setGPSposition(new double[]{Initiallatitud,Initiallongitud});
-		
 		sdata.setinitial();													// Fix local coordinate system XY
 		sdata.GPS2XY();														// Transformation GPS to XY coordinates
 
@@ -227,19 +235,20 @@ public class Sensorfusionmodule implements Runnable{
 
 		
 		rrdata.initialize(sdata.getLatitud(),sdata.getLongitud());			// Fix local coordinate system XY
-		this.missionobject = mainbus.getMissionObject();					//Reads mission object from mainbus			
+		//this.missionobject = mainbus.getMissionObject();					//Reads mission object from mainbus			
 		rrdata.updateref(referenceextractor.update(missionobject));			// update ref @ Autonomous flight mode		
 
+		checkIsRunning();
 		
 						//Start Quad-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-		
-						ControlSignal csignal = new ControlSignal();	
-						csignal.setStart(1);
-						mainbus.setControlSignalobject(csignal);
+						//ControlSignal csignal = new ControlSignal();	
+						//csignal.setStart(1);
+						//mainbus.setControlSignalobject(csignal);
 						try {
 							if(debugMode){
 								System.out.println("Waiting for quadcopter...");
 								System.out.println("Quad is starting .. startsignal =  ");
-								System.out.println(csignal.getStart());
+								//System.out.println(csignal.getStart());
 								System.out.println("");
 							}
 							Thread.sleep((long) 1500);
@@ -458,6 +467,9 @@ public class Sensorfusionmodule implements Runnable{
 				
 				if (counter == 20*seconds){
 					try {
+						
+						ControlSignal csignal1 = new ControlSignal();
+						mainbus.setControlSignalobject(csignal1);
 						saver.createMatFileFromFlightData("States", states);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
