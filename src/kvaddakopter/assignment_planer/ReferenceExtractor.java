@@ -86,7 +86,7 @@ public double[] updatetest(){
 	double[] returnvalue = new double[]{		0,														// GPS lat
 												0 + 2*Math.pow(-1, counter),			 				// GPS long
 												1,														// Height
-												0,													// Yaw
+												0,														// Yaw
 												1000,													// Time at coordinate
 												0,														// null
 												0,														// Mission type
