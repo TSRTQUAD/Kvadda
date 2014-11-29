@@ -15,6 +15,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.maps.GPSCoordinate;
@@ -64,6 +66,9 @@ public class TabUtforController extends BaseController implements Initializable 
     private Button btnEmergency;
     @FXML
     private ComboBox<String> cmbListOfMissions;
+    @FXML
+    private ImageView imgMovie;
+    
     
 	/**
      * Properties
@@ -132,6 +137,17 @@ public class TabUtforController extends BaseController implements Initializable 
     	this.getParent().getMainBus().toggleController();
     }
 
+    /**
+     * Update the current Image view to the current
+     * @param currentImage
+     */
+    public void updateMovie(){
+    	if(this.getParent().getMainBus() != null){
+    		Image currentImage = this.getParent().getMainBus().getImage();
+    		this.imgMovie.setImage(currentImage);
+    	}
+    }
+    
     
     /**
      * Update the clock that shows the time left.
@@ -228,11 +244,12 @@ public class TabUtforController extends BaseController implements Initializable 
 		this.lblWIFI.setText(status);
 	}
 	
-	public void updateSpeed(float newSpeed){
-		this.lblSpeed.setText(String.format("%.1f m/s", newSpeed));
+	public void updateSpeed(){
+		if (this.getParent().getMainBus() != null){
+                this.lblSpeed.setText(String.format("%.1f m/s", this.getParent().getMainBus().getCurrentSpeed()));
+		}
 	}
 
-	 
 	public void updateBattery(float newBattery){
 		if(newBattery < 15){
 			this.lblBattery.setText(String.format("WRN! %.1f %%", newBattery));
