@@ -17,16 +17,17 @@ import kvaddakopter.control_module.signals.*;
 public class Controller{		
 	protected double  errorheight,errorlateralvel, errorforwardvel, errorheading, Ts;
 	protected double KVelForward, KVelForward2, KVelHeight, KVelLateral,KVelLateral2, KYaw, KYaw2, Tintegral, integral;
-
+	protected boolean Yawdirection;
 
 	public Controller(double sampletime){	
 		KVelHeight = 1.5; 
 		KVelForward = 0.04;
 		KVelForward2 = 0.1;
 		KVelLateral = 0.04;
-		KVelLateral2 = 0.05;
+		KVelLateral2 = 0.01;
 		KYaw = 1.5;
-		KYaw2 = 0.5;
+		KYaw2 = 2.5;
+		Yawdirection = true;
 		Tintegral = 0.05;
 		Ts = sampletime;
 		errorheight = 0;
@@ -43,6 +44,22 @@ public class Controller{
 		 * @param Referencedata object
 		 * @return Controlsignal
 		 */
+	
+		public double SelectYawDirection(double Yawref,double Yaw, double KYaw){
+			boolean direction = KYaw >= 0;
+			if (Math.abs(Yawref - Yaw) > (2*Math.PI - Math.abs(Yawref) - Math.abs(Yaw))){
+				if (direction){
+				KYaw = -KYaw;
+				}
+			}
+			else{
+			KYaw = Math.abs(KYaw);
+			}
+			return KYaw;
+			}
+	
+	
+	
 		public ControlSignal GetControlSignalMission0(RefinedSensorData rsdata, ReferenceData rrdata){
 		
 		ControlSignal csignal = new ControlSignal();
@@ -54,7 +71,8 @@ public class Controller{
 														 Math.sin(rsdata.getYaw()), Math.cos(rsdata.getYaw()));					 
 		SimpleMatrix RDataVel = pos2vel.mult(errorpos);
 		
-		
+		//Yaw controlling direction correction
+		this.KYaw = this.SelectYawDirection(rrdata.getYaw(), rsdata.getYaw(), this.KYaw);
 		
 		//Control signals
 		csignal.setForwardvelocity	(	KVelForward*(RDataVel.get(0) - rsdata.getForVel() )		);
@@ -72,6 +90,8 @@ public class Controller{
 		}
 
 		
+		
+		
 		/**
 		 * Function that calculates controlsignal given mission = 1 @ Reference data
 		 * This controller uses the velocity referenece in Referencedata object.
@@ -83,6 +103,9 @@ public class Controller{
 		 //Constant speed controlling
 			ControlSignal csignal = new ControlSignal();
 			 
+			
+			this.KYaw2 = this.SelectYawDirection(rrdata.getYaw(), rsdata.getYaw(), this.KYaw2);
+			
 			 csignal.setForwardvelocity		(	(this.integral + (KVelForward2+ Ts*Tintegral/2)*
 					 							(rrdata.getForVel() - rsdata.getForVel())	+
 					 							(Ts*Tintegral/2 - KVelForward2)*this.errorforwardvel)				);

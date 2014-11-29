@@ -1,14 +1,9 @@
 package kvaddakopter.Mainbus;
 
 import java.awt.Frame;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
@@ -63,6 +58,8 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	
 	//GENERAL
 	private boolean isStarted = false;
+	private boolean shouldStart = false;
+	private boolean mIsArmed = false;
 	
 	//Assignment planer storage
 	private MatlabProxyConnection matlabproxy;
@@ -71,7 +68,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	private boolean mAssignmentPlanerRunning = false;
 	
 	//Communication
-	Communication communicationtest;
+	//Communication communicationtest;
 	static float[] ControlSignal = new float[5];
 	private String mode;
 	public boolean selfCheck = false;
@@ -88,8 +85,6 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	public int seq_signal = 0;
 	QuadData quadData = new QuadData();
 
-	protected boolean shouldStart = false;
-
 	private boolean gpsFixOk;
 
 	private boolean wifiFixOk;
@@ -105,10 +100,10 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 		kvaddakopter.control_module.signals.ControlSignal csignal) {		
 		if (true == this.runcontroller){
 		//Controlsignal[Landing/Start Roll Pitch Gaz Yaw ]		
-		//ControlSignal[0] = csignal.getStart();
-		//ControlSignal[1] = (float) 	csignal.getLateralvelocity();
-		//ControlSignal[2] = (float) 	csignal.getForwardvelocity();
-		//ControlSignal[3] = (float)  	csignal.getHeightvelocity();
+		ControlSignal[0] = csignal.getStart();
+		ControlSignal[1] = (float) 	csignal.getLateralvelocity();
+		ControlSignal[2] = (float) 	csignal.getForwardvelocity();
+		ControlSignal[3] = (float)  	csignal.getHeightvelocity();
 		ControlSignal[4] = (float)  	csignal.getYawrate();
 		}
 	}
@@ -136,16 +131,16 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 		
 		try{
 			ControlSignal = new float[] {0, 0, 0, 0, 0};
-			Communication communicationtest = new Communication(3,mainbus,"Communication");
-			Thread t7 = new Thread(communicationtest);
+			Communication communication = new Communication(3,mainbus,"Communication");
+			Thread t7 = new Thread(communication);
 			t7.setDaemon(true);
 			t7.setPriority(1);
 			t7.start();
 			System.out.println("Communication-link initiated");
 
 
-			NavData navdatatest = new NavData(4,mainbus,"NavData", communicationtest);	
-			Thread t5 = new Thread(navdatatest);
+			NavData navdata = new NavData(4,mainbus,"NavData", communication);	
+			Thread t5 = new Thread(navdata);
 			t5.setDaemon(true);
 			t5.setPriority(1);
 			t5.start();
@@ -238,11 +233,12 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	//Communication
 	@Override
 	public synchronized float[] getControlSignal(){
-		ControlSignalAll[seq][0] = (double)ControlSignal[0];
+		
+		/*ControlSignalAll[seq][0] = (double)ControlSignal[0];
 		ControlSignalAll[seq][1] = (double)ControlSignal[1];
 		ControlSignalAll[seq][2] = (double)ControlSignal[2];
 		ControlSignalAll[seq][3] = (double)ControlSignal[3];
-		ControlSignalAll[seq][4] = (double)ControlSignal[4];
+		ControlSignalAll[seq][4] = (double)ControlSignal[4]; */
  	
 		seq_signal = seq_signal + 1;
 		//System.out.println("Pos 1:   " + ControlSignal[1] + "Pos 2:   " + ControlSignal[2]);
@@ -323,7 +319,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	public synchronized void initIPVariables() {
 		mColorTemplates.add(new ColorTemplate("Pink square", 120, 200, 50, 90, 180, 245, ColorTemplate.FORM_SQUARE));	
 		mColorTemplates.add(new ColorTemplate("Yellow square", 30, 120, 50, 120, 130, 255, ColorTemplate.FORM_SQUARE));
-		
+		mTargetList = new ArrayList<TargetObject>();
 		mIPCalibTemplate[0] = new ColorTemplate();
 		mIPImageToShow[0] = null;
 		
@@ -543,12 +539,23 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 		this.runcontroller = runctrl;	
 	}
 
-	// Varför klagar den på båda? - Interfaces säger endast 1?
 
 	@Override
-	public void setruncontroller(boolean b) {
-		// TODO Auto-generated method stub
-		this.runcontroller = b;
+	public boolean getIsArmed() {
+		return mIsArmed;
 	}
+
+
+	@Override
+	public void setIsArmed(boolean b) {
+		mIsArmed = true;
+		
+	}
+	
+	public boolean getStartPermission() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 
 }

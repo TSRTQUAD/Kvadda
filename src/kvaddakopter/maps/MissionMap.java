@@ -105,7 +105,7 @@ public class MissionMap extends BaseMap implements MapComponentInitializedListen
 	 * @return
 	 */
 	protected LatLong startCoordinate(){
-		return new LatLong(58.406659, 15.620358);
+		return new LatLong(58.395128,15.575096);
 	}
 
 	public void drawTargetsOnMap(HashMap<String, GPSCoordinate> targets) {

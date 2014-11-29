@@ -38,5 +38,11 @@ public class TargetMap extends AbstractMapShape implements MapShapeInterface {
 		marker.getMarker().setTitle(currentTitle);
 		return marker;
 	}	
+	
+	
+	@Override
+	public boolean isValid(){
+		return this.markers.size() >= 1;
+	}
 
 }

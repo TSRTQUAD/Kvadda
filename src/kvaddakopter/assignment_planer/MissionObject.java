@@ -61,8 +61,8 @@ public class MissionObject {
 	public double[][] getStartCoordinate(){
 		return this.startcoordinate;
 	}
-	public double[] getHeight(){
-		return this.height;
+	public double getHeight(){
+		return this.height[0];
 	}
 	public double[] getRadius(){
 		return this.radius;

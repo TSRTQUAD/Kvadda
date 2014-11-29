@@ -15,6 +15,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.maps.GPSCoordinate;
@@ -53,6 +55,8 @@ public class TabUtforController extends BaseController implements Initializable 
     private Label lblWIFI;
     
     @FXML
+    private Button btnArm;
+    @FXML
     private Button btnStartMission;
     @FXML
     private Button btnAbortMission;
@@ -62,6 +66,9 @@ public class TabUtforController extends BaseController implements Initializable 
     private Button btnEmergency;
     @FXML
     private ComboBox<String> cmbListOfMissions;
+    @FXML
+    private ImageView imgMovie;
+    
     
 	/**
      * Properties
@@ -87,7 +94,7 @@ public class TabUtforController extends BaseController implements Initializable 
     private void changeSelectedMission() throws FileNotFoundException, IOException{
     	this.currentSelectedMissionName = this.cmbListOfMissions.getSelectionModel().getSelectedItem();
     	this.currentSelectedMissionObject = this.missionStorage.loadMission(this.currentSelectedMissionName);
-    	
+    	this.getParent().getMainBus().setMissionObject(this.currentSelectedMissionObject);
     	this.drawMission();
     	this.lblMissionType.setText(this.currentSelectedMissionObject.getMissionType().toString());
     	this.lblEstimatedDistance.setText(String.valueOf((int) this.currentSelectedMissionObject.getTrajectoryLength()[0][0])+ " m");
@@ -96,6 +103,14 @@ public class TabUtforController extends BaseController implements Initializable 
 
     @FXML
     private void startMission(){
+    	this.getParent().getMainBus().setIsStarted(true);
+    	synchronized (this.getParent().getMainBus()) {
+			this.getParent().getMainBus().notifyAll();
+		}
+    }
+    
+    @FXML
+    private void arm(){
     	this.timeLeft = (long) this.currentSelectedMissionObject.getMissionTime()[0][0];
     	System.out.println("Started");
     	System.out.println(this.currentSelectedMissionName);
@@ -104,7 +119,6 @@ public class TabUtforController extends BaseController implements Initializable 
 			this.getParent().getMainBus().notifyAll();
 		}
     }
-    
     
     @FXML
     private void abortMission(){
@@ -123,13 +137,27 @@ public class TabUtforController extends BaseController implements Initializable 
     	this.getParent().getMainBus().toggleController();
     }
 
+    /**
+     * Update the current Image view to the current
+     * @param currentImage
+     */
+    public void updateMovie(){
+    	
+    	if(this.getParent().getMainBus() != null) return;
+		Image image = this.getParent().getMainBus().getIPImageToShow();
+		if(image != null){
+			this.imgMovie.setImage(image);
+		}
+    	
+    }
+    
     
     /**
      * Update the clock that shows the time left.
      * @param passedTime
      */
 	public void updateTimeLeft(long passedTime){
-		 this.timeLeft -= (long) passedTime/1000;
+		this.timeLeft -= (long) passedTime/1000;
 		long newTime = this.timeLeft;
 		
 		this.lblTimeLeft.setText( SecToMinSec.transform( Math.max(0, newTime)));
@@ -208,15 +236,6 @@ public class TabUtforController extends BaseController implements Initializable 
                     this.missionMap.drawTargetsOnMap(this.getParent().getMainBus().getTargets());
     	}
     }
-    
-//    /**
-//     * TODO Draw the Target to the map.
-//     */  
-//    public void drawTargetMarker(){
-//		HashMap<String,GPSCoordinate> targetMap = this.getParent().getMainBus().getTargets();
-//    	GPSCoordinate gps = this.getParent().getMainBus().getCurrentQuadPosition();
-//    	this.missionMap.drawTarget(gps.getLatitude(), gps.getLongitude());
-//    }
 
 	public void updateGPSStatus(boolean isOk) {
 		String status = (isOk) ? "GPS: OK!" : "GPS: NOT OK!";
@@ -228,16 +247,30 @@ public class TabUtforController extends BaseController implements Initializable 
 		this.lblWIFI.setText(status);
 	}
 	
-	public void updateSpeed(float newSpeed){
-		this.lblSpeed.setText(String.format("%.1f m/s", newSpeed));
+	public void updateSpeed(){
+		if (this.getParent().getMainBus() != null){
+                this.lblSpeed.setText(String.format("%.1f m/s", this.getParent().getMainBus().getCurrentSpeed()));
+		}
 	}
 
-	 
 	public void updateBattery(float newBattery){
-		if(newBattery < 15){
+		if(newBattery < 0){
+			this.lblBattery.setText("- \\%");
+		}
+		else if(newBattery < 15){
 			this.lblBattery.setText(String.format("WRN! %.1f %%", newBattery));
 		} else {
 			this.lblBattery.setText(String.format("%.1f %%", newBattery));
+		}
+	}
+	
+	public void updateButtons(){
+		if(this.getParent().getMainBus() == null) return;
+		else if(this.getParent().getMainBus().getIsArmed()){
+			btnStartMission.setDisable(false);
+		}
+		else{
+			btnStartMission.setDisable(true);
 		}
 	}
 	

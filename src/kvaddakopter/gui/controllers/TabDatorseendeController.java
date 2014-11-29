@@ -412,7 +412,6 @@ public class TabDatorseendeController extends BaseController implements Initiali
 		Image image = mainbus.getIPImageToShow();
 		if(image != null){
 			view.setImage(image);
-			System.out.println("Image redraw");
 		}
 
 		

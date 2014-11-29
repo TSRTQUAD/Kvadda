@@ -30,7 +30,7 @@ public class MatFileHandler {
 		//Read data and put them in ML-classes
 		MLDouble mission = new MLDouble( "mission", new double[][] {{missionobject.getMissionType().getValue()}});
 		MLDouble startcoordinate = new MLDouble( "startcoordinate", missionobject.getStartCoordinate() );
-		MLDouble height = new MLDouble( "height", missionobject.getHeight(), 1 );
+		MLDouble height = new MLDouble( "height", new double[]{missionobject.getHeight()}, 1 );
 		MLDouble radius = new MLDouble( "radius", missionobject.getRadius(), 1 );
 
 		MLDouble imageTemplate = new MLDouble("imageTemplate", new double[][] {{missionobject.getImageTemplate()}});

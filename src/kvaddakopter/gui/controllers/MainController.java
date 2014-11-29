@@ -56,7 +56,7 @@ public class MainController implements Initializable {
 	
 	
 	/**
-	 * Controller representing the tab for compuser vision.
+	 * Controller representing the tab for computer vision.
 	 */
 	@FXML 
 	public TabDatorseendeController tabDatorseendeController;

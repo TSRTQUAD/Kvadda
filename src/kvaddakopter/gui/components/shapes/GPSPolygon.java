@@ -84,4 +84,9 @@ public abstract class GPSPolygon extends AbstractMapShape implements MapShapeInt
 	}
 	
 	
+	@Override
+	public boolean isValid(){
+		return this.markers.size() >= 3;
+	}
+	
 }
