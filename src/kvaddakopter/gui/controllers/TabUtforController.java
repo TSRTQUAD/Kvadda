@@ -1,12 +1,11 @@
 package kvaddakopter.gui.controllers;
 
 
-import com.lynden.gmapsfx.GoogleMapView;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
@@ -23,6 +22,8 @@ import kvaddakopter.maps.GPSCoordinate;
 import kvaddakopter.maps.MissionMap;
 import kvaddakopter.storage.MissionStorage;
 import kvaddakopter.utils.SecToMinSec;
+
+import com.lynden.gmapsfx.GoogleMapView;
 
 
 
@@ -225,6 +226,7 @@ public class TabUtforController extends BaseController implements Initializable 
      */
     public void drawQuadMarker(){
     	GPSCoordinate gps = this.getParent().getMainBus().getCurrentQuadPosition();
+    	if(gps == null || this.missionMap == null) return;
     	this.missionMap.drawQuad(gps.getLatitude(), gps.getLongitude());
     }
     
@@ -232,9 +234,9 @@ public class TabUtforController extends BaseController implements Initializable 
      * Draw targets to the Map
      */
     public void drawTargetsOnMap(){
-    	if (this.getParent().getMainBus().getTargets() != null){
-                    this.missionMap.drawTargetsOnMap(this.getParent().getMainBus().getTargets());
-    	}
+    	HashMap<String, GPSCoordinate> targetList = this.getParent().getMainBus().getTargets();
+    	if(targetList == null || targetList.size() == 0 || this.missionMap == null) return;
+		this.missionMap.drawTargetsOnMap(this.getParent().getMainBus().getTargets());
     }
 
 	public void updateGPSStatus(boolean isOk) {
@@ -254,7 +256,10 @@ public class TabUtforController extends BaseController implements Initializable 
 	}
 
 	public void updateBattery(float newBattery){
-		if(newBattery < 15){
+		if(newBattery < 0){
+			this.lblBattery.setText("- \\%");
+		}
+		else if(newBattery < 15){
 			this.lblBattery.setText(String.format("WRN! %.1f %%", newBattery));
 		} else {
 			this.lblBattery.setText(String.format("%.1f %%", newBattery));

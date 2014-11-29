@@ -5,7 +5,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.StringTokenizer;
 
 import kvaddakopter.interfaces.MainBusCommInterface;
 
@@ -54,7 +53,6 @@ public class NavData implements Runnable {
 		} catch (Exception ex1) {
 			ex1.printStackTrace();
 		}
-
 		System.out.println("Init NavData");
 	}
 	
@@ -73,9 +71,7 @@ public class NavData implements Runnable {
 			}
 		System.out.println("Stopped waiting!");
 		}
-		
-	
-		
+			
 		if(!mIsInitiated){
 			mIsInitiated = true;
 			NavDataTimeOut = false;
@@ -95,7 +91,7 @@ public class NavData implements Runnable {
 		while(true){
 			checkIsCommRunning();
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(500);
 				
 				byte[] buf_snd = { 0x01, 0x00, 0x00, 0x00 };
 				DatagramPacket packet_snd = new DatagramPacket(buf_snd,
@@ -138,8 +134,6 @@ public class NavData implements Runnable {
 						while (!finnished) {
 							int optionId = reader.uint16();
 							int length = reader.uint16();
-
-							// System.out.println("OptionId: " + optionId);
 
 							byte[] content;
 							// length includes 4 byte header
@@ -197,14 +191,15 @@ public class NavData implements Runnable {
 								break;
 							}
 						}
-						// System.out.println(mQuadData.getNGPSSatelites());
-					//	System.out.println(mQuadData.getBatteryLevel());
 						mMainbus.setQuadData(mQuadData);				
 						checkStartConditions();
 					
 
 					} catch (SocketTimeoutException ex3) {
-						System.out.println("socket_nav.receive(): Timeout");
+						System.err.println("socket_nav.receive(): Timeout");
+						
+						if(!comm.getIsFlying())
+							mMainbus.setShouldStart(false);
 						NavDataTimeOut = true;
 						comm.reset();
 						mIsInitiated = false;

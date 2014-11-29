@@ -88,5 +88,10 @@ public class GPSCircle extends AbstractMapShape implements MapShapeInterface{
 		circle = null;
 	}
 	
+	
+	@Override
+	public boolean isValid(){
+		return this.markers.size() == 1;
+	}
 
 }

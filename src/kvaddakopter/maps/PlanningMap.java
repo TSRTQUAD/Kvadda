@@ -70,8 +70,6 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 		this.forbiddenShapes = new ArrayList<MapShapeInterface>();
 		
 		this.isMapInitialized = true;
-		
-		
 		this.addMapEventListeners();
 
 	}
@@ -97,6 +95,8 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 				shape.remove();
 			}
 			this.navigationMapShapes.clear();
+			this.currentActiveMissionAreaCounter = 0;
+			this.createNewMapShape();
 		}
 	}
 	
@@ -109,6 +109,8 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 				shape.remove();
 			}
 			this.forbiddenShapes.clear();
+			this.currentActiveForbiddenAreaCounter = 0;
+			this.createNewForbiddenArea();
 		}
 	}
 	
@@ -190,7 +192,11 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 	private void addMapEventListeners() {
 		//EVENT FOR USER CLICKED MAP
 		this.map.addUIEventHandler(UIEventType.click, (JSObject obj) -> {
-			
+
+			System.out.println("Curent size of shapes");
+			System.out.println(this.navigationMapShapes.size());
+			System.out.println("Current forbidden:");
+			System.out.println(this.forbiddenShapes.size());
 			//Coordinate where the user clicked.
 			LatLong clickedCoordinate = new LatLong((JSObject) obj.getMember("latLng"));
 			//MissionType missionType = this.owningController.getCurrentSelectedMissionType();
@@ -222,16 +228,26 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 	
 	
 	public void createNewMapShape() {
-		this.clearGeneratedTrajectory();
 		MissionType missionType = this.owningController.getCurrentSelectedMissionType();
+		if(this.navigationMapShapes.size() > this.currentActiveForbiddenAreaCounter){
+			if(!this.navigationMapShapes.get(this.currentActiveMissionAreaCounter).isValid()){
+				return;
+			}
+		}
+		this.clearGeneratedTrajectory();
 		MapShapeInterface newShape =  MapShapeFactory.make(missionType, this.map);
-		System.out.println(newShape);
 		this.navigationMapShapes.add(newShape);
 		this.currentActiveMissionAreaCounter = this.navigationMapShapes.size() - 1;
+
 	}
 
 
 	public void createNewForbiddenArea(){
+		if( this.forbiddenShapes.size() > this.currentActiveForbiddenAreaCounter){
+			if(!this.forbiddenShapes.get(this.currentActiveForbiddenAreaCounter).isValid()){
+				return;
+			}
+		}
 		this.clearGeneratedTrajectory();
 		MapShapeInterface newShape =  MapShapeFactory.make(MissionType.NULL_MISSION, this.map);
 		this.forbiddenShapes.add(newShape);

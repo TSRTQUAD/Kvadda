@@ -69,5 +69,10 @@ public class GPSPath extends AbstractMapShape implements MapShapeInterface{
 	}
 	
 	
+	@Override
+	public boolean isValid(){
+		return this.markers.size() >= 2;
+	}
+	
 	
 }

@@ -40,7 +40,7 @@ public class GUIWorker implements Runnable{
 				}
 
 				//RUN A MISSION
-				if(mainBuss.isStarted()){
+				//if(mainBuss.isStarted()){
 					Platform.runLater(new Runnable() {
 						@Override
 						public void run() {
@@ -52,7 +52,7 @@ public class GUIWorker implements Runnable{
 						}
 					});
 
-				}
+				//}
 				
 				
 				

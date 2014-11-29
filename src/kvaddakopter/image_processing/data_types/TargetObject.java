@@ -20,6 +20,7 @@ import org.opencv.core.Rect;
 public class TargetObject {
 	private SimpleMatrix x; // State [x1, x2, dot(x1), dot(x2)]'
 	private SimpleMatrix P; // Covariance for the states
+	private int ID; // ID of tracked target
 	private Identifier identifier; // Holds identification information about the target
 	private GPSCoordinate geoPosition; // Estimated Geo position for target
 
@@ -33,8 +34,8 @@ public class TargetObject {
 	 */
 	public TargetObject(SimpleMatrix position_, float noise_level, ArrayList<Long> targetHSVChannels) {
 		// Create the state matrix with given position measurements
-		x = new SimpleMatrix(4, 1, true, position_.get(0, 0), position_.get(1,
-				0), 0, 0);
+		x = new SimpleMatrix(4, 1, true, 
+				position_.get(0, 0), position_.get(1, 0), 0, 0);
 
 		// Create the covariance matrix with noise_level on diagonal
 		P = SimpleMatrix.diag(1, 1, 3, 3).scale(noise_level);
@@ -184,5 +185,34 @@ public class TargetObject {
 	 */
 	public void setGPSCoordinate(GPSCoordinate newCoordinate){
 		geoPosition = newCoordinate;
+	}
+	
+	/**
+	 * Returns ID of tracked target
+	 * @return ID
+	 */
+	public int getID(){
+		return ID;
+	}
+	
+	/**
+	 * Sets ID of tracked target
+	 * @param newID
+	 */
+	public void setID(int newID){
+		ID = newID;
+	}
+	
+	/**
+	 * Returns the target with specific ID or null if not found.
+	 * @param targetList List of targets to search.
+	 * @param searchID Target ID to search for.
+	 * @return Target with searchID or null if not found.
+	 */
+	public static TargetObject getTargetByID(ArrayList<TargetObject> targetList, int searchID){
+		for(TargetObject target:targetList){
+			if(target.getID() == searchID) return target;
+		}
+		return null;
 	}
 }
