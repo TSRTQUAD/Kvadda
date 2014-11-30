@@ -128,13 +128,12 @@ public class Communication implements Runnable {
 			send_pcmd(0, 0, 0, 0, 0);
 
 			Thread.sleep(INTERVAL);
-			send_at_cmd("AT*REF=" + get_seq() + ",290717696");
+			send_at_cmd("AT*REF=" + get_seq() + ",290717696");  // Bort. 
 			Thread.sleep(INTERVAL);
 			// send_at_cmd("AT*REF=" + get_seq() + ",290717952"); //toggle
 			// Emergency
 			// Thread.sleep(INTERVAL);
-			send_at_cmd("AT*REF=" + get_seq() + ",290717696");
-
+			send_at_cmd("AT*REF=" + get_seq() + ",290717696");   // Bort. 
 			System.out.println("Init done...");
 
 		} catch (Exception ex2) {

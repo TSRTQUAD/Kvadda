@@ -211,7 +211,7 @@ public class ColorTemplate {
 	 * Use this to adapt if no targets are found
 	 */
 	public void adaptToOriginalBounds(){
-		float T = adaptationConstant; // number of updates to 63%
+		/*float T = adaptationConstant; // number of updates to 63%
 		//Hue update
 		hueLow = (int) ((float)(hueLow + ((oHueLow) - hueLow))/T);
 		hueHigh = (int) ((float)(hueHigh + ((oHueHigh) - hueHigh))/T);
@@ -222,7 +222,7 @@ public class ColorTemplate {
 		
 		//Value update
 		valueLow = (int) ((float)(valueLow + (oValueLow - valueLow))/T);
-		valueHigh = (int) ((float)(valueHigh + (oValueHigh - valueHigh))/T);
+		valueHigh = (int) ((float)(valueHigh + (oValueHigh - valueHigh))/T);*/
 	}
 
 	/**

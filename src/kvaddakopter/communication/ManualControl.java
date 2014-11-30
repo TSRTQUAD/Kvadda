@@ -30,7 +30,6 @@ public class ManualControl extends Frame implements KeyListener, Runnable{
                 System.exit(0);	
             }		
           });	
-                
         }
 
 	public void keyTyped(KeyEvent e) {

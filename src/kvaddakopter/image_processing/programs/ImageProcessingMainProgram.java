@@ -139,14 +139,12 @@ public class ImageProcessingMainProgram extends ProgramClass{
 				templateMatchingImage= mTemplateMatch.getIntermediateResult();
 			}
 			if(modes[MainBusIPInterface.MODE_TRACKING] == 1){
-				if(targetObjects.size() > 0){
-					mTracker.update(targetObjects,currentQuadData);
-					Mat currentImage = imageObject.getImage();
-					trackingImage = mTracker.getImage(
-							currentImage.width(),
-							currentImage.height(),
-							currentImage);
-				}
+				mTracker.update(targetObjects,currentQuadData);
+				Mat currentImage = imageObject.getImage();
+				trackingImage = mTracker.getImage(
+						currentImage.width(),
+						currentImage.height(),
+						currentImage);
 			}
 			if(modes[MainBusIPInterface.MODE_TEMPLATE_CALIBRATION] == 1){
 				FormTemplate formTemplate = mMainbus.getCalibFormTemplate();
