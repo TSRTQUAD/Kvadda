@@ -43,7 +43,7 @@ public interface AssignmentPlanerInterface {
 	 * Count the nr of visited points to be able to evaluate coverage amount.
 	 * @param point
 	 */
-	public void addVisitedPoint();
+	public void addVisitedPoint(int counter);
 	
 	/**
 	 * Get nr of visited points

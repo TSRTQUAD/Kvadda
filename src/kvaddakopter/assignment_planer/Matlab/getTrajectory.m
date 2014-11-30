@@ -24,8 +24,9 @@ for ii = 1:3
     % ================= Last check =====================
     % Search for points in forbidden areas and put them on the edge
     rawtrajectory = lastCheck( rawtrajectory, object );
+    tmptrajectory = lastCheck( tmptrajectory, object );
 
-    DPtrajectory = DouglasPeucker(rawtrajectory);
+    DPtrajectory = DouglasPeucker(tmptrajectory);
     
     % This function calculates the total estimated time for the mission
     % which is used as a mesure of performance for the trajectory

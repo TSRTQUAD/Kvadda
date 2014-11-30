@@ -65,7 +65,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	//Assignment planer storage
 	private MatlabProxyConnection matlabproxy;
 	private MissionObject missionobject;
-	private double nrofvisitedpoints = 0;
+	private double nrofvisitedpoints;
 	//Flags
 	private boolean mAssignmentPlanerRunning = false;
 	
@@ -88,7 +88,6 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	QuadData quadData = new QuadData();
 
 	private boolean gpsFixOk;
-
 	private boolean wifiFixOk;
 	
 	//Control modules	
@@ -104,7 +103,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 		//Controlsignal[Landing/Start Roll Pitch Gaz Yaw ]		
 		//ControlSignal[0] = csignal.getStart();
 		ControlSignal[1] = (float) 		csignal.getLateralvelocity();
-		ControlSignal[2] = (float) 		csignal.getForwardvelocity();
+		ControlSignal[2] = (float) 		-csignal.getForwardvelocity();
 		ControlSignal[3] = (float)  	csignal.getHeightvelocity();
 		ControlSignal[4] = (float)  	csignal.getYawrate();
 		}
@@ -561,8 +560,8 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 
 
 	@Override
-	public void addVisitedPoint() {
-		this.nrofvisitedpoints += 1;
+	public void addVisitedPoint(int counter) {
+		this.nrofvisitedpoints = counter;
 		
 	}
 

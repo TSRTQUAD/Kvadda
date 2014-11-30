@@ -74,7 +74,7 @@ public class ReferenceExtractor {
 												missionobject.getYaw(),
 												missionobject.getWaitingtime(),
 												missionobject.getReferenceVelocity()[this.counter][0]
-															 ,0,start,land};
+															 ,1,start,land};
 			
 			this.counter = this.counter + 1;			
 			return returnvalue;	
@@ -98,6 +98,12 @@ public double[] updatetest(){
 												this.land};												// Set start/land
 			return returnvalue;
 		}
+
+
+public int getCounter() {
+	// TODO Auto-generated method stub
+	return this.counter;
+}
 
 
 }

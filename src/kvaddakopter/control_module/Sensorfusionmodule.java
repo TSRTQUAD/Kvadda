@@ -78,7 +78,7 @@ public class Sensorfusionmodule implements Runnable{
 	protected int					counter				= 0;
 	protected int					controllingmode		= 0; 					// 0 for autonomous 
 	protected boolean				debugMode			= true;					// Toggle System out prints 		
-	protected int					whichkalman			= 1; // 1 for 2xY 0 for 1xY
+	protected int					whichkalman			= 0; // 1 for 2xY 0 for 1xY
 	protected double[][]			states				= new double[(int) (1/sampletime*seconds)][4];
 	protected MatFileHandler		saver				= new MatFileHandler();
 	protected boolean				initialbool 		= true;
@@ -229,7 +229,7 @@ public class Sensorfusionmodule implements Runnable{
 
 		
 		rrdata.initialize(sdata.getLatitud(),sdata.getLongitud());			// Fix local coordinate system XY
-		//this.missionobject = mainbus.getMissionObject();					//Reads mission object from mainbus			
+		this.missionobject = mainbus.getMissionObject();					//Reads mission object from mainbus			
 		rrdata.updateref(referenceextractor.update(missionobject));			// update ref @ Autonomous flight mode		
 
 		checkIsRunning();
