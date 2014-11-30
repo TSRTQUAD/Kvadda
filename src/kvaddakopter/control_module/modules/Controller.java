@@ -78,7 +78,7 @@ public class Controller{
 		csignal.setForwardvelocity	(	-KVelForward*(RDataVel.get(0) - rsdata.getForVel() )	);
 		csignal.setLateralvelocity	(	KVelLateral*(RDataVel.get(1) - rsdata.getLatVel() )		);	
 		csignal.setHeightvelocity	( 	KVelHeight*(rrdata.getHeight() - rsdata.getHeight())	);	
-		csignal.setYawrate			(	KYaw*(rrdata.getYaw() - rsdata.getYaw())				);
+		csignal.setYawrate			(	-KYaw*(rrdata.getYaw() - rsdata.getYaw())				);
 
 		 
 		

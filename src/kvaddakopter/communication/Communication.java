@@ -118,6 +118,7 @@ public class Communication implements Runnable {
 			Thread.sleep(INTERVAL);
 
 			send_at_cmd("AT*FTRIM=" + get_seq()); // flat trim
+			System.out.println("FLAAAATTRIM");
 			// Thread.sleep(INTERVAL);
 			Thread.sleep(INTERVAL);
 

@@ -308,12 +308,7 @@ public class Sensorfusionmodule implements Runnable{
 		//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 		}
 		
-		
-		//rsdata.print();
-		if(debugMode){
-			System.out.println("Initializing completed");
-			System.out.println("");
-		}
+
 		
 
 
@@ -360,12 +355,6 @@ public class Sensorfusionmodule implements Runnable{
 				sdata.xydot2XYdot();										//Transformation
 				}
 				
-				if(debugMode){
-					System.out.format("Sensordata at sample %d%n",counter);
-					sdata.print();
-				}
-													
-
 				
 				//SENSORFUSION  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				//Update states from Kalman filter
@@ -409,10 +398,7 @@ public class Sensorfusionmodule implements Runnable{
 						}
 						// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_				
 				}						
-						if(debugMode){
-					System.out.format("States at sample %d%n",counter);
-					rsdata.print();
-				}
+
 				// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				
 				
@@ -428,10 +414,6 @@ public class Sensorfusionmodule implements Runnable{
 				else if (2 == controllingmode){
 				rrdata.updatetest(rsdata);									//Reference is init+-(2m)
 				}	
-				if(debugMode){
-					System.out.print("Reference signal:");
-					rrdata.print();
-				}
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 				
 				
@@ -440,34 +422,33 @@ public class Sensorfusionmodule implements Runnable{
 				if(rrdata.getMission()==1){
 					csignal = controller.GetControlSignalMission1(rsdata, rrdata);
 					if(debugMode) System.out.println("Controller Mission = 1, controlsignal:");
-					//csignal.print();
 					csignal = controller.saturation(csignal,0.25,0.25,0.4,5,0.02);
 				}
 				else if(rrdata.getMission()==0 || rrdata.getMission()==2){
 					csignal = controller.GetControlSignalMission0(rsdata, rrdata);
 					if(debugMode) System.out.println("Controller Mission = 0, controlsignal:");
-					//csignal.print();
 					csignal = controller.saturation(csignal,0.2,0.2,0.1,1.5,0.02);
 				}
+				mainbus.setControlSignalobject(csignal);						// Update main-bus control-signal
 				
-				if( rrdata.getLand() == 1){									//Initiate landing?
+				//---------------------------------------------------------------------------------
+				//	INITAIATE LANDING?
+				if( rrdata.getLand() == 1){									
 					ControlSignal csignal1 = new ControlSignal();
 					csignal.setStart(0);
 					mainbus.setControlSignalobject(csignal1);
 									//
-					try {													//
-						Thread.sleep((long) 10000);							//
+					try {													
+						Thread.sleep((long) 10000);							
 						this.threadrunning = false;
-					} catch (InterruptedException e) {						//
-						e.printStackTrace();								//
+					} catch (InterruptedException e) {						
+						e.printStackTrace();								
 					}					
 				}
-				
-				//csignal = controller.saturation(csignal,0.7,0.6,0.1,1.5,0.02);// Saturate control-signal
-				mainbus.setControlSignalobject(csignal);						// Update main-bus control-signal
-				if(debugMode) csignal.print();
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
-			/*	
+			
+				
+				/*	
 				//Save data-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				if (counter <= 20*seconds){
 				states[counter-1][0] = rsdata.getXpos();
@@ -488,9 +469,24 @@ public class Sensorfusionmodule implements Runnable{
 					}
 				}
 				}
+				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				*/
 				
+				//Printer-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+				if(debugMode){
+					System.out.format("Sensordata at sample %d%n",counter);
+					sdata.print();
+					System.out.format("States at sample %d%n",counter);
+					rsdata.print();
+					System.out.print("Reference signal:");
+					rrdata.print();
+					System.out.println("Controlsignal, Mission = " + rrdata.getMission());
+					csignal.print();
+				}
+				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				
+				
+	
 				//Sample-time -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 				time = sampletime*1000 - (System.currentTimeMillis()-time);				
 //				System.out.format("Samplingsintervall: %.2f%n",time); 

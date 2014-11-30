@@ -215,15 +215,6 @@ public class NavData implements Runnable {
 					}
 					mMainbus.setQuadData(mQuadData);
 					checkStartConditions();
-
-					try {
-						Thread.sleep(200);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
-					
 				}
 			} catch (Exception ex2) {
 				ex2.printStackTrace();

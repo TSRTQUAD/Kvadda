@@ -102,12 +102,13 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 		if (true == this.runcontroller){
 		//Controlsignal[Landing/Start Roll Pitch Gaz Yaw ]		
 		//ControlSignal[0] = csignal.getStart();
-		ControlSignal[1] = (float) 	csignal.getLateralvelocity();
-		ControlSignal[2] = (float) 	csignal.getForwardvelocity();
+		ControlSignal[1] = (float) 		csignal.getLateralvelocity();
+		ControlSignal[2] = (float) 		csignal.getForwardvelocity();
 		ControlSignal[3] = (float)  	csignal.getHeightvelocity();
 		ControlSignal[4] = (float)  	csignal.getYawrate();
 		}
 	}
+	
 	
 	public static void main(String[] args) {
 

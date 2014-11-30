@@ -33,7 +33,7 @@ public class SensorData {
 			this.xdot = quadData.getVx();
 			this.ydot = quadData.getVy();
 			this.height = quadData.getAltitude();
-			this.yaw = -Math.PI/180*quadData.getYaw(); //Is in degrees
+			this.yaw = -Math.PI/180*quadData.getYaw(); 
 		}
 
 	}
