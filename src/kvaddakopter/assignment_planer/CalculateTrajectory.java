@@ -1,5 +1,6 @@
 package kvaddakopter.assignment_planer;
 
+import kvaddakopter.interfaces.AssignmentPlanerInterface;
 import matlabcontrol.MatlabConnectionException;
 import matlabcontrol.MatlabInvocationException;
 import matlabcontrol.MatlabProxy;
@@ -26,10 +27,19 @@ public class CalculateTrajectory {
 
 	}
 	
-	public double getCoverageAmount() {
+	public double coveragePercentage(AssignmentPlanerInterface mainbus) {
+		double realnrofpoints = mainbus.getMissionObject().getTrajectory().length;
+		double nrofvisitedpoints = mainbus.getVisitedPoints();
+		double percent = Math.min((realnrofpoints - nrofvisitedpoints)/realnrofpoints, 100);
 		
+		return percent;
 		
-		return 0;
+	}
+	
+	public double coverageArea(AssignmentPlanerInterface mainbus) {
+		double coveragearea = coveragePercentage(mainbus)*mainbus.getMissionObject().getCoverageArea()[0][0];
+		
+		return coveragearea;
 		
 	}
 
