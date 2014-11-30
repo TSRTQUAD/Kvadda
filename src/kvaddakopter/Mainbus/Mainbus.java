@@ -76,7 +76,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	float speed = -1f;
 	float batteryLevel = -1f;
     boolean shift = false;
-    boolean runcontroller = false;
+    boolean runcontroller = true;
     boolean space_bar = false; //true = Takeoff, false = Landing
 	public boolean EmerStop = false;
 	public boolean manualcontrolbool;
@@ -117,7 +117,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 
 		Mainbus mainbus = new Mainbus();
 		
-		/*
+	
 		//Setting up a Matlab Proxy Server
 		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
 		mainbus.setMatlabProxyConnection(matlabproxy);
@@ -127,7 +127,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 		Thread t4 = new Thread(assignmentplanerrunnable);
 		t4.setPriority(1);
 		t4.start();
-*/
+
 		//Communication
 		
 		

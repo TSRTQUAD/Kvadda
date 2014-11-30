@@ -76,7 +76,7 @@ public class Sensorfusionmodule implements Runnable{
 	protected ReferenceData 		rrdata				= new ReferenceData();   
 	protected ReferenceExtractor	referenceextractor	= new ReferenceExtractor(0);
 	protected int					counter				= 0;
-	protected int					controllingmode		= 2; 					// 0 for autonomous 
+	protected int					controllingmode		= 0; 					// 0 for autonomous 
 	protected boolean				debugMode			= true;					// Toggle System out prints 		
 	protected int					whichkalman			= 1; // 1 for 2xY 0 for 1xY
 	protected double[][]			states				= new double[(int) (1/sampletime*seconds)][4];
@@ -427,7 +427,7 @@ public class Sensorfusionmodule implements Runnable{
 				else if(rrdata.getMission()==0 || rrdata.getMission()==2){
 					csignal = controller.GetControlSignalMission0(rsdata, rrdata);
 					if(debugMode) System.out.println("Controller Mission = 0, controlsignal:");
-					csignal = controller.saturation(csignal,0.2,0.2,0.1,1.5,0.02);
+					csignal = controller.saturation(csignal,0.2,0.2,0.5,1.5,0.02);
 				}
 				mainbus.setControlSignalobject(csignal);						// Update main-bus control-signal
 				
@@ -448,7 +448,7 @@ public class Sensorfusionmodule implements Runnable{
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 			
 				
-				/*	
+				
 				//Save data-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				if (counter <= 20*seconds){
 				states[counter-1][0] = rsdata.getXpos();
@@ -470,7 +470,7 @@ public class Sensorfusionmodule implements Runnable{
 				}
 				}
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-				*/
+				
 				
 				//Printer-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				if(debugMode){

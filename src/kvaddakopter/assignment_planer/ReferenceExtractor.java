@@ -23,7 +23,7 @@ public class ReferenceExtractor {
 			this.start = 1;
 			double[] returnvalue = new double[]{missionobject.getTrajectory()[0][0],
 												missionobject.getTrajectory()[0][1],
-												missionobject.getHeight(),
+												3,
 												missionobject.getYaw(),
 												3000,
 												missionobject.getReferenceVelocity()[this.counter][0]
@@ -39,10 +39,10 @@ public class ReferenceExtractor {
 			this.land = 1;
 			double[] returnvalue = new double[]{missionobject.getTrajectory()[0][0],
 												missionobject.getTrajectory()[0][1],
-												missionobject.getHeight(),
+												3,
 												missionobject.getYaw(),
 												5000,
-												missionobject.getReferenceVelocity()[this.counter][0]
+												missionobject.getReferenceVelocity()[0][0]
 															 ,0,start,land};
 			land = 0;
 			return returnvalue;
@@ -64,7 +64,7 @@ public class ReferenceExtractor {
 			//System.out.format("Reference update no. %d%n",this.counter);
 			double[] returnvalue = new double[]{missionobject.getTrajectory()[this.counter][0],
 												missionobject.getTrajectory()[this.counter][1],
-												missionobject.getHeight(),
+												3,
 												missionobject.getYaw(),
 												missionobject.getWaitingtime(),
 												missionobject.getReferenceVelocity()[this.counter][0]

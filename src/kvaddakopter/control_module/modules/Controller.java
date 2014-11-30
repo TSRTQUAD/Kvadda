@@ -20,7 +20,7 @@ public class Controller{
 	protected boolean Yawdirection;
 
 	public Controller(double sampletime){	
-		KVelHeight = 1.5; 
+		KVelHeight = 2; 
 		KVelForward = 0.04;
 		KVelForward2 = 0.1;
 		KVelLateral = 0.04;
