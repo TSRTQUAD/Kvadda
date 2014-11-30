@@ -13,25 +13,25 @@ public class Kalmanfilter_endast_gps {
 	public Kalmanfilter_endast_gps(double sampletime,double lambdaxdot,double lambday,
 						double initialx, double initialxdot){		
 	    // Construct all matrices
-		F = new SimpleMatrix(2,2,true,		1.0,	(sampletime),	0.0,
+		F = new SimpleMatrix(3,3,true,		1.0,	(sampletime),	0.0,
 											0.0,	0.0,			1.0,
 											0.0,	0.0,			1.0); 
 		
-		Gu = new SimpleMatrix(2,1,true,	0.0,
+		Gu = new SimpleMatrix(3,1,true,	0.0,
 										1.0,
 										0.0);
 		
-		Gv = new SimpleMatrix(2,1,true,	Math.pow(sampletime, 2)/2,
-										sampletime,
-										1);
+		Gv = new SimpleMatrix(3,1,true,	Math.pow(sampletime, 2)/2,
+													sampletime,
+														1);
 		
 		Q = new SimpleMatrix(1,1,true,lambdaxdot);
 		R = new SimpleMatrix(1,1,true,lambday);
-		H = new SimpleMatrix(1,2,true,	1.0,
+		H = new SimpleMatrix(1,3,true,	1.0,
 										0.0,
 										0,0);
 		
-		P = new SimpleMatrix(2,2,true,	1,0,0,
+		P = new SimpleMatrix(3,3,true,	1,0,0,
 										0,1,0,
 										0,0,1);       ///// Initial states!!
 		HP = new SimpleMatrix(1,3);
@@ -40,7 +40,7 @@ public class Kalmanfilter_endast_gps {
 		error = new SimpleMatrix(1,1);
 		z1 = new SimpleMatrix(1,1);
 		z2 = new SimpleMatrix(1,1);
-		x = new SimpleMatrix(2,1,true,initialx,initialxdot,0);
+		x = new SimpleMatrix(3,1,true,initialx,initialxdot,0);
 	}
 	
 	

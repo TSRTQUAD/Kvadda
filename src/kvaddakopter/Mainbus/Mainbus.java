@@ -54,6 +54,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	//Image processing storage
 	private boolean mIsIPRunning;
 	private ArrayList<TargetObject> mTargetList = new ArrayList<TargetObject>();
+	Image mIPImageToShow[] = new Image[1];
 	
 	
 	//GENERAL
@@ -64,18 +65,19 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	//Assignment planer storage
 	private MatlabProxyConnection matlabproxy;
 	private MissionObject missionobject;
+	private double nrofvisitedpoints;
 	//Flags
 	private boolean mAssignmentPlanerRunning = false;
 	
 	//Communication
 	//Communication communicationtest;
-	static float[] ControlSignal = new float[5];
+	static float[] ControlSignal = {1f,0,0,0,0};
 	private String mode;
 	public boolean selfCheck = false;
-	float speed = (float)-1;
+	float speed = -1f;
 	float batteryLevel = -1f;
     boolean shift = false;
-    boolean runcontroller = false;
+    boolean runcontroller = true;
     boolean space_bar = false; //true = Takeoff, false = Landing
 	public boolean EmerStop = false;
 	public boolean manualcontrolbool;
@@ -86,7 +88,6 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	QuadData quadData = new QuadData();
 
 	private boolean gpsFixOk;
-
 	private boolean wifiFixOk;
 	
 	//Control modules	
@@ -100,13 +101,14 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 		kvaddakopter.control_module.signals.ControlSignal csignal) {		
 		if (true == this.runcontroller){
 		//Controlsignal[Landing/Start Roll Pitch Gaz Yaw ]		
-		ControlSignal[0] = 0; //csignal.getStart();
-		ControlSignal[1] = (float) 	csignal.getLateralvelocity();
-		ControlSignal[2] = (float) 	csignal.getForwardvelocity();
+		//ControlSignal[0] = csignal.getStart();
+		ControlSignal[1] = (float) 		csignal.getLateralvelocity();
+		ControlSignal[2] = (float) 		-csignal.getForwardvelocity();
 		ControlSignal[3] = (float)  	csignal.getHeightvelocity();
 		ControlSignal[4] = (float)  	csignal.getYawrate();
 		}
 	}
+	
 	
 	public static void main(String[] args) {
 
@@ -115,7 +117,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 
 		Mainbus mainbus = new Mainbus();
 		
-		
+	
 		//Setting up a Matlab Proxy Server
 		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
 		mainbus.setMatlabProxyConnection(matlabproxy);
@@ -130,7 +132,6 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 		
 		
 		try{
-			ControlSignal = new float[] {0, 0, 0, 0, 0};
 			Communication communication = new Communication(3,mainbus,"Communication");
 			Thread t7 = new Thread(communication);
 			t7.setDaemon(true);
@@ -282,7 +283,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	
 	@Override
 	public double getCurrentSpeed() {
-		return 1.23;
+		return speed;
 	}
 
 
@@ -314,8 +315,10 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	
 	@Override
 	public synchronized void initIPVariables() {
-		mColorTemplates.add(new ColorTemplate("Pink square", 120, 200, 50, 90, 180, 245, ColorTemplate.FORM_SQUARE));	
+		mColorTemplates.add(new ColorTemplate("Pink square", 120, 200, 50, 90, 180, 245, ColorTemplate.FORM_SQUARE));
 		mColorTemplates.add(new ColorTemplate("Yellow square", 30, 120, 50, 120, 130, 255, ColorTemplate.FORM_SQUARE));
+		mColorTemplates.get(0).deactivate();
+		mColorTemplates.get(1).deactivate();
 		mTargetList = new ArrayList<TargetObject>();
 		mIPCalibTemplate[0] = new ColorTemplate();
 		mIPImageToShow[0] = null;
@@ -521,7 +524,8 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 
 	@Override
 	public synchronized void setControlSignal(float[] controlsignal) {
-		ControlSignal = controlsignal;	
+		ControlSignal = controlsignal;
+		System.out.println("Position 1:   " + ControlSignal[0]);
 	}
 
 
@@ -552,6 +556,20 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	public boolean getStartPermission() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+
+	@Override
+	public void addVisitedPoint(int counter) {
+		this.nrofvisitedpoints = counter;
+		
+	}
+
+
+	@Override
+	public double getVisitedPoints() {
+		return this.nrofvisitedpoints;
+		
 	}
 
 

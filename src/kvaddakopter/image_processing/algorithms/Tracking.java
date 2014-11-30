@@ -2,17 +2,13 @@ package kvaddakopter.image_processing.algorithms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import kvaddakopter.communication.QuadData;
 import kvaddakopter.image_processing.data_types.Identifier;
 import kvaddakopter.image_processing.data_types.TargetObject;
 import kvaddakopter.maps.GPSCoordinate;
 
-import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.ejml.simple.SimpleMatrix;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -31,8 +27,8 @@ public class Tracking {
 	double Ts = 0.15;
 	double sigmaSquared = 200;
 
-	CircularFifoQueue<double[]> trajectoryX = new CircularFifoQueue<double[]>(30);
-	CircularFifoQueue<double[]> trajectoryM = new CircularFifoQueue<double[]>(30);
+	//CircularFifoQueue<double[]> trajectoryX = new CircularFifoQueue<double[]>(30);
+	//CircularFifoQueue<double[]> trajectoryM = new CircularFifoQueue<double[]>(30);
 	long lastTime;
 	
 	boolean debugPrintMatches = false;
@@ -49,10 +45,6 @@ public class Tracking {
 		// Initialize target list
 		mInternalTargets = new ArrayList<TargetObject>();
 		lastTime = System.currentTimeMillis();
-		
-		// Debug
-		mInternalTargets.add(new TargetObject(new SimpleMatrix(2, 1, true, 0, 0), 50, null));
-		mInternalTargets.get(0).setGPSCoordinate(new GPSCoordinate(58.40708, 15.62126));
 	}
 	
 
@@ -73,6 +65,16 @@ public class Tracking {
 		
 		// Perform time update
 		timeUpdate();
+
+		// Remove old internal targets with too high covariance
+		// If ||P|| > threshold we remove the target from tracked targets
+		Iterator<TargetObject> iter = mInternalTargets.iterator();
+		while(iter.hasNext()){
+		    TargetObject target = iter.next();
+			if(target.getCovariance().normF() > 1000){
+				iter.remove();
+		    }
+		}
 		
 		// If no targets are observed, skip matching and measurement update and return instead
 		if(targetObjects.size() == 0) return;
@@ -96,23 +98,13 @@ public class Tracking {
 			measurementUpdate(TargetObject.getTargetByID(mInternalTargets, matchedIDs[i]), z, R);
 			
 			
-			// TODO Add optinal trajectories again for debugging purposes
+			// TODO Add optional trajectories again for debugging purposes
 		}
 		
 		if(qData != null){
 			estimateGeo(qData);
 		}
 		
-		// Remove old internal targets with too high covariance
-		// If ||P|| > threshold we remove the target from tracked targets
-		Iterator<TargetObject> iter = mInternalTargets.iterator();
-		while(iter.hasNext()){
-		    TargetObject target = iter.next();
-			if(target.getCovariance().normF() > 1000){
-				iter.remove();
-				System.out.println("Tracking: Removing target");
-		    }
-		}
 	}
 
 	/**
@@ -204,14 +196,15 @@ public class Tracking {
 		
 		
 		// For each entry in the matching table, set matching value as a combination of methods Identigier.compare and compareDistance.
-		for(TargetObject internalTarget : mInternalTargets){
+		for(int internalI = 0; internalI < mInternalTargets.size(); internalI++){
+			TargetObject internalTarget = mInternalTargets.get(internalI);
 			if(debugPrintMatches) System.out.format("|%2d|", internalTarget.getID());
-			for(TargetObject target : targetObjects){
-				
-				matchTable[internalTarget.getID()][targetObjects.indexOf(target)] = 
+			for(int newTargetsI = 0; newTargetsI < targetObjects.size(); newTargetsI++){
+				TargetObject target = targetObjects.get(newTargetsI);
+				matchTable[internalI][newTargetsI] = 
 						(Identifier.compare(internalTarget.getIdentifier(), target.getIdentifier().setmeanHSVValuesCertainty(1)) + 
 						compareDistance(internalTarget, target)) / 2;
-				if(debugPrintMatches) System.out.format("%.2f|", matchTable[internalTarget.getID()][targetObjects.indexOf(target)]);
+				if(debugPrintMatches) System.out.format("%.2f|", matchTable[internalI][newTargetsI]);
 			}
 			if(debugPrintMatches) System.out.println();
 		}
@@ -326,16 +319,15 @@ public class Tracking {
 	 */
 	private void estimateGeo(QuadData qData){
 		for(TargetObject target : mInternalTargets) {
-			double fullYAngle = 90; // Field of view in vertical
-			double fullYPixels = 360; // half the image pixel height
+			double fullYAngle = 45.1040; // Field of view in vertical
+			double fullYPixels = 180; // half the image pixel height
 			double yAngle = Math.atan(((fullYPixels - target.getPosition().get(1,0)) / fullYPixels) * Math.tan(Math.toRadians(fullYAngle / 2)));
 			double yDist = qData.getAltitude() * Math.tan(Math.toRadians(qData.getPitch()) + yAngle);
 
-			double fullXAngle = 120; // Field of view in horizontal
-			double fullXPixels = 480; // Half the image pixel width
+			double fullXAngle = 80.1849; // Field of view in horizontal
+			double fullXPixels = 320; // Half the image pixel width
 			double xAngle = Math.atan(((target.getPosition().get(0,0) - fullXPixels) / fullXPixels) * Math.tan(Math.toRadians(fullXAngle / 2)));
 			double xDist = qData.getAltitude() * Math.tan(Math.toRadians(-qData.getRoll()) + xAngle);
-			
 			
 			double latDist = -xDist*Math.cos(Math.toRadians(qData.getYaw())) + yDist*Math.sin(Math.toRadians(qData.getYaw()));
 			double lonDist = xDist*Math.sin(Math.toRadians(qData.getYaw())) + yDist*Math.cos(Math.toRadians(qData.getYaw()));

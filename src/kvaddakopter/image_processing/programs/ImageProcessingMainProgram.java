@@ -53,11 +53,21 @@ public class ImageProcessingMainProgram extends ProgramClass{
 		
 		//Create and initialize decoder. And select source.
 		mDecoder = new FFMpegDecoder();
+		
+		boolean reconnect = true;
+		while(reconnect){
+			try{
+				mDecoder.initialize("tcp://192.168.1.1:5555"/*FFMpegDecoder.STREAM_ADDR_BIPBOP*/);
+				reconnect = false;
+				//mDecoder.initialize(FFMpegDecoder.STREAM_ADDR_BIPBOP);
+				//mDecoder.initialize("mvi2.mp4");
+				// Listen to decoder events
+				}
+				catch(Exception e){
+					
+				}			
+		}
 
-		mDecoder.initialize("tcp://192.168.1.1:5555"/*FFMpegDecoder.STREAM_ADDR_BIPBOP*/);
-		//mDecoder.initialize(FFMpegDecoder.STREAM_ADDR_BIPBOP);
-		//mDecoder.initialize("mvi2.mp4");
-		// Listen to decoder events
 		mDecoder.setDecoderListener(this);
 
 		//Start stream on a separate thread
@@ -129,14 +139,12 @@ public class ImageProcessingMainProgram extends ProgramClass{
 				templateMatchingImage= mTemplateMatch.getIntermediateResult();
 			}
 			if(modes[MainBusIPInterface.MODE_TRACKING] == 1){
-				if(targetObjects.size() > 0){
-					mTracker.update(targetObjects,currentQuadData);
-					Mat currentImage = imageObject.getImage();
-					trackingImage = mTracker.getImage(
-							currentImage.width(),
-							currentImage.height(),
-							currentImage);
-				}
+				mTracker.update(targetObjects,currentQuadData);
+				Mat currentImage = imageObject.getImage();
+				trackingImage = mTracker.getImage(
+						currentImage.width(),
+						currentImage.height(),
+						currentImage);
 			}
 			if(modes[MainBusIPInterface.MODE_TEMPLATE_CALIBRATION] == 1){
 				FormTemplate formTemplate = mMainbus.getCalibFormTemplate();

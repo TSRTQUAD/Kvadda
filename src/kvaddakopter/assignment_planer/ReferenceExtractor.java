@@ -14,10 +14,16 @@ public class ReferenceExtractor {
 
 	
 	// Returndata  = (latitude, longitud, height, yaw, time, forward velocity, mission type, start,land)
-	public double[] update(MissionObject missionobject){
-		
-		
-		
+	
+/**
+ * Reads missionobject data and extracts relevant reference information. 
+ * First update: Wait for 3 seconds @ coordinate
+ * Last update: Landing is set to 1.
+ * Returndata  = (latitude, longitud, height, Yaw, time, forward velocity, mission type, start,land) 	
+ * @param missionobject
+ * @return Referencevetor 
+ */
+	public double[] update(MissionObject missionobject){		
 		if (0 == this.counter ){
 			//System.out.format("Reference first update no. %d%n",this.counter);
 			this.start = 1;
@@ -42,7 +48,7 @@ public class ReferenceExtractor {
 												missionobject.getHeight(),
 												missionobject.getYaw(),
 												5000,
-												missionobject.getReferenceVelocity()[this.counter][0]
+												missionobject.getReferenceVelocity()[0][0]
 															 ,0,start,land};
 			land = 0;
 			return returnvalue;
@@ -68,7 +74,7 @@ public class ReferenceExtractor {
 												missionobject.getYaw(),
 												missionobject.getWaitingtime(),
 												missionobject.getReferenceVelocity()[this.counter][0]
-															 ,0,start,land};
+															 ,1,start,land};
 			
 			this.counter = this.counter + 1;			
 			return returnvalue;	
@@ -76,7 +82,7 @@ public class ReferenceExtractor {
 	}	
 	
 	
-	
+
 public double[] updatetest(){			
 			//System.out.format("Reference first update no. %d%n",this.counter);
 	this.counter = this.counter + 1;
@@ -92,6 +98,12 @@ public double[] updatetest(){
 												this.land};												// Set start/land
 			return returnvalue;
 		}
+
+
+public int getCounter() {
+	// TODO Auto-generated method stub
+	return this.counter;
+}
 
 
 }

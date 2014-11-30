@@ -93,7 +93,7 @@ public class Communication implements Runnable {
 			send_at_cmd("AT*COMWDG=" + get_seq());
 			Thread.sleep(INTERVAL);
 			send_at_cmd("AT*CONFIG=" + get_seq()
-					+ ",\"control:altitude_max\",\"1000\""); // altitude max 2m
+					+ ",\"control:altitude_max\",\"5000\""); // altitude max 2m
 			Thread.sleep(INTERVAL);
 			send_at_cmd("AT*CONFIG=" + get_seq()
 					+ ",\"control:control_level\",\"0\""); // 0:BEGINNER, 1:ACE,
@@ -118,6 +118,7 @@ public class Communication implements Runnable {
 			Thread.sleep(INTERVAL);
 
 			send_at_cmd("AT*FTRIM=" + get_seq()); // flat trim
+			System.out.println("FLAAAATTRIM");
 			// Thread.sleep(INTERVAL);
 			Thread.sleep(INTERVAL);
 
@@ -127,13 +128,12 @@ public class Communication implements Runnable {
 			send_pcmd(0, 0, 0, 0, 0);
 
 			Thread.sleep(INTERVAL);
-			send_at_cmd("AT*REF=" + get_seq() + ",290717696");
+			send_at_cmd("AT*REF=" + get_seq() + ",290717696");  // Bort. 
 			Thread.sleep(INTERVAL);
 			// send_at_cmd("AT*REF=" + get_seq() + ",290717952"); //toggle
 			// Emergency
 			// Thread.sleep(INTERVAL);
-			send_at_cmd("AT*REF=" + get_seq() + ",290717696");
-
+			send_at_cmd("AT*REF=" + get_seq() + ",290717696");   // Bort. 
 			System.out.println("Init done...");
 
 		} catch (Exception ex2) {
@@ -163,7 +163,7 @@ public class Communication implements Runnable {
 			}
 		}
 		mIsRunning = true;
-		if(!mIsInitiated){
+		if(!mIsInitiated && !mIsFlying){
 			System.out.println("Comm unit being initiated");
 			init();
 			synchronized(this){

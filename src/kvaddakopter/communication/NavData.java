@@ -22,32 +22,37 @@ public class NavData implements Runnable {
 	private Communication comm;
 	private boolean NavDataTimeOut = false;
 	private boolean mIsInitiated = false;
+	private int counter = 0;
 
 	// Container class for sensor data
 	QuadData mQuadData = new QuadData();
 
-	public NavData(
-			int threadid,
-			MainBusCommInterface mainbus,
-			String name,
-			Communication comm){
-		
+	public NavData(int threadid, MainBusCommInterface mainbus, String name,
+			Communication comm) {
+
 		mMainbus = mainbus;
 		this.comm = comm;
 		try {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			socket_nav = new DatagramSocket(Communication.NAV_PORT);
-			socket_nav.setSoTimeout(3000);
+			socket_nav.setSoTimeout(5000);
 		} catch (SocketException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
-	
+
 	/**
 	 * Initializes the UDP socket
 	 */
-	public void init(){
+	public void init() {
 		try {
 			this.inet_addr = comm.getInetAddr();
 		} catch (Exception ex1) {
@@ -55,44 +60,44 @@ public class NavData implements Runnable {
 		}
 		System.out.println("Init NavData");
 	}
-	
+
 	/**
 	 * Checks if the communication unit is started
 	 */
-	
-	public void checkIsCommRunning(){
-		while(!comm.isRunning() || !comm.isInitiated()){
-			synchronized(comm){
+
+	public void checkIsCommRunning() {
+		while (!comm.isRunning() && !comm.isInitiated()) {
+			synchronized (comm) {
 				try {
 					comm.wait();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
-				}				
+				}
 			}
-		System.out.println("NavData: Stopped waiting!");
+			System.out.println("NavData: Stopped waiting!");
 		}
-			
-		if(!mIsInitiated){
+
+		if (!mIsInitiated) {
 			mIsInitiated = true;
 			NavDataTimeOut = false;
 			init();
 		}
-		
+
 	}
-	
+
 	/**
-	 * Sends what information to get with AT.CONFIG messages
-	 * and receives messages with {@link socket_nav.receive(packet_rcv)}
+	 * Sends what information to get with AT.CONFIG messages and receives
+	 * messages with {@link socket_nav.receive(packet_rcv)}
 	 * 
-	 * Received data is read in order with {@link NavReader class}
-	 * Processes different header opts and data types
+	 * Received data is read in order with {@link NavReader class} Processes
+	 * different header opts and data types
 	 */
 	public void run() {
-		while(true){
+		while (true) {
 			checkIsCommRunning();
 			try {
-				Thread.sleep(500);
-				
+				Thread.sleep(3000);
+
 				byte[] buf_snd = { 0x01, 0x00, 0x00, 0x00 };
 				DatagramPacket packet_snd = new DatagramPacket(buf_snd,
 						buf_snd.length, this.inet_addr, Communication.NAV_PORT);
@@ -101,104 +106,25 @@ public class NavData implements Runnable {
 				System.out.println("Sent trigger flag to UDP port "
 						+ Communication.NAV_PORT);
 
-				comm.send_at_cmd("AT*CONFIG="
-						+ comm.get_seq()
+				comm.send_at_cmd("AT*CONFIG=" + comm.get_seq()
 						+ ",\"general:navdata_demo\",\"FALSE\"");
-				comm.send_at_cmd("AT*CONFIG="
-						+ comm.get_seq() + ",777060865");
-				
+				comm.send_at_cmd("AT*CONFIG=" + comm.get_seq() + ",777060865");
+
 				byte[] buf_rcv = new byte[10240];
 				DatagramPacket packet_rcv = new DatagramPacket(buf_rcv,
 						buf_rcv.length);
 
 				while (!NavDataTimeOut) {
 					try {
-						//checkIsCommRunning();
+						// checkIsCommRunning();
 						socket_nav.receive(packet_rcv);
-
-						NavReader reader = new NavReader(packet_rcv.getData());
-
-						// Get header information
-						long header = reader.uint32();
-						boolean[] droneStates = reader.droneStates32();
-						long sequenceNumber = reader.uint32();
-						long visionFlag = reader.uint32();
-						
-						if(droneStates[NavReader.COMM_LOST])
-							//System.err.println("COMM LOST");
-						if(droneStates[NavReader.FLYING])
-							comm.setIsFlying(true);
-
-						// Run until checksum
-						boolean finnished = false;
-						while (!finnished) {
-							int optionId = reader.uint16();
-							int length = reader.uint16();
-
-							byte[] content;
-							// length includes 4 byte header
-							content = reader.getSubArray(length - 4);
-							NavReader contentReader = new NavReader(content);
-
-							switch (optionId) {
-							case NavReader.DEMO:
-								int flyState = contentReader.uint16();
-								int controlState = contentReader.uint16();
-
-								mQuadData.setBatteryLevel(contentReader.uint32());
-								mQuadData.setPitch(contentReader.float32() / 1000);
-								mQuadData.setRoll(contentReader.float32() / 1000);
-								mQuadData.setYaw(contentReader.float32() / 1000);
-								mQuadData.setAltitude((float)(contentReader.int32()) / 1000);
-								mQuadData.setVx(contentReader.float32() / 1000);
-								mQuadData.setVy(contentReader.float32() / 1000);
-								mQuadData.setVz(contentReader.float32());
-
-								long frameIndex = contentReader.uint32();
-								break;
-
-							case NavReader.WIFI:
-								mQuadData.setLinkQuality(1 - contentReader
-										.float32());
-								break;
-
-							case NavReader.GPS:
-								mQuadData.setGPSLat(contentReader.double64());
-								mQuadData.setGPSLong(contentReader.double64());
-								mQuadData.setNGPSSatelites(contentReader.uint32(164));
-								break;
-							// Checksum used to determine if message received
-							// properly
-							case NavReader.CHECKSUM:
-
-								long expectedChecksum = 0;
-								for (int i = 0; i < buf_rcv.length - length; i++) {
-									expectedChecksum += buf_rcv[i];
-								}
-
-								long checksum = contentReader.uint32();
-
-								if (checksum != expectedChecksum) {
-
-									// System.err.println("Checksum fail, expected: "
-									// + expectedChecksum + ", got: " + checksum);
-
-								}
-
-								// checksum is the last option
-								finnished = true;
-								//Thread.sleep(50); //TODO REFRESH TIME
-								break;
-							}
-						}
-						mMainbus.setQuadData(mQuadData);				
-						checkStartConditions();
-					
+						//System.out.println("NAvData: Message received!");
+						NavDataTimeOut = false;
 
 					} catch (SocketTimeoutException ex3) {
 						System.err.println("socket_nav.receive(): Timeout");
-						
-						if(!comm.getIsFlying())
+
+						if (!comm.getIsFlying())
 							mMainbus.setShouldStart(false);
 						NavDataTimeOut = true;
 						comm.reset();
@@ -207,6 +133,86 @@ public class NavData implements Runnable {
 					} catch (Exception ex1) {
 						ex1.printStackTrace();
 					}
+
+					NavReader reader = new NavReader(packet_rcv.getData());
+
+					// Get header information
+					long header = reader.uint32();
+					boolean[] droneStates = reader.droneStates32();
+					long sequenceNumber = reader.uint32();
+					long visionFlag = reader.uint32();
+
+					if (droneStates[NavReader.FLYING]) {
+						comm.setIsFlying(true);
+						
+						}
+					
+					// Run until checksum
+					boolean finnished = false;
+					while (!finnished) {
+						int optionId = reader.uint16();
+						int length = reader.uint16();
+
+						byte[] content;
+						// length includes 4 byte header
+						content = reader.getSubArray(length - 4);
+						NavReader contentReader = new NavReader(content);
+
+						switch (optionId) {
+						case NavReader.DEMO:
+							int flyState = contentReader.uint16();
+							int controlState = contentReader.uint16();
+
+							mQuadData.setBatteryLevel(contentReader.uint32());
+							mQuadData.setPitch(contentReader.float32() / 1000);
+							mQuadData.setRoll(contentReader.float32() / 1000);
+							mQuadData.setYaw(contentReader.float32() / 1000);
+							mQuadData.setAltitude((float) (contentReader
+									.int32()) / 1000);
+							mQuadData.setVx(contentReader.float32() / 1000);
+							mQuadData.setVy(contentReader.float32() / 1000);
+							mQuadData.setVz(contentReader.float32());
+
+							long frameIndex = contentReader.uint32();
+							break;
+
+						case NavReader.WIFI:
+							mQuadData.setLinkQuality(1 - contentReader
+									.float32());
+							break;
+
+						case NavReader.GPS:
+							mQuadData.setGPSLat(contentReader.double64());
+							mQuadData.setGPSLong(contentReader.double64());
+							mQuadData.setNGPSSatelites(contentReader
+									.uint32(164));
+							break;
+						// Checksum used to determine if message received
+						// properly
+						case NavReader.CHECKSUM:
+
+							long expectedChecksum = 0;
+							for (int i = 0; i < buf_rcv.length - length; i++) {
+								expectedChecksum += buf_rcv[i];
+							}
+
+							long checksum = contentReader.uint32();
+
+							if (checksum != expectedChecksum) {
+
+								// System.err.println("Checksum fail, expected: "
+								// + expectedChecksum + ", got: " + checksum);
+
+							}
+
+							// checksum is the last option
+							finnished = true;
+							// Thread.sleep(50); //TODO REFRESH TIME
+							break;
+						}
+					}
+					mMainbus.setQuadData(mQuadData);
+					checkStartConditions();
 				}
 			} catch (Exception ex2) {
 				ex2.printStackTrace();
@@ -214,30 +220,27 @@ public class NavData implements Runnable {
 		}
 
 	}
-	
-	
-	
-	public void checkStartConditions(){
-		boolean wifi = false,gps=false;
-		if(mQuadData.getNGPSSatelites() > 2){
+
+	public void checkStartConditions() {
+		boolean wifi = false, gps = false;
+		if (mQuadData.getNGPSSatelites() > 2) {
 			mMainbus.setGpsFixOk(true);
 			gps = true;
 		}
-		if(mQuadData.getLinkQuality() > 0.8){
+		if (mQuadData.getLinkQuality() > 0.8) {
 			mMainbus.setWifiFixOk(true);
-			wifi=true;
+			wifi = true;
 		}
-		
-		if(wifi && gps){
-			
+
+		if ( gps) {		
+		if (!mMainbus.getIsArmed()) {
+			mMainbus.setIsArmed(true);
+			synchronized (mMainbus) {
+				mMainbus.notifyAll();
+				System.out.println("Communication: Armed, notifyall!");
+			}
 		}
-			if(!mMainbus.getIsArmed()){
-				mMainbus.setIsArmed(true);
-				synchronized(mMainbus){
-					mMainbus.notifyAll();
-					System.out.println("Communication: Armed, notifyall!");
-				}				
-			}	
-	}	
-	
+		}
+	}
+
 }

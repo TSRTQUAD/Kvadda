@@ -112,6 +112,7 @@ public class TabUtforController extends BaseController implements Initializable 
     
     @FXML
     private void arm(){
+    	if(this.currentSelectedMissionObject == null) return;
     	this.timeLeft = (long) this.currentSelectedMissionObject.getMissionTime()[0][0];
     	System.out.println("Started");
     	System.out.println(this.currentSelectedMissionName);
@@ -143,13 +144,16 @@ public class TabUtforController extends BaseController implements Initializable 
      * @param currentImage
      */
     public void updateMovie(){
-    	
-    	if(this.getParent().getMainBus() != null) return;
+
+    	if(this.getParent().getMainBus() == null) return;
 		Image image = this.getParent().getMainBus().getIPImageToShow();
 		if(image != null){
 			this.imgMovie.setImage(image);
+			this.imgMovie.autosize();
+			//this.imgMovie.setScaleX(.5);
+			//this.imgMovie.setScaleY(.5);
+			this.imgMovie.toFront();
 		}
-    	
     }
     
     
@@ -160,8 +164,11 @@ public class TabUtforController extends BaseController implements Initializable 
 	public void updateTimeLeft(long passedTime){
 		this.timeLeft -= (long) passedTime/1000;
 		long newTime = this.timeLeft;
-		
-		this.lblTimeLeft.setText( SecToMinSec.transform( Math.max(0, newTime)));
+		if(newTime < 0){
+			this.lblTimeLeft.setText("- s");
+		} else {
+			this.lblTimeLeft.setText(SecToMinSec.transform( Math.max(0, newTime)));
+		}
 	}
 	
 
@@ -225,6 +232,7 @@ public class TabUtforController extends BaseController implements Initializable 
      * Draw the Quad to the map.
      */
     public void drawQuadMarker(){
+    	if(this.getParent().getMainBus().getQuadData() == null) return;
     	GPSCoordinate gps = this.getParent().getMainBus().getCurrentQuadPosition();
     	if(gps == null || this.missionMap == null) return;
     	this.missionMap.drawQuad(gps.getLatitude(), gps.getLongitude());
@@ -235,7 +243,7 @@ public class TabUtforController extends BaseController implements Initializable 
      */
     public void drawTargetsOnMap(){
     	HashMap<String, GPSCoordinate> targetList = this.getParent().getMainBus().getTargets();
-    	if(targetList == null || targetList.size() == 0 || this.missionMap == null) return;
+    	if(targetList == null || this.missionMap == null) return;
 		this.missionMap.drawTargetsOnMap(this.getParent().getMainBus().getTargets());
     }
 
@@ -251,13 +259,17 @@ public class TabUtforController extends BaseController implements Initializable 
 	
 	public void updateSpeed(){
 		if (this.getParent().getMainBus() != null){
-                this.lblSpeed.setText(String.format("%.1f m/s", this.getParent().getMainBus().getCurrentSpeed()));
+			if(this.getParent().getMainBus().getCurrentSpeed() < 0){
+				this.lblSpeed.setText("- m/s");
+			} else {
+				this.lblSpeed.setText(String.format("%.1f m/s", this.getParent().getMainBus().getCurrentSpeed()));
+			}
 		}
 	}
 
 	public void updateBattery(float newBattery){
 		if(newBattery < 0){
-			this.lblBattery.setText("- \\%");
+			this.lblBattery.setText("- %");
 		}
 		else if(newBattery < 15){
 			this.lblBattery.setText(String.format("WRN! %.1f %%", newBattery));

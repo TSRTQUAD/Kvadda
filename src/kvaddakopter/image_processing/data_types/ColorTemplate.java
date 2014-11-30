@@ -25,6 +25,7 @@ public class ColorTemplate {
 	String description;
 	private int hueLow, hueHigh, saturationLow, saturationHigh, valueLow, valueHigh;
 	private boolean isActive;
+	private float hueMean;
 	
 	//Original Values
 	private int oHueLow, oHueHigh, oSaturationLow, oSaturationHigh, oValueLow, oValueHigh;
@@ -41,6 +42,7 @@ public class ColorTemplate {
 		valueLow = DEFAULT_VAL_LOW;
 		valueHigh = DEFAULT_VAL_HIGH;
 		isActive = true;
+		hueMean = angleMean(hueLow, hueHigh);
 		
 		//original values
 		oHueLow = hueLow;
@@ -74,6 +76,7 @@ public class ColorTemplate {
 		valueLow = valueLow_;
 		valueHigh = valueHigh_;
 		isActive = true;
+		hueMean = angleMean(hueLow, hueHigh);
 		
 		//original values
 		oHueLow = hueLow_;
@@ -176,8 +179,9 @@ public class ColorTemplate {
 	public void adapt(ArrayList<Long> objectHSVChannels,int hueWindow, int satWindow, int valWindow){
 		float T = adaptationConstant; // number of updates to 63%
 		//Hue update
-		hueLow = (int) (hueLow + ((float)(objectHSVChannels.get(0)-hueWindow/2 - hueLow))/T);
-		hueHigh = (int) (hueHigh + ((float)(objectHSVChannels.get(0)+hueWindow/2 - hueHigh))/T);
+		// Since a hue value of zero is the same as a hue value of 180 we adapt hue by averaging the unit
+		// vectors represented by the hue angle.		
+		hueAdapt(objectHSVChannels.get(0), hueWindow, T, hueLow, hueHigh);
 		
 		//Saturation update
 		saturationLow = (int) (saturationLow +((float)(objectHSVChannels.get(1)-satWindow/2 - saturationLow))/T);
@@ -193,11 +197,11 @@ public class ColorTemplate {
 	 * @param objectHSVChannels HSV values to adapt to
 	 */
 	public void adapt(ArrayList<Long> objectHSVChannels){
-		if(hueLow>hueHigh)
+		if(hueLow > hueHigh)
 			hueHigh += 180;
-		int hueWindow = hueHigh-hueLow;
-		int satWindow = saturationHigh-saturationLow;
-		int valWindow = valueHigh-valueLow;
+		int hueWindow = hueHigh - hueLow;
+		int satWindow = saturationHigh - saturationLow;
+		int valWindow = valueHigh - valueLow;
 		this.adapt(objectHSVChannels, hueWindow, satWindow, valWindow);
 	}
 	
@@ -207,7 +211,7 @@ public class ColorTemplate {
 	 * Use this to adapt if no targets are found
 	 */
 	public void adaptToOriginalBounds(){
-		float T = adaptationConstant; // number of updates to 63%
+		/*float T = adaptationConstant; // number of updates to 63%
 		//Hue update
 		hueLow = (int) ((float)(hueLow + ((oHueLow) - hueLow))/T);
 		hueHigh = (int) ((float)(hueHigh + ((oHueHigh) - hueHigh))/T);
@@ -218,7 +222,34 @@ public class ColorTemplate {
 		
 		//Value update
 		valueLow = (int) ((float)(valueLow + (oValueLow - valueLow))/T);
-		valueHigh = (int) ((float)(valueHigh + (oValueHigh - valueHigh))/T);
+		valueHigh = (int) ((float)(valueHigh + (oValueHigh - valueHigh))/T);*/
+	}
+
+	/**
+	 * 
+	 * @param newHue
+	 * @param hueWindow
+	 * @param T
+	 * @param hueLow2
+	 * @param hueHigh2
+	 */
+	private void hueAdapt(Long newHue, int hueWindow, float T, int hueLow2, int hueHigh2){
+	    //float hueMean = angleMean(hueLow2, hueHigh2);
+	    float hueDiff = angleDiff(hueMean, newHue);
+	    hueMean = (hueMean + (hueDiff / T)) % 180;
+	    hueLow = (int)(hueMean - hueWindow/2) % 180;
+	    hueHigh = (int)(hueMean + hueWindow/2) % 180;
+	}
+	
+	private float angleMean(float angleLow, float angleHigh){
+		if(angleHigh < angleLow){
+			angleHigh += 180;
+		}
+		return (((angleLow + angleHigh) / 2) % 180);
+	}
+	
+	private float angleDiff(float angle1, float angle2){
+		return (180 + angle2 - angle1 + 90) % 180 - 90;
 	}
 
 	/**

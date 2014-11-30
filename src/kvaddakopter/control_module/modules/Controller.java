@@ -20,7 +20,7 @@ public class Controller{
 	protected boolean Yawdirection;
 
 	public Controller(double sampletime){	
-		KVelHeight = 1.5; 
+		KVelHeight = 2; 
 		KVelForward = 0.04;
 		KVelForward2 = 0.1;
 		KVelLateral = 0.04;
@@ -75,7 +75,7 @@ public class Controller{
 		this.KYaw = this.SelectYawDirection(rrdata.getYaw(), rsdata.getYaw(), this.KYaw);
 		
 		//Control signals
-		csignal.setForwardvelocity	(	KVelForward*(RDataVel.get(0) - rsdata.getForVel() )		);
+		csignal.setForwardvelocity	(	KVelForward*(RDataVel.get(0) - rsdata.getForVel() )	);
 		csignal.setLateralvelocity	(	KVelLateral*(RDataVel.get(1) - rsdata.getLatVel() )		);	
 		csignal.setHeightvelocity	( 	KVelHeight*(rrdata.getHeight() - rsdata.getHeight())	);	
 		csignal.setYawrate			(	-KYaw*(rrdata.getYaw() - rsdata.getYaw())				);
@@ -118,6 +118,7 @@ public class Controller{
 			 this.errorforwardvel = rrdata.getForVel() - rsdata.getForVel();
 			 this.errorheading = rrdata.getYaw() - rsdata.getYaw();
 			 this.integral = csignal.getForwardvelocity();
+			 
 			 return csignal;
 		 }
 		 

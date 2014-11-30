@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.imageio.ImageIO;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
@@ -20,17 +18,19 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import kvaddakopter.Mainbus.Mainbus;
+
+import javax.imageio.ImageIO;
+
 import kvaddakopter.gui.controllers.TabDatorseendeController;
 import kvaddakopter.image_processing.algorithms.TemplateMatch;
 import kvaddakopter.image_processing.data_types.FormTemplate;
 import kvaddakopter.interfaces.MainBusIPInterface;
 
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.highgui.Highgui;
 
@@ -73,6 +73,8 @@ public class TemplateMatchSliders{
 	public TemplateMatchSliders(TabDatorseendeController parent){
 		secondStage = new Stage();
 		mParent = parent;
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	}
 
 	void resetActiveTemplate(){
