@@ -144,7 +144,7 @@ public class NavData implements Runnable {
 
 					if (droneStates[NavReader.FLYING]) {
 						comm.setIsFlying(true);
-						System.out.println("flying");
+						
 						}
 					
 					// Run until checksum

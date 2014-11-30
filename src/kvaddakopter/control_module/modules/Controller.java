@@ -75,7 +75,7 @@ public class Controller{
 		this.KYaw = this.SelectYawDirection(rrdata.getYaw(), rsdata.getYaw(), this.KYaw);
 		
 		//Control signals
-		csignal.setForwardvelocity	(	-KVelForward*(RDataVel.get(0) - rsdata.getForVel() )	);
+		csignal.setForwardvelocity	(	KVelForward*(RDataVel.get(0) - rsdata.getForVel() )	);
 		csignal.setLateralvelocity	(	KVelLateral*(RDataVel.get(1) - rsdata.getLatVel() )		);	
 		csignal.setHeightvelocity	( 	KVelHeight*(rrdata.getHeight() - rsdata.getHeight())	);	
 		csignal.setYawrate			(	-KYaw*(rrdata.getYaw() - rsdata.getYaw())				);
