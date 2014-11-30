@@ -73,7 +73,7 @@ public class ReferenceData {
 	public int getreferenscounter(){
 		return referenceextractor.getCounter();
 	}
-	missionobject.getHeight()
+
 	
 	public void updateref(double[] latestreference){
 // latestreference  = (latitude, longitud, height, yaw, time, 
