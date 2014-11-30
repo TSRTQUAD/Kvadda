@@ -112,4 +112,10 @@ public interface MainBusGUIInterface {
 	 */
 	public HashMap<String,GPSCoordinate> getTargets();
 	
+	/**
+	 * Check if communication is initiated properly and everything is set to initiate launch
+	 * @return boolean IsArmed
+	 */
+	public boolean getIsArmed();
+	
 }

@@ -3,6 +3,7 @@ package kvaddakopter.communication;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -20,19 +21,6 @@ public class Communication implements Runnable {
 	static final int NAV_PORT = 5554;
 	static final int VIDEO_PORT = 5555;
 	static final int AT_PORT = 5556;
-
-	// NavData offset
-//	static final int NAVDATA_STATE = 4;
-//	static final int NAVDATA_BATTERY = 24;
-//	static final int NAVDATA_ALTITUDE = 40;
-//
-//	static final int NAVDATA_PITCH = 28;
-//	static final int NAVDATA_ROLL = 32;
-//	static final int NAVDATA_YAW = 36;
-//	static final int NAVDATA_VX = 44;
-//	static final int NAVDATA_VY = 48;
-//	static final int NAVDATA_VZ = 52;
-//	static final int NAVDATA_GPS = 27;
 
 	static final int INTERVAL = 100;
 
@@ -63,6 +51,12 @@ public class Communication implements Runnable {
 	 */
 	public Communication(int threadid, MainBusCommInterface mainbus, String name) {
 		mMainbus = mainbus;
+		try {
+			AT_socket = new DatagramSocket(Communication.AT_PORT);
+			AT_socket.setSoTimeout(3000);
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -87,9 +81,6 @@ public class Communication implements Runnable {
 		try {
 
 			inet_addr = InetAddress.getByAddress(ip_bytes);
-			AT_socket = new DatagramSocket(Communication.AT_PORT);
-			AT_socket.setSoTimeout(3000);
-
 			this.inet_addr = inet_addr;
 
 			System.out.println("CMD-SEQ-1");
@@ -127,6 +118,7 @@ public class Communication implements Runnable {
 			Thread.sleep(INTERVAL);
 
 			send_at_cmd("AT*FTRIM=" + get_seq()); // flat trim
+			System.out.println("FLAAAATTRIM");
 			// Thread.sleep(INTERVAL);
 			Thread.sleep(INTERVAL);
 
@@ -160,7 +152,7 @@ public class Communication implements Runnable {
 	private void checkIsRunning(){
 		if(mMainbus == null)
 			return;
-		while(!mMainbus.shouldStart() && !mIsFlying){
+		while((!mMainbus.shouldStart() && !mIsFlying)){
 			synchronized(mMainbus){
 				try {
 					mIsRunning = false;
@@ -172,7 +164,7 @@ public class Communication implements Runnable {
 			}
 		}
 		mIsRunning = true;
-		if(!mIsInitiated){
+		if(!mIsInitiated && !mIsFlying){
 			System.out.println("Comm unit being initiated");
 			init();
 			synchronized(this){
@@ -182,15 +174,19 @@ public class Communication implements Runnable {
 
 		}
 	}
+	
+	public synchronized void reset(){
+		//AT_socket.disconnect();
+		mIsRunning = false;
+		mIsInitiated  = false;
+	}
 
 	public void run() {
-		checkIsRunning();		
+		
 		try {
-			Thread.sleep(200);
-			send_at_cmd("AT*REF=" + get_seq() + ",290717696"); // Landing
 
-			while (!mMainbus.isStarted() && true) { // ADD START COMMAND FROM GUI
-				System.out.println("Waiting for GPS-FIX and initiation");
+			while (!mMainbus.isStarted()) { // ADD START COMMAND FROM GUI
+				checkIsRunning();	
 				Thread.sleep(200);
 				
 				if (sequence == sequence_1)
@@ -205,7 +201,7 @@ public class Communication implements Runnable {
 			Thread.sleep(200);
 
 			while (true) { // SET STARTING CONDITION //
-
+				checkIsRunning();	
 				if (mMainbus.EmergencyStop()) {
 					send_at_cmd("AT*REF=" + get_seq() + ",290717952"); // FALL
 					System.out.println("EmergencyStop");
@@ -318,17 +314,21 @@ public class Communication implements Runnable {
 		return n;
 	}
 
-	public static String byte2hex(byte[] data, int offset, int len) {
-		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < len; i++) {
-			String tmp = Integer.toHexString(((int) data[offset + i]) & 0xFF);
-			for (int t = tmp.length(); t < 2; t++) {
-				sb.append("0");
-			}
-			sb.append(tmp);
-			sb.append(" ");
-		}
-		return sb.toString();
+//	public static String byte2hex(byte[] data, int offset, int len) {
+//		StringBuffer sb = new StringBuffer();
+//		for (int i = 0; i < len; i++) {
+//			String tmp = Integer.toHexString(((int) data[offset + i]) & 0xFF);
+//			for (int t = tmp.length(); t < 2; t++) {
+//				sb.append("0");
+//			}
+//			sb.append(tmp);
+//			sb.append(" ");
+//		}
+//		return sb.toString();
+//	}
+	
+	public synchronized void disconnect(){
+		AT_socket.disconnect();
 	}
 	
 	public synchronized String getIP(){

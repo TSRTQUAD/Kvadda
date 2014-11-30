@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.media.*?>
 <?import javafx.geometry.*?>
@@ -16,7 +17,7 @@
 				<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="700.0" prefWidth="1200.0">
                <children>
                   <AnchorPane fx:id="mapContainer" prefHeight="700.0" prefWidth="1200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-      <AnchorPane layoutX="373.0" layoutY="593.0" prefHeight="93.0" prefWidth="455.0">
+      <AnchorPane layoutX="553.0" layoutY="593.0" prefHeight="93.0" prefWidth="455.0">
       	<children>
                         <HBox prefHeight="96.0" prefWidth="628.0">
                            <children>
@@ -89,11 +90,13 @@
                         </HBox>
       	</children>
       </AnchorPane>
+                  <ImageView fx:id="imgMovie" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
                </children></AnchorPane>
 <ToolBar layoutX="-2.0" layoutY="-4.0" prefHeight="50.0" prefWidth="1207.0">
 	<items>
 		<ComboBox fx:id="cmbListOfMissions" onAction="#changeSelectedMission" prefWidth="150.0" />
-		<Button fx:id="btnStartMission" mnemonicParsing="false" onAction="#startMission" text="Execute" />
+                  <Button fx:id="btnArm" mnemonicParsing="false" onAction="#arm" text="Arm" />
+		<Button fx:id="btnStartMission" disable="true" mnemonicParsing="false" onAction="#startMission" text="Execute" />
 		<Label text="Mission type:">
 			<padding>
 				<Insets left="100.0" />

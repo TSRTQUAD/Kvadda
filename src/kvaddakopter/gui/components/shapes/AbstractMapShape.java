@@ -87,9 +87,9 @@ public abstract class AbstractMapShape {
 		for(AbstractGPSMarker marker : this.markers){
 			//Draw markers
 			marker.attachToMap(this.map);
-			this.map.setZoom(this.map.getZoom() - 1);
-			this.map.setZoom(this.map.getZoom() + 1);
 		}	
+		this.map.setZoom(this.map.getZoom() - 1);
+		this.map.setZoom(this.map.getZoom() + 1);
 	}
 	
 	
@@ -100,9 +100,9 @@ public abstract class AbstractMapShape {
 		
 		for(AbstractGPSMarker marker : this.markers){
 			marker.clearFromMap(this.map);
-			this.map.setZoom(this.map.getZoom() - 1);
-			this.map.setZoom(this.map.getZoom() + 1);
 		}	
+		this.map.setZoom(this.map.getZoom() - 1);
+		this.map.setZoom(this.map.getZoom() + 1);
 	}
 	
 	
@@ -126,4 +126,6 @@ public abstract class AbstractMapShape {
 		this.unDraw();
 		this.markers.clear();
 	}
+	
+	abstract public boolean isValid();
 }

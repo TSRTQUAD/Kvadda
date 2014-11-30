@@ -15,4 +15,11 @@ public interface MainBusCommInterface {
 	public void setGpsFixOk(boolean b);
 	public void setWifiFixOk(boolean b);
 	public boolean isStarted();
+	public void setIsArmed(boolean b);
+	/**
+	 * Sets to true when a mission should start
+	 * @param b
+	 */
+	public void setShouldStart(boolean b);
+	public boolean getIsArmed();
 }

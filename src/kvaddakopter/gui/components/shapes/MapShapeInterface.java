@@ -35,4 +35,15 @@ public interface MapShapeInterface {
 	 */
 	public ArrayList<AbstractGPSMarker> getMarkers();
 	
+	
+	
+	/**
+	 * Check if the shape "valid". 
+	 * For a path valid is considered more than 2 points.
+	 * For a polygon this is more than 3 points.
+	 * For a Circle this is considered 1 point and 1 point only
+	 * @return
+	 */
+	public boolean isValid();
+	
 }

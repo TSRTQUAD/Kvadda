@@ -8,26 +8,27 @@ public class Identifier {
 	float meanHSVValuesCertainty; // More updates add to certainty
 
 	// From TemplateMatching
-	float[] templateMatches;  // Number of matches per template where place 
-							// in array corresponds to place in TemplateObjects array
+	int templateID;
+	float percentageMatches;  // Number of matches for templateID divided by total possible mathes for that template.
 
 	
 	public Identifier(ArrayList<Long> targetHSVChannels){
 		meanHSVValues = new float[3];
 		meanHSVValuesCertainty = 0.7f;
-		templateMatches = new float[Template.getTemplates().size()];
+		templateID = -1;
+		percentageMatches = 0;
 		
+		if(targetHSVChannels == null) return;
 		for(int i = 0; i < 3; i++){
 			meanHSVValues[i] = (float)targetHSVChannels.get(i);
 		}
 	}
 	
-	public Identifier(int templateID, long numMatches){
+	public Identifier(int newID, float newPercentageMatches){
 		meanHSVValues = new float[3];
 		meanHSVValuesCertainty = 0.7f;
-		templateMatches = new float[Template.getTemplates().size()];
-		
-		templateMatches[templateID] = numMatches;
+		templateID =  newID;
+		percentageMatches = newPercentageMatches;
 	}
 	
 	public static float compare(Identifier first, Identifier second){
@@ -43,6 +44,18 @@ public class Identifier {
 					Math.pow((1 - Math.abs(first.meanHSVValues[2] - second.meanHSVValues[2]) / 255), 4);
 		}
 		
+
+		float certaintyFromTemplates = 0;
+		float templateMatchingPower = 0;
+		if(first.templateID != -1 || second.templateID != -1){
+			if(first.templateID == -1 || second.templateID == -1){
+				templateMatchingPower = 1;
+			} else {
+				templateMatchingPower = first.percentageMatches * second.percentageMatches;
+				certaintyFromTemplates = (1 - Math.abs(first.percentageMatches - second.percentageMatches));
+			}
+		}
+		
 		
 		// For each template the number of normalized matches in first and second is
 		// added and multiplied by 1 - the difference between number of matches. 
@@ -51,7 +64,8 @@ public class Identifier {
 		// for the 'second' identifier. Then each certainty can be multiplied by:   
 		// (1 - abs(a - b))		
 		// Old version used with addition: ((a + b) / 2) * (1 - abs(a - b)) / numberOfTemplates
-		int numberOfTemplates = Template.getTemplates().size();
+		/* XXX: Possible update with detections in multiple templates. 
+		 * int numberOfTemplates = Template.getTemplates().size();
 		float certaintyFromTemplates = 0;
 		float templateMatchingPower = 0;
 		for(int i = 0; i < numberOfTemplates; i++){
@@ -61,7 +75,7 @@ public class Identifier {
 			certaintyFromTemplates *= (1 - Math.abs(a - b));
 			
 			templateMatchingPower += a * b;
-		}
+		}*/
 		
 		
 		// Returns the normalized certainity
@@ -85,9 +99,8 @@ public class Identifier {
 		}
 
 		// Updates number of matches by adapting to newMeasured number of matches with time constant timeConstant
-		int numberOfTemplates = Template.getTemplates().size();
-		for(int i = 0; i < numberOfTemplates; i++){
-			templateMatches[i] += (newMeasured.templateMatches[i] - templateMatches[i]) / timeConstant;
+		if(newMeasured.templateID == templateID){
+			percentageMatches += (newMeasured.percentageMatches - percentageMatches) / timeConstant;
 		}
 	}
 	

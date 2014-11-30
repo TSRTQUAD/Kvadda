@@ -16,16 +16,14 @@ public class ReferenceExtractor {
 	// Returndata  = (latitude, longitud, height, yaw, time, forward velocity, mission type, start,land)
 	public double[] update(MissionObject missionobject){
 		
-		if (this.counter == missionobject.getHeight().length){
-			this.counter = 0;
-		}
-				
+		
+		
 		if (0 == this.counter ){
 			//System.out.format("Reference first update no. %d%n",this.counter);
 			this.start = 1;
 			double[] returnvalue = new double[]{missionobject.getTrajectory()[0][0],
 												missionobject.getTrajectory()[0][1],
-												missionobject.getHeight()[this.counter],
+												3,
 												missionobject.getYaw(),
 												3000,
 												missionobject.getReferenceVelocity()[this.counter][0]
@@ -37,23 +35,23 @@ public class ReferenceExtractor {
 
 			return returnvalue;
 		}
-		else if (this.counter == missionobject.getHeight().length){
+		else if (this.counter == missionobject.getTrajectory().length){
 			this.land = 1;
 			double[] returnvalue = new double[]{missionobject.getTrajectory()[0][0],
 												missionobject.getTrajectory()[0][1],
-												missionobject.getHeight()[0],
+												3,
 												missionobject.getYaw(),
 												5000,
-												missionobject.getReferenceVelocity()[this.counter][0]
+												missionobject.getReferenceVelocity()[0][0]
 															 ,0,start,land};
 			land = 0;
 			return returnvalue;
 		}
-		else if (this.counter > missionobject.getHeight().length){
+		else if (this.counter > missionobject.getTrajectory().length){
 			// Close thread TODO
 			double[] returnvalue = new double[]{missionobject.getTrajectory()[0][0],
 					missionobject.getTrajectory()[1][1],
-					missionobject.getHeight()[1],
+					missionobject.getHeight(),
 					missionobject.getYaw(),
 					missionobject.getWaitingtime(),
 					missionobject.getReferenceVelocity()[1][0]
@@ -66,7 +64,7 @@ public class ReferenceExtractor {
 			//System.out.format("Reference update no. %d%n",this.counter);
 			double[] returnvalue = new double[]{missionobject.getTrajectory()[this.counter][0],
 												missionobject.getTrajectory()[this.counter][1],
-												missionobject.getHeight()[this.counter],
+												3,
 												missionobject.getYaw(),
 												missionobject.getWaitingtime(),
 												missionobject.getReferenceVelocity()[this.counter][0]
@@ -86,7 +84,7 @@ public double[] updatetest(){
 	double[] returnvalue = new double[]{		0,														// GPS lat
 												0 + 2*Math.pow(-1, counter),			 				// GPS long
 												1,														// Height
-												0,													// Yaw
+												0,														// Yaw
 												1000,													// Time at coordinate
 												0,														// null
 												0,														// Mission type

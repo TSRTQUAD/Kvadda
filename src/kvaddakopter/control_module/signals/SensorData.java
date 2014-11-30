@@ -17,14 +17,15 @@ public class SensorData {
 	private double initiallat;
 	private double radius = 6371;
 	
-	private double Longitudold;
-	private double Latitudold;
+	private double Longitudold = 0;
+	private double Latitudold = 0;
 	
 		/**
 		 * Set sensordata object from sensordata in vector format
 		 * {Latitud,Longitud,xdot,ydot,height,yaw}
 		 * @param sensorvector
 		 */
+	
 	public void setnewsensordata(QuadData quadData){
 		synchronized(quadData){
 			this.Latitud = quadData.getGPSLat();
@@ -32,7 +33,7 @@ public class SensorData {
 			this.xdot = quadData.getVx();
 			this.ydot = quadData.getVy();
 			this.height = quadData.getAltitude();
-			this.yaw = -Math.PI/180*quadData.getYaw(); //Is in degrees
+			this.yaw = -Math.PI/180*quadData.getYaw(); 
 		}
 
 	}
