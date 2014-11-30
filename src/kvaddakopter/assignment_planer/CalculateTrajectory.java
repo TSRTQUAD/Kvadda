@@ -25,5 +25,12 @@ public class CalculateTrajectory {
 		proxy.eval("assignmentplaner");
 
 	}
+	
+	public double getCoverageAmount() {
+		
+		
+		return 0;
+		
+	}
 
 }
