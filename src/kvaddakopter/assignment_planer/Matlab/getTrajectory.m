@@ -1,5 +1,5 @@
 function [besttrajectory,besttrajectoryfullsize] = ...
-    getTrajectory( tmpcostmat, nodes, startpoint )
+    getTrajectory( object, tmpcostmat, nodes, startpoint )
 % The TSP-solver kan only handle integers, rescale the costmatrix to fit
 % each element in an 32-bit unsigned variable.
 normalizationfactor = 2^16/max([max(max(tmpcostmat.lon)),max(max...
@@ -20,6 +20,11 @@ for ii = 1:3
     % the nr of nodes to interpolate between each nodpair in the trajectory
     rawtrajectory = interparc(1e3,tmptrajectory(:,1),...
         tmptrajectory(:,2),'spline');
+    
+    % ================= Last check =====================
+    % Search for points in forbidden areas and put them on the edge
+    rawtrajectory = lastCheck( rawtrajectory, object );
+
     DPtrajectory = DouglasPeucker(rawtrajectory);
     
     % This function calculates the total estimated time for the mission

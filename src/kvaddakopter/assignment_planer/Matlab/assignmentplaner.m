@@ -48,30 +48,36 @@ if object.mission == 1
 % ======= Draw trajectory around coordinate ========
 spiraltrajectory = []; pointsinbetween = [];
 for ii = 1:length(area);
-rotations = object.radius(ii)/(imagelength_meter/2);
-th = transpose(2*pi:pi/100:rotations*2*pi);
-spanlat = 0.5*imagelength_meter/(2*pi*1.1119e+05);
-spanlon = 0.5*imagelength_meter/(2*pi*5.8924e+04);
-span = imagelength/(2*2*pi*rotations);
-if ii == 1
-    spiraltrajectory = [spanlat*th.*cos(th) spanlon*th.*sin(th)]...
-    + repmat(object.area{ii},size(th));
-else
-    currentspiral = [spanlat*th.*cos(th) spanlon*th.*sin(th)]...
-    + repmat(object.area{ii},size(th));
-    pointsinbetween = interparc(10,[spiraltrajectory(end,1) ...
-        currentspiral(1,1)],[spiraltrajectory(end,2) ...
-        currentspiral(1,2)],'linear');
-    spiraltrajectory = [spiraltrajectory; pointsinbetween(3:end-3,:);...
-        currentspiral];
-end
+    rotations = object.radius(ii)/(imagelength_meter/2);
+    th = transpose(2*pi:pi/100:rotations*2*pi);
+    spanlat = 0.5*imagelength_meter/(2*pi*1.1119e+05);
+    spanlon = 0.5*imagelength_meter/(2*pi*5.8924e+04);
+    span = imagelength/(2*2*pi*rotations);
+    if ii == 1
+        spiraltrajectory = [spanlat*th.*cos(th) spanlon*th.*sin(th)]...
+            + repmat(object.area{ii},size(th));
+    else
+        currentspiral = [spanlat*th.*cos(th) spanlon*th.*sin(th)]...
+            + repmat(object.area{ii},size(th));
+        pointsinbetween = interparc(10,[spiraltrajectory(end,1) ...
+            currentspiral(1,1)],[spiraltrajectory(end,2) ...
+            currentspiral(1,2)],'linear');
+        spiraltrajectory = [spiraltrajectory;...
+            pointsinbetween(3:end-3,:); currentspiral];
+    end
 end
 % Add a path to and from the spirals
 rawtrajectory = getStartEndPath(object.startcoordinate, spiraltrajectory);
+
 % Interpolate using parametric splines, the first argument determines the
 % nr of nodes to interpolate between each nodpair in the trajectory.
 trajectoryfullsize = interparc(5e2,rawtrajectory(:,1),...
     rawtrajectory(:,2),'spline');
+
+% ================= Last check =====================
+% Search for points in forbidden areas and put them on the edge
+trajectoryfullsize = lastCheck( trajectoryfullsize, object );
+
 trajectory = DouglasPeucker(trajectoryfullsize);
 
 % =============== Present results ==================
@@ -93,6 +99,11 @@ rawtrajectory = getStartEndPath(object.startcoordinate, lines);
 % nr of nodes to interpolate between each nodpair in the trajectory.
 trajectoryfullsize = interparc(5e2,rawtrajectory(:,1),...
     rawtrajectory(:,2),'spline');
+
+% ================= Last check =====================
+% Search for points in forbidden areas and put them on the edge
+trajectoryfullsize = lastCheck( trajectoryfullsize, object );
+
 trajectory = DouglasPeucker(trajectoryfullsize);
 
 % =============== Present results ==================
@@ -114,8 +125,8 @@ tmpcostmat = getCostMatrix(nodes,object);
 
 % =============== Find trajectory ==================
 % The interpolation and Douglas Peucker algoritms are run inside.
-[trajectory,trajectoryfullsize] = getTrajectory(tmpcostmat,nodes,...
-    object.startcoordinate);
+[trajectory,trajectoryfullsize] = getTrajectory(object, tmpcostmat,...
+    nodes, object.startcoordinate);
 
 % =============== Present results ==================
 [trajectorylength,coveragearea,time,velocity] = getResults( object,...
