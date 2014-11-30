@@ -57,8 +57,8 @@ public class TabDatorseendeController extends BaseController implements Initiali
 	final static int BUTTON_Y_START = -90;
 	final static int BUTTON_GROUP_SEPARATION = 40;
 
-	final ComboBox availableColorTemplates = new ComboBox();
-	final ComboBox availableFormTemplates = new ComboBox();
+	final ComboBox<ColorTemplate> availableColorTemplates = new ComboBox<ColorTemplate>();
+	final ComboBox<FormTemplate> availableFormTemplates = new ComboBox<FormTemplate>();
 	
 	final Background SelectedColor = GreenBackground;
 	final Background DeselectedColor = GrayBackground;
@@ -363,6 +363,7 @@ public class TabDatorseendeController extends BaseController implements Initiali
 		
 		updateColorTemplates();
 		updateFormTemplates();
+		//availableColorTemplates.
 		
 		
 		view = new ImageView();

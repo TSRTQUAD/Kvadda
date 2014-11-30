@@ -268,7 +268,7 @@ public class TabUtforController extends BaseController implements Initializable 
 
 	public void updateBattery(float newBattery){
 		if(newBattery < 0){
-			this.lblBattery.setText("- %%");
+			this.lblBattery.setText("- %");
 		}
 		else if(newBattery < 15){
 			this.lblBattery.setText(String.format("WRN! %.1f %%", newBattery));
