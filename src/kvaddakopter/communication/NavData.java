@@ -142,13 +142,11 @@ public class NavData implements Runnable {
 					long sequenceNumber = reader.uint32();
 					long visionFlag = reader.uint32();
 
-					if (droneStates[NavReader.COMM_LOST])
-						// System.err.println("COMM LOST");
-						if (droneStates[NavReader.FLYING]) {
-							comm.setIsFlying(true);
-
-							System.out.println("flying");
+					if (droneStates[NavReader.FLYING]) {
+						comm.setIsFlying(true);
+						System.out.println("flying");
 						}
+					
 					// Run until checksum
 					boolean finnished = false;
 					while (!finnished) {

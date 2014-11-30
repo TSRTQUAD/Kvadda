@@ -84,7 +84,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	double[][] ControlSignalAll = new double[3000][5];
 	public int seq = 0;
 	public int seq_signal = 0;
-	QuadData quadData;// = new QuadData();
+	QuadData quadData = new QuadData();
 
 	private boolean gpsFixOk;
 

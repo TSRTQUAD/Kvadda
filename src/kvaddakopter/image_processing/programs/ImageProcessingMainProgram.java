@@ -53,11 +53,21 @@ public class ImageProcessingMainProgram extends ProgramClass{
 		
 		//Create and initialize decoder. And select source.
 		mDecoder = new FFMpegDecoder();
+		
+		boolean reconnect = true;
+		while(reconnect){
+			try{
+				mDecoder.initialize("tcp://192.168.1.1:5555"/*FFMpegDecoder.STREAM_ADDR_BIPBOP*/);
+				reconnect = false;
+				//mDecoder.initialize(FFMpegDecoder.STREAM_ADDR_BIPBOP);
+				//mDecoder.initialize("mvi2.mp4");
+				// Listen to decoder events
+				}
+				catch(Exception e){
+					
+				}			
+		}
 
-		mDecoder.initialize("tcp://192.168.1.1:5555"/*FFMpegDecoder.STREAM_ADDR_BIPBOP*/);
-		//mDecoder.initialize(FFMpegDecoder.STREAM_ADDR_BIPBOP);
-		//mDecoder.initialize("mvi2.mp4");
-		// Listen to decoder events
 		mDecoder.setDecoderListener(this);
 
 		//Start stream on a separate thread
