@@ -149,8 +149,8 @@ public class TabUtforController extends BaseController implements Initializable 
 		if(image != null){
 			this.imgMovie.setImage(image);
 			this.imgMovie.autosize();
-			this.imgMovie.setScaleX(.75);
-			this.imgMovie.setScaleY(.75);
+			//this.imgMovie.setScaleX(.5);
+			//this.imgMovie.setScaleY(.5);
 			this.imgMovie.toFront();
 		}
     }
@@ -268,7 +268,7 @@ public class TabUtforController extends BaseController implements Initializable 
 
 	public void updateBattery(float newBattery){
 		if(newBattery < 0){
-			this.lblBattery.setText("- %%");
+			this.lblBattery.setText("- %");
 		}
 		else if(newBattery < 15){
 			this.lblBattery.setText(String.format("WRN! %.1f %%", newBattery));

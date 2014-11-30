@@ -48,7 +48,7 @@ public class MissionStorage {
 		MatFileHandler missionstorage = new MatFileHandler();
 		MissionObject mission = new MissionObject();
 		System.out.println(missionname);
-		missionstorage.readMatFile(missionname, mission);
+		mission = missionstorage.readMatFile(missionname, mission);
 		
 		return mission;
 	}

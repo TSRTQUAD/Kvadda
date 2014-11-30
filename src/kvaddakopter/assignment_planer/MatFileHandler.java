@@ -176,7 +176,7 @@ public class MatFileHandler {
 			double[][] height = ((MLDouble) MLRead.getMLArray("height")).getArray();
 			missionobject.setHeight( new double[] {height[0][0]} );
 			double[][] radius = ((MLDouble) MLRead.getMLArray("radius")).getArray();
-			missionobject.setHeight( new double[] {radius[0][0]} );
+			missionobject.setRadius( new double[] {radius[0][0]} );
 			double[][] imageTemplate = ((MLDouble) MLRead.getMLArray("imageTemplate")).getArray();
 			missionobject.setImageTemplate( (int) imageTemplate[0][0] );
 			double[][] colorTemplate = ((MLDouble) MLRead.getMLArray("colorTemplate")).getArray();

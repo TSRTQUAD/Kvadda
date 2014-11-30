@@ -65,6 +65,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	//Assignment planer storage
 	private MatlabProxyConnection matlabproxy;
 	private MissionObject missionobject;
+	private double nrofvisitedpoints;
 	//Flags
 	private boolean mAssignmentPlanerRunning = false;
 	
@@ -553,6 +554,20 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	public boolean getStartPermission() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+
+	@Override
+	public void addVisitedPoint(int counter) {
+		this.nrofvisitedpoints = counter;
+		
+	}
+
+
+	@Override
+	public double getVisitedPoints() {
+		return this.nrofvisitedpoints;
+		
 	}
 
 

@@ -48,15 +48,18 @@ public class TabDatorseendeController extends BaseController implements Initiali
 	final Background GreenBackground  = new Background(new BackgroundFill(Color.LIGHTGREEN,new CornerRadii(4.5),new Insets(1.0)));
 
 	/*Image pos*/
-	final static int IMAGE_POS_X = -0;
-	final static int IMAGE_POS_Y = 0;
+	final static int IMAGE_POS_X = 0;
+	final static int IMAGE_POS_Y = 150;
 	
 	/*Buttons Common */
-	final static int MODES_POS_X = 200;
+	final static int MODES_POS_X = 50;
 	final static int BUTTON_X_START = 600;
-	final static int BUTTON_Y_START = 20;
+	final static int BUTTON_Y_START = -90;
 	final static int BUTTON_GROUP_SEPARATION = 40;
 
+	final ComboBox<ColorTemplate> availableColorTemplates = new ComboBox<ColorTemplate>();
+	final ComboBox<FormTemplate> availableFormTemplates = new ComboBox<FormTemplate>();
+	
 	final Background SelectedColor = GreenBackground;
 	final Background DeselectedColor = GrayBackground;
 
@@ -74,19 +77,13 @@ public class TabDatorseendeController extends BaseController implements Initiali
 
 
 	/* Options Buttons */
-	final static int OPT_BUTTON_X_START = -150;
-	final static int OPT_BUTTON_Y_START = -250;
+	final static int OPT_BUTTON_X_START = -450;
+	final static int OPT_BUTTON_Y_START = -325;
 	final static int OPT_BUTTON_Y_SPACE = 40;
 	final static int OPT_BUTTON_WIDTH = 200;
 	
 	
 	/* Template lists */
-	final ComboBox availableColorTemplates = new ComboBox();
-	final ComboBox availableFormTemplates = new ComboBox();
-	final static int TEMPLATE_LISTS_X_START = -150;
-	final static int TEMPLATE_LISTS_Y_START = 150;
-	final static int TEMPLATE_LISTS_Y_SPACE = 40;
-	final static int TEMPLATE_LISTS_WIDTH = 200;
 
 	@FXML
 	private AnchorPane ipRoot;
@@ -222,8 +219,8 @@ public class TabDatorseendeController extends BaseController implements Initiali
 			newButton.setText(pairs.getValue());
 
 			//Set X and Y position
-			newButton.setTranslateX(BUTTON_X_START);
-			newButton.setTranslateY(BUTTON_Y_START+BUTTON_GROUP_SEPARATION);
+			newButton.setTranslateX(BUTTON_X_START + MODE_BUTTON_MIN_WIDTH + BUTTON_GROUP_SEPARATION);
+			newButton.setTranslateY(BUTTON_Y_START - 175);
 			newButton.setMinWidth(MODE_BUTTON_MIN_WIDTH);
 
 			//Set Defualt Background
@@ -277,7 +274,7 @@ public class TabDatorseendeController extends BaseController implements Initiali
 		
 		Button stopIPBtn = new Button();
 		stopIPBtn.setText("Stop Image Processing Unit");
-		stopIPBtn.setTranslateX(OPT_BUTTON_X_START + OPT_BUTTON_WIDTH + TEMPLATE_LISTS_Y_SPACE);
+		stopIPBtn.setTranslateX(OPT_BUTTON_X_START + OPT_BUTTON_WIDTH + BUTTON_GROUP_SEPARATION);
 		stopIPBtn.setTranslateY(OPT_BUTTON_Y_START);
 		stopIPBtn.setMinWidth(OPT_BUTTON_WIDTH);
 		root.getChildren().add(stopIPBtn);
@@ -291,8 +288,8 @@ public class TabDatorseendeController extends BaseController implements Initiali
 
 		Button cCalibBtn = new Button();
 		cCalibBtn.setText("Color Template Settings");
-		cCalibBtn.setTranslateX(OPT_BUTTON_X_START);
-		cCalibBtn.setTranslateY(OPT_BUTTON_Y_START+OPT_BUTTON_Y_SPACE);
+		cCalibBtn.setTranslateX(OPT_BUTTON_X_START );
+		cCalibBtn.setTranslateY(OPT_BUTTON_Y_START + OPT_BUTTON_Y_SPACE);
 		cCalibBtn.setMinWidth(OPT_BUTTON_WIDTH);
 		root.getChildren().add(cCalibBtn);
 		//Initiating sliderGUI
@@ -308,8 +305,8 @@ public class TabDatorseendeController extends BaseController implements Initiali
 		Button imgCalibrateTemplateButton = new Button();
 		imgCalibrateTemplateButton.setText("Template matching Settings");
 		final TemplateMatchSliders templateSliders = new TemplateMatchSliders();
-		imgCalibrateTemplateButton.setTranslateX(OPT_BUTTON_X_START);
-		imgCalibrateTemplateButton.setTranslateY(OPT_BUTTON_Y_START+OPT_BUTTON_Y_SPACE*2);
+		imgCalibrateTemplateButton.setTranslateX(OPT_BUTTON_X_START + OPT_BUTTON_WIDTH + BUTTON_GROUP_SEPARATION);
+		imgCalibrateTemplateButton.setTranslateY(OPT_BUTTON_Y_START + OPT_BUTTON_Y_SPACE);
 		imgCalibrateTemplateButton.setMinWidth(OPT_BUTTON_WIDTH);
 		root.getChildren().add(imgCalibrateTemplateButton);
 		imgCalibrateTemplateButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -323,20 +320,20 @@ public class TabDatorseendeController extends BaseController implements Initiali
 		// Color and form template lists
 		root.getChildren().add(availableColorTemplates);
 		root.getChildren().add(availableFormTemplates);
-		availableColorTemplates.setTranslateX(TEMPLATE_LISTS_X_START);
-		availableColorTemplates.setTranslateY(TEMPLATE_LISTS_Y_START);
-		availableColorTemplates.setMinWidth(TEMPLATE_LISTS_WIDTH);
+		availableColorTemplates.setTranslateX(OPT_BUTTON_X_START);
+		availableColorTemplates.setTranslateY(OPT_BUTTON_Y_START  + OPT_BUTTON_Y_SPACE * 2);
+		availableColorTemplates.setMinWidth(OPT_BUTTON_WIDTH);
 		availableColorTemplates.setVisibleRowCount(10);
-		availableFormTemplates.setTranslateX(TEMPLATE_LISTS_X_START);
-		availableFormTemplates.setTranslateY(TEMPLATE_LISTS_Y_START + TEMPLATE_LISTS_Y_SPACE);
-		availableFormTemplates.setMinWidth(TEMPLATE_LISTS_WIDTH);
+		availableFormTemplates.setTranslateX(OPT_BUTTON_X_START + OPT_BUTTON_WIDTH + BUTTON_GROUP_SEPARATION);
+		availableFormTemplates.setTranslateY(OPT_BUTTON_Y_START + OPT_BUTTON_Y_SPACE * 2);
+		availableFormTemplates.setMinWidth(OPT_BUTTON_WIDTH);
 		
 
 		Button toggleColorTemplateActiveButton = new Button();
 		toggleColorTemplateActiveButton.setText("Toggle active");
-		toggleColorTemplateActiveButton.setTranslateX(TEMPLATE_LISTS_X_START + TEMPLATE_LISTS_WIDTH + TEMPLATE_LISTS_Y_SPACE);
-		toggleColorTemplateActiveButton.setTranslateY(TEMPLATE_LISTS_Y_START);
-		toggleColorTemplateActiveButton.setMinWidth(TEMPLATE_LISTS_WIDTH);
+		toggleColorTemplateActiveButton.setTranslateX(OPT_BUTTON_X_START);
+		toggleColorTemplateActiveButton.setTranslateY(OPT_BUTTON_Y_START + OPT_BUTTON_Y_SPACE * 3);
+		toggleColorTemplateActiveButton.setMinWidth(OPT_BUTTON_WIDTH);
 		root.getChildren().add(toggleColorTemplateActiveButton);
 		toggleColorTemplateActiveButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -350,9 +347,9 @@ public class TabDatorseendeController extends BaseController implements Initiali
 
 		Button toggleFormTemplateActiveButton = new Button();
 		toggleFormTemplateActiveButton.setText("Toggle active");
-		toggleFormTemplateActiveButton.setTranslateX(TEMPLATE_LISTS_X_START + TEMPLATE_LISTS_WIDTH + TEMPLATE_LISTS_Y_SPACE);
-		toggleFormTemplateActiveButton.setTranslateY(TEMPLATE_LISTS_Y_START + TEMPLATE_LISTS_Y_SPACE);
-		toggleFormTemplateActiveButton.setMinWidth(TEMPLATE_LISTS_WIDTH);
+		toggleFormTemplateActiveButton.setTranslateX(OPT_BUTTON_X_START + OPT_BUTTON_WIDTH + BUTTON_GROUP_SEPARATION);
+		toggleFormTemplateActiveButton.setTranslateY(OPT_BUTTON_Y_START + OPT_BUTTON_Y_SPACE * 3);
+		toggleFormTemplateActiveButton.setMinWidth(200);
 		root.getChildren().add(toggleFormTemplateActiveButton);
 		toggleFormTemplateActiveButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -366,11 +363,12 @@ public class TabDatorseendeController extends BaseController implements Initiali
 		
 		updateColorTemplates();
 		updateFormTemplates();
+		//availableColorTemplates.
 		
 		
 		view = new ImageView();
 		view.setTranslateX(IMAGE_POS_X);
-		view.setTranslateX(IMAGE_POS_Y);
+		view.setTranslateY(IMAGE_POS_Y);
 		root.getChildren().add(view);
 		
 		

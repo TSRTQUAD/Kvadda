@@ -210,9 +210,11 @@ public class ColorDetection  extends DetectionClass{
 		ArrayList<Long> channelMeanValues = new ArrayList<Long>();
 		
 		long HVal = 0, SVal = 0, VVal = 0;
-		
-		long Htot = 0, Stot = 0, Vtot = 0;
+
+		double HtotSin = 0, HtotCos = 0;
+		long Stot = 0, Vtot = 0;
 		long numVals = 0;
+		double hRad = 0;
 		double[] tmpHSV;
 		
 		for(int r = 0; r < cutout.rows(); r++){
@@ -220,7 +222,9 @@ public class ColorDetection  extends DetectionClass{
 				tmpHSV = cutout.get(r, c);
 				if(tmpHSV[2] > threshold){
 					numVals++;
-					Htot += tmpHSV[0];
+					hRad = 2*Math.toRadians(tmpHSV[0]);
+					HtotSin += Math.sin(hRad);
+					HtotCos += Math.cos(hRad);
 					Stot += tmpHSV[1];
 					Vtot += tmpHSV[2];
 				}
@@ -230,7 +234,7 @@ public class ColorDetection  extends DetectionClass{
 			System.out.println("calculateMeanHSVValues has 0 numVals > threshold");
 			return channelMeanValues;
 		}
-		HVal = Htot/numVals;
+		HVal = (long)(((360 + Math.toDegrees(Math.atan2(HtotSin/numVals, HtotCos/numVals))) % 360) / 2);
 		channelMeanValues.add(HVal);
 		SVal = Stot/numVals;
 		channelMeanValues.add(SVal);

@@ -200,14 +200,15 @@ public class Tracking {
 		
 		
 		// For each entry in the matching table, set matching value as a combination of methods Identigier.compare and compareDistance.
-		for(TargetObject internalTarget : mInternalTargets){
+		for(int internalI = 0; internalI < mInternalTargets.size(); internalI++){
+			TargetObject internalTarget = mInternalTargets.get(internalI);
 			if(debugPrintMatches) System.out.format("|%2d|", internalTarget.getID());
-			for(TargetObject target : targetObjects){
-				
-				matchTable[internalTarget.getID()][targetObjects.indexOf(target)] = 
+			for(int newTargetsI = 0; newTargetsI < targetObjects.size(); newTargetsI++){
+				TargetObject target = targetObjects.get(newTargetsI);
+				matchTable[internalI][newTargetsI] = 
 						(Identifier.compare(internalTarget.getIdentifier(), target.getIdentifier().setmeanHSVValuesCertainty(1)) + 
 						compareDistance(internalTarget, target)) / 2;
-				if(debugPrintMatches) System.out.format("%.2f|", matchTable[internalTarget.getID()][targetObjects.indexOf(target)]);
+				if(debugPrintMatches) System.out.format("%.2f|", matchTable[internalI][newTargetsI]);
 			}
 			if(debugPrintMatches) System.out.println();
 		}
