@@ -135,8 +135,8 @@ public class ImageObject {
 			System.err.println("ImageObject: Descriptors has not been computed returning null");
 						
 		//If we dont have any keypoint return an empty MatOfDMatch
-		if(internalImageObject.numberOfKeyPoints() <= 0 ||
-				externalImageObject.numberOfKeyPoints() <= 0)
+		if(internalImageObject.numberOfKeyPoints() <= 4 ||
+				externalImageObject.numberOfKeyPoints() <= 4)
 			return null;
 
 
