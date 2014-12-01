@@ -41,6 +41,12 @@ imagelength = imagelength_meter/1.09e+05; % m -> latlon
 cameracoverage = imagelength^2; % cameracoverage
 ppa = 1/cameracoverage; % nr of nodes per square latlon
 
+% Hardcoded values to get 2m distance between nodes
+LAT = 1.111949266445575e+05/2;      % Latitude
+LON = 58.923795838568971e+03/2;     % Longitud
+
+
+
 if object.mission == 1
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                Coordinate Search                 %
@@ -119,7 +125,7 @@ elseif object.mission == 3
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ================= Place nodes ====================
 % Create nodes within the polygon
-nodes = getPolygonGrid(object,ppa);
+nodes = getPolygonGrid(object,LAT,LON);
 
 % =============== Find costmatrix ==================
 % Create cost matrixes, 3 different fly patterns

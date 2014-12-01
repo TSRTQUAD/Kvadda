@@ -7,7 +7,7 @@
 %ppa refers to the points per unit area you would like inside the polygon.
 %Here unit area refers to a 1.0 X 1.0 square in the axes.
 
-function [nodes] = getPolygonGrid( object, ppa)
+function [nodes] = getPolygonGrid( object, LAT, LON)
 % Extract all coordinates from the areas to be searched
 lon = []; lat = [];
 nrofareas = length(object.area);
@@ -15,7 +15,7 @@ for ii = 1:nrofareas
     lat = [lat;object.area{ii}(:,1)];
     lon = [lon;object.area{ii}(:,2)];
 end
-N = sqrt(ppa);
+% N = sqrt(ppa);
 
 % Find the bounding rectangle
 lower_lat = min(lat);
@@ -24,8 +24,8 @@ lower_lon = min(lon);
 higher_lon = max(lon);
 
 % Create a grid of points within the bounding rectangle
-inc_lat = 1/N;
-inc_lon = 1/N;
+inc_lat = 1/LAT;
+inc_lon = 1/LON;
 interval_lat = lower_lat:inc_lat:higher_lat;
 interval_lon = lower_lon:inc_lon:higher_lon;
 [bigGridLat, bigGridLon] = meshgrid(interval_lat, interval_lon);
