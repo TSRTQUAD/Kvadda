@@ -194,6 +194,9 @@ public class ImageProcessingMainProgram extends ProgramClass{
 			if(mStandAloneTest)
 				updateJavaWindow(out);
 		}
+		// Free memory in the image objecty.
+		// release key points and descriptors.
+		imageObject.release();
 	}	
 
 }

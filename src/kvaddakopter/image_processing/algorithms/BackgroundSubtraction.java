@@ -56,7 +56,9 @@ public class BackgroundSubtraction  extends DetectionClass{
 	public ArrayList<TargetObject> runMethod(ImageObject currentImageData) {
 
 		// Compute key points and descriptors for the current image
-		currentImageData.computeKeyPoints(FeatureDetector.SIFT);
+		int numKeyPoints = currentImageData.computeKeyPoints(FeatureDetector.SIFT);
+		
+		
 		currentImageData.computeDescriptors(DescriptorExtractor.SIFT);
 
 		//Creating a list of target objects

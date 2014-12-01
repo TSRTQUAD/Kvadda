@@ -52,7 +52,7 @@ public class ImageObject {
 	 * Eg: FeatureDetector.SIFT
 	 * @return
 	 */
-	public MatOfKeyPoint computeKeyPoints(int detectingMethod){
+	public int computeKeyPoints(int detectingMethod){
 
 		//Feature Detector
 		FeatureDetector featureDetector = FeatureDetector.create(detectingMethod);
@@ -63,7 +63,10 @@ public class ImageObject {
 		//Detect key points in image
 		featureDetector.detect(mImage, mKeyPoints);
 
-		return mKeyPoints;
+		
+		//Num keypoints
+		int numKeyPoints = mKeyPoints.rows()*mKeyPoints.cols();
+		return numKeyPoints;
 	}
 
 	public MatOfKeyPoint getKeyPoints(){
