@@ -209,6 +209,7 @@ public class Communication implements Runnable {
 						System.out.println("EmergencyStop");
 						this.mMainbus.setIsStarted(false);
 						this.mMainbus.setShouldStart(false);
+						this.reset();
 						break;
 
 					}
@@ -235,16 +236,18 @@ public class Communication implements Runnable {
 
 						send_at_cmd("AT*REF=" + get_seq() + ",290717696"); // Landing
 
-						while (this.mIsFlying) {
+						this.mMainbus.setIsStarted(false);
+						this.mMainbus.setShouldStart(false);
+						this.reset();
+						while (!mMainbus.isStarted()) {
 							// System.out.println("Landing");
 						}
 						
-						this.mMainbus.setIsStarted(false);
-						this.mMainbus.setShouldStart(false);
 
 					}
 
 				}
+				this.reset();
 			}
 		} catch (Exception ex1) {
 
