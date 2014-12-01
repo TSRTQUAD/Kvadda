@@ -207,7 +207,8 @@ public class Communication implements Runnable {
 					if (mMainbus.EmergencyStop()) {
 						send_at_cmd("AT*REF=" + get_seq() + ",290717952"); // FALL
 						System.out.println("EmergencyStop");
-
+						this.mMainbus.setIsStarted(false);
+						this.mMainbus.setShouldStart(false);
 						break;
 
 					}
@@ -234,9 +235,12 @@ public class Communication implements Runnable {
 
 						send_at_cmd("AT*REF=" + get_seq() + ",290717696"); // Landing
 
-						while (true) {
+						while (this.mIsFlying) {
 							// System.out.println("Landing");
 						}
+						
+						this.mMainbus.setIsStarted(false);
+						this.mMainbus.setShouldStart(false);
 
 					}
 
