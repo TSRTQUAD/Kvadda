@@ -135,7 +135,9 @@ public class TabUtforController extends BaseController implements Initializable 
     
     @FXML
     private void toggleControl(){
-    	this.getParent().getMainBus().toggleController();
+    	boolean automatic = this.getParent().getMainBus().toggleController();
+    	String showText = (automatic) ? "Toggle manual" : "Toggle auto";
+    	this.btnToggleControl.setText(showText);
     }
 
     /**

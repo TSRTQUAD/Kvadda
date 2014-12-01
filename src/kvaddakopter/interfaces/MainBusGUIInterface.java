@@ -10,8 +10,9 @@ public interface MainBusGUIInterface {
 	
 	/**
 	 * Toggle Manual automatic control
+	 * Returns true if automatic control.
 	 */
-	public void toggleController();
+	public boolean toggleController();
 	
 	
 	/**
