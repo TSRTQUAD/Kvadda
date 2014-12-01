@@ -17,6 +17,7 @@ import kvaddakopter.image_processing.decoder.FFMpegDecoder;
 import kvaddakopter.image_processing.utils.ImageConversion;
 import kvaddakopter.interfaces.MainBusIPInterface;
 
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 
 /**
@@ -36,6 +37,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 	private BackgroundSubtraction mBackgroundSubtraction;
 	private BlurDetection mBlurDetection;
 	private Tracking mTracker;
+	private boolean flippedCamera = true; 
 
 	int count = 0;
 	
@@ -108,6 +110,7 @@ public class ImageProcessingMainProgram extends ProgramClass{
 		Mat trackingImage = null;
 
 		Mat image = getNextFrame();
+		if(flippedCamera) Core.flip(image, image, 0);
 		ImageObject imageObject = new ImageObject(image);
 
 		ArrayList<TargetObject> targetObjects = new ArrayList<TargetObject>();

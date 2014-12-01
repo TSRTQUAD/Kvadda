@@ -319,15 +319,16 @@ public class Tracking {
 	 */
 	private void estimateGeo(QuadData qData){
 		for(TargetObject target : mInternalTargets) {
+			double quadAltitude = qData.getAltitude();
 			double fullYAngle = 45.1040; // Field of view in vertical
 			double fullYPixels = 180; // half the image pixel height
 			double yAngle = Math.atan(((fullYPixels - target.getPosition().get(1,0)) / fullYPixels) * Math.tan(Math.toRadians(fullYAngle / 2)));
-			double yDist = qData.getAltitude() * Math.tan(Math.toRadians(qData.getPitch()) + yAngle);
+			double yDist = quadAltitude * Math.tan(Math.toRadians(qData.getPitch()) + yAngle);
 
 			double fullXAngle = 80.1849; // Field of view in horizontal
 			double fullXPixels = 320; // Half the image pixel width
-			double xAngle = Math.atan(((target.getPosition().get(0,0) - fullXPixels) / fullXPixels) * Math.tan(Math.toRadians(fullXAngle / 2)));
-			double xDist = qData.getAltitude() * Math.tan(Math.toRadians(-qData.getRoll()) + xAngle);
+			double xAngle = Math.atan(((fullXPixels - target.getPosition().get(0,0)) / fullXPixels) * Math.tan(Math.toRadians(fullXAngle / 2)));
+			double xDist = quadAltitude * Math.tan(Math.toRadians(-qData.getRoll()) + xAngle);
 			
 			double latDist = -xDist*Math.cos(Math.toRadians(qData.getYaw())) + yDist*Math.sin(Math.toRadians(qData.getYaw()));
 			double lonDist = xDist*Math.sin(Math.toRadians(qData.getYaw())) + yDist*Math.cos(Math.toRadians(qData.getYaw()));

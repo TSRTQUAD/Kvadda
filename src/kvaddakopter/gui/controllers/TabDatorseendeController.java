@@ -171,7 +171,7 @@ public class TabDatorseendeController extends BaseController implements Initiali
 		mImageButtonMap.put(MainBusIPInterface.IMAGE_DEFAULT, "Default Image");
 		mImageButtonMap.put(MainBusIPInterface.IMAGE_CUT_OUT, "Cut out Image");
 		mImageButtonMap.put(MainBusIPInterface.IMAGE_COLOR_CALIBRRATE, "Color Calibrate Image");
-		mImageButtonMap.put(MainBusIPInterface.IMAGE_SURPRISE, "Suprise Image");
+		//mImageButtonMap.put(MainBusIPInterface.IMAGE_SURPRISE, "Suprise Image");
 
 		mImageButtons = new ToggleButton[mImageButtonMap.size()];
 		mImageButtonGroup = new ToggleGroup();
@@ -220,7 +220,7 @@ public class TabDatorseendeController extends BaseController implements Initiali
 
 			//Set X and Y position
 			newButton.setTranslateX(BUTTON_X_START + MODE_BUTTON_MIN_WIDTH + BUTTON_GROUP_SEPARATION);
-			newButton.setTranslateY(BUTTON_Y_START - 175);
+			newButton.setTranslateY(BUTTON_Y_START - 150);
 			newButton.setMinWidth(MODE_BUTTON_MIN_WIDTH);
 
 			//Set Defualt Background
@@ -341,7 +341,7 @@ public class TabDatorseendeController extends BaseController implements Initiali
 			public void handle(ActionEvent event) {
 				ColorTemplate currTemplate = (ColorTemplate)availableColorTemplates.getValue();
 				currTemplate.toggleActive();
-//				updateColorTemplates();
+				updateColorTemplates();
 				availableColorTemplates.setValue(currTemplate);
 			}
 		});
