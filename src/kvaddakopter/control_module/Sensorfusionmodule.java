@@ -123,9 +123,8 @@ public class Sensorfusionmodule implements Runnable{
 		
 		//Initialize -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-		
 		
-		//MissionObject -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-		
-		
-		missionobject.setTrajectory(new double[][]
+		//MissionObject FOR TESTING -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-				
+		/*missionobject.setTrajectory(new double[][]
 				{{58.395132,15.574524},
 				{58.395184,15.574648},
 				{58.395224,15.574768},
@@ -184,51 +183,51 @@ public class Sensorfusionmodule implements Runnable{
 				{0.7,0},
 				{0.7,0},
 				{0.7,0}
-				});
+				}); */
 	
-		//Initialize -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 		
+		
+		//Initialize -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-		
 		if(debugMode){
-		System.out.println("Initializing modules ..");
+			System.out.println("Initializing modules ..");
 		}
-				
+
 		if (0 == controllingmode){
-		
-		
-		//Average initials -_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_-
-		double Initiallatitud = 0;
-		double Initiallongitud = 0;
-		int localcounter = 0;
-		
-		while(initialbool) {					
-		this.quadData = mainbus.getQuadData();								//Reads sensor data from mainbus
-		sdata.setnewsensordata(quadData);
-		if (sdata.isGPSnew()){
-			
-			if (debugMode){
-		System.out.println(this.quadData.getGPSLat());
-		System.out.println(this.quadData.getGPSLong());
-		System.out.println(localcounter);
+
+			//Average initials -_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_-
+			double Initiallatitud = 0;
+			double Initiallongitud = 0;
+			int localcounter = 0;
+
+			while(initialbool) {					
+				this.quadData = mainbus.getQuadData();								//Reads sensor data from mainbus
+				sdata.setnewsensordata(quadData);
+				if (sdata.isGPSnew()){
+
+					if (debugMode){
+						System.out.println(this.quadData.getGPSLat());
+						System.out.println(this.quadData.getGPSLong());
+						System.out.println(localcounter);
+					}
+
+					Initiallatitud = Initiallatitud + this.quadData.getGPSLat();
+					Initiallongitud = Initiallongitud + this.quadData.getGPSLong();
+					localcounter = localcounter + 1;
+
+					if (5 == localcounter) initialbool = false;
+				}
+				try {
+					Thread.sleep((long) 200);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 
-		Initiallatitud = Initiallatitud + this.quadData.getGPSLat();
-		Initiallongitud = Initiallongitud + this.quadData.getGPSLong();
-		localcounter = localcounter + 1;
-		
-		if (5 == localcounter) initialbool = false;
-		}
-		try {
-			Thread.sleep((long) 200);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		}
-		
-		Initiallatitud = Initiallatitud/(localcounter);
-		Initiallongitud = Initiallongitud/(localcounter);
-		sdata.setGPSposition(new double[]{Initiallatitud,Initiallongitud});
-		sdata.setinitial();													// Fix local coordinate system XY
-		sdata.GPS2XY();														// Transformation GPS to XY coordinates
+			Initiallatitud = Initiallatitud/(localcounter);
+			Initiallongitud = Initiallongitud/(localcounter);
+			sdata.setGPSposition(new double[]{Initiallatitud,Initiallongitud});
+			sdata.setinitial();													// Fix local coordinate system XY
+			sdata.GPS2XY();														// Transformation GPS to XY coordinates
 
 		//-_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_-
 
