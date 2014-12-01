@@ -451,9 +451,11 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	}
 	
 	@Override
-	public synchronized void toggleController(){
+	public synchronized boolean toggleController(){
 		this.runcontroller = !this.runcontroller;
+		return this.runcontroller;
 	}
+	
 	
 	@Override
 	public synchronized float getSpeed(){
