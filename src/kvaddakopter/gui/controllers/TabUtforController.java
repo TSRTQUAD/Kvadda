@@ -104,6 +104,7 @@ public class TabUtforController extends BaseController implements Initializable 
 
     @FXML
     private void startMission(){
+    	this.getParent().getMainBus().setShouldStart(false);
     	this.getParent().getMainBus().setIsStarted(true);
     	synchronized (this.getParent().getMainBus()) {
 			this.getParent().getMainBus().notifyAll();
@@ -114,8 +115,7 @@ public class TabUtforController extends BaseController implements Initializable 
     private void arm(){
     	if(this.currentSelectedMissionObject == null) return;
     	this.timeLeft = (long) this.currentSelectedMissionObject.getMissionTime()[0][0];
-    	System.out.println("Started");
-    	System.out.println(this.currentSelectedMissionName);
+    	this.getParent().getMainBus().setIsStarted(false);
     	this.getParent().getMainBus().setShouldStart(true);
     	synchronized (this.getParent().getMainBus()) {
 			this.getParent().getMainBus().notifyAll();
