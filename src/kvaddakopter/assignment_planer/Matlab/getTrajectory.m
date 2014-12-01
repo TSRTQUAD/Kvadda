@@ -26,7 +26,7 @@ for ii = 1:3
     rawtrajectory = lastCheck( rawtrajectory, object );
     tmptrajectory = lastCheck( tmptrajectory, object );
 
-    DPtrajectory = DouglasPeucker(tmptrajectory);
+    DPtrajectory = tmptrajectory; %DouglasPeucker(tmptrajectory);
     
     % This function calculates the total estimated time for the mission
     % which is used as a mesure of performance for the trajectory
