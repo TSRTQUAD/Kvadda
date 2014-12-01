@@ -61,7 +61,14 @@ public class ImageObject {
 		mKeyPoints = new MatOfKeyPoint();
 
 		//Detect key points in image
-		featureDetector.detect(mImage, mKeyPoints);
+		try {
+			featureDetector.detect(mImage, mKeyPoints);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			System.err.println("Error computing keypoints");
+		}
+
 
 		
 		//Num keypoints
@@ -94,8 +101,13 @@ public class ImageObject {
 		if(mKeyPoints == null)
 			System.err.print("Error - do NOT extract descriptors before computing keypoints\n");
 
-
+		try {
 		descriptorExtractor.compute(mImage, mKeyPoints, mDescriptors);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			System.err.println("Error computing descriptors");
+		}
 
 		return mDescriptors;
 	}

@@ -51,12 +51,12 @@ public class TemplateMatch  extends DetectionClass{
 		mIntermeditateResult = imageObject.getImage().clone();
 
 		//Compute KP and descriptors for incoming image
-		int numKeyPoints = imageObject.computeKeyPoints(FeatureDetector.SIFT);
+		int numKeyPoints = imageObject.computeKeyPoints(FeatureDetector.SURF);
 		// Fix. Make sure we have enough key points. If not return empty list of targets.
 		if(numKeyPoints < 5)
 			return targetObjects;
 		
-		imageObject.computeDescriptors(DescriptorExtractor.SIFT);
+		imageObject.computeDescriptors(DescriptorExtractor.SURF);
 
 		for(FormTemplate template: mTemplates){
 			if(template.isActive()){
@@ -230,11 +230,11 @@ public class TemplateMatch  extends DetectionClass{
 		Mat result = null;
 		if(formTemplate != null){
 			/* Start of with computing properties of the template image */
-			int numKeyPoints = formTemplate.getImageObject().computeKeyPoints(FeatureDetector.SIFT);
+			int numKeyPoints = formTemplate.getImageObject().computeKeyPoints(FeatureDetector.SURF);
 			result = calibrateCurrentImage(formTemplate);
 			// Make sure we have enough kp's.
 			if(numKeyPoints > 4)
-				formTemplate.getImageObject().computeDescriptors(DescriptorExtractor.SIFT);
+				formTemplate.getImageObject().computeDescriptors(DescriptorExtractor.SURF);
 			
 		}
 		return result;

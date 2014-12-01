@@ -215,7 +215,9 @@ public abstract class ProgramClass implements Runnable,DecoderListener,KeyBoardL
 	@Override
 	public void onConnectionLost() {
 		System.err.print("Disconnected from video source\n");
-		System.exit(0);
+		//mMainbus.setIsIPRunning(false);
+		mIsInitiated = false;
+		//System.exit(0);
 	}
 	
 	@Override
