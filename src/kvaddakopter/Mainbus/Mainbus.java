@@ -118,7 +118,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 		Mainbus mainbus = new Mainbus();
 		
 	
-		//Setting up a Matlab Proxy Server
+		/*//Setting up a Matlab Proxy Server
 		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
 		mainbus.setMatlabProxyConnection(matlabproxy);
 		matlabproxy.startMatlab("quiet");
@@ -127,7 +127,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 		Thread t4 = new Thread(assignmentplanerrunnable);
 		t4.setPriority(1);
 		t4.start();
-
+*/
 		//Communication
 		
 		
@@ -451,9 +451,11 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	}
 	
 	@Override
-	public synchronized void toggleController(){
+	public synchronized boolean toggleController(){
 		this.runcontroller = !this.runcontroller;
+		return this.runcontroller;
 	}
+	
 	
 	@Override
 	public synchronized float getSpeed(){
@@ -525,7 +527,6 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	@Override
 	public synchronized void setControlSignal(float[] controlsignal) {
 		ControlSignal = controlsignal;
-		System.out.println("Position 1:   " + ControlSignal[0]);
 	}
 
 

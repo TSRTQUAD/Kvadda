@@ -72,9 +72,7 @@ public class Security implements Runnable {
 		
 	} catch (Exception ex1){
 	    ex1.printStackTrace();
-		System.out.println("You're Fucked");
-	}
-		
+	}		
 	}
 
 	

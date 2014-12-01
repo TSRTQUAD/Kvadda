@@ -19,18 +19,18 @@ public class ManualControl extends Frame implements KeyListener, Runnable{
     boolean space_bar = false; //true = Takeoff, false = Landing
     
 	
-	public ManualControl(int threadid, ManualControlInterface mainbus) {	
-		mMainbus = mainbus;		
-		
-		addKeyListener(this);
-        setSize(320, 160);
-        setVisible(true);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                System.exit(0);	
-            }		
-          });	
-        }
+    public ManualControl(int threadid, ManualControlInterface mainbus) {	
+    	mMainbus = mainbus;		
+
+    	addKeyListener(this);
+    	setSize(320, 160);
+    	setVisible(true);
+    	addWindowListener(new WindowAdapter() {
+    		public void windowClosing(WindowEvent e) {
+    			System.exit(0);	
+    		}		
+    	});	
+    }
 
 	public void keyTyped(KeyEvent e) {
         ;
@@ -196,9 +196,11 @@ public class ManualControl extends Frame implements KeyListener, Runnable{
     	}
     }
 
+    
 	@Override
 	public void run() {
 		// TODO Auto-generated method stu
+		while (true){
 		checkIsRunning();
 		try {
 			
@@ -210,7 +212,7 @@ public class ManualControl extends Frame implements KeyListener, Runnable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		}
 		
 	}	
 }

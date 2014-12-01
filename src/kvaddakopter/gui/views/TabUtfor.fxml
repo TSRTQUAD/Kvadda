@@ -66,7 +66,7 @@
                                        <children>
                                           <Button fx:id="btnAbortMission" mnemonicParsing="false" onAction="#abortMission" prefWidth="100.0" text="Abort" />
                   				<Button fx:id="btnEmergency" alignment="CENTER" mnemonicParsing="false" onAction="#emergency" prefHeight="42.0" prefWidth="178.0" styleClass="btn-danger" text="Emergency" textAlignment="CENTER" />
-                                          <Button fx:id="btnToggleControl" alignment="CENTER_RIGHT" contentDisplay="CENTER" mnemonicParsing="false" onAction="#toggleControl" prefHeight="26.0" prefWidth="94.0" text="Toggle Auto" />
+                                          <Button fx:id="btnToggleControl" alignment="CENTER_RIGHT" contentDisplay="CENTER" mnemonicParsing="false" onAction="#toggleControl" prefHeight="26.0" prefWidth="114.0" text="Toggle manual" />
                                        </children>
                                     </HBox>
             			</children>
