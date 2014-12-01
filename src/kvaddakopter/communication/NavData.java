@@ -88,16 +88,20 @@ public class NavData implements Runnable {
 	public void handleTimeOut(){
 		if (!comm.getIsFlying())
 		{
+			System.err.println("While stationary");
 			mMainbus.setShouldStart(false);
 			NavDataTimeOut = true;
+			mMainbus.setWifiFixOk(false);
 			comm.reset();
 			mIsInitiated = false;
 		}
 		else{
-			mMainbus.setControlSignal(new float[]{1,0, 0, 0, 0});
+			System.err.println("While flying");
+			mMainbus.setControlSignal(new float[]{1,0,0,0,0});
 			mMainbus.setRunController(false);
-			//NavDataTimeOut = true;
+			mMainbus.setWifiFixOk(false);
 			//comm.reset();
+			//NavDataTimeOut = true;
 			//mIsInitiated = false;
 		}
 	}
