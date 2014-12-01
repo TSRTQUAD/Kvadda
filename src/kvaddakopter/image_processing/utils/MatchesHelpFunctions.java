@@ -322,8 +322,8 @@ public class MatchesHelpFunctions {
 					numInliers++;	
 				}
 			}
-			//If there are 2 few inlier -> abort 
-			if(numInliers < 3)
+			//If there are 4 few inlier -> abort 
+			if(numInliers < 4)
 				return null;
 			
 			//Store inliers,

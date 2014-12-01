@@ -32,6 +32,8 @@ public class QuadData {
 	}
 
 	public QuadData() {
+		mGPS_Lat = 0f;
+		mGPS_Long = 0f;
 	}
 
 	public synchronized float getBatteryLevel() {

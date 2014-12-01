@@ -45,10 +45,6 @@ public class Tracking {
 		// Initialize target list
 		mInternalTargets = new ArrayList<TargetObject>();
 		lastTime = System.currentTimeMillis();
-		
-		// Debug
-		mInternalTargets.add(new TargetObject(new SimpleMatrix(2, 1, true, 0, 0), 50, null));
-		mInternalTargets.get(0).setGPSCoordinate(new GPSCoordinate(58.40708, 15.62126));
 	}
 	
 
@@ -69,6 +65,16 @@ public class Tracking {
 		
 		// Perform time update
 		timeUpdate();
+
+		// Remove old internal targets with too high covariance
+		// If ||P|| > threshold we remove the target from tracked targets
+		Iterator<TargetObject> iter = mInternalTargets.iterator();
+		while(iter.hasNext()){
+		    TargetObject target = iter.next();
+			if(target.getCovariance().normF() > 1000){
+				iter.remove();
+		    }
+		}
 		
 		// If no targets are observed, skip matching and measurement update and return instead
 		if(targetObjects.size() == 0) return;
@@ -92,23 +98,13 @@ public class Tracking {
 			measurementUpdate(TargetObject.getTargetByID(mInternalTargets, matchedIDs[i]), z, R);
 			
 			
-			// TODO Add optinal trajectories again for debugging purposes
+			// TODO Add optional trajectories again for debugging purposes
 		}
 		
 		if(qData != null){
 			estimateGeo(qData);
 		}
 		
-		// Remove old internal targets with too high covariance
-		// If ||P|| > threshold we remove the target from tracked targets
-		Iterator<TargetObject> iter = mInternalTargets.iterator();
-		while(iter.hasNext()){
-		    TargetObject target = iter.next();
-			if(target.getCovariance().normF() > 1000){
-				iter.remove();
-				System.out.println("Tracking: Removing target");
-		    }
-		}
 	}
 
 	/**

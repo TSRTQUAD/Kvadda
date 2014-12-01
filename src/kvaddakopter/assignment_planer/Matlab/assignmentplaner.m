@@ -77,7 +77,7 @@ trajectoryfullsize = interparc(5e2,rawtrajectory(:,1),...
 % ================= Last check =====================
 % Search for points in forbidden areas and put them on the edge
 trajectoryfullsize = lastCheck( trajectoryfullsize, object );
-trajectory = lastCheck( trajectory, object );
+trajectory = lastCheck( rawtrajectory, object );
 
 trajectory = DouglasPeucker(trajectory);
 

@@ -46,7 +46,7 @@ public class GUIWorker implements Runnable{
 						public void run() {
 							mainController.tabUtforController.drawQuadMarker();
 							mainController.tabUtforController.drawTargetsOnMap();
-							mainController.tabUtforController.updateTimeLeft(sampleTime);
+							if(mainBuss.isStarted()) mainController.tabUtforController.updateTimeLeft(sampleTime);
 							mainController.tabUtforController.updateSpeed();
 							mainController.tabUtforController.updateMovie();
 						}

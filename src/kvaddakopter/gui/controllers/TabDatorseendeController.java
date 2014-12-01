@@ -95,7 +95,7 @@ public class TabDatorseendeController extends BaseController implements Initiali
 		mModeButtonMap.put(MainBusIPInterface.MODE_BLUR_DETECTION, "Blur Detection");
 		mModeButtonMap.put(MainBusIPInterface.MODE_COLOR_CALIBRATION, "Color Calibration");
 		mModeButtonMap.put(MainBusIPInterface.MODE_COLOR_DETECTION, "Color Detection");
-		mModeButtonMap.put(MainBusIPInterface.MODE_TEMPLATE_CALIBRATION, "Template Calibration");
+	//	mModeButtonMap.put(MainBusIPInterface.MODE_TEMPLATE_CALIBRATION, "Template Calibration");
 		mModeButtonMap.put(MainBusIPInterface.MODE_TEMPLATE_MATCHING, "Template Matching");
 		mModeButtonMap.put(MainBusIPInterface.MODE_TRACKING, "Tracking");
 
@@ -166,7 +166,7 @@ public class TabDatorseendeController extends BaseController implements Initiali
 
 		mImageButtonMap = new HashMap<>(); 
 		mImageButtonMap.put(MainBusIPInterface.IMAGE_TEMPLATE_CALIBRATE, "Template Match Image");
-		mImageButtonMap.put(MainBusIPInterface.IMAGE_TEMPLATE_MATCHING, "Template Calibrate Image");
+		//mImageButtonMap.put(MainBusIPInterface.IMAGE_TEMPLATE_MATCHING, "Template Calibrate Image");
 		mImageButtonMap.put(MainBusIPInterface.IMAGE_TARGET, "Target Image");
 		mImageButtonMap.put(MainBusIPInterface.IMAGE_DEFAULT, "Default Image");
 		mImageButtonMap.put(MainBusIPInterface.IMAGE_CUT_OUT, "Cut out Image");
@@ -304,7 +304,8 @@ public class TabDatorseendeController extends BaseController implements Initiali
 
 		Button imgCalibrateTemplateButton = new Button();
 		imgCalibrateTemplateButton.setText("Template matching Settings");
-		final TemplateMatchSliders templateSliders = new TemplateMatchSliders();
+
+		final TemplateMatchSliders templateSliders = new TemplateMatchSliders(this);
 		imgCalibrateTemplateButton.setTranslateX(OPT_BUTTON_X_START + OPT_BUTTON_WIDTH + BUTTON_GROUP_SEPARATION);
 		imgCalibrateTemplateButton.setTranslateY(OPT_BUTTON_Y_START + OPT_BUTTON_Y_SPACE);
 		imgCalibrateTemplateButton.setMinWidth(OPT_BUTTON_WIDTH);
@@ -340,7 +341,7 @@ public class TabDatorseendeController extends BaseController implements Initiali
 			public void handle(ActionEvent event) {
 				ColorTemplate currTemplate = (ColorTemplate)availableColorTemplates.getValue();
 				currTemplate.toggleActive();
-				updateColorTemplates();
+//				updateColorTemplates();
 				availableColorTemplates.setValue(currTemplate);
 			}
 		});
@@ -355,9 +356,13 @@ public class TabDatorseendeController extends BaseController implements Initiali
 			@Override
 			public void handle(ActionEvent event) {
 				FormTemplate currTemplate = (FormTemplate)availableFormTemplates.getValue();
-				currTemplate.toggleActive();
+				if(currTemplate != null){
+					currTemplate.toggleActive();
+					updateFormTemplates();
+					availableFormTemplates.setValue(currTemplate);
+				}
 				updateFormTemplates();
-				availableFormTemplates.setValue(currTemplate);
+				
 			}
 		});
 		

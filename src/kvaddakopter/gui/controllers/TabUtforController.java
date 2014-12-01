@@ -112,6 +112,7 @@ public class TabUtforController extends BaseController implements Initializable 
     
     @FXML
     private void arm(){
+    	if(this.currentSelectedMissionObject == null) return;
     	this.timeLeft = (long) this.currentSelectedMissionObject.getMissionTime()[0][0];
     	System.out.println("Started");
     	System.out.println(this.currentSelectedMissionName);
@@ -244,7 +245,7 @@ public class TabUtforController extends BaseController implements Initializable 
      */
     public void drawTargetsOnMap(){
     	HashMap<String, GPSCoordinate> targetList = this.getParent().getMainBus().getTargets();
-    	if(targetList == null || targetList.size() == 0 || this.missionMap == null) return;
+    	if(targetList == null || this.missionMap == null) return;
 		this.missionMap.drawTargetsOnMap(this.getParent().getMainBus().getTargets());
     }
 

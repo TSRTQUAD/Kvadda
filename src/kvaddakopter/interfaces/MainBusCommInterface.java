@@ -22,4 +22,6 @@ public interface MainBusCommInterface {
 	 */
 	public void setShouldStart(boolean b);
 	public boolean getIsArmed();
+	public void setControlSignal(float[] controlsignal);
+	public void setRunController(boolean runctrl);
 }

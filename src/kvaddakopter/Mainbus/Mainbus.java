@@ -315,8 +315,10 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	
 	@Override
 	public synchronized void initIPVariables() {
-		mColorTemplates.add(new ColorTemplate("Pink square", 120, 200, 50, 90, 180, 245, ColorTemplate.FORM_SQUARE));	
+		mColorTemplates.add(new ColorTemplate("Pink square", 120, 200, 50, 90, 180, 245, ColorTemplate.FORM_SQUARE));
 		mColorTemplates.add(new ColorTemplate("Yellow square", 30, 120, 50, 120, 130, 255, ColorTemplate.FORM_SQUARE));
+		mColorTemplates.get(0).deactivate();
+		mColorTemplates.get(1).deactivate();
 		mTargetList = new ArrayList<TargetObject>();
 		mIPCalibTemplate[0] = new ColorTemplate();
 		mIPImageToShow[0] = null;

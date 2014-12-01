@@ -41,7 +41,7 @@ public class NavData implements Runnable {
 			}
 			
 			socket_nav = new DatagramSocket(Communication.NAV_PORT);
-			socket_nav.setSoTimeout(5000);
+			socket_nav.setSoTimeout(3000);
 		} catch (SocketException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -84,6 +84,23 @@ public class NavData implements Runnable {
 		}
 
 	}
+	
+	public void handleTimeOut(){
+		if (!comm.getIsFlying())
+		{
+			mMainbus.setShouldStart(false);
+			NavDataTimeOut = true;
+			comm.reset();
+			mIsInitiated = false;
+		}
+		else{
+			mMainbus.setControlSignal(new float[]{1,0, 0, 0, 0});
+			mMainbus.setRunController(false);
+			//NavDataTimeOut = true;
+			//comm.reset();
+			//mIsInitiated = false;
+		}
+	}
 
 	/**
 	 * Sends what information to get with AT.CONFIG messages and receives
@@ -118,21 +135,16 @@ public class NavData implements Runnable {
 					try {
 						// checkIsCommRunning();
 						socket_nav.receive(packet_rcv);
-						//System.out.println("NAvData: Message received!");
 						NavDataTimeOut = false;
 
 					} catch (SocketTimeoutException ex3) {
 						System.err.println("socket_nav.receive(): Timeout");
-
-						if (!comm.getIsFlying())
-							mMainbus.setShouldStart(false);
-						NavDataTimeOut = true;
-						comm.reset();
-						mIsInitiated = false;
-						break;
+						handleTimeOut();
+						continue;	
 					} catch (Exception ex1) {
 						ex1.printStackTrace();
 					}
+					
 
 					NavReader reader = new NavReader(packet_rcv.getData());
 
@@ -144,8 +156,7 @@ public class NavData implements Runnable {
 
 					if (droneStates[NavReader.FLYING]) {
 						comm.setIsFlying(true);
-						
-						}
+					}
 					
 					// Run until checksum
 					boolean finnished = false;
