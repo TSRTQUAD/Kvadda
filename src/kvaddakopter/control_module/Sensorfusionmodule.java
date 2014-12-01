@@ -77,7 +77,7 @@ public class Sensorfusionmodule implements Runnable{
 	protected ReferenceExtractor	referenceextractor	= new ReferenceExtractor(0);
 	protected int					counter				= 0;
 	protected int					controllingmode		= 0; 					// 0 for autonomous 
-	protected boolean				debugMode			= true;					// Toggle System out prints 		
+	protected boolean				debugMode			= false;					// Toggle System out prints 		
 	protected int					whichkalman			= 0; // 1 for 2xY 0 for 1xY
 	protected double[][]			states				= new double[(int) (1/sampletime*seconds)][4];
 	protected MatFileHandler		saver				= new MatFileHandler();
@@ -204,12 +204,17 @@ public class Sensorfusionmodule implements Runnable{
 		this.quadData = mainbus.getQuadData();								//Reads sensor data from mainbus
 		sdata.setnewsensordata(quadData);
 		if (sdata.isGPSnew()){
+			
+			if (debugMode){
 		System.out.println(this.quadData.getGPSLat());
 		System.out.println(this.quadData.getGPSLong());
+		System.out.println(localcounter);
+			}
+
 		Initiallatitud = Initiallatitud + this.quadData.getGPSLat();
 		Initiallongitud = Initiallongitud + this.quadData.getGPSLong();
 		localcounter = localcounter + 1;
-		System.out.println(localcounter);
+		
 		if (5 == localcounter) initialbool = false;
 		}
 		try {
@@ -432,7 +437,7 @@ public class Sensorfusionmodule implements Runnable{
 				}
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 			
-				
+				//mainbus.addVisitedPoint(rrdata.getCounter());
 				
 				//Save data-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				if (counter <= 20*seconds){
