@@ -101,8 +101,8 @@ public class NavData implements Runnable {
 			mMainbus.setRunController(false);
 			mMainbus.setWifiFixOk(false);
 			//comm.reset();
-			//NavDataTimeOut = true;
-			//mIsInitiated = false;
+			NavDataTimeOut = true;
+			mIsInitiated = false;
 		}
 	}
 
