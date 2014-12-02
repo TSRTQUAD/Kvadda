@@ -2,7 +2,7 @@
 %*************************************************************************
 % Search for points in forbidden areas and put them on the edge
 %*************************************************************************
-function trajectoryfullsize = lastCheck( trajectoryfullsize, object )
+function trajectory = lastCheck( trajectoryfullsize, object )
 if not(isempty(object.forbiddenarea))
 try
 for ii = 1:length(object.forbiddenarea)
@@ -116,4 +116,22 @@ for ii = 1:length(object.forbiddenarea)
 end
 catch
 end
+end
+
+% Get points with the distance of maximum object.pointdistance
+trajectory = trajectoryfullsize;
+index = 2;
+for ii = 2:size(trajectoryfullsize,1)
+    localtrajectorylength = lldistkm(trajectoryfullsize(ii-1,:),...
+        trajectoryfullsize(ii,:))*1e3;
+    if localtrajectorylength > 1.1*object.pointdistance
+        nrofpoints = floor(localtrajectorylength/object.pointdistance);
+        points = interparc(2+nrofpoints,trajectoryfullsize(ii-1:ii,1),...
+            trajectoryfullsize(ii-1:ii,2),'linear');
+        trajectory = [trajectory(1:index-1,:); points(2:end-1,:);...
+            trajectory(index:end,:)];
+        index = index + nrofpoints + 1;
+    else
+        index = index + 1;
+    end
 end

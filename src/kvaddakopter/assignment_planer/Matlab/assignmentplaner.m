@@ -42,8 +42,9 @@ cameracoverage = imagelength^2; % cameracoverage
 ppa = 1/cameracoverage; % nr of nodes per square latlon
 
 % Hardcoded values to get 2m distance between nodes
-LAT = 1.111949266445575e+05/2;      % Latitude
-LON = 58.923795838568971e+03/2;     % Longitud
+object.pointdistance = 4;
+LAT = 1.111949266445575e+05/5;      % Latitude
+LON = 58.923795838568971e+03/5;     % Longitud
 
 
 
@@ -77,15 +78,15 @@ rawtrajectory = getStartEndPath(object.startcoordinate, spiraltrajectory);
 
 % Interpolate using parametric splines, the first argument determines the
 % nr of nodes to interpolate between each nodpair in the trajectory.
-trajectoryfullsize = interparc(5e2,rawtrajectory(:,1),...
-    rawtrajectory(:,2),'spline');
+% trajectoryfullsize = interparc(5e2,rawtrajectory(:,1),...
+%     rawtrajectory(:,2),'spline');
 
 % ================= Last check =====================
 % Search for points in forbidden areas and put them on the edge
 trajectoryfullsize = lastCheck( trajectoryfullsize, object );
 trajectory = lastCheck( rawtrajectory, object );
 
-trajectory = DouglasPeucker(trajectory);
+% trajectory = DouglasPeucker(trajectory);
 
 % =============== Present results ==================
 [trajectorylength,coveragearea,time,velocity] = getResults( object, [],...
@@ -112,7 +113,7 @@ trajectoryfullsize = interparc(5e2,rawtrajectory(:,1),...
 trajectoryfullsize = lastCheck( trajectoryfullsize, object );
 trajectory = lastCheck( rawtrajectory, object );
 
-trajectory = DouglasPeucker(trajectory);
+% trajectory = DouglasPeucker(trajectory);
 
 % =============== Present results ==================
 [trajectorylength,coveragearea,time,velocity] = getResults( object, [],...
