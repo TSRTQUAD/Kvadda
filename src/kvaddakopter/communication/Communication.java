@@ -156,7 +156,6 @@ public class Communication implements Runnable {
 				try {
 					mIsRunning = false;
 					mMainbus.wait();
-					System.out.println("WAIT FOR START");
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -236,18 +235,20 @@ public class Communication implements Runnable {
 
 						send_at_cmd("AT*REF=" + get_seq() + ",290717696"); // Landing
 
-						this.mMainbus.setIsStarted(false);
-						this.mMainbus.setShouldStart(false);
-						this.reset();
-						while (!mMainbus.isStarted()) {
+						
+						while (!mIsFlying) {
 							// System.out.println("Landing");
 						}
-						
-						//HEJHEJHEJ ny kommentar
+						this.mMainbus.setControlSignal(new float[]{1f,0,0,0,0});
+						this.mMainbus.setIsStarted(false);
+						this.mMainbus.setShouldStart(true);
+						//this.reset();
 					}
 
 				}
-				this.reset();
+				//this.mMainbus.setIsStarted(false);
+				//this.mMainbus.setShouldStart(false);
+				//this.reset();
 			}
 		} catch (Exception ex1) {
 

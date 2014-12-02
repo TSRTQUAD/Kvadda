@@ -341,7 +341,7 @@ public class TabDatorseendeController extends BaseController implements Initiali
 			public void handle(ActionEvent event) {
 				ColorTemplate currTemplate = (ColorTemplate)availableColorTemplates.getValue();
 				currTemplate.toggleActive();
-//				updateColorTemplates();
+				updateColorTemplates();
 				availableColorTemplates.setValue(currTemplate);
 			}
 		});
