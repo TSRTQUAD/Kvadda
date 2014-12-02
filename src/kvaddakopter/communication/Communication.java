@@ -93,7 +93,7 @@ public class Communication implements Runnable {
 			send_at_cmd("AT*COMWDG=" + get_seq());
 			Thread.sleep(INTERVAL);
 			send_at_cmd("AT*CONFIG=" + get_seq()
-					+ ",\"control:altitude_max\",\"5000\""); // altitude max 2m
+					+ ",\"control:altitude_max\",\"7000\""); // altitude max 2m
 			Thread.sleep(INTERVAL);
 			send_at_cmd("AT*CONFIG=" + get_seq()
 					+ ",\"control:control_level\",\"0\""); // 0:BEGINNER, 1:ACE,

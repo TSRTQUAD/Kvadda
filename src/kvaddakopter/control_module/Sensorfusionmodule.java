@@ -61,7 +61,7 @@ public class Sensorfusionmodule implements Runnable{
 	protected ControlMainBusInterface mainbus;
 	protected double 				sampletime			= 0.05; //seconds
 	protected double 				time;
-	protected double 				seconds				= 30;
+	protected double 				seconds				= 50;
 	protected QuadData				quadData;
 	protected SensorData 			sdata				= new SensorData();
 	protected ControlSignal 		controlsignal		= new ControlSignal();
@@ -77,8 +77,8 @@ public class Sensorfusionmodule implements Runnable{
 	protected ReferenceExtractor	referenceextractor	= new ReferenceExtractor(0);
 	protected int					counter				= 0;
 	protected int					controllingmode		= 0; 					// 0 for autonomous 
-	protected boolean				debugMode			= false;					// Toggle System out prints 		
-	protected int					whichkalman			= 0; // 1 for 2xY 0 for 1xY
+	protected boolean				debugMode			= true;					// Toggle System out prints 		
+	protected int					whichkalman			= 1; // 1 for 2xY 0 for 1xY
 	protected double[][]			states				= new double[(int) (1/sampletime*seconds)][4];
 	protected MatFileHandler		saver				= new MatFileHandler();
 	protected boolean				initialbool 		= true;
@@ -239,13 +239,13 @@ public class Sensorfusionmodule implements Runnable{
 		checkIsRunning();
 		
 						//Start Quad-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-		
-						//ControlSignal csignal = new ControlSignal();	
-						//csignal.setStart(1);
-						//mainbus.setControlSignalobject(csignal);
+						ControlSignal csignal = new ControlSignal();	
+						csignal.setStart(1);
+						mainbus.setControlSignalobject(csignal);
 						try {
 							if(debugMode){
 								System.out.println("Waiting for quadcopter...");
-								System.out.println("Quad is starting .. startsignal =  ");
+								//System.out.println("Quad is starting .. startsignal =  ");
 								//System.out.println(csignal.getStart());
 								System.out.println("");
 							}
@@ -355,8 +355,6 @@ public class Sensorfusionmodule implements Runnable{
 							//For every new GPS measurement-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 							if(sdata.isGPSnew() )
 							{	
-		
-		
 								rsdata.setXstates(skalmanx.gpsmeasurementupdate(sdata.getX()));	// Measurement update in kalmanfilter
 								rsdata.setYstates(skalmany.gpsmeasurementupdate(sdata.getY()));	// Measurement update in kalmanfilter
 								rsdata.XYdot2Vel();												//Transform Xdot,Ydot to velocities								
@@ -416,7 +414,7 @@ public class Sensorfusionmodule implements Runnable{
 				else if(rrdata.getMission()==0 || rrdata.getMission()==2){
 					csignal = controller.GetControlSignalMission0(rsdata, rrdata);
 					if(debugMode) System.out.println("Controller Mission = 0, controlsignal:");
-					csignal = controller.saturation(csignal,0.2,0.2,0.5,1.5,0.02);
+					csignal = controller.saturation(csignal,0.15,0.15,0.5,1.5,0.02);
 				}
 				mainbus.setControlSignalobject(csignal);						// Update main-bus control-signal
 				

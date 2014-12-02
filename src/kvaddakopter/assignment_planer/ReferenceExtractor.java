@@ -74,7 +74,7 @@ public class ReferenceExtractor {
 												missionobject.getYaw(),
 												missionobject.getWaitingtime(),
 												missionobject.getReferenceVelocity()[this.counter][0]
-															 ,1,start,land};
+															 ,0,start,land};
 			
 			this.counter = this.counter + 1;			
 			return returnvalue;	
