@@ -73,6 +73,14 @@
             		</VBox>
                               <VBox alignment="CENTER_LEFT" prefHeight="96.0" prefWidth="178.0" style="-fx-background-color: #ccc; -fx-border-color: black;" stylesheets="@../../application.css">
                                  <children>
+                                    <Label fx:id="lblCoverageArea" alignment="TOP_LEFT" text="42 % (42 m2)">
+                                       <font>
+                                          <Font size="21.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets left="20.0" />
+                                       </VBox.margin>
+                                    </Label>
                                     <Label fx:id="lblGPS" alignment="TOP_LEFT" text="GPS NOT OK!">
                                        <font>
                                           <Font size="21.0" />
@@ -86,7 +94,7 @@
                                           <Font size="21.0" />
                                        </font>
                                        <VBox.margin>
-                                          <Insets left="20.0" top="10.0" />
+                                          <Insets left="20.0" />
                                        </VBox.margin>
                                     </Label>
                                  </children>

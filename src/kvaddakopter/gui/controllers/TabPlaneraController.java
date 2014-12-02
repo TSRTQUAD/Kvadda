@@ -47,16 +47,43 @@ public class TabPlaneraController extends BaseController implements Initializabl
     /**
      * Properties
      */
-	public PlanningMap planningMap;
     
+    /**
+     * Represents the planning map.
+     */
+	public PlanningMap planningMap;
+	
+	
+	/**
+	 * Tells if we are current in Mission coordinate Mode. Map click event uses this to determine the action 
+	 * taken on a click.
+	 */
     protected boolean canEnterMissionCoordinates = false;
+    
+    
+	/**
+	 * Tells if we are current in Forbidden Area Mode. Map click event uses this to determine the action 
+	 * taken on a click.
+	 */
 	protected boolean canEnterForbiddenAreaCoordinates = false;
+	
+	
+	/**
+	 * Tells if we are current in Add quad start Mode. Map click event uses this to determine the action 
+	 * taken on a click.
+	 */
 	protected boolean canEnterQuadStartPosition = false;
 	
 	
+	/**
+	 * Direct representation of the storage module.
+	 */
 	protected MissionStorage storage;
 	
 	
+	/**
+	 * Represent the current mission Type.
+	 */
 	protected MissionType currentSelectedMissionType;
 	
 	
@@ -77,6 +104,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	}
     }
     
+    
     /**
      * Triggered when user presses btn "Clear mission areas"
      */
@@ -84,6 +112,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     private void btnClickedClearNagivationCoordinates(){
     	this.planningMap.clearNavigationCoordinates();
     }
+    
     
     /**
      * Triggered when user presses btn "Clear forbidden areas"
@@ -93,6 +122,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	this.planningMap.clearForbiddenAreasCoordinates();
     }
     
+    
     /**
      * Clear the set quad position
      */
@@ -100,6 +130,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     private void btnClickedClearQuadStartPosition(){
     	this.planningMap.clearQuadStartPosition();
     }
+    
     
     /**
      * Triggered when user presses btn "Mark new mission coordinates"
@@ -112,6 +143,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	this.planningMap.createNewMapShape();
     }
     
+    
     /**
      * Triggered when user presses btn "Mark forbidden areas"
      */
@@ -123,6 +155,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	this.planningMap.createNewForbiddenArea();
     }
 
+    
     /**
      * Triggered when user presses btn "New Quad start postion"
      */
@@ -133,6 +166,10 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	this.canEnterMissionCoordinates = false;
     } 
     
+    
+    /**
+     * Event when user clicks the generate trajectory button.
+     */
     @FXML
     private void btnGenerateTrajectory(){
     	//Get mission data from GUI and set it to MainBus
@@ -157,13 +194,13 @@ public class TabPlaneraController extends BaseController implements Initializabl
 			}
 		catch (InterruptedException e) {}
 		
-		System.out.println("Results retrived");
 		MissionObject mission = mainbus.getMissionObject();
 		
 		this.txtEstimatedTime.setText(String.format("%s" , SecToMinSec.transform( (long) mission.getMissionTime()[0][0])));
 		this.txtEstimatedDistance.setText(String.format("%s m", (int)mission.getTrajectoryLength()[0][0]));
 		this.planningMap.drawResultingTrajectory(mission.getTrajectoryFullSize());
     }
+    
     
     /**
      * Triggered when the user clicks "Save mission"
@@ -186,9 +223,6 @@ public class TabPlaneraController extends BaseController implements Initializabl
     }
     
     
-	/**
-	 * Public Methods
-	 */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
     	System.out.println("Planera DONE");
@@ -206,6 +240,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     	return this.canEnterMissionCoordinates;
     }
     
+    
     /**
      * Used by map to determine if the user specified that he/she want to add Forbidden Area Coordinates.
      * @return boolean If we are on this Mode
@@ -213,6 +248,7 @@ public class TabPlaneraController extends BaseController implements Initializabl
     public boolean addForbiddenAreasMode(){
     	return this.canEnterForbiddenAreaCoordinates;
     }
+    
     
     /**
      * Used by map to determine if the user specified that he/she want to add Forbidden Area Coordinates.
@@ -223,13 +259,14 @@ public class TabPlaneraController extends BaseController implements Initializabl
     }
 
     
+    /**
+     *  Returns the current selected mission type.
+     * @return
+     */
     public MissionType getCurrentSelectedMissionType(){
     	return this.currentSelectedMissionType;
     }
     
-    /**
-     * Private Methods
-     */
     
     /**
      * Loads and sets the default values for all GUI options.

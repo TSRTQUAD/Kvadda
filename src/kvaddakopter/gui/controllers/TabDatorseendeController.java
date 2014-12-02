@@ -38,32 +38,109 @@ import kvaddakopter.interfaces.MainBusIPInterface;
 public class TabDatorseendeController extends BaseController implements Initializable{
 
 	
+	/**
+	 * GUI root for extra window.
+	 */
 	private StackPane root;
+	
+	
+	/**
+	 * ImageView to reprecent the displayed image.
+	 */
 	private ImageView view;
+	
+	/**
+	 * The used mainbus.
+	 */
 	public MainBusIPInterface mainbus;
 
+	
+	
 	/*Background colors*/
+	/**
+	 * Grey Background color 
+	 */
 	final Background GrayBackground  = new Background(new BackgroundFill(Color.GRAY,new CornerRadii(4.5),new Insets(1.0)));
+	
+	
+	/**
+	 * Light Grey background color.
+	 */
 	final Background LightGrayBackground  = new Background(new BackgroundFill(Color.LIGHTGOLDENRODYELLOW,new CornerRadii(4.5),new Insets(1.0)));
+	
+	
+	/**
+	 * Green background color.
+	 */
 	final Background GreenBackground  = new Background(new BackgroundFill(Color.LIGHTGREEN,new CornerRadii(4.5),new Insets(1.0)));
 
+	
 	/*Image pos*/
+	/**
+	 * Image position X
+	 */
 	final static int IMAGE_POS_X = 0;
+	
+	
+	/**
+	 * Image position Y.
+	 */
 	final static int IMAGE_POS_Y = 150;
 	
+	
 	/*Buttons Common */
+	/**
+	 * Modedes pos X.
+	 */
 	final static int MODES_POS_X = 50;
+	
+	
+	/**
+	 * Button X start.
+	 */
 	final static int BUTTON_X_START = 600;
+	
+	
+	/**
+	 * Button Y start
+	 */
 	final static int BUTTON_Y_START = -90;
+	
+	
+	/**
+	 * Button group separation.
+	 */
 	final static int BUTTON_GROUP_SEPARATION = 40;
-
+	
+	
+	/**
+	 * Combobox of available color templates.
+	 */
 	final ComboBox<ColorTemplate> availableColorTemplates = new ComboBox<ColorTemplate>();
+	
+	
+	/**
+	 * Combo box of available form templates.
+	 */
 	final ComboBox<FormTemplate> availableFormTemplates = new ComboBox<FormTemplate>();
 	
+	
+	/**
+	 * Current selected color.
+	 */
 	final Background SelectedColor = GreenBackground;
+	
+	
+	/**
+	 * Current selected dSelected Color.
+	 */
 	final Background DeselectedColor = GrayBackground;
 
+	
 	/* Image Toggle Buttons */ 
+	/**
+	 * Toggle group for Images.
+	 */
 	ToggleGroup mImageButtonGroup;
 	ToggleButton[] mImageButtons;
 	HashMap<Integer,String> mImageButtonMap;
@@ -87,7 +164,12 @@ public class TabDatorseendeController extends BaseController implements Initiali
 
 	@FXML
 	private AnchorPane ipRoot;
-
+	
+	
+	/**
+	 * Initialize the buttons.
+	 * @param vbox
+	 */
 	private void initializeModeButtons(VBox vbox ){
 
 		mModeButtonMap = new HashMap<>(); 
@@ -161,7 +243,11 @@ public class TabDatorseendeController extends BaseController implements Initiali
 		}
 	}
 
-
+	
+	/**
+	 * Initialize the Images buttons.
+	 * @param vbox
+	 */
 	private void initializeImageButtons(VBox vbox){
 
 		mImageButtonMap = new HashMap<>(); 
@@ -244,6 +330,10 @@ public class TabDatorseendeController extends BaseController implements Initiali
 	}
 
 	
+	/**
+	 * Load extra GUI window.
+	 * @param root2
+	 */
 	public void loadIPGUI(AnchorPane root2) {
 		root = new StackPane(); // XXX: Possibly we create this multiple times.
 		mainbus = this.getParent().getMainBus();
@@ -386,6 +476,10 @@ public class TabDatorseendeController extends BaseController implements Initiali
 
 	}
 	
+	
+	/**
+	 * Update the color templates.
+	 */
 	public void updateColorTemplates(){
 		availableColorTemplates.getItems().clear(); // TODO: Remove and update text instead
 		ArrayList<ColorTemplate> templates = mainbus.getIPColorTemplates();
@@ -395,7 +489,11 @@ public class TabDatorseendeController extends BaseController implements Initiali
 			}
 		}
 	}
-
+	
+	
+	/**
+	 * Updates the form templates.
+	 */
 	public void updateFormTemplates(){
 		availableFormTemplates.getItems().clear(); // TODO: Remove and update text instead
 		ArrayList<FormTemplate> templates = mainbus.getIPFormTemplates();
@@ -406,6 +504,10 @@ public class TabDatorseendeController extends BaseController implements Initiali
 		}
 	}	
 	
+	
+	/**
+	 * Update image.
+	 */
 	public void updateImage() {
 		if(mainbus == null) return;
 		Image image = mainbus.getIPImageToShow();
