@@ -243,7 +243,7 @@ public class Communication implements Runnable {
 							// System.out.println("Landing");
 						}
 						
-
+						//HEJHEJHEJ ny kommentar
 					}
 
 				}
