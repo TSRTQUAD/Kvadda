@@ -163,8 +163,8 @@ public class ReferenceData {
 	public void update(RefinedSensorData rsdata, MissionObject missionobject){
 		//mission = FALSE		
 		if ( 
-			Math.abs(rsdata.getXpos()-Xpos)<1.5   && 
-			Math.abs(rsdata.getYpos()-Ypos)<1.5   &&
+			Math.abs(rsdata.getXpos()-Xpos)<2.5   && 
+			Math.abs(rsdata.getYpos()-Ypos)<2.5   &&
 			mission==0										){
 			
 			if (!running){
