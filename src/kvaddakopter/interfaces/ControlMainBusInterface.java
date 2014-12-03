@@ -11,5 +11,11 @@ public interface ControlMainBusInterface {
 	public boolean isStarted();
 	public void setRunController(boolean runctrl);
 	public boolean getIsArmed();
+	
+	/**
+	 * Count the nr of visited points to be able to evaluate coverage amount.
+	 * @param point
+	 */
+	public void setVisitedPoints(int counter);
 
 }

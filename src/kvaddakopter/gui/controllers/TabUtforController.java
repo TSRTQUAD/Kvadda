@@ -374,14 +374,15 @@ public class TabUtforController extends BaseController implements Initializable 
 	
 	
 	/**
-	 * Updates the area coverage to the current value.
+	 * Updates the area coverage amount and the percentage to the current value.
 	 */
 	public void updateCoverage(){
 		MainBusGUIInterface mainbus = this.getParent().getMainBus();
 		double realnrofpoints = mainbus.getMissionObject().getTrajectory().length;
 		double nrofvisitedpoints = mainbus.getVisitedPoints();
-		double percent = Math.min((realnrofpoints - nrofvisitedpoints)/realnrofpoints, 100);	
-		double coveragearea = percent*mainbus.getMissionObject().getCoverageArea()[0][0];	
+		double percent = Math.max(Math.min(nrofvisitedpoints/realnrofpoints, 1), 0)*100;	
+		double coveragearea = percent*mainbus.getMissionObject().getCoverageArea()[0][0]/100;
+		
 		String text =  (int)percent + " % ("+ String.valueOf((int)coveragearea) +" m2)";
 		this.lblCoverageArea.setText(text);
 	}

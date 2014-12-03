@@ -39,15 +39,5 @@ public interface AssignmentPlanerInterface {
 	 */
 	public MatlabProxyConnection getMatlabProxyConnection();
 	
-	/**
-	 * Count the nr of visited points to be able to evaluate coverage amount.
-	 * @param point
-	 */
-	public void addVisitedPoint(int counter);
-	
-	/**
-	 * Get nr of visited points
-	 */
-	public double getVisitedPoints();
 	
 }

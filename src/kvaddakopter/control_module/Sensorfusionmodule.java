@@ -434,7 +434,8 @@ public class Sensorfusionmodule implements Runnable{
 				}
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 			
-				//mainbus.addVisitedPoint(rrdata.getCounter());
+				// Sets the number of points that have been visited for area coverage amount.
+				// mainbus.setVisitedPoints(rrdata.getCounter());
 				
 				//Save data-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				if (counter <= 20*seconds){
