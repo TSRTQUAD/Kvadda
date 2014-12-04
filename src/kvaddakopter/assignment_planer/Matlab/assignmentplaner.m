@@ -15,13 +15,25 @@
 % forbidden areas.
 %
 % Hardcoded values:
-% main              - Camera propterties
+% main              - Camera propterties and maximum pointdistance
 % getResults        - Arial velocities
-% DouglasPeucker    - Epsilon describing minimum prependicular distance between two
-%                     points and the evaluated one.
+% DouglasPeucker    - Epsilon describing minimum prependicular distance
+%                     between two points and the evaluated one.
 % interpolation     - Number of points to be set between each nodpair
 % lldistkm          - Earth radius
 
+% NOTE: At the moment there are two trajectorys, one to be plotted in full
+% size and one used by the controller. The idé is to use Douglas Peuckers
+% algoritm on the full size trajectory. This is changed due to that the
+% constant velocity controller does not work for this pointintervall. So
+% for now on the trajectory is scaled down in number of points with a
+% maximum distance that are set manually. This configuration is implemented
+% for all modes. This means that if the trajectory are to be used with a
+% reference-vector which is the future plan the implementation in this main
+% script has to be edited so that the last check are done on the
+% fullsizetrajectory instead of the rawtrajectory. This change also have to
+% be done in the file getTrajectory.m in order for it to work in the mode
+% area coverage.
 
 % --------------------------------------------------
 % ================== Load object ===================
@@ -37,14 +49,12 @@ object.area = area; object.forbiddenarea = forbiddenarea;
 % --------------------------------------------------
 imageangle = pi/3;
 imagelength_meter = 2*object.height*tan(imageangle/2)/sqrt(2);
-imagelength = imagelength_meter/1.09e+05; % m -> latlon
-cameracoverage = imagelength^2; % cameracoverage
-ppa = 1/cameracoverage; % nr of nodes per square latlon
+imagelength = imagelength_meter/1.09e+05;           % m -> latlon
+LAT = 1.111949266445575e+05/imagelength_meter;      % Latitude
+LON = 58.923795838568971e+03/imagelength_meter;     % Longitud
 
-% Hardcoded values to get 2m distance between nodes
-object.pointdistance = 4;
-LAT = 1.111949266445575e+05/5;      % Latitude
-LON = 58.923795838568971e+03/5;     % Longitud
+% Hardcoded value to get maximum 4m in distance between points
+object.pointdistance = 4;                           % [m]
 
 
 
@@ -78,8 +88,8 @@ rawtrajectory = getStartEndPath(object.startcoordinate, spiraltrajectory);
 
 % Interpolate using parametric splines, the first argument determines the
 % nr of nodes to interpolate between each nodpair in the trajectory.
-% trajectoryfullsize = interparc(5e2,rawtrajectory(:,1),...
-%     rawtrajectory(:,2),'spline');
+trajectoryfullsize = interparc(5e2,rawtrajectory(:,1),...
+    rawtrajectory(:,2),'spline');
 
 % ================= Last check =====================
 % Search for points in forbidden areas and put them on the edge
