@@ -37,7 +37,6 @@ public class ManualControl extends Frame implements KeyListener, Runnable {
 	}
 
 	public void keyTyped(KeyEvent e) {
-		;
 	}
 
 	public void keyPressed(KeyEvent e) {
