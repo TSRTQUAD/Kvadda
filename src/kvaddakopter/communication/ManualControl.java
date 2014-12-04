@@ -64,11 +64,6 @@ public class ManualControl extends Frame implements KeyListener, Runnable {
 		ControlSignal = mMainbus.getControlSignal();
 		switch (keyCode) {
 		case KeyEvent.VK_C:
-			/*
-			 * if (false == this.runcontroller){ this.runcontroller = true; }
-			 * else if (true == this.runcontroller){ this.runcontroller = false;
-			 * }
-			 */
 			if (false == mMainbus.getRunController()) {
 				mMainbus.setRunController(true);
 			} else if (true == mMainbus.getRunController()) {
@@ -219,7 +214,7 @@ public class ManualControl extends Frame implements KeyListener, Runnable {
 			try {
 
 				Thread.sleep(50);
-				mMainbus.setSpeed(speed);
+				//mMainbus.setSpeed(speed);
 				// mMainbus.setControlSignal(ControlSignal);
 
 			} catch (InterruptedException e) {

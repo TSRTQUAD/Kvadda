@@ -180,7 +180,6 @@ public class NavData implements Runnable {
 
 					if (droneStates[NavReader.FLYING]) {
 						comm.setIsFlying(true);
-						System.err.println("FLYING");
 					}else{
 						comm.setIsFlying(false);
 					}

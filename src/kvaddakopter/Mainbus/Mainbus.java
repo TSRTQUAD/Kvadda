@@ -68,7 +68,6 @@ public class Mainbus implements ManualControlInterface, MainBusCommInterface, Co
 	static float[] ControlSignal = {1f,0,0,0,0};
 	private String mode;
 	public boolean selfCheck = false;
-	float speed = -1f;
     boolean runcontroller = true;
 	public boolean EmerStop = false;
 	public int seq = 0;
@@ -135,12 +134,13 @@ public class Mainbus implements ManualControlInterface, MainBusCommInterface, Co
 			t5.setPriority(1);
 			t5.start();
 		
-			
+			/**
 			ManualControl manualcontrol = new ManualControl(5,mainbus);
 			Thread t2 = new Thread(manualcontrol);
 			t2.setDaemon(true);
 			t2.setPriority(1);
 			t2.start();
+			**/
 
 		} catch (Exception ex1){
 
@@ -149,8 +149,6 @@ public class Mainbus implements ManualControlInterface, MainBusCommInterface, Co
 			t6.setDaemon(true);
 			t6.setPriority(1);
 			t6.start();
-			System.out.println("Security-link initiated");
-
 			ex1.printStackTrace();	
 		}
 		
@@ -173,7 +171,7 @@ public class Mainbus implements ManualControlInterface, MainBusCommInterface, Co
 		mainbus.initIPVariables();
 		Thread t9 = new Thread(imageProcessing);
 		t9.setDaemon(true);
-		t9.setPriority(1);
+		t9.setPriority(2);
 		t9.start();
 		
 		while(true){
@@ -475,12 +473,6 @@ public class Mainbus implements ManualControlInterface, MainBusCommInterface, Co
 		
 	}
 
-
-
-	@Override
-	public synchronized void setSpeed(float spd) {
-		speed = spd;		
-	}
 
 	@Override
 	public synchronized boolean getManualControl() {

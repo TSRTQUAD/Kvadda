@@ -1,7 +1,6 @@
 package kvaddakopter.interfaces;
 
 public interface ManualControlInterface {
-	public void setSpeed(float spd);
 	public void setEmergencyStop(boolean newBool);
 	boolean getManualControl();
 	public void setManualControl(boolean mcb);
