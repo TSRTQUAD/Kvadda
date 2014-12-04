@@ -17,7 +17,9 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import kvaddakopter.assignment_planer.CalculateTrajectory;
 import kvaddakopter.assignment_planer.MissionObject;
+import kvaddakopter.interfaces.MainBusGUIInterface;
 import kvaddakopter.maps.GPSCoordinate;
 import kvaddakopter.maps.MissionMap;
 import kvaddakopter.storage.MissionStorage;
@@ -54,6 +56,8 @@ public class TabUtforController extends BaseController implements Initializable 
     private Label lblGPS;
     @FXML
     private Label lblWIFI;
+    @FXML
+    private Label lblCoverageArea;
     
     @FXML
     private Button btnArm;
@@ -74,18 +78,44 @@ public class TabUtforController extends BaseController implements Initializable 
 	/**
      * Properties
      */
-	
+    
+    
+    /**
+     * Abstraction of the mission map in this controller.
+     */
 	public MissionMap missionMap;
-	 
+	
+	
+	/**
+	 * List of all current available missions.
+	 */
     private ArrayList<String> listOfMissions;
+    
+    
+    /**
+     * Represent the current selected in the listOfMissions drop down.
+     */
     private MissionObject currentSelectedMissionObject;
+    
+    
+    /**
+     * Represents the current selected Mission Name as as string.
+     */
     private String currentSelectedMissionName;
     
-    private MissionStorage missionStorage = new MissionStorage();
-
     
+    /**
+     * Direct reference to the storage module.
+     */
+    private MissionStorage missionStorage = new MissionStorage();
+    
+    
+    /**
+     * The counter to represent the time left of a mission.
+     */
     private long timeLeft = 0;
- 
+    
+    
     /**
      * UI Events
      * @throws IOException 
@@ -101,7 +131,11 @@ public class TabUtforController extends BaseController implements Initializable 
     	this.lblEstimatedDistance.setText(String.valueOf((int) this.currentSelectedMissionObject.getTrajectoryLength()[0][0])+ " m");
     	this.lblEstimatedTime.setText(SecToMinSec.transform((long) this.currentSelectedMissionObject.getMissionTime()[0][0]));
     }
-
+    
+    
+    /**
+     * Event when user clicks Execute button.
+     */
     @FXML
     private void startMission(){
     	this.getParent().getMainBus().setIsStarted(true);
@@ -110,6 +144,10 @@ public class TabUtforController extends BaseController implements Initializable 
 		}
     }
     
+    
+    /**
+     * Event when user presses Arm button.
+     */
     @FXML
     private void arm(){
     	if(this.currentSelectedMissionObject == null) return;
@@ -122,18 +160,29 @@ public class TabUtforController extends BaseController implements Initializable 
 		}
     }
     
+    
+    /**
+     * Event when user clicks Abort mission button.
+     */
     @FXML
     private void abortMission(){
     	this.getParent().getMainBus().setIsStarted(false);
     }
     
     
+    /**
+     * Event when user clicks the emergency button.
+     */
     @FXML
     private void emergency(){
     	this.getParent().getMainBus().setEmergencyStop(true);
     }
 
     
+    
+    /**
+     * Event when the user presses the toggle auto/manual button.
+     */
     @FXML
     private void toggleControl(){
     	boolean automatic = this.getParent().getMainBus().toggleController();
@@ -141,6 +190,7 @@ public class TabUtforController extends BaseController implements Initializable 
     	this.btnToggleControl.setText(showText);
     }
 
+    
     /**
      * Update the current Image view to the current
      * @param currentImage
@@ -173,7 +223,7 @@ public class TabUtforController extends BaseController implements Initializable 
 		}
 	}
 	
-
+	
     @Override
     public void initialize(URL url, ResourceBundle rb) {
     	
@@ -194,7 +244,7 @@ public class TabUtforController extends BaseController implements Initializable 
     
     
     /**
-     * Populates GUI elementsValues
+     * Populates GUI default values
      */
 	private void populateDefaultLists() {
 		
@@ -207,6 +257,7 @@ public class TabUtforController extends BaseController implements Initializable 
 		this.lblBattery.setText("");
 		this.lblGPS.setText("");
 		this.lblWIFI.setText("");
+		this.lblCoverageArea.setText("");
 		
 		
 		this.cmbListOfMissions.setItems( FXCollections.observableArrayList(
@@ -215,6 +266,10 @@ public class TabUtforController extends BaseController implements Initializable 
 		//this.cmbListOfMissions.getSelectionModel().select(0);
 	}
 	
+	
+	/**
+	 * Uses the current available missions and update the drop down list with it's content.
+	 */
 	public void updateMissionList(){
 		this.loadFromStorage();
 		this.cmbListOfMissions.setItems( FXCollections.observableArrayList(
@@ -224,14 +279,16 @@ public class TabUtforController extends BaseController implements Initializable 
 	
     
     /**
-     * Draw the mission coordinates to the map Map
+     * Draw the mission coordinates to the map. 
      */
     private void drawMission() {
     	this.missionMap.drawResultingTrajectory(this.currentSelectedMissionObject.getTrajectoryFullSize());
 	}
     
+    
     /**
-     * Draw the Quad to the map.
+     * Draw the Quad to the map. 
+     * Fetches the current Quad position and draws a quadmarker on the map.
      */
     public void drawQuadMarker(){
     	if(this.getParent().getMainBus().getQuadData() == null) return;
@@ -240,25 +297,41 @@ public class TabUtforController extends BaseController implements Initializable 
     	this.missionMap.drawQuad(gps.getLatitude(), gps.getLongitude());
     }
     
+    
     /**
-     * Draw targets to the Map
+     * Draw targets to the Map.
+     * Fetches the targetlist of the mainbus and draws all on the mission map.
      */
     public void drawTargetsOnMap(){
     	HashMap<String, GPSCoordinate> targetList = this.getParent().getMainBus().getTargets();
     	if(targetList == null || this.missionMap == null) return;
 		this.missionMap.drawTargetsOnMap(this.getParent().getMainBus().getTargets());
     }
-
+    
+    
+    /**
+     * Sets the status text on the GPS status label.
+     * @param isOk 
+     */
 	public void updateGPSStatus(boolean isOk) {
 		String status = (isOk) ? "GPS: OK!" : "GPS: NOT OK!";
 		this.lblGPS.setText(status);
 	}
 
+	
+	/**
+	 * Sets the status text on the WIFI status label.
+	 * @param isOk
+	 */
 	public void updateWIFIStatus(boolean isOk) {
 		String status = (isOk) ? "WIFI: OK!" : "WIFI: NOT OK!";
 		this.lblWIFI.setText(status);
 	}
 	
+	
+	/**
+	 * Updates the speed label to the current speed.
+	 */
 	public void updateSpeed(){
 		if (this.getParent().getMainBus() != null){
 			if(this.getParent().getMainBus().getCurrentSpeed() < 0){
@@ -268,7 +341,12 @@ public class TabUtforController extends BaseController implements Initializable 
 			}
 		}
 	}
-
+	
+	
+	/**
+	 * Updates the battery percent.
+	 * @param newBattery
+	 */
 	public void updateBattery(float newBattery){
 		if(newBattery < 0){
 			this.lblBattery.setText("- %");
@@ -280,6 +358,10 @@ public class TabUtforController extends BaseController implements Initializable 
 		}
 	}
 	
+	
+	/**
+	 * Checks the mainbus and sets the buttons disable status according to the current state.
+	 */
 	public void updateButtons(){
 		if(this.getParent().getMainBus() == null) return;
 		else if(this.getParent().getMainBus().getIsArmed()){
@@ -291,6 +373,21 @@ public class TabUtforController extends BaseController implements Initializable 
 	}
 	
 	
+	/**
+	 * Updates the area coverage amount and the percentage to the current value.
+	 */
+	public void updateCoverage(){
+		MainBusGUIInterface mainbus = this.getParent().getMainBus();
+		if(mainbus == null || mainbus.getMissionObject() == null || mainbus.getMissionObject().getTrajectory() == null) return;
+		double realnrofpoints = mainbus.getMissionObject().getTrajectory().length;
+		
+		double nrofvisitedpoints = mainbus.getVisitedPoints();
+		double percent = Math.max(Math.min(nrofvisitedpoints/realnrofpoints, 1), 0)*100;	
+		double coveragearea = percent*mainbus.getMissionObject().getCoverageArea()[0][0]/100;
+		
+		String text =  (int)percent + " % ("+ String.valueOf((int)coveragearea) +" m2)";
+		this.lblCoverageArea.setText(text);
+	}
     
 }
 

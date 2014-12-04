@@ -301,6 +301,7 @@ public class Sensorfusionmodule implements Runnable{
 				
 								
 				//Control-signal -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+
 					csignal = controller.GetControlSignalMission0(rsdata, rrdata);			// Calculates controlsignal
 					csignal = controller.saturation(csignal,0.15,0.15,0.5,1.5,0.02);		// Saturate Controlsignal
 					csignal = controller.shouldland(rrdata, csignal);						// Initiate landing?														
@@ -309,7 +310,38 @@ public class Sensorfusionmodule implements Runnable{
 
 				//% of mission completed -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 				//mainbus.addVisitedPoint(rrdata.getCounter());
+/*
+				if(rrdata.getMission()==1){
+					csignal = controller.GetControlSignalMission1(rsdata, rrdata);
+					if(debugMode) System.out.println("Controller Mission = 1, controlsignal:");
+					csignal = controller.saturation(csignal,0.25,0.25,0.4,5,0.02);
+				}
+				else if(rrdata.getMission()==0 || rrdata.getMission()==2){
+					csignal = controller.GetControlSignalMission0(rsdata, rrdata);
+					if(debugMode) System.out.println("Controller Mission = 0, controlsignal:");
+					csignal = controller.saturation(csignal,0.15,0.15,0.5,1.5,0.02);
+				}
+				mainbus.setControlSignalobject(csignal);						// Update main-bus control-signal
 				
+				//---------------------------------------------------------------------------------
+				//	INITAIATE LANDING?
+				if( rrdata.getLand() == 1){									
+					ControlSignal csignal1 = new ControlSignal();
+					csignal.setStart(0);
+					mainbus.setControlSignalobject(csignal1);
+									//
+					try {													
+						Thread.sleep((long) 10000);							
+						this.threadrunning = false;
+					} catch (InterruptedException e) {						
+						e.printStackTrace();								
+					}					
+				}
+				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
+			
+				// Sets the number of points that have been visited for area coverage amount.
+				// mainbus.setVisitedPoints(rrdata.getCounter());
+*/
 				
 					
 				/*

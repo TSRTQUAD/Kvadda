@@ -118,5 +118,11 @@ public interface MainBusGUIInterface {
 	 * @return boolean IsArmed
 	 */
 	public boolean getIsArmed();
+
+	
+	/**
+	 * Get nr of visited points
+	 */
+	public double getVisitedPoints();
 	
 }
