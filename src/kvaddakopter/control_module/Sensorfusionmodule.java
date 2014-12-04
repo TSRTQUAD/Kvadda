@@ -59,33 +59,40 @@ import kvaddakopter.interfaces.ControlMainBusInterface;
 
 public class Sensorfusionmodule implements Runnable{	
 	protected ControlMainBusInterface mainbus;
-	protected double 				sampletime			= 0.05; //seconds
-	protected double 				seconds				= 50;
-	protected QuadData				quadData;
+
+
+	// Parameters
+	protected double 				sampletime			= 0.05; 	// in seconds
+	protected boolean				debugMode			= false;	// Toggle System out prints 
+	protected int					whichkalman			= 0; // 1 for 2xY 0 for 1xY //REMOVE??
+
+	//Signal objects
 	protected SensorData 			sdata				= new SensorData();
 	protected ControlSignal 		controlsignal		= new ControlSignal();
 	protected MissionObject 		missionobject		= new MissionObject(); 
+	protected ReferenceData 		rrdata				= new ReferenceData();
+	protected QuadData				quadData;
+	protected RefinedSensorData 	rsdata  			= new RefinedSensorData();
+
+	//Functions
+	protected ReferenceExtractor	referenceextractor	= new ReferenceExtractor(0);
+	protected SampleTimer			sampletimer			= new SampleTimer(sampletime*1000);
+	protected DataSaver				datasaver			= new DataSaver();
+	//Modules
 	protected KalmanFilter			skalmanx 			= new KalmanFilter(sampletime,1,0.01,1,0,0); //REMOVE??
 	protected KalmanFilter			skalmany	 		= new KalmanFilter(sampletime,1,0.01,1,0,0); //REMOVE??
 	protected Kalmanfilter_endast_gps			skalmanxx 			= new Kalmanfilter_endast_gps(sampletime,1,0.01,0,0);
 	protected Kalmanfilter_endast_gps			skalmanyy	 		= new Kalmanfilter_endast_gps(sampletime,1,0.01,0,0);	
-	protected RefinedSensorData 	rsdata  			= new RefinedSensorData();
 	protected Controller			controller			= new Controller(sampletime);
-	protected ReferenceData 		rrdata				= new ReferenceData();   
-	protected ReferenceExtractor	referenceextractor	= new ReferenceExtractor(0);
-	protected boolean				debugMode			= false;					// Toggle System out prints 		
-	protected int					whichkalman			= 0; // 1 for 2xY 0 for 1xY //REMOVE??
-	protected double[][]			states				= new double[(int) (1/sampletime*seconds)][2];
-	protected MatFileHandler		saver				= new MatFileHandler();
+
+	//Other variables		
 	protected boolean				initialbool 		= true;
 	protected boolean				threadrunning		= true;
-	protected SampleTimer			sampletimer			= new SampleTimer(sampletime*1000);
-	protected DataSaver				datasaver			= new DataSaver();
-	protected double 				time;
+
 
 
 	public Sensorfusionmodule(ControlMainBusInterface mainbus) {
-		this.mainbus = mainbus;			
+		this.mainbus = mainbus;
 	}
 
 
@@ -116,17 +123,16 @@ public class Sensorfusionmodule implements Runnable{
 		}
 	}
 
-	
-	
+
+
 	public void run(){	
 		while(true){
-			
-			
 			checkIsArmed();			
 			if(debugMode){
 				System.out.println("Initializing modules ..");
 			}
 
+			
 			//Average initials -_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_-
 			double Initiallatitud = 0;
 			double Initiallongitud = 0;
@@ -160,15 +166,15 @@ public class Sensorfusionmodule implements Runnable{
 			sdata.setinitial();													// Fix local coordinate system XY
 			sdata.GPS2XY();														// Transformation GPS to XY coordinates
 
-			
-			
+
+
 			//Initialize reference data-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 			rrdata.initialize(sdata.getLatitud(),sdata.getLongitud());			// Fix local coordinate system XY
 			this.missionobject = mainbus.getMissionObject();					//Reads mission object from mainbus			
 			rrdata.updateref(referenceextractor.update(missionobject));			// update ref @ Autonomous flight mode		
-			
-			
-			
+
+
+
 			//Waiting for Quad to start-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-								
 			checkIsRunning();
 			try {
@@ -189,16 +195,15 @@ public class Sensorfusionmodule implements Runnable{
 			while(threadrunning && mainbus.isStarted())
 			{
 
-				time = System.currentTimeMillis();	
 				//For every sample  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				sampletimer.initiate();
-				//time = System.currentTimeMillis();						//REMOVE?
 				ControlSignal csignal = new ControlSignal();			
 				this.quadData = mainbus.getQuadData();						//Reads sensor data from mainbus
 				sdata.setnewsensordata(quadData);							//Update local sensor object
 				sdata.GPS2XY();												//Transformation
 				sdata.xydot2XYdot();										//Transformation
 
+				
 				//SENSORFUSION  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				if (1 ==  whichkalman){
 					rsdata.setXstates(skalmanx.timeupdate()); 							//Kalman filter in X direction
@@ -251,7 +256,7 @@ public class Sensorfusionmodule implements Runnable{
 				if (controller.landinginitiated()) threadrunning = false;				// Shuts down thread after landing is initiated.
 
 
-				
+
 				//Number of reference points visited -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				mainbus.setVisitedPoints(rrdata.getreferenscounter());
 
