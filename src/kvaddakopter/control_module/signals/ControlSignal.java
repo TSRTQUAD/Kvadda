@@ -16,7 +16,7 @@ public class ControlSignal{
 		heightvelocity = 0;
 		lateralvelocity = 0;
 		yawrate = 0;
-		start = 0;
+		start = 1;
 	}
 	
 	

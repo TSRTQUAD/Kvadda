@@ -14,7 +14,7 @@ public class GUIWorker implements Runnable{
 	protected MainController mainController;
 
 
-	protected long sampleTime = 1000;
+	protected long sampleTime = 100;
 
 	public GUIWorker(MainController main){
 		this.mainController = main;
@@ -76,7 +76,7 @@ public class GUIWorker implements Runnable{
 					}
 				});
 				
-				Thread.sleep(clock.stopAndGetSleepTime(1000));
+				Thread.sleep(clock.stopAndGetSleepTime(100));
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

@@ -1,5 +1,6 @@
 package kvaddakopter.control_module.modules;
 import org.ejml.simple.SimpleMatrix;
+
 import kvaddakopter.control_module.signals.*;
 
 
@@ -17,7 +18,7 @@ import kvaddakopter.control_module.signals.*;
 public class Controller{		
 	protected double  errorheight,errorlateralvel, errorforwardvel, errorheading, Ts;
 	protected double KVelForward, KVelForward2, KVelHeight, KVelLateral,KVelLateral2, KYaw, KYaw2, Tintegral, integral;
-	protected boolean Yawdirection;
+	protected boolean Yawdirection, landing;
 
 	public Controller(double sampletime){	
 		KVelHeight = 2; 
@@ -35,6 +36,7 @@ public class Controller{
 		errorforwardvel = 0;
 		errorheading = 0;
 		integral = 0;
+		landing = false;
 	}
 		
 	
@@ -162,7 +164,33 @@ public class Controller{
 		return csignal;		
 	}
 		 
+	
+	/**
+	 * Sets landing command in Controlsignal if reference data specifies that, otherwise it returns input control signal.
+	 * @param rrdata
+	 * @param inputcsignal
+	 * @return
+	 */
+	public ControlSignal shouldland(ReferenceData rrdata,ControlSignal inputcsignal){
+		if( rrdata.getLand() == 1){									
+			ControlSignal csignal = new ControlSignal();
+			csignal.setStart(0);
+			this.landing = true;
+			return csignal;
+		}
+		else
+			return inputcsignal;
+	}
 
+	
+	/**
+	 * Returns true if landing is initiated else false;
+	 * @return
+	 */
+	public boolean landinginitiated(){
+		return landing;
+	}
+	
 	/**
 	 * Get error height
 	 * @return
@@ -194,4 +222,7 @@ public class Controller{
 		return errorheading;
 	}
 	
+	public void setLanding(boolean landing){
+		this.landing = landing;
+	}
 }
