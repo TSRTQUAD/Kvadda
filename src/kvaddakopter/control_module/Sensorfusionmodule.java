@@ -73,17 +73,16 @@ public class Sensorfusionmodule implements Runnable{
 	protected Controller			controller			= new Controller(sampletime);
 	protected ReferenceData 		rrdata				= new ReferenceData();   
 	protected ReferenceExtractor	referenceextractor	= new ReferenceExtractor(0);
-	protected int					counter				= 0;
-	protected int					controllingmode		= 0; 	//REMOVE??
 	protected boolean				debugMode			= true;					// Toggle System out prints 		
-	protected int					whichkalman			= 0; // 1 for 2xY 0 for 1xY //REMOVE??
+	protected int					whichkalman			= 1; // 1 for 2xY 0 for 1xY //REMOVE??
 	protected double[][]			states				= new double[(int) (1/sampletime*seconds)][2];
 	protected MatFileHandler		saver				= new MatFileHandler();
 	protected boolean				initialbool 		= true;
 	protected boolean				threadrunning		= true;
 	protected SampleTimer			sampletimer			= new SampleTimer(sampletime/1000);
-	protected DataSaver				datasaver			= new DataSaver(sampletime,50,2);
+	protected DataSaver				datasaver			= new DataSaver();
 	protected double 				time;
+	
 	
 	
 	public Sensorfusionmodule(ControlMainBusInterface mainbus) {
@@ -124,8 +123,6 @@ public class Sensorfusionmodule implements Runnable{
 		if(debugMode){
 			System.out.println("Initializing modules ..");
 		}
-		if (0 == controllingmode){
-
 			
 			//Average initials -_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_-
 			double Initiallatitud = 0;
@@ -182,25 +179,6 @@ public class Sensorfusionmodule implements Runnable{
 		this.quadData = mainbus.getQuadData();								//Reads sensor data from mainbus
 		sdata.setnewsensordata(quadData);							
 		sdata.xydot2XYdot();
-		}			
-		
-		
-		else if (1 == controllingmode){
-		sdata.setinitial();													// Fix local coordinate system XY
-		sdata.GPS2XY();														// Transformation GPS to XY coordinates
-		sdata.xydot2XYdot();
-		rrdata.initialize(sdata.getLatitud(),sdata.getLongitud());			// Fix local coordinate system XY
-		rrdata.settestpoint();												// Primitive fixed reference @ initial-lat/lon		
-		}
-		
-		else if (2 == controllingmode){
-			sdata.setGPSposition(new double[]{0,0});						// Set initial gps to {0,0}
-			sdata.setinitial();												// Fix local coordinate system XY
-			sdata.GPS2XY();													// Transformation GPS to XY coordinates
-			sdata.xydot2XYdot();											// Transformation velocities to XY(dot)
-			rrdata.initialize(sdata.getLatitud(),sdata.getLongitud());		// Fix local coordinate system XY
-			rrdata.updateindoor(referenceextractor.updatetest());			// Indoor flight mode GPS has to be [0,0]
-		}	
 		//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 		
 		
@@ -246,9 +224,8 @@ public class Sensorfusionmodule implements Runnable{
 				if(debugMode) System.out.println("Controllerloop initialized");
 				while(threadrunning)
 				{
-					
+				time = System.currentTimeMillis();	
 				//For every sample  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-				counter ++;
 				sampletimer.initiate();
 																				//time = System.currentTimeMillis();						//REMOVE?
 				ControlSignal csignal = new ControlSignal();			
@@ -294,7 +271,8 @@ public class Sensorfusionmodule implements Runnable{
 							}		
 				}						
 
-								
+				//Save data-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+				datasaver.saver(new double[]{rsdata.getXpos(),rsdata.getYpos()},rrdata.land == 1);				
 				
 				//Reference update  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-				
 				rrdata.update(rsdata, missionobject);						//Update reference data
@@ -367,15 +345,15 @@ public class Sensorfusionmodule implements Runnable{
 				
 				
 					
-				//Save data-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-				datasaver.saver(new double[]{rsdata.getXpos(),rsdata.getYpos()});
+
 				
 				
 				//Printer-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				if(debugMode){
-					System.out.format("Sensordata at sample %d%n",counter);
+					System.out.println("");
+					System.out.print("Sensordata:");
 					sdata.print();
-					System.out.format("States at sample %d%n",counter);
+					System.out.format("States: %d%n");
 					rsdata.print();
 					System.out.print("Reference signal:");
 					rrdata.print();
@@ -407,7 +385,8 @@ public class Sensorfusionmodule implements Runnable{
 				
 							
 				//Sample-time-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-				sampletimer.waiter();	
+				sampletimer.waiter();
+				System.out.println(time - System.currentTimeMillis());
 		}				
 	}	
 }
