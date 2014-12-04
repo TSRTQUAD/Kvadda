@@ -74,7 +74,7 @@ public class Sensorfusionmodule implements Runnable{
 	protected ReferenceData 		rrdata				= new ReferenceData();   
 	protected ReferenceExtractor	referenceextractor	= new ReferenceExtractor(0);
 	protected boolean				debugMode			= false;					// Toggle System out prints 		
-	protected int					whichkalman			= 1; // 1 for 2xY 0 for 1xY //REMOVE??
+	protected int					whichkalman			= 0; // 1 for 2xY 0 for 1xY //REMOVE??
 	protected double[][]			states				= new double[(int) (1/sampletime*seconds)][2];
 	protected MatFileHandler		saver				= new MatFileHandler();
 	protected boolean				initialbool 		= true;
@@ -120,8 +120,9 @@ public class Sensorfusionmodule implements Runnable{
 	
 	public void run(){	
 		while(true){
-			checkIsArmed();		
-			//Initialize -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-		
+			
+			
+			checkIsArmed();			
 			if(debugMode){
 				System.out.println("Initializing modules ..");
 			}
@@ -158,15 +159,18 @@ public class Sensorfusionmodule implements Runnable{
 			sdata.setGPSposition(new double[]{Initiallatitud,Initiallongitud});
 			sdata.setinitial();													// Fix local coordinate system XY
 			sdata.GPS2XY();														// Transformation GPS to XY coordinates
-			//-_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_-
 
-
+			
+			
+			//Initialize reference data-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 			rrdata.initialize(sdata.getLatitud(),sdata.getLongitud());			// Fix local coordinate system XY
 			this.missionobject = mainbus.getMissionObject();					//Reads mission object from mainbus			
 			rrdata.updateref(referenceextractor.update(missionobject));			// update ref @ Autonomous flight mode		
+			
+			
+			
+			//Waiting for Quad to start-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-								
 			checkIsRunning();
-
-			//Waiting for Quad-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-								
 			try {
 				if(debugMode){
 					System.out.println("Waiting for quadcopter...");
@@ -175,48 +179,8 @@ public class Sensorfusionmodule implements Runnable{
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			//-_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_--_-_-_-_-_-
 
 
-			this.quadData = mainbus.getQuadData();								//Reads sensor data from mainbus
-			sdata.setnewsensordata(quadData);							
-			sdata.xydot2XYdot();
-
-			if (1 ==  whichkalman){
-				//SENSORFUSION  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-				rsdata.setXstates(skalmanx.timeupdate()); 							//Kalman filter in X direction
-				rsdata.setYstates(skalmany.timeupdate()); 							//Kalman filter in Y direction
-				rsdata.setXstates(skalmanx.velmeasurementupdate(sdata.getXdot())); 	// Kalmanfilter in X direction
-				rsdata.setYstates(skalmany.velmeasurementupdate(sdata.getYdot())); 	// Kalmanfilter in Y direction
-				rsdata.setYaw(sdata.getYaw());										// Set Yaw
-				rsdata.setHeight(sdata.getHeight());								// Set Height
-				rsdata.XYdot2Vel();													//Transform Xdot,Ydot to velocities
-				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-			}
-
-
-			if (0 ==  whichkalman){
-				//SENSORFUSION  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-				rsdata.setXstates(skalmanxx.timeupdate(sdata.getXdot())); 							//Kalman filter in X direction
-				rsdata.setYstates(skalmanyy.timeupdate(sdata.getYdot())); 							//Kalman filter in Y direction
-				rsdata.setYaw(sdata.getYaw());										// Set Yaw
-				rsdata.setHeight(sdata.getHeight());								// Set Height
-				rsdata.XYdot2Vel();													//Transform Xdot,Ydot to velocities
-				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-			}
-
-
-
-
-
-			//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-
-			try {
-				if(debugMode) System.out.println("Sleep");
-				Thread.sleep((long) 500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
 
 
 			//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
@@ -287,7 +251,8 @@ public class Sensorfusionmodule implements Runnable{
 				if (controller.landinginitiated()) threadrunning = false;				// Shuts down thread after landing is initiated.
 
 
-				// Sets the number of points that have been visited for area coverage amount.
+				
+				//Number of reference points visited -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				mainbus.setVisitedPoints(rrdata.getreferenscounter());
 
 
@@ -303,29 +268,6 @@ public class Sensorfusionmodule implements Runnable{
 					System.out.println("Controlsignal, Mission = " + rrdata.getMission());
 					csignal.print();
 				}
-
-
-
-				/*
-				//Sample-time -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
-				time = sampletime*1000 - (System.currentTimeMillis() - time);				
-				System.out.format("Samplingsintervall: %.2f%n",time); 
-				if(debugMode){
-					System.out.println("-------------------------------");
-					System.out.println("");
-					System.out.println("");
-				}
-				if(time>0){
-
-				try {
-					Thread.sleep((long) time);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				}
-				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_- */  //REMOVE???
-
-
 
 				//Sample-time-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				sampletimer.waiter();
