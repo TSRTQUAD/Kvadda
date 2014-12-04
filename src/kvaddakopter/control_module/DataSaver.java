@@ -1,63 +1,45 @@
 package kvaddakopter.control_module;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
 
 import kvaddakopter.assignment_planer.MatFileHandler;
 
 
 public class DataSaver {
-double sampletime, periodoftime;
-int counter = 0;
 int numberofstates;
-double[][] states;
+ArrayList<double[]> states = new ArrayList<double[]>();
+Date currentdate = new Date();
 protected MatFileHandler		saver				= new MatFileHandler();
-
-/**
- * Initialize a DataSaverobject that save a "number of states" under a "period of time". Sampletime of loop should be specified.
- * @param sampletime
- * @param periodoftime
- * @param numberofstates
- */
-public DataSaver(double sampletime,int periodoftime,int numberofstates){
-	this.sampletime = sampletime;
-	this.periodoftime = periodoftime;
-	this.states = new double[(int)(periodoftime/sampletime)][numberofstates];
-}
 
 
 /**
  * Function that saves input States after collection over specified period of time. Data is saved under name States.m
  * @param States
  */
-public void saver(double[] inputstates){
-	counter ++;
+public void saver(double[] inputstates,boolean save){
 
-	if (counter <= (int)(1/this.sampletime*this.periodoftime)){
-		this.states[counter-1][0] = inputstates[0];
-		this.states[counter-1][1] = inputstates[1];
-	}
-
-	if (counter == (int)(1/this.sampletime*this.periodoftime)){
-
-
+		this.states.add(inputstates);	
+		
+	if (save){		
+		double[][] statesarray = (double[][]) states.toArray();
 		new Thread(new Runnable(){
 			@Override
 			public void run(){
-
 				try {
-					
-					saver.createMatFileFromFlightData("States", states);
-					//System.out.println("SAVE COMPLETED");
+					@SuppressWarnings("deprecation")
+					String name = (String.valueOf("States_" + currentdate.getYear()) + "_" + String.valueOf(currentdate.getMonth()+1) + "_" + String.valueOf(currentdate.getHours()) + "_" + String.valueOf(currentdate.getMinutes()));
+					saver.createMatFileFromFlightData(name, statesarray);
+					System.out.println("FlightData has been saved");
 				} catch (IOException e) {
 					System.err.println("Error with creating Matfile from DataSaver");
 					e.printStackTrace();
 				}
-			}
+			}			
 		}).start();
 	}
-
 }
-
 }		
 
 

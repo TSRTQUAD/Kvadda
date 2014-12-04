@@ -26,7 +26,9 @@ for ii = 1:3
     rawtrajectory = lastCheck( rawtrajectory, object );
     tmptrajectory = lastCheck( tmptrajectory, object );
 
-    DPtrajectory = tmptrajectory; %DouglasPeucker(tmptrajectory);
+    % NOTE: If the fullsizetrajcetory are to be used, run the Douglas
+    % Peucker algoritm on the rawtrajectory, the part that i commented.
+    DPtrajectory = tmptrajectory; % DouglasPeucker(rawtrajectory);
     
     % This function calculates the total estimated time for the mission
     % which is used as a mesure of performance for the trajectory

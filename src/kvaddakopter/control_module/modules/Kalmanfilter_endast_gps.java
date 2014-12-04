@@ -62,13 +62,14 @@ public class Kalmanfilter_endast_gps {
         this.S = HP.mult(H.transpose()).plus(R);
         //S.print();
         // K = PH'S^(-1)
-        this.K = P.mult(H.transpose().mult(S.invert()));
+        this.K = P.mult(H.transpose().mult(S.pseudoInverse()));
         //K.print();
         // x = x + Ky
         this.x = x.plus(K.mult(error));
         //x.print();
         // P = (I-kH)P = P - KHP
-        P = P.minus(K.mult(HP));
+        this.P = P.minus(K.mult(HP));
+        this.P = P.mult(P.transpose()).divide(2);
         states = new double[]{x.get(0),x.get(1)};
         return states;
 	    }
@@ -86,6 +87,7 @@ public class Kalmanfilter_endast_gps {
 		// P = F P F' + Gv Q Gv'
 		//x.print();
 		this.P = F.mult(P.mult(F.transpose())).plus(Gv.mult(Q.mult(Gv.transpose())));
+		this.P = P.mult(P.transpose()).divide(2);
         states = new double[]{x.get(0),x.get(1)};
         return states;
 	}

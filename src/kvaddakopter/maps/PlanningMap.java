@@ -229,7 +229,7 @@ public class PlanningMap extends BaseMap implements MapComponentInitializedListe
 	
 	public void createNewMapShape() {
 		MissionType missionType = this.owningController.getCurrentSelectedMissionType();
-		if(this.navigationMapShapes.size() > this.currentActiveForbiddenAreaCounter){
+		if(this.navigationMapShapes.size() > this.currentActiveMissionAreaCounter){
 			if(!this.navigationMapShapes.get(this.currentActiveMissionAreaCounter).isValid()){
 				return;
 			}
