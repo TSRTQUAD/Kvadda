@@ -263,14 +263,6 @@ public class Communication implements Runnable {
 
 	}
 
-	public void selfCheck() {
-
-		// DO THE SELFCHECK //
-		mMainbus.setSelfCheck(true);
-		System.out.println("Selfcheck Complete");
-
-	}
-
 	// -------- SEND AT COMMANDS ----------//
 	public synchronized void send_at_cmd(String AT_CMD) throws Exception {
 

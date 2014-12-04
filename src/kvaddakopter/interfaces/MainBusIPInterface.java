@@ -75,10 +75,6 @@ public interface MainBusIPInterface {
 	public FormTemplate getCalibFormTemplate();
 	public void setCalibFormTemplate(FormTemplate template);
 	
-	//GPS
-	public void setIPGPSCoordinate(GPSCoordinate coord);
-	public GPSCoordinate getCurrentQuadPosition();
-	
 	//Targets
 	public void setIPTargetList(ArrayList<TargetObject> targets);
 	

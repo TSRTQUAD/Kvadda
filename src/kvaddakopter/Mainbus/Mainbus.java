@@ -232,16 +232,6 @@ public class Mainbus implements ManualControlInterface, MainBusCommInterface, Co
 		this.quadData = quadData;
 	}
 	
-	@Override
-	public synchronized void setSelfCheck(boolean b){
-	    selfCheck = true;
-	}
-	
-	@Override
-	public synchronized String getMode(){
-		return mode; 
-	}
-	
 	
 	@Override
 	public synchronized boolean EmergencyStop(){
@@ -293,7 +283,6 @@ public class Mainbus implements ManualControlInterface, MainBusCommInterface, Co
 		mTargetList = new ArrayList<TargetObject>();
 		mIPCalibTemplate[0] = new ColorTemplate();
 		mIPImageToShow[0] = null;
-		
 		mIsIPRunning = false;
 	}
 
@@ -357,12 +346,6 @@ public class Mainbus implements ManualControlInterface, MainBusCommInterface, Co
 	@Override
 	public synchronized void addIPFormTemplate(FormTemplate template) {
 		mFormTemplates.add(template);
-	}
-
-	@Override
-	public synchronized void setIPGPSCoordinate(GPSCoordinate coord) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
