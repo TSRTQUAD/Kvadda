@@ -21,7 +21,7 @@ protected MatFileHandler		saver				= new MatFileHandler();
 public DataSaver(double sampletime,int periodoftime,int numberofstates){
 	this.sampletime = sampletime;
 	this.periodoftime = periodoftime;
-	this.states = new double[(int)(periodoftime*sampletime)][numberofstates];
+	this.states = new double[(int)(periodoftime/sampletime)][numberofstates];
 }
 
 
@@ -45,7 +45,9 @@ public void saver(double[] inputstates){
 			public void run(){
 
 				try {
+					
 					saver.createMatFileFromFlightData("States", states);
+					//System.out.println("SAVE COMPLETED");
 				} catch (IOException e) {
 					System.err.println("Error with creating Matfile from DataSaver");
 					e.printStackTrace();

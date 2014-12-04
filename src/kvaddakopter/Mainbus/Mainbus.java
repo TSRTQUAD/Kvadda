@@ -101,7 +101,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 		kvaddakopter.control_module.signals.ControlSignal csignal) {		
 		if (true == this.runcontroller){
 		//Controlsignal[Landing/Start Roll Pitch Gaz Yaw ]		
-		//ControlSignal[0] = csignal.getStart();
+		ControlSignal[0] = csignal.getStart();
 		ControlSignal[1] = (float) 		csignal.getLateralvelocity();
 		ControlSignal[2] = (float) 		-csignal.getForwardvelocity();
 		ControlSignal[3] = (float)  	csignal.getHeightvelocity();
@@ -117,17 +117,22 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 
 		Mainbus mainbus = new Mainbus();
 		
-		/*
-		//Setting up a Matlab Proxy Server
-		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
-		mainbus.setMatlabProxyConnection(matlabproxy);
-		matlabproxy.startMatlab("quiet");
+		(new Thread(new Runnable(){
+			@Override
+			public void run(){
+				//Setting up a Matlab Proxy Server
+				MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
+				mainbus.setMatlabProxyConnection(matlabproxy);
+				matlabproxy.startMatlab("quiet");
+
+			}
+
+		})).start();
 		
-		AssignmentPlanerRunnable assignmentplanerrunnable = new AssignmentPlanerRunnable(3,mainbus);
-		Thread t4 = new Thread(assignmentplanerrunnable);
-		t4.setPriority(1);
-		t4.start();
-		*/
+				AssignmentPlanerRunnable assignmentplanerrunnable = new AssignmentPlanerRunnable(3,mainbus);
+				Thread t4 = new Thread(assignmentplanerrunnable);
+				t4.setPriority(1);
+				t4.start();
 
 		//Communication
 		

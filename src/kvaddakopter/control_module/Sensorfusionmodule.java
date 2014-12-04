@@ -75,7 +75,7 @@ public class Sensorfusionmodule implements Runnable{
 	protected ReferenceExtractor	referenceextractor	= new ReferenceExtractor(0);
 	protected int					counter				= 0;
 	protected int					controllingmode		= 0; 	//REMOVE??
-	protected boolean				debugMode			= true;					// Toggle System out prints 		
+	protected boolean				debugMode			= false;					// Toggle System out prints 		
 	protected int					whichkalman			= 0; // 1 for 2xY 0 for 1xY //REMOVE??
 	protected double[][]			states				= new double[(int) (1/sampletime*seconds)][2];
 	protected MatFileHandler		saver				= new MatFileHandler();
@@ -340,8 +340,8 @@ public class Sensorfusionmodule implements Runnable{
 				//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-	
 			
 				// Sets the number of points that have been visited for area coverage amount.
-				// mainbus.setVisitedPoints(rrdata.getCounter());
-*/
+				 */
+				 mainbus.setVisitedPoints(rrdata.getreferenscounter());
 				
 					
 				/*
@@ -368,7 +368,7 @@ public class Sensorfusionmodule implements Runnable{
 				
 					
 				//Save data-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-				datasaver.saver(new double[]{rsdata.getXpos(),rsdata.getYpos()});
+				//datasaver.saver(new double[]{rsdata.getXpos(),rsdata.getYpos()});
 				
 				
 				//Printer-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
