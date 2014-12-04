@@ -95,13 +95,6 @@ public interface MainBusGUIInterface {
 
 
 	/**
-	 * Gets current speed
-	 * @return speed
-	 */
-	public float getSpeed();
-
-
-	/**
 	 * Get current battery level
 	 * @return battery level
 	 */

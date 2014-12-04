@@ -1,6 +1,5 @@
 package kvaddakopter.Mainbus;
 
-import java.awt.Frame;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,13 +43,8 @@ import kvaddakopter.maps.GPSCoordinate;
  * 3) start thread
  * 
  */
-public class Mainbus extends Frame implements ManualControlInterface, MainBusCommInterface, ControlMainBusInterface, AssignmentPlanerInterface, MainBusGUIInterface, MainBusIPInterface, IPAndGUIInterface{
+public class Mainbus implements ManualControlInterface, MainBusCommInterface, ControlMainBusInterface, AssignmentPlanerInterface, MainBusGUIInterface, MainBusIPInterface, IPAndGUIInterface{
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
 	//Image processing storage
 	private boolean mIsIPRunning;
 	private ArrayList<TargetObject> mTargetList = new ArrayList<TargetObject>();
@@ -75,14 +69,8 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	private String mode;
 	public boolean selfCheck = false;
 	float speed = -1f;
-	float batteryLevel = -1f;
-    boolean shift = false;
     boolean runcontroller = true;
-    boolean space_bar = false; //true = Takeoff, false = Landing
 	public boolean EmerStop = false;
-	public boolean manualcontrolbool;
-	double[][] NavDataOverAll = new double[3000][6];
-	double[][] ControlSignalAll = new double[3000][5];
 	public int seq = 0;
 	public int seq_signal = 0;
 	QuadData quadData = new QuadData();
@@ -99,9 +87,9 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	
 	public void setControlSignalobject(
 		kvaddakopter.control_module.signals.ControlSignal csignal) {		
-		if (true == this.runcontroller){
+		if (this.runcontroller){
 		//Controlsignal[Landing/Start Roll Pitch Gaz Yaw ]		
-		//ControlSignal[0] = csignal.getStart();
+		ControlSignal[0] = csignal.getStart();
 		ControlSignal[1] = (float) 		csignal.getLateralvelocity();
 		ControlSignal[2] = (float) 		-csignal.getForwardvelocity();
 		ControlSignal[3] = (float)  	csignal.getHeightvelocity();
@@ -112,25 +100,26 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	
 	public static void main(String[] args) {
 
-		//M�ste laddas i b�rjan av programmet... F�rslagsvis h�r.
-		//     System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
 		Mainbus mainbus = new Mainbus();
 		
-		/*
-		//Setting up a Matlab Proxy Server
-		MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
-		mainbus.setMatlabProxyConnection(matlabproxy);
-		matlabproxy.startMatlab("quiet");
-		
+		(new Thread(new Runnable(){
+			@Override
+			public void run(){
+				//Setting up a Matlab Proxy Server
+				MatlabProxyConnection matlabproxy = new MatlabProxyConnection();
+				mainbus.setMatlabProxyConnection(matlabproxy);
+				matlabproxy.startMatlab("quiet");
+
+			}
+
+		})).start();
+
 		AssignmentPlanerRunnable assignmentplanerrunnable = new AssignmentPlanerRunnable(3,mainbus);
 		Thread t4 = new Thread(assignmentplanerrunnable);
 		t4.setPriority(1);
 		t4.start();
-		*/
 
-		//Communication
-		
 		
 		try{
 			Communication communication = new Communication(3,mainbus,"Communication");
@@ -138,7 +127,6 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 			t7.setDaemon(true);
 			t7.setPriority(1);
 			t7.start();
-			System.out.println("Communication-link initiated");
 
 
 			NavData navdata = new NavData(4,mainbus,"NavData", communication);	
@@ -146,7 +134,6 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 			t5.setDaemon(true);
 			t5.setPriority(1);
 			t5.start();
-			System.out.println("NavData-link initiated");
 		
 			
 			ManualControl manualcontrol = new ManualControl(5,mainbus);
@@ -154,7 +141,6 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 			t2.setDaemon(true);
 			t2.setPriority(1);
 			t2.start();
-			System.out.println("Manual Control initiated");
 
 		} catch (Exception ex1){
 
@@ -236,12 +222,6 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	@Override
 	public synchronized float[] getControlSignal(){
 		
-		/*ControlSignalAll[seq][0] = (double)ControlSignal[0];
-		ControlSignalAll[seq][1] = (double)ControlSignal[1];
-		ControlSignalAll[seq][2] = (double)ControlSignal[2];
-		ControlSignalAll[seq][3] = (double)ControlSignal[3];
-		ControlSignalAll[seq][4] = (double)ControlSignal[4]; */
- 	
 		seq_signal = seq_signal + 1;
 		//System.out.println("Pos 1:   " + ControlSignal[1] + "Pos 2:   " + ControlSignal[2]);
 		return ControlSignal;
@@ -250,14 +230,6 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 
 	@Override
 	public synchronized void setQuadData(QuadData quadData){
-		/*
-		NavDataOverAll[seq][0] = nd[0];
-		NavDataOverAll[seq][1] = nd[1];
-		NavDataOverAll[seq][2] = nd[2];
-		NavDataOverAll[seq][3] = nd[3];
-		NavDataOverAll[seq][4] = nd[4];
-		NavDataOverAll[seq][5] = nd[5];
-		*/		
 		seq = seq + 1;
 		this.quadData = quadData;
 	}
@@ -284,7 +256,7 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	
 	@Override
 	public double getCurrentSpeed() {
-		return speed;
+		return Math.sqrt(Math.pow(quadData.getVx(), 2) + Math.pow(quadData.getVy(), 2) + Math.pow(quadData.getVz(), 2));
 	}
 
 
@@ -459,13 +431,8 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 	
 	
 	@Override
-	public synchronized float getSpeed(){
-		return speed;
-	}
-	
-	@Override
 	public synchronized float getBattery(){
-		return batteryLevel;
+		return quadData.getBatteryLevel();
 	}
 
 
@@ -517,12 +484,12 @@ public class Mainbus extends Frame implements ManualControlInterface, MainBusCom
 
 	@Override
 	public synchronized boolean getManualControl() {
-		return manualcontrolbool = true;
+		return !runcontroller;
 	}
 
 	@Override
 	public synchronized void setManualControl(boolean mcb) {
-		manualcontrolbool = mcb;
+		this.runcontroller = !mcb;
 	}
 
 	@Override

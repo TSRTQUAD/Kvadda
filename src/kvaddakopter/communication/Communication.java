@@ -27,7 +27,7 @@ public class Communication implements Runnable {
 	private volatile MainBusCommInterface mMainbus;
 	private boolean mIsInitiated = false;
 	private boolean mIsRunning = false;
-	
+
 	private boolean mIsFlying = false;
 	float[] ControlSignal = new float[5];
 	public String ip;
@@ -42,7 +42,7 @@ public class Communication implements Runnable {
 
 	private FloatBuffer fb;
 	private IntBuffer ib;
-	
+
 	/**
 	 * Constructor of communication class
 	 * @param threadid
@@ -58,8 +58,8 @@ public class Communication implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
+
 	private void init(){
 		System.out.println("Init Communication");
 
@@ -93,11 +93,11 @@ public class Communication implements Runnable {
 			send_at_cmd("AT*COMWDG=" + get_seq());
 			Thread.sleep(INTERVAL);
 			send_at_cmd("AT*CONFIG=" + get_seq()
-					+ ",\"control:altitude_max\",\"7000\""); // altitude max 2m
+					+ ",\"control:altitude_max\",\"5000\""); // altitude max 2m
 			Thread.sleep(INTERVAL);
 			send_at_cmd("AT*CONFIG=" + get_seq()
 					+ ",\"control:control_level\",\"0\""); // 0:BEGINNER, 1:ACE,
-															// 2:MAX
+			// 2:MAX
 			Thread.sleep(INTERVAL);
 			send_at_cmd("AT*CONFIG=" + get_seq()
 					+ ",\"general:navdata_demo\",\"TRUE\"");
@@ -145,7 +145,7 @@ public class Communication implements Runnable {
 		ByteBuffer bb = ByteBuffer.allocate(4);
 		fb = bb.asFloatBuffer();
 		ib = bb.asIntBuffer();
-		
+
 	}
 
 	private void checkIsRunning(){
@@ -156,13 +156,12 @@ public class Communication implements Runnable {
 				try {
 					mIsRunning = false;
 					mMainbus.wait();
-					System.out.println("WAIT FOR START");
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
 		}
-		mIsRunning = true;
+		
 		if(!mIsInitiated && !mIsFlying){
 			System.out.println("Comm unit being initiated");
 			init();
@@ -172,8 +171,9 @@ public class Communication implements Runnable {
 			}
 
 		}
+		mIsRunning = true;
 	}
-	
+
 	public synchronized void reset(){
 		//AT_socket.disconnect();
 		mIsRunning = false;
@@ -181,62 +181,75 @@ public class Communication implements Runnable {
 	}
 
 	public void run() {
-		
+
+
 		try {
+			while(true){
 
-			while (!mMainbus.isStarted()) { // ADD START COMMAND FROM GUI
-				checkIsRunning();	
-				Thread.sleep(200);
-				
-				if (sequence == sequence_1)
-					send_at_cmd(AT_CMD_1);
-				send_at_cmd("AT*REF=" + get_seq() + ",290717696");
+				while (!mMainbus.isStarted()) { // ADD START COMMAND FROM GUI
+					checkIsRunning();	
+					Thread.sleep(200);
 
-			}
-
-			System.out.println("Lift-off");
-
-			send_at_cmd("AT*REF=" + get_seq() + ",290718208"); // Starting
-			Thread.sleep(200);
-
-			while (true) { // SET STARTING CONDITION //
-				checkIsRunning();	
-				if (mMainbus.EmergencyStop()) {
-					send_at_cmd("AT*REF=" + get_seq() + ",290717952"); // FALL
-					System.out.println("EmergencyStop");
-
-					break;
+					if (sequence == sequence_1)
+						send_at_cmd(AT_CMD_1);
+					send_at_cmd("AT*REF=" + get_seq() + ",290717696");
 
 				}
 
-				Thread.sleep(50);
-				if (sequence == sequence_1)
-					send_at_cmd(AT_CMD_1);
+				System.out.println("Lift-off");
 
-				ControlSignal = mMainbus.getControlSignal();
+				send_at_cmd("AT*REF=" + get_seq() + ",290718208"); // Starting
+				Thread.sleep(200);
 
-				sequence_1 = sequence;
-				// send_pcmd(1,0, 0, 0, 0);
+				while (mMainbus.isStarted()) { // SET STARTING CONDITION //
+					checkIsRunning();	
 
-				
-				
-				// System.out.println("  CS[0]:  " + ControlSignal[0] + "  CS[1]:  " + ControlSignal[1] +
-				// "CS[2]   " + ControlSignal[2] + "CS[3]  " + ControlSignal[3]
-				// + "CS[4]  " + ControlSignal[4]);
+					if (mMainbus.EmergencyStop()) {
+						send_at_cmd("AT*REF=" + get_seq() + ",290717952"); // FALL
+						System.out.println("EmergencyStop");
+						this.mMainbus.setIsStarted(false);
+						this.mMainbus.setShouldStart(false);
+						this.reset();
+						break;
 
-				send_pcmd(1, ControlSignal[1], ControlSignal[2],
-						ControlSignal[3], ControlSignal[4]);
+					}
 
-				if (ControlSignal[0] == 0) {
+					Thread.sleep(50);
+					if (sequence == sequence_1)
+						send_at_cmd(AT_CMD_1);
 
-					send_at_cmd("AT*REF=" + get_seq() + ",290717696"); // Landing
+					ControlSignal = mMainbus.getControlSignal();
 
-					while (true) {
-						// System.out.println("Landing");
+					sequence_1 = sequence;
+					// send_pcmd(1,0, 0, 0, 0);
+
+
+
+					// System.out.println("  CS[0]:  " + ControlSignal[0] + "  CS[1]:  " + ControlSignal[1] +
+					// "CS[2]   " + ControlSignal[2] + "CS[3]  " + ControlSignal[3]
+					// + "CS[4]  " + ControlSignal[4]);
+
+					send_pcmd(1, ControlSignal[1], ControlSignal[2],
+							ControlSignal[3], ControlSignal[4]);
+
+					if (ControlSignal[0] == 0) {
+
+						send_at_cmd("AT*REF=" + get_seq() + ",290717696"); // Landing
+
+						
+						while (!mIsFlying) {
+							// System.out.println("Landing");
+						}
+						this.mMainbus.setControlSignal(new float[]{1f,0,0,0,0});
+						this.mMainbus.setIsStarted(false);
+						this.mMainbus.setShouldStart(true);
+						//this.reset();
 					}
 
 				}
-
+				//this.mMainbus.setIsStarted(false);
+				//this.mMainbus.setShouldStart(false);
+				//this.reset();
 			}
 		} catch (Exception ex1) {
 
@@ -315,43 +328,43 @@ public class Communication implements Runnable {
 		return n;
 	}
 
-//	public static String byte2hex(byte[] data, int offset, int len) {
-//		StringBuffer sb = new StringBuffer();
-//		for (int i = 0; i < len; i++) {
-//			String tmp = Integer.toHexString(((int) data[offset + i]) & 0xFF);
-//			for (int t = tmp.length(); t < 2; t++) {
-//				sb.append("0");
-//			}
-//			sb.append(tmp);
-//			sb.append(" ");
-//		}
-//		return sb.toString();
-//	}
-	
+	//	public static String byte2hex(byte[] data, int offset, int len) {
+	//		StringBuffer sb = new StringBuffer();
+	//		for (int i = 0; i < len; i++) {
+	//			String tmp = Integer.toHexString(((int) data[offset + i]) & 0xFF);
+	//			for (int t = tmp.length(); t < 2; t++) {
+	//				sb.append("0");
+	//			}
+	//			sb.append(tmp);
+	//			sb.append(" ");
+	//		}
+	//		return sb.toString();
+	//	}
+
 	public synchronized void disconnect(){
 		AT_socket.disconnect();
 	}
-	
+
 	public synchronized String getIP(){
 		return ip;
 	}
-	
+
 	public synchronized InetAddress getInetAddr(){
 		return this.inet_addr;
 	}
-	
+
 	public synchronized boolean isInitiated(){
 		return mIsInitiated;
 	}
-	
+
 	public synchronized boolean isRunning(){
 		return mIsRunning;
 	}
-	
+
 	public synchronized boolean getIsFlying(){
 		return mIsFlying;
 	}
-	
+
 	public synchronized void setIsFlying(boolean b){
 		mIsFlying = b;
 	}

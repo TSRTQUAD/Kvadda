@@ -75,6 +75,11 @@ public class NavData implements Runnable {
 				}
 			}
 			System.out.println("NavData: Stopped waiting!");
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 
 		if (!mIsInitiated) {
@@ -82,7 +87,21 @@ public class NavData implements Runnable {
 			NavDataTimeOut = false;
 			init();
 		}
+	}
+	
+	public void checkShouldStart(){
+		while (!mMainbus.shouldStart() && !mMainbus.isStarted()) {
+			synchronized (mMainbus) {
+				try {
+					mIsInitiated = false;
+					mMainbus.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 
+			System.out.println("NavData: Stopped waiting on shouldStart!");
+		}
 	}
 	
 	public void handleTimeOut(){
@@ -115,6 +134,7 @@ public class NavData implements Runnable {
 	 */
 	public void run() {
 		while (true) {
+			checkShouldStart();
 			checkIsCommRunning();
 			try {
 				Thread.sleep(3000);
@@ -160,6 +180,9 @@ public class NavData implements Runnable {
 
 					if (droneStates[NavReader.FLYING]) {
 						comm.setIsFlying(true);
+						System.err.println("FLYING");
+					}else{
+						comm.setIsFlying(false);
 					}
 					
 					// Run until checksum

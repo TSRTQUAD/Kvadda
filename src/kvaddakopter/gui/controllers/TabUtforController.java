@@ -17,7 +17,6 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import kvaddakopter.assignment_planer.CalculateTrajectory;
 import kvaddakopter.assignment_planer.MissionObject;
 import kvaddakopter.interfaces.MainBusGUIInterface;
 import kvaddakopter.maps.GPSCoordinate;
@@ -138,6 +137,7 @@ public class TabUtforController extends BaseController implements Initializable 
      */
     @FXML
     private void startMission(){
+    	this.getParent().getMainBus().setShouldStart(false);
     	this.getParent().getMainBus().setIsStarted(true);
     	synchronized (this.getParent().getMainBus()) {
 			this.getParent().getMainBus().notifyAll();
@@ -154,6 +154,7 @@ public class TabUtforController extends BaseController implements Initializable 
     	this.timeLeft = (long) this.currentSelectedMissionObject.getMissionTime()[0][0];
     	System.out.println("Started");
     	System.out.println(this.currentSelectedMissionName);
+    	this.getParent().getMainBus().setIsStarted(false);
     	this.getParent().getMainBus().setShouldStart(true);
     	synchronized (this.getParent().getMainBus()) {
 			this.getParent().getMainBus().notifyAll();
@@ -166,7 +167,7 @@ public class TabUtforController extends BaseController implements Initializable 
      */
     @FXML
     private void abortMission(){
-    	this.getParent().getMainBus().setIsStarted(false);
+    	this.getParent().getMainBus().setEmergencyStop(true);
     }
     
     
