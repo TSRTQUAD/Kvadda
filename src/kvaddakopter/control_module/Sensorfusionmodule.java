@@ -9,14 +9,17 @@ import kvaddakopter.control_module.modules.*;
 import kvaddakopter.control_module.signals.*;
 import kvaddakopter.interfaces.ControlMainBusInterface;
 
-
-/*Initialize
- * 1: Read sensor data and set origo @ intilong initlat
- * 2: Initialize kalmanfilter
- * 3:
- */
-
-/*Control loop
+/**
+ * 	Controller: Implements a kalmanfilter for positions and velocity estimates, reads referencedata and calculates controlsignals.
+ * 
+ */ 
+ /*	Initialize
+ * 1: Read sensor data and set origo @ intilong initlat after averageing 5 gps measurements.
+ * 2: Initialize reference data
+ * 3: Waiting for execute command
+ *
+ *
+ *	Control loop
  * 1: Update Reference ..
  * 2: Transformation into correct coordinate system
  * 3: Check mission type:
@@ -26,9 +29,9 @@ import kvaddakopter.interfaces.ControlMainBusInterface;
  * 				controller.GetControlSignalSingle(rsdata, rrdata);
  * 4: Saturate control signal?
  * 5: Update to mainbus?
- */
-
-/*Main control loop
+ *
+ *
+ * 	Main control loop
  *	 1: For every sample:
  * 		SENSORFUSION
  *	 	i: Read latest sensor data
@@ -55,16 +58,13 @@ import kvaddakopter.interfaces.ControlMainBusInterface;
  *  
  */
 
-
-
 public class Sensorfusionmodule implements Runnable{	
 	protected ControlMainBusInterface mainbus;
 
-
 	// Parameters
 	protected double 				sampletime			= 0.05; 	// in seconds
-	protected boolean				debugMode			= false;	// Toggle System out prints 
-	protected int					whichkalman			= 0; // 1 for 2xY 0 for 1xY //REMOVE??
+	protected boolean				debugmode			= true;		// Toggle System out prints 
+	protected int					whichkalman			= 0; 		// 0 for 1xY  			1 for 2xY   //REMOVE??
 
 	//Signal objects
 	protected SensorData 			sdata				= new SensorData();
@@ -77,7 +77,8 @@ public class Sensorfusionmodule implements Runnable{
 	//Functions
 	protected ReferenceExtractor	referenceextractor	= new ReferenceExtractor(0);
 	protected SampleTimer			sampletimer			= new SampleTimer(sampletime*1000);
-	protected DataSaver				datasaver			= new DataSaver();
+	protected DataSaver				datasaver			= new DataSaver(2,"states");
+	
 	//Modules
 	protected KalmanFilter			skalmanx 			= new KalmanFilter(sampletime,1,0.01,1,0,0); //REMOVE??
 	protected KalmanFilter			skalmany	 		= new KalmanFilter(sampletime,1,0.01,1,0,0); //REMOVE??
@@ -128,7 +129,7 @@ public class Sensorfusionmodule implements Runnable{
 	public void run(){	
 		while(true){
 			checkIsArmed();			
-			if(debugMode){
+			if(debugmode){
 				System.out.println("Initializing modules ..");
 			}
 
@@ -142,7 +143,7 @@ public class Sensorfusionmodule implements Runnable{
 				sdata.setnewsensordata(quadData);
 				if (sdata.isGPSnew()){
 
-					if (debugMode){
+					if (debugmode){
 						System.out.println(this.quadData.getGPSLat());
 						System.out.println(this.quadData.getGPSLong());
 						System.out.println(localcounter);
@@ -178,7 +179,7 @@ public class Sensorfusionmodule implements Runnable{
 			//Waiting for Quad to start-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-								
 			checkIsRunning();
 			try {
-				if(debugMode){
+				if(debugmode){
 					System.out.println("Waiting for quadcopter...");
 				}
 				Thread.sleep((long) 1500);
@@ -187,11 +188,11 @@ public class Sensorfusionmodule implements Runnable{
 			}
 
 
-
+			
 
 			//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 			//-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_--_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-			if(debugMode) System.out.println("Controllerloop initialized");
+			if(debugmode) System.out.println("Controllerloop initialized");
 			while(threadrunning && mainbus.isStarted())
 			{
 
@@ -203,7 +204,7 @@ public class Sensorfusionmodule implements Runnable{
 				sdata.GPS2XY();												//Transformation
 				sdata.xydot2XYdot();										//Transformation
 
-				
+			
 				//SENSORFUSION  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				if (1 ==  whichkalman){
 					rsdata.setXstates(skalmanx.timeupdate()); 							//Kalman filter in X direction
@@ -220,8 +221,7 @@ public class Sensorfusionmodule implements Runnable{
 						rsdata.XYdot2Vel();												// Transform Xdot,Ydot to velocities								
 					}
 				}
-
-
+				
 				//SENSORFUSION  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				if (0 ==  whichkalman){					
 					rsdata.setXstates(skalmanxx.timeupdate(sdata.getXdot())); 							//Kalman filter in X direction
@@ -240,7 +240,7 @@ public class Sensorfusionmodule implements Runnable{
 				}						
 
 				//Save data-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-				datasaver.saver(new double[]{rsdata.getXpos(),rsdata.getYpos()},rrdata.land == 1);				
+				datasaver.adddata(new double[]{rsdata.getXpos(),rsdata.getYpos()});				
 
 
 				//Reference update  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-				
@@ -248,7 +248,6 @@ public class Sensorfusionmodule implements Runnable{
 
 
 				//Control-signal -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-
 				csignal = controller.GetControlSignalMission0(rsdata, rrdata);			// Calculates controlsignal
 				csignal = controller.saturation(csignal,0.15,0.15,0.5,1.5,0.02);		// Saturate Controlsignal
 				csignal = controller.shouldland(rrdata, csignal);						// Initiate landing?														
@@ -262,7 +261,7 @@ public class Sensorfusionmodule implements Runnable{
 
 
 				//Printer-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-				if(debugMode){
+				if(debugmode){
 					System.out.println("");
 					System.out.print("Sensordata:");
 					sdata.print();
@@ -277,6 +276,9 @@ public class Sensorfusionmodule implements Runnable{
 				//Sample-time-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				sampletimer.waiter();
 			}
+			
+				//Save data to matfile when landed -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+			datasaver.savedata();
 		}
 	}
 }

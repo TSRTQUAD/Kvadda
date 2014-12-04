@@ -1,5 +1,9 @@
 package kvaddakopter.control_module;
-
+/**
+ * Waits the right amount of time to get specified sampletime.
+ *
+ *
+ */
 public class SampleTimer {
 double timer,sampletime, deltatime;
 int counter;

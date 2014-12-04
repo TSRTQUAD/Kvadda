@@ -2,14 +2,24 @@ package kvaddakopter.control_module.modules;
 import org.ejml.simple.SimpleMatrix;
 
 
+/**
+ * Kalmanfilter with GPS measurement as measurement updates and velocity measurement as input signal.
+ *
+ *
+ */
+
 
 public class Kalmanfilter_endast_gps {
-
 	protected SimpleMatrix F,Gu,Gv,Q,H,P,K,S,R,HP,error,z1,z2,x;
-	protected double[] states;
-	
-	
-	// Construct all matrices from initial conditions, and variances
+	protected double[] states;	
+	/** Construct all matrices from sampletime, variances and initial conditions,.
+	 * 
+	 * @param sampletime
+	 * @param lambdaxdot
+	 * @param lambday
+	 * @param initialx
+	 * @param initialxdot
+	 */
 	public Kalmanfilter_endast_gps(double sampletime,double lambdaxdot,double lambday,
 						double initialx, double initialxdot){		
 	    // Construct all matrices
@@ -21,8 +31,8 @@ public class Kalmanfilter_endast_gps {
 										1.0,
 										0.0);
 		
-		Gv = new SimpleMatrix(3,1,true,	Math.pow(sampletime, 2)/2,
-													sampletime,
+		Gv = new SimpleMatrix(3,1,true,	Math.pow(sampletime, 4)/4,
+										Math.pow(sampletime, 3)/2,
 														1);
 		
 		Q = new SimpleMatrix(1,1,true,lambdaxdot);
@@ -46,7 +56,10 @@ public class Kalmanfilter_endast_gps {
 	
 	
 	
-	// Update x according to new observations. 
+	/** Update x according to new GPS measurement and returns the calculated states position and velocity. 
+	 * @param observation
+	 * @return
+	 */
 	public double[] gpsmeasurementupdate(double observation){	
 	    // Transform observation to matrix
         this.z1 = new SimpleMatrix(1,1,true,observation);
@@ -69,7 +82,7 @@ public class Kalmanfilter_endast_gps {
         //x.print();
         // P = (I-kH)P = P - KHP
         this.P = P.minus(K.mult(HP));
-        this.P = P.mult(P.transpose()).divide(2);
+        this.P = (P.plus(P.transpose())).scale(.5);;
         states = new double[]{x.get(0),x.get(1)};
         return states;
 	    }
@@ -77,7 +90,10 @@ public class Kalmanfilter_endast_gps {
 	
 	
 	
-	// Update x by time.	
+	/** Update x by time and current velocity measurements. Returns calculated states.
+	 * @param observation
+	 * @return
+	 */
 	public double[] timeupdate(double observation){
 		
 		// Transform observation to matrix
@@ -87,14 +103,16 @@ public class Kalmanfilter_endast_gps {
 		// P = F P F' + Gv Q Gv'
 		//x.print();
 		this.P = F.mult(P.mult(F.transpose())).plus(Gv.mult(Q.mult(Gv.transpose())));
-		this.P = P.mult(P.transpose()).divide(2);
+		this.P = (P.plus(P.transpose())).scale(.5);;
         states = new double[]{x.get(0),x.get(1)};
         return states;
 	}
 	
 	
 	
-	
+	/**
+	 * Print out current matrixes.
+	 */
 	public void print(){
 	    // Construct all matrices 	
 		F.print(); 
