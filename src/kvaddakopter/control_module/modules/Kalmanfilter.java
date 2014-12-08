@@ -9,7 +9,7 @@ import org.ejml.simple.SimpleMatrix;
  */
 
 
-public class Kalmanfilter_endast_gps {
+public class Kalmanfilter {
 	protected SimpleMatrix F,Gu,Gv,Q,H,P,K,S,R,HP,error,z1,z2,x;
 	protected double[] states;	
 	/** Construct all matrices from sampletime, variances and initial conditions,.
@@ -20,7 +20,7 @@ public class Kalmanfilter_endast_gps {
 	 * @param initialx
 	 * @param initialxdot
 	 */
-	public Kalmanfilter_endast_gps(double sampletime,double lambdaxdot,double lambday,
+	public Kalmanfilter(double sampletime,double lambdaxdot,double lambday,
 						double initialx, double initialxdot){		
 	    // Construct all matrices
 		F = new SimpleMatrix(3,3,true,		1.0,	(sampletime),	0.0,

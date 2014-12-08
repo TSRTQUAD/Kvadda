@@ -188,7 +188,7 @@ public class Controller{
 	 * @return
 	 */
 	public boolean landinginitiated(){
-		return landing;
+		return this.landing;
 	}
 	
 	/**

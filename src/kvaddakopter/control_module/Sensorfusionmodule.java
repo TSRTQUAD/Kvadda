@@ -64,7 +64,6 @@ public class Sensorfusionmodule implements Runnable{
 	// Parameters
 	protected double 				sampletime			= 0.05; 	// in seconds
 	protected boolean				debugmode			= true;		// Toggle System out prints 
-	protected int					whichkalman			= 0; 		// 0 for 1xY  			1 for 2xY   //REMOVE??
 
 	//Signal objects
 	protected SensorData 			sdata				= new SensorData();
@@ -80,10 +79,8 @@ public class Sensorfusionmodule implements Runnable{
 	protected DataSaver				datasaver			= new DataSaver(2,"states");
 	
 	//Modules
-	protected KalmanFilter			skalmanx 			= new KalmanFilter(sampletime,1,0.01,1,0,0); //REMOVE??
-	protected KalmanFilter			skalmany	 		= new KalmanFilter(sampletime,1,0.01,1,0,0); //REMOVE??
-	protected Kalmanfilter_endast_gps			skalmanxx 			= new Kalmanfilter_endast_gps(sampletime,1,0.01,0,0);
-	protected Kalmanfilter_endast_gps			skalmanyy	 		= new Kalmanfilter_endast_gps(sampletime,1,0.01,0,0);	
+	protected Kalmanfilter			kalmanx 			= new Kalmanfilter(sampletime,1,0.01,0,0);
+	protected Kalmanfilter			kalmany	 			= new Kalmanfilter(sampletime,1,0.01,0,0);	
 	protected Controller			controller			= new Controller(sampletime);
 
 	//Other variables		
@@ -205,27 +202,9 @@ public class Sensorfusionmodule implements Runnable{
 				sdata.xydot2XYdot();										//Transformation
 
 			
-				//SENSORFUSION  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-				if (1 ==  whichkalman){
-					rsdata.setXstates(skalmanx.timeupdate()); 							//Kalman filter in X direction
-					rsdata.setYstates(skalmany.timeupdate()); 							//Kalman filter in Y direction
-					rsdata.setXstates(skalmanx.velmeasurementupdate(sdata.getXdot()));  //Kalman filter in X direction
-					rsdata.setYstates(skalmany.velmeasurementupdate(sdata.getYdot()));  //Kalman filter in Y direction
-					rsdata.XYdot2Vel();													//Transform Xdot,Ydot to velocities
-					rsdata.s2rs(sdata);
-					//For every new GPS measurement-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-					if(sdata.isGPSnew() )
-					{	
-						rsdata.setXstates(skalmanx.gpsmeasurementupdate(sdata.getX()));	// Measurement update in kalmanfilter
-						rsdata.setYstates(skalmany.gpsmeasurementupdate(sdata.getY()));	// Measurement update in kalmanfilter
-						rsdata.XYdot2Vel();												// Transform Xdot,Ydot to velocities								
-					}
-				}
-				
-				//SENSORFUSION  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
-				if (0 ==  whichkalman){					
-					rsdata.setXstates(skalmanxx.timeupdate(sdata.getXdot())); 							//Kalman filter in X direction
-					rsdata.setYstates(skalmanyy.timeupdate(sdata.getYdot())); 							//Kalman filter in Y direction
+				//SENSORFUSION  -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-				
+					rsdata.setXstates(kalmanx.timeupdate(sdata.getXdot())); 							//Kalman filter in X direction
+					rsdata.setYstates(kalmany.timeupdate(sdata.getYdot())); 							//Kalman filter in Y direction
 					rsdata.setYaw(sdata.getYaw());														// Set Yaw
 					rsdata.setHeight(sdata.getHeight());												// Set Height
 					rsdata.XYdot2Vel();																	//Transform Xdot,Ydot to velocities
@@ -233,11 +212,10 @@ public class Sensorfusionmodule implements Runnable{
 					//For every new GPS measurement-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 					if(sdata.isGPSnew() )
 					{	
-						rsdata.setXstates(skalmanxx.gpsmeasurementupdate(sdata.getX()));	// Measurement update in kalmanfilter
-						rsdata.setYstates(skalmanyy.gpsmeasurementupdate(sdata.getY()));	// Measurement update in kalmanfilter
+						rsdata.setXstates(kalmanx.gpsmeasurementupdate(sdata.getX()));	// Measurement update in kalmanfilter
+						rsdata.setYstates(kalmany.gpsmeasurementupdate(sdata.getY()));	// Measurement update in kalmanfilter
 						rsdata.XYdot2Vel();													//Transform Xdot,Ydot to velocities								
-					}		
-				}						
+					}								
 
 				//Save data-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 				datasaver.adddata(new double[]{rsdata.getXpos(),rsdata.getYpos()});				
@@ -279,6 +257,7 @@ public class Sensorfusionmodule implements Runnable{
 			
 				//Save data to matfile when landed -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
 			datasaver.savedata();
+			
 		}
 	}
 }

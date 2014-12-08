@@ -14,7 +14,7 @@ import kvaddakopter.assignment_planer.MatFileHandler;
 public class DataSaver {
 int numberofstates;
 ArrayList<double[]> states = new ArrayList<double[]>();
-Date currentdate = new Date();
+
 String name;
 protected MatFileHandler		saver				= new MatFileHandler();
 
@@ -34,8 +34,9 @@ public void adddata(double[] inputstates){
 /**
  * Saves collected data under the name specified in constructor.
  */
-public void savedata(){	
-		double[][] statesarray = new double[states.size()][numberofstates];
+public void savedata(){		
+	Date currentdate = new Date();
+	double[][] statesarray = new double[states.size()][numberofstates];
 		int counter = 0;
 		for (double[] row:states){			
 			statesarray[counter] = row;
@@ -51,7 +52,8 @@ public void savedata(){
 														String.valueOf(currentdate.getMonth()+1) + "_" + 
 														String.valueOf(currentdate.getDate()) + "_" + 
 														String.valueOf(currentdate.getHours()) + "_" + 
-														String.valueOf(currentdate.getMinutes())) 			);
+														String.valueOf(currentdate.getMinutes())) + "_"	+
+														String.valueOf(currentdate.getSeconds()));
 					saver.createMatFileFromFlightData(finalname, statesarray);
 					System.out.println("FlightData has been saved");
 				} catch (IOException e) {
