@@ -6,6 +6,11 @@ import matlabcontrol.MatlabConnectionException;
 import matlabcontrol.MatlabInvocationException;
 import kvaddakopter.interfaces.AssignmentPlanerInterface;
 
+/**
+ * The runnable file for the Assigmentplaner.
+ * @author tobiashammarling
+ *
+ */
 public class AssignmentPlanerRunnable implements Runnable {
 
 	private AssignmentPlanerInterface mainbus;
@@ -13,14 +18,23 @@ public class AssignmentPlanerRunnable implements Runnable {
 	private CalculateTrajectory calculatetrajectory;
 	private MissionObject missionobject;
 
+	/**
+	 * Constructor for the AssignmentPlanerRunnable. The input parameter MB should fulfill <br>
+	 * the AssignmentPlanerInterface conditions.
+	 * @param threadid
+	 * @param MB
+	 */
 	public AssignmentPlanerRunnable(int threadid, AssignmentPlanerInterface MB) {
 		mainbus = MB;
 		// mThreadId = threadid;
 	}
 
+	/**
+	 * Runs continuously when the module is started.
+	 */
 	public void run() {
 		while (true) {
-			//Wait for GUI to start AssignmentPlaner
+			//Wait for GUI to start the AssignmentPlaner
 			waitOnCondVar();
 
 			System.out.println("Assignmentplaner running ...");
@@ -49,6 +63,10 @@ public class AssignmentPlanerRunnable implements Runnable {
 
 	}
 
+	/**
+	 * Puts the module in hold until it's called from the GUI. Activation is handled with <br>
+	 * the conditional variable isAssigmentPlanerOn.
+	 */
 	public void waitOnCondVar(){
 		while (!mainbus.isAssignmentPlanerOn()) {
 			System.out.println("AssignmentPlaner waiting on conditional variable from from GUI");
@@ -62,6 +80,10 @@ public class AssignmentPlanerRunnable implements Runnable {
 		}
 	}
 
+	/**
+	 * Resets the conditional variable used by the GUI and AssignmentPlanerRunnable to notify <br>
+	 * each other if the assignmentplaner is activated or not.
+	 */
 	public void resetCondVar(){
 		mainbus.setAssignmentPlanerOn(false);
 		synchronized(mainbus){

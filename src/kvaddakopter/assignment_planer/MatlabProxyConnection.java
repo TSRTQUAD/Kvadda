@@ -1,13 +1,5 @@
 package kvaddakopter.assignment_planer;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import sun.misc.IOUtils;
 import matlabcontrol.MatlabConnectionException;
 import matlabcontrol.MatlabInvocationException;
 import matlabcontrol.MatlabProxy;
@@ -25,7 +17,8 @@ public class MatlabProxyConnection {
 
 	/**
 	 * Starts the Matlab Proxy Server, if to be running in the background. Set option to <br>
-	 * "quiet". To try connect with an existing proxy set option to "existing".
+	 * "quiet". To try connect with an existing proxy set option to "existing". Otherwise <br>
+	 * the session will be started in regular mode. The default setting is in quiet mode.
 	 * @param option
 	 * @throws MatlabConnectionException
 	 */
@@ -45,7 +38,6 @@ public class MatlabProxyConnection {
 			try {
 				this.proxy = factory.getProxy();
 			} catch (MatlabConnectionException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -61,7 +53,6 @@ public class MatlabProxyConnection {
 			try {
 				this.proxy = factory.getProxy();
 			} catch (MatlabConnectionException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -73,7 +64,6 @@ public class MatlabProxyConnection {
 			try {
 				this.proxy = factory.getProxy();
 			} catch (MatlabConnectionException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -83,7 +73,6 @@ public class MatlabProxyConnection {
 			proxy.eval("cd('" + System.getProperty("user.dir") + 
 					"/src/kvaddakopter/assignment_planer/Matlab')");
 		} catch (MatlabInvocationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -101,7 +90,7 @@ public class MatlabProxyConnection {
 	}
 
 	/**
-	 * Returns the proxy.
+	 * Returns the current proxy.
 	 * @return
 	 */
 	public MatlabProxy getMatlabProxy() {

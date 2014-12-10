@@ -101,7 +101,6 @@ public double[] updatetest(){
 
 
 public int getCounter() {
-	// TODO Auto-generated method stub
 	return this.counter;
 }
 

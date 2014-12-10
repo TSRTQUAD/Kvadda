@@ -15,7 +15,7 @@ public class MatFileHandler {
 	}
 	
 	/**
-	 * Creates a Mat-file to be loaded in Matlab by the Matlabscript. All values are obtained <br>
+	 * Creates a Mat-file to be loaded in Matlab by the Matlab script. All values are obtained <br>
 	 * from the input classvariable missionobject.
 	 * @param missionobject
 	 * @throws IOException
@@ -189,6 +189,14 @@ public class MatFileHandler {
 		return missionobject;
 	}
 	
+	/**
+	 * This function is called from the Sensorfusionmodule to save the current flight data to file. <br>
+	 * The name should be specified as current date and time. The created Mat-file will be put in <br>
+	 * the root directory.
+	 * @param name
+	 * @param data
+	 * @throws IOException
+	 */
 	public void createMatFileFromFlightData(String name, double[][] data) throws IOException {
 		MLDouble datatowrite = new MLDouble(name, data);
 		ArrayList<MLArray> list = new ArrayList<MLArray>();

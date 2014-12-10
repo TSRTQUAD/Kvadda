@@ -17,7 +17,7 @@ public interface AssignmentPlanerInterface {
 	public MissionObject getMissionObject();
 	
 	/**
-	 * Starts AssignmentPlaner
+	 * Activates the AssignmentPlaner
 	 */
 	public void setAssignmentPlanerOn(boolean state);
 	

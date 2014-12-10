@@ -1,6 +1,5 @@
 package kvaddakopter.assignment_planer;
 
-import kvaddakopter.interfaces.AssignmentPlanerInterface;
 import matlabcontrol.MatlabConnectionException;
 import matlabcontrol.MatlabInvocationException;
 import matlabcontrol.MatlabProxy;
@@ -13,7 +12,9 @@ import matlabcontrol.MatlabProxy;
 public class CalculateTrajectory {
 
 	/**
-	 * Calls the Matlabscript, the output is saved in a Mat-file called results.mat.
+	 * Calls the Matlab script, the output is saved in a Mat-file called results.mat. The call <br>
+	 * presumes that an object file i.e. object.mat have already been created and put in the Data <br>
+	 * directory. This should be taken care of by the AssignmentPlanerRunnable.
 	 * @throws MatlabConnectionException
 	 * @throws MatlabInvocationException
 	 */
