@@ -2,6 +2,11 @@ package kvaddakopter.image_processing.data_types;
 
 import java.util.ArrayList;
 
+/**
+ * The Identifier class stores identification information about a target with information from
+ * the different detection methods.
+ *
+ */
 public class Identifier {
 	// From ColorDetection
 	float[] meanHSVValues; // {mean hue, mean saturation, mean value}
@@ -12,6 +17,10 @@ public class Identifier {
 	float percentageMatches;  // Number of matches for templateID divided by total possible mathes for that template.
 
 	
+	/**
+	 * Constructor which takes mean HSV values as identifier.
+	 * @param targetHSVChannels
+	 */
 	public Identifier(ArrayList<Long> targetHSVChannels){
 		meanHSVValues = new float[3];
 		meanHSVValuesCertainty = 0.7f;
@@ -24,6 +33,11 @@ public class Identifier {
 		}
 	}
 	
+	/**
+	 * Constructor which takes template matching information and 
+	 * @param newID
+	 * @param newPercentageMatches
+	 */
 	public Identifier(int newID, float newPercentageMatches){
 		meanHSVValues = new float[3];
 		meanHSVValuesCertainty = 0.7f;
@@ -31,6 +45,12 @@ public class Identifier {
 		percentageMatches = newPercentageMatches;
 	}
 	
+	/**
+	 * Compares two identifiers and returns the estimated probability that the identifiers are from the same target.
+	 * @param first
+	 * @param second
+	 * @return
+	 */
 	public static float compare(Identifier first, Identifier second){
 		
 		float certaintyFromColorDetection = 0;
@@ -83,6 +103,10 @@ public class Identifier {
 				(colorDetectionPower + templateMatchingPower);
 	}
 	
+	/**
+	 * Adapts an identifier towards a new identifier.
+	 * @param newMeasured The identifier to adapt to.
+	 */
 	public void update(Identifier newMeasured){
 		float timeConstant = 10;
 		
@@ -104,6 +128,11 @@ public class Identifier {
 		}
 	}
 	
+	/**
+	 * Sets certainty that the mean HSV values are the correct ones.
+	 * @param val certainty
+	 * @return
+	 */
 	public Identifier setmeanHSVValuesCertainty(float val){
 		meanHSVValuesCertainty = val;
 		return this;
