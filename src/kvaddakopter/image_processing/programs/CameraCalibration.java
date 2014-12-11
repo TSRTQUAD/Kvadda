@@ -21,7 +21,7 @@ import org.opencv.core.TermCriteria;
 import org.opencv.highgui.Highgui;
 import org.opencv.imgproc.Imgproc;
 /**
- * @see<a href="http://docs.opencv.org/trunk/doc/py_tutorials/py_calib3d/py_calibration/py_calibration.html#calibration">Lé camerat calibracíon
+ * @see<a href="http://docs.opencv.org/trunk/doc/py_tutorials/py_calib3d/py_calibration/py_calibration.html#calibration">
  */
 public class CameraCalibration extends ProgramClass{
 
